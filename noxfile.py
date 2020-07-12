@@ -13,7 +13,7 @@ from nox.sessions import Session
 
 
 package = "cutty"
-python_versions = ["3.8", "3.7", "3.6"]
+python_versions = ["3.8", "3.7"]
 nox.options.sessions = "pre-commit", "safety", "mypy", "tests", "typeguard"
 
 
