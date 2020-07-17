@@ -1,4 +1,5 @@
 """Create a project."""
+import logging
 from typing import Tuple
 
 from cookiecutter.config import get_user_config
@@ -11,6 +12,9 @@ from .. import cache
 from .. import tags
 
 
+logger = logging.getLogger(__name__)
+
+
 def create(template: str, extra_context: Tuple[str, ...]) -> None:
     """Create a project from a Cookiecutter template."""
     config = get_user_config()
@@ -21,6 +25,9 @@ def create(template: str, extra_context: Tuple[str, ...]) -> None:
     tag = tags.find_latest(repository)
     with cache.worktree(template, tag) as worktree:
         context_file = worktree.path / "cookiecutter.json"
+
+        logger.debug("context_file is %s", context_file)
+
         context = generate_context(
             context_file=context_file,
             default_context=config["default_context"],
