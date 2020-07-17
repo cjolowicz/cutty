@@ -1,10 +1,22 @@
 """Command-line interface."""
+from typing import cast
 from typing import Tuple
 
 import click
-from cookiecutter.cli import validate_extra_context
+from cookiecutter import cli
 
 from .core import create
+
+
+def validate_extra_context(
+    context: click.Context, parameter: click.Parameter, value: Tuple[str]
+) -> Tuple[str]:
+    """Validate extra_context command-line argument.
+
+    This is a simple wrapper used to simplify the return type.
+    """
+    result = cli.validate_extra_context(context, parameter, value)
+    return cast(Tuple[str], () if result is None else result)
 
 
 @click.command()
