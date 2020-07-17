@@ -5,7 +5,7 @@ from .create.console import create
 
 
 @click.group()
-@click.version_option()
+@click.version_option(None, "-V", "--version")
 def main() -> None:
     """Cutty."""
 
