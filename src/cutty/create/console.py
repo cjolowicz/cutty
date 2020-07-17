@@ -14,7 +14,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 
     This is a simple wrapper used to simplify the return type.
     """
-    if len(args) != 3:
+    if len(args) != 3:  # pragma: no cover
         # Typeguard confuses click < 8.0 because click inspects `__code__` to
         # determine the number of arguments to pass, and Typeguard's wrapper
         # has an argument count of zero due to the use of `*args`.
