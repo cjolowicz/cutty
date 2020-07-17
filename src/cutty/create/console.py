@@ -1,13 +1,35 @@
 """Command-line interface."""
+import json
+from textwrap import dedent
 from typing import Any
 from typing import cast
 from typing import Tuple
 
 import click
 from cookiecutter import cli
+from cookiecutter import exceptions
 from cookiecutter.log import configure_logger
 
 from . import core
+
+
+errors = (
+    exceptions.OutputDirExistsException,
+    exceptions.FailedHookException,
+    exceptions.UnknownExtension,
+)
+
+
+def format_undefined_variable_error(
+    error: exceptions.UndefinedVariableInTemplate,
+) -> str:
+    """Provide some more detail when encountering undefined template variables."""
+    context = json.dumps(error.context, indent=2, sort_keys=True)
+    message = f"""\
+    {error.message}
+    Error message: {error.error.message}
+    Context: {context}"""
+    return dedent(message)
 
 
 def validate_extra_context(*args: Any) -> Tuple[str, ...]:
@@ -31,4 +53,11 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 def create(template: str, extra_context: Tuple[str, ...]) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="INFO")
-    core.create(template, extra_context)
+
+    try:
+        core.create(template, extra_context)
+    except errors as error:
+        raise click.ClickException(str(error))
+    except exceptions.UndefinedVariableInTemplate as error:
+        message = format_undefined_variable_error(error)
+        raise click.ClickException(message)
