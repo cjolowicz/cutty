@@ -11,7 +11,7 @@ from .. import cache
 from .. import tags
 
 
-def create(template: str, extra_context: Tuple[str]) -> None:
+def create(template: str, extra_context: Tuple[str, ...]) -> None:
     """Create a project from a Cookiecutter template."""
     config = get_user_config()
     template = expand_abbreviations(
