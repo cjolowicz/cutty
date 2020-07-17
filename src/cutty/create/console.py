@@ -24,7 +24,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     return cast(Tuple[str], () if result is None else result)
 
 
-@click.command()
+@click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("template")
 @click.argument("extra_context", nargs=-1, callback=validate_extra_context)
 def create(template: str, extra_context: Tuple[str, ...]) -> None:
