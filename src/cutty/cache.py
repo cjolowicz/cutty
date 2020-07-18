@@ -3,6 +3,7 @@ import contextlib
 import hashlib
 from pathlib import Path
 from typing import Iterator
+from typing import Optional
 
 import appdirs
 
@@ -12,6 +13,13 @@ from . import git
 appname = "cutty"
 path = Path(appdirs.user_cache_dir(appname=appname, appauthor=appname))
 repositories = path / "repositories"
+
+
+def get_repository_hash(location: str, *, directory: Optional[Path] = None) -> str:
+    """Return a unique hash for the template."""
+    return _get_repository_hash(
+        location if directory is None else "/".join((location, *directory.parts))
+    )
 
 
 def _get_repository_hash(location: str) -> str:

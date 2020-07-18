@@ -71,6 +71,11 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     "-v", "--verbose", is_flag=True, help="Print debug information", default=False
 )
 @click.option(
+    "--replay",
+    is_flag=True,
+    help="Do not prompt for parameters and only use information entered previously",
+)
+@click.option(
     "--config-file", type=click.Path(), default=None, help="User configuration file"
 )
 def create(
@@ -80,6 +85,7 @@ def create(
     checkout: Optional[str],
     directory: Optional[str],
     verbose: bool,
+    replay: bool,
     config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
@@ -92,6 +98,7 @@ def create(
             no_input=no_input,
             checkout=checkout,
             directory=directory,
+            replay=replay,
             config_file=config_file,
         )
     except errors as error:
