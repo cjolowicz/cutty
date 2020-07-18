@@ -54,6 +54,7 @@ def create(
     directory: Optional[str],
     replay: bool,
     overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
     config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
@@ -94,4 +95,5 @@ def create(
             repo_dir=str(repo_dir),
             context=context,
             overwrite_if_exists=overwrite_if_exists,
+            skip_if_file_exists=skip_if_file_exists,
         )

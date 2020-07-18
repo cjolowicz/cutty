@@ -83,6 +83,13 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     help="Overwrite the contents of the output directory if it already exists",
 )
 @click.option(
+    "-s",
+    "--skip-if-file-exists",
+    is_flag=True,
+    help="Skip the files in the corresponding directories if they already exist",
+    default=False,
+)
+@click.option(
     "--config-file", type=click.Path(), default=None, help="User configuration file"
 )
 def create(
@@ -94,6 +101,7 @@ def create(
     verbose: bool,
     replay: bool,
     overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
     config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
@@ -108,6 +116,7 @@ def create(
             directory=directory,
             replay=replay,
             overwrite_if_exists=overwrite_if_exists,
+            skip_if_file_exists=skip_if_file_exists,
             config_file=config_file,
         )
     except errors as error:
