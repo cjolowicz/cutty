@@ -1,6 +1,9 @@
 """Create a project."""
 import logging
 from pathlib import Path
+from typing import Any
+from typing import cast
+from typing import Mapping
 from typing import Optional
 from typing import Tuple
 
@@ -18,6 +21,28 @@ from .. import tags
 
 
 logger = logging.getLogger(__name__)
+StrMapping = Mapping[str, Any]
+
+
+def _create_context(
+    context_file: Path,
+    *,
+    template: str,
+    extra_context: Tuple[str, ...],
+    no_input: bool,
+    config: StrMapping,
+) -> StrMapping:
+    logger.debug("context_file is %s", context_file)
+
+    context = generate_context(
+        context_file=context_file,
+        default_context=config["default_context"],
+        extra_context=extra_context,
+    )
+    context["cookiecutter"] = prompt_for_config(context, no_input)
+    context["cookiecutter"]["_template"] = template
+
+    return cast(StrMapping, context)
 
 
 def create(
@@ -55,17 +80,13 @@ def create(
             context = load(config["replay_dir"], repo_hash)
         else:
             context_file = repo_dir / "cookiecutter.json"
-
-            logger.debug("context_file is %s", context_file)
-
-            context = generate_context(
-                context_file=context_file,
-                default_context=config["default_context"],
+            context = _create_context(
+                context_file,
+                template=template,
                 extra_context=extra_context,
+                no_input=no_input,
+                config=config,
             )
-            context["cookiecutter"] = prompt_for_config(context, no_input)
-            context["cookiecutter"]["_template"] = template
-
             dump(config["replay_dir"], repo_hash, context)
 
         generate_files(repo_dir=str(repo_dir), context=context)
