@@ -1,5 +1,6 @@
 """Create a project."""
 import logging
+from typing import Optional
 from typing import Tuple
 
 from cookiecutter.config import get_user_config
@@ -15,15 +16,21 @@ from .. import tags
 logger = logging.getLogger(__name__)
 
 
-def create(template: str, extra_context: Tuple[str, ...], *, no_input: bool) -> None:
+def create(
+    template: str,
+    extra_context: Tuple[str, ...],
+    *,
+    no_input: bool,
+    checkout: Optional[str]
+) -> None:
     """Create a project from a Cookiecutter template."""
     config = get_user_config()
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
     repository = cache.repository(template)
-    tag = tags.find_latest(repository)
-    with cache.worktree(template, tag) as worktree:
+    ref = checkout if checkout is not None else tags.find_latest(repository)
+    with cache.worktree(template, ref) as worktree:
         context_file = worktree.path / "cookiecutter.json"
 
         logger.debug("context_file is %s", context_file)
