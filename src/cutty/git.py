@@ -22,9 +22,13 @@ class Error(Exception):
 def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
     """Invoke git."""
     try:
-        return subprocess.run(["git", *args], check=check, **kwargs)  # noqa: S603,S607
+        return subprocess.run(  # noqa: S603,S607
+            ["git", *args], check=check, stderr=subprocess.PIPE, text=True, **kwargs
+        )
     except subprocess.CalledProcessError as error:
-        raise Error() from error
+        command = " ".join(error.cmd[:2])
+        message = error.stderr if error.stderr else f"error ({error.returncode})"
+        raise Error(f"{command}: {message}") from error
 
 
 def _format_boolean_options(**kwargs: bool) -> List[str]:
@@ -55,8 +59,7 @@ class Repository:
             "for-each-ref",
             "--format=%(refname:short)",
             "refs/tags",
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
         )
         return process.stdout.split()
 
@@ -75,6 +78,6 @@ class Repository:
     def rev_parse(self, rev: str) -> str:
         """Return the SHA1 hash for the given revision."""
         process = self.git(
-            "rev-parse", "--verify", "--quiet", rev, capture_output=True, text=True,
+            "rev-parse", "--verify", "--quiet", rev, stdout=subprocess.PIPE
         )
         return process.stdout.strip()
