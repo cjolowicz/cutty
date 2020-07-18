@@ -15,7 +15,7 @@ from .. import tags
 logger = logging.getLogger(__name__)
 
 
-def create(template: str, extra_context: Tuple[str, ...]) -> None:
+def create(template: str, extra_context: Tuple[str, ...], *, no_input: bool) -> None:
     """Create a project from a Cookiecutter template."""
     config = get_user_config()
     template = expand_abbreviations(
@@ -33,6 +33,6 @@ def create(template: str, extra_context: Tuple[str, ...]) -> None:
             default_context=config["default_context"],
             extra_context=extra_context,
         )
-        context["cookiecutter"] = prompt_for_config(context)
+        context["cookiecutter"] = prompt_for_config(context, no_input)
         context["cookiecutter"]["_template"] = template
         generate_files(repo_dir=str(worktree.path), context=context)
