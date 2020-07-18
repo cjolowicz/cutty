@@ -90,6 +90,13 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     default=False,
 )
 @click.option(
+    "-o",
+    "--output-dir",
+    default=".",
+    type=click.Path(),
+    help="Where to output the generated project dir into",
+)
+@click.option(
     "--config-file", type=click.Path(), default=None, help="User configuration file"
 )
 def create(
@@ -102,6 +109,7 @@ def create(
     replay: bool,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
+    output_dir: str,
     config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
@@ -117,6 +125,7 @@ def create(
             replay=replay,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
+            output_dir=output_dir,
             config_file=config_file,
         )
     except errors as error:
