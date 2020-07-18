@@ -58,3 +58,39 @@ def test_create(
         create, [str(template.path)], input="example", catch_exceptions=False
     )
     assert result.exit_code == 0
+
+
+def _replace(path: Path, old: str, new: str) -> None:
+    text = path.read_text()
+    text = text.replace(old, new)
+    path.write_text(text)
+
+
+def test_undefined_variable(
+    runner: CliRunner, user_cache_dir: Path, template: git.Repository
+) -> None:
+    """It displays an informative error message if a variable is undefined."""
+    _replace(template.path / "cookiecutter.json", "project", "XXproject")
+
+    template.git("add", ".")
+    template.git("commit", "--message=Typo")
+    template.git("tag", "v1.0.1")
+
+    result = runner.invoke(
+        create, [str(template.path)], input="example", catch_exceptions=False
+    )
+
+    assert "has no attribute 'project'" in result.output
+
+
+def test_output_directory_exists(
+    runner: CliRunner, user_cache_dir: Path, template: git.Repository
+) -> None:
+    """It displays an informative error message if the output directory exists."""
+    Path("example").mkdir()
+
+    result = runner.invoke(
+        create, [str(template.path)], input="example", catch_exceptions=False
+    )
+
+    assert "already exists" in result.output
