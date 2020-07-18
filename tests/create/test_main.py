@@ -1,4 +1,5 @@
 """Test cases for the console module."""
+import shutil
 from pathlib import Path
 from textwrap import dedent
 from typing import Iterator
@@ -51,11 +52,21 @@ def template(repository: git.Repository) -> git.Repository:
 
 
 @pytest.fixture
-def user_config_file(tmp_path: Path) -> Path:
+def cookiecutters_dir(tmp_path: Path) -> Path:
+    """A temporary directory for cookiecutters."""
+    return tmp_path / "cookiecutters_dir"
+
+
+@pytest.fixture
+def replay_dir(tmp_path: Path) -> Path:
+    """A temporary directory for replay data."""
+    return tmp_path / "replay_dir"
+
+
+@pytest.fixture
+def user_config_file(tmp_path: Path, cookiecutters_dir: Path, replay_dir: Path) -> Path:
     """Configure cookiecutter to write to temporary directories."""
     path = tmp_path / ".cookiecutterrc"
-    cookiecutters_dir = tmp_path / "cookiecutters_dir"
-    replay_dir = tmp_path / "replay_dir"
     config = f"""\
     cookiecutters_dir: {cookiecutters_dir}
     replay_dir: {replay_dir}
@@ -152,3 +163,54 @@ def test_checkout(
     )
 
     assert (Path("example") / "README.md").read_text().startswith("## ")
+
+
+def test_replay_dump(
+    runner: CliRunner,
+    user_cache_dir: Path,
+    user_config_file: Path,
+    replay_dir: Path,
+    template: git.Repository,
+) -> None:
+    """It dumps the context."""
+    runner.invoke(
+        create,
+        [str(template.path), f"--config-file={user_config_file}"],
+        input="example",
+        catch_exceptions=False,
+    )
+    assert replay_dir.exists()
+
+
+def test_replay_load(
+    runner: CliRunner,
+    user_cache_dir: Path,
+    user_config_file: Path,
+    replay_dir: Path,
+    template: git.Repository,
+) -> None:
+    """It loads the context."""
+    project = Path("replay-example")
+
+    runner.invoke(
+        create,
+        [str(template.path), f"--config-file={user_config_file}"],
+        input=project.name,
+        catch_exceptions=False,
+    )
+
+    shutil.rmtree(project)
+
+    runner.invoke(
+        create,
+        [str(template.path), f"--config-file={user_config_file}", "--replay"],
+        catch_exceptions=False,
+    )
+
+    assert project.exists()
+
+
+def test_replay_with_no_input(runner: CliRunner, template: git.Repository) -> None:
+    """It fails when passed --replay and --no-input."""
+    result = runner.invoke(create, [str(template.path), "--replay", "--no-input"])
+    assert result.exit_code == 1 and "replay" in result.output
