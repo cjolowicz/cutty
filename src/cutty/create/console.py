@@ -16,8 +16,9 @@ from . import core
 
 
 errors = (
-    exceptions.OutputDirExistsException,
     exceptions.FailedHookException,
+    exceptions.InvalidModeException,
+    exceptions.OutputDirExistsException,
     exceptions.UnknownExtension,
 )
 
