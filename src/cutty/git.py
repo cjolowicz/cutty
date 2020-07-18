@@ -15,9 +15,16 @@ else:
     CompletedProcess = subprocess.CompletedProcess
 
 
+class Error(Exception):
+    """Git error."""
+
+
 def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
     """Invoke git."""
-    return subprocess.run(["git", *args], check=check, **kwargs)  # noqa: S603,S607
+    try:
+        return subprocess.run(["git", *args], check=check, **kwargs)  # noqa: S603,S607
+    except subprocess.CalledProcessError as error:
+        raise Error() from error
 
 
 def _format_boolean_options(**kwargs: bool) -> List[str]:

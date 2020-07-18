@@ -13,6 +13,7 @@ from cookiecutter import exceptions
 from cookiecutter.log import configure_logger
 
 from . import core
+from .. import git
 
 
 errors = (
@@ -20,6 +21,7 @@ errors = (
     exceptions.InvalidModeException,
     exceptions.OutputDirExistsException,
     exceptions.UnknownExtension,
+    git.Error,
 )
 
 
