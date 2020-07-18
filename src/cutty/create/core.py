@@ -1,5 +1,6 @@
 """Create a project."""
 import logging
+from pathlib import Path
 from typing import Optional
 from typing import Tuple
 
@@ -21,7 +22,8 @@ def create(
     extra_context: Tuple[str, ...],
     *,
     no_input: bool,
-    checkout: Optional[str]
+    checkout: Optional[str],
+    directory: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
     config = get_user_config()
@@ -31,7 +33,10 @@ def create(
     repository = cache.repository(template)
     ref = checkout if checkout is not None else tags.find_latest(repository)
     with cache.worktree(template, ref) as worktree:
-        context_file = worktree.path / "cookiecutter.json"
+        repo_dir = (
+            worktree.path if directory is None else worktree.path / Path(directory)
+        )
+        context_file = repo_dir / "cookiecutter.json"
 
         logger.debug("context_file is %s", context_file)
 
@@ -42,4 +47,4 @@ def create(
         )
         context["cookiecutter"] = prompt_for_config(context, no_input)
         context["cookiecutter"]["_template"] = template
-        generate_files(repo_dir=str(worktree.path), context=context)
+        generate_files(repo_dir=str(repo_dir), context=context)

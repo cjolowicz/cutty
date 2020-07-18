@@ -60,17 +60,31 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.option(
     "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
 )
+@click.option(
+    "--directory",
+    help=(
+        "Directory within repo that holds cookiecutter.json file "
+        "for advanced repositories with multi templates in it"
+    ),
+)
 def create(
     template: str,
     extra_context: Tuple[str, ...],
     no_input: bool,
     checkout: Optional[str],
+    directory: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="INFO")
 
     try:
-        core.create(template, extra_context, no_input=no_input, checkout=checkout)
+        core.create(
+            template,
+            extra_context,
+            no_input=no_input,
+            checkout=checkout,
+            directory=directory,
+        )
     except errors as error:
         sys.exit(str(error))
     except exceptions.UndefinedVariableInTemplate as error:
