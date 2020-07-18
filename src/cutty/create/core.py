@@ -57,6 +57,7 @@ def create(
     skip_if_file_exists: bool,
     output_dir: str,
     config_file: Optional[str],
+    default_config: bool,
 ) -> None:
     """Create a project from a Cookiecutter template."""
     if replay and (no_input or extra_context):
@@ -65,7 +66,7 @@ def create(
             "at the same time."
         )
 
-    config = get_user_config(config_file=config_file)
+    config = get_user_config(config_file=config_file, default_config=default_config)
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )

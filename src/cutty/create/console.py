@@ -99,6 +99,11 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.option(
     "--config-file", type=click.Path(), default=None, help="User configuration file"
 )
+@click.option(
+    "--default-config",
+    is_flag=True,
+    help="Do not load a config file. Use the defaults instead",
+)
 def create(
     template: str,
     extra_context: Tuple[str, ...],
@@ -111,6 +116,7 @@ def create(
     skip_if_file_exists: bool,
     output_dir: str,
     config_file: Optional[str],
+    default_config: bool,
 ) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="DEBUG" if verbose else "INFO")
@@ -127,6 +133,7 @@ def create(
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
             config_file=config_file,
+            default_config=default_config,
         )
     except errors as error:
         sys.exit(str(error))
