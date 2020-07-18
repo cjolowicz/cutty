@@ -94,3 +94,26 @@ def test_output_directory_exists(
     )
 
     assert "already exists" in result.output
+
+
+def test_checkout(
+    runner: CliRunner, user_cache_dir: Path, template: git.Repository
+) -> None:
+    """It checks out the specified revision."""
+    _replace(
+        template.path / "{{cookiecutter.project}}" / "README.md",
+        "# {{cookiecutter.project}}",
+        "## {{cookiecutter.project}}",
+    )
+
+    template.git("add", ".")
+    template.git("commit", "--message=Style")
+
+    runner.invoke(
+        create,
+        [str(template.path), "--checkout=master"],
+        input="example",
+        catch_exceptions=False,
+    )
+
+    assert (Path("example") / "README.md").read_text().startswith("## ")
