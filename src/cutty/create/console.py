@@ -104,6 +104,12 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     is_flag=True,
     help="Do not load a config file. Use the defaults instead",
 )
+@click.option(
+    "--debug-file",
+    type=click.Path(),
+    default=None,
+    help="File to be used as a stream for DEBUG logging",
+)
 def create(
     template: str,
     extra_context: Tuple[str, ...],
@@ -117,9 +123,10 @@ def create(
     output_dir: str,
     config_file: Optional[str],
     default_config: bool,
+    debug_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    configure_logger(stream_level="DEBUG" if verbose else "INFO")
+    configure_logger(stream_level="DEBUG" if verbose else "INFO", debug_file=debug_file)
 
     try:
         core.create(
