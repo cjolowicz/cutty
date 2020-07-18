@@ -24,9 +24,10 @@ def create(
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],
+    config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    config = get_user_config()
+    config = get_user_config(config_file=config_file)
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
