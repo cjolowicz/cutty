@@ -67,15 +67,19 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
         "for advanced repositories with multi templates in it"
     ),
 )
+@click.option(
+    "-v", "--verbose", is_flag=True, help="Print debug information", default=False
+)
 def create(
     template: str,
     extra_context: Tuple[str, ...],
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],
+    verbose: bool,
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    configure_logger(stream_level="INFO")
+    configure_logger(stream_level="DEBUG" if verbose else "INFO")
 
     try:
         core.create(
