@@ -20,6 +20,7 @@ errors = (
     exceptions.FailedHookException,
     exceptions.InvalidModeException,
     exceptions.OutputDirExistsException,
+    exceptions.UndefinedVariableInTemplate,
     exceptions.UnknownExtension,
     git.Error,
 )
@@ -35,6 +36,13 @@ def format_undefined_variable_error(
     Error message: {error.error.message}
     Context: {context}"""
     return dedent(message)
+
+
+def format_error(error: Exception) -> str:
+    """Return the error message for the exception."""
+    if isinstance(error, exceptions.UndefinedVariableInTemplate):
+        return format_undefined_variable_error(error)
+    return str(error)
 
 
 def validate_extra_context(*args: Any) -> Tuple[str, ...]:
@@ -145,7 +153,5 @@ def create(
             default_config=default_config,
         )
     except errors as error:
-        sys.exit(str(error))
-    except exceptions.UndefinedVariableInTemplate as error:
-        message = format_undefined_variable_error(error)
+        message = format_error(error)
         sys.exit(message)
