@@ -1,6 +1,4 @@
 """Tests for the tags module."""
-import pytest
-
 from .utils import commit
 from cutty import git
 from cutty import tags
@@ -8,16 +6,14 @@ from cutty import tags
 
 def test_no_tags(repository: git.Repository) -> None:
     """It raises ValueError if there are no tags."""
-    with pytest.raises(ValueError):
-        tags.find_latest(repository)
+    assert tags.find_latest(repository) is None
 
 
 def test_no_version_tags(repository: git.Repository) -> None:
     """It raises ValueError if the only tag does not identify a version."""
     commit(repository)
     repository.git("tag", "bogus")
-    with pytest.raises(ValueError):
-        tags.find_latest(repository)
+    assert tags.find_latest(repository) is None
 
 
 def test_single_version_tag(repository: git.Repository) -> None:

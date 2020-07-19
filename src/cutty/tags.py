@@ -4,6 +4,7 @@ from __future__ import annotations
 import contextlib
 from dataclasses import dataclass
 from typing import Iterator
+from typing import Optional
 
 from packaging.version import InvalidVersion
 from packaging.version import Version
@@ -32,8 +33,12 @@ def load(repository: git.Repository) -> Iterator[VersionTag]:
             yield VersionTag.create(tag)
 
 
-def find_latest(repository: git.Repository) -> str:
+def find_latest(repository: git.Repository) -> Optional[str]:
     """Return the Git tag for the latest version."""
-    tags = load(repository)
-    latest = max(tags, key=lambda tag: tag.version)
-    return latest.name
+    tags = list(load(repository))
+
+    if tags:
+        latest = max(tags, key=lambda tag: tag.version)
+        return latest.name
+
+    return None
