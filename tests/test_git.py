@@ -41,3 +41,21 @@ def test_rev_parse(repository: git.Repository) -> None:
     """It returns the SHA1 hash."""
     commit(repository)
     assert repository.rev_parse("HEAD")
+
+
+def test_clone_non_existing_directory() -> None:
+    """It raises an error."""
+    with pytest.raises(git.Error, match="does not exist"):
+        git.Repository.clone("/no/such/directory")
+
+
+def test_parse_non_existing_revision(repository: git.Repository) -> None:
+    """It raises an error."""
+    with pytest.raises(git.Error, match="unknown revision"):
+        repository.rev_parse("no-such-revision")
+
+
+def test_error_without_stderr(repository: git.Repository) -> None:
+    """It reports the exit status."""
+    with pytest.raises(git.Error, match="exit status"):
+        repository.git("rev-parse", "--verify", "--quiet", "no-such-revision")
