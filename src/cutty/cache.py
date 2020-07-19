@@ -44,12 +44,15 @@ def repository_hash(location: str, *, directory: Optional[Path] = None) -> str:
 
 def repository(location: str) -> git.Repository:
     """Clone or update repository."""
-    repository = _get_repository(location)
+    path = _get_repository_path(location)
 
-    if repository.path.exists():
-        repository.git("remote", "update")
+    if path.exists():
+        repository = git.Repository(path)
+        repository.update_remote(prune=True)
     else:
-        git.git("clone", "--mirror", location, str(repository.path))
+        repository = git.Repository.clone(
+            location, destination=path, mirror=True, quiet=True
+        )
 
     return repository
 
