@@ -72,6 +72,11 @@ class Repository:
         """Invoke git."""
         return git(*args, cwd=self.path, **kwargs)
 
+    def update_remote(self, prune: bool = False) -> None:
+        """Fetch updates for remotes in the repository."""
+        options = _format_boolean_options(prune=prune)
+        self.git("remote", "update", *options, stdout=subprocess.PIPE)
+
     def tags(self) -> List[str]:
         """Return the tags."""
         process = self.git(
