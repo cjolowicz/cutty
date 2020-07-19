@@ -77,8 +77,8 @@ def create(
         template=template, abbreviations=config["abbreviations"]
     )
     repository = cache.repository(template)
-    ref = checkout if checkout is not None else _determine_revision(repository)
-    with cache.worktree(template, ref) as worktree:
+    revision = checkout if checkout is not None else _determine_revision(repository)
+    with cache.worktree(template, revision) as worktree:
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
