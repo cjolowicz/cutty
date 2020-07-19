@@ -15,8 +15,41 @@ else:
     CompletedProcess = subprocess.CompletedProcess
 
 
+def removeprefix(string: str, prefix: str) -> str:
+    """Remove prefix from string, if present."""
+    return string[len(prefix) :] if string.startswith(prefix) else string
+
+
 class Error(Exception):
     """Git error."""
+
+    def __init__(self, error: subprocess.CalledProcessError) -> None:
+        """Initialize."""
+        self.error = error
+
+    @property
+    def command(self) -> str:
+        """Return the git command."""
+        return "".join(self.error.cmd[1:2])
+
+    @property
+    def message(self) -> str:
+        """Return a friendly error message."""
+        if (
+            self.command == "rev-parse"
+            and "Needed a single revision" in self.error.stderr
+        ):
+            return f"unknown revision {self.error.cmd[-1]!r}"
+
+        if not self.error.stderr:
+            return f"returned non-zero exit status {self.error.returncode}"
+
+        message = self.error.stderr.splitlines()[-1]
+        return removeprefix(message, "fatal: ")
+
+    def __str__(self) -> str:
+        """Return a friendly error message, prefixed by the command."""
+        return f"git {self.command}: {self.message}"
 
 
 def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
@@ -26,9 +59,7 @@ def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
             ["git", *args], check=check, stderr=subprocess.PIPE, text=True, **kwargs
         )
     except subprocess.CalledProcessError as error:
-        command = " ".join(error.cmd[:2])
-        message = error.stderr if error.stderr else f"error ({error.returncode})"
-        raise Error(f"{command}: {message}") from error
+        raise Error(error) from None
 
 
 def _format_boolean_options(**kwargs: bool) -> List[str]:
