@@ -101,7 +101,5 @@ class Repository:
 
     def rev_parse(self, rev: str) -> str:
         """Return the SHA1 hash for the given revision."""
-        process = self.git(
-            "rev-parse", "--verify", "--quiet", rev, stdout=subprocess.PIPE
-        )
+        process = self.git("rev-parse", "--verify", rev, stdout=subprocess.PIPE)
         return process.stdout.strip()
