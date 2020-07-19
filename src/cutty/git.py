@@ -49,6 +49,25 @@ class Repository:
         git("init", cwd=path)
         return cls(path)
 
+    @classmethod
+    def clone(
+        cls,
+        location: str,
+        *,
+        destination: Optional[Path] = None,
+        quiet: bool = False,
+        mirror: bool = False,
+    ) -> Repository:
+        """Clone a repository."""
+        options = _format_boolean_options(quiet=quiet, mirror=mirror)
+
+        if destination is None:
+            git("clone", *options, location)
+        else:
+            git("clone", *options, location, str(destination))
+
+        return Repository(destination)
+
     def git(self, *args: str, **kwargs: Any) -> CompletedProcess:
         """Invoke git."""
         return git(*args, cwd=self.path, **kwargs)
