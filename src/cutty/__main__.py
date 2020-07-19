@@ -2,6 +2,7 @@
 import click
 
 from .create.console import create
+from .update.console import update
 
 
 @click.group()
@@ -11,6 +12,7 @@ def main() -> None:
 
 
 main.add_command(create)
+main.add_command(update)
 
 
 if __name__ == "__main__":
