@@ -76,7 +76,7 @@ def create(
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
-        repo_hash = cache.get_repository_hash(
+        repo_hash = cache.repository_hash(
             template, directory=Path(directory) if directory is not None else None
         )
 

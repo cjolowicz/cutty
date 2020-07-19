@@ -15,13 +15,6 @@ path = Path(appdirs.user_cache_dir(appname=appname, appauthor=appname))
 repositories = path / "repositories"
 
 
-def get_repository_hash(location: str, *, directory: Optional[Path] = None) -> str:
-    """Return a unique hash for the template."""
-    return _get_repository_hash(
-        location if directory is None else "/".join((location, *directory.parts))
-    )
-
-
 def _get_repository_hash(location: str) -> str:
     return hashlib.blake2b(location.encode()).hexdigest()
 
@@ -36,6 +29,13 @@ def _get_worktree_path(location: str, sha1: str) -> Path:
     hash = _get_repository_hash(location)
     name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
     return repositories / hash[:2] / hash / "worktrees" / sha1 / name
+
+
+def repository_hash(location: str, *, directory: Optional[Path] = None) -> str:
+    """Return a unique hash for the template."""
+    return _get_repository_hash(
+        location if directory is None else "/".join((location, *directory.parts))
+    )
 
 
 def repository(location: str) -> git.Repository:
