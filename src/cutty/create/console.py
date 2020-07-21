@@ -5,7 +5,6 @@ from textwrap import dedent
 from typing import Any
 from typing import cast
 from typing import Optional
-from typing import Tuple
 
 import click
 from cookiecutter import cli
@@ -14,6 +13,7 @@ from cookiecutter.log import configure_logger
 
 from . import core
 from .. import git
+from ..types import StrMapping
 
 
 errors = (
@@ -45,7 +45,7 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def validate_extra_context(*args: Any) -> Tuple[str, ...]:
+def validate_extra_context(*args: Any) -> StrMapping:
     """Validate extra_context command-line argument.
 
     This is a simple wrapper used to simplify the return type.
@@ -57,7 +57,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
         context, value = args
         args = (context, None, value)
     result = cli.validate_extra_context(*args)
-    return cast(Tuple[str], () if result is None else result)
+    return cast(StrMapping, {} if result is None else result)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
@@ -122,7 +122,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 )
 def create(
     template: str,
-    extra_context: Tuple[str, ...],
+    extra_context: StrMapping,
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],

@@ -1,11 +1,8 @@
 """Create a project."""
 import logging
 from pathlib import Path
-from typing import Any
 from typing import cast
-from typing import Mapping
 from typing import Optional
-from typing import Tuple
 
 from cookiecutter import exceptions
 from cookiecutter.config import get_user_config
@@ -19,10 +16,10 @@ from cookiecutter.repository import expand_abbreviations
 from .. import cache
 from .. import git
 from .. import tags
+from ..types import StrMapping
 
 
 logger = logging.getLogger(__name__)
-StrMapping = Mapping[str, Any]
 
 
 def _determine_revision(repository: git.Repository) -> str:
@@ -34,7 +31,7 @@ def _create_context(
     context_file: Path,
     *,
     template: str,
-    extra_context: Tuple[str, ...],
+    extra_context: StrMapping,
     no_input: bool,
     config: StrMapping,
 ) -> StrMapping:
@@ -53,7 +50,7 @@ def _create_context(
 
 def create(
     template: str,
-    extra_context: Tuple[str, ...],
+    extra_context: StrMapping,
     *,
     no_input: bool,
     checkout: Optional[str],
