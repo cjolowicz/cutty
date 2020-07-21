@@ -20,8 +20,8 @@ def update() -> None:
     with cache.worktree(template, revision) as worktree:
         instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
-        project = instance.add_worktree(project_path, "cookiecutter")
-        try:
+
+        with instance.worktree(project_path, "template", force_remove=True) as project:
             generate_files(
                 repo_dir=str(worktree.path),
                 context=context,
@@ -30,5 +30,3 @@ def update() -> None:
             )
             project.git("add", "--all")
             project.git("commit", f"--message=Update template to {revision}")
-        finally:
-            instance.remove_worktree(project.path, force=True)
