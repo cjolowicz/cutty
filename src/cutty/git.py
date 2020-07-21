@@ -1,9 +1,11 @@
 """Git interface."""
 from __future__ import annotations
 
+import contextlib
 import subprocess  # noqa: S404
 from pathlib import Path
 from typing import Any
+from typing import Iterator
 from typing import List
 from typing import MutableMapping
 from typing import Optional
@@ -138,6 +140,20 @@ class Repository:
         """Remove a worktree."""
         options = _format_boolean_options(force=force)
         self.git("worktree", "remove", *options, str(path))
+
+    @contextlib.contextmanager
+    def worktree(
+        self, path: Path, ref: str, *, detach: bool = False, force_remove: bool = False
+    ) -> Iterator[Repository]:
+        """Context manager to add and remove a worktree."""
+        worktree = self.add_worktree(path, ref, detach=detach)
+
+        try:
+            yield worktree
+        finally:
+            self.remove_worktree(path, force=force_remove)
+
+    worktree.__annotations__["return"] = contextlib.AbstractContextManager
 
     def rev_parse(self, rev: str) -> str:
         """Return the SHA1 hash for the given revision."""
