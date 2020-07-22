@@ -73,3 +73,27 @@ def template(repository: git.Repository) -> git.Repository:
     repository.git("tag", "v1.0.0")
 
     return repository
+
+
+@pytest.fixture
+def cookiecutters_dir(tmp_path: Path) -> Path:
+    """A temporary directory for cookiecutters."""
+    return tmp_path / "cookiecutters_dir"
+
+
+@pytest.fixture
+def replay_dir(tmp_path: Path) -> Path:
+    """A temporary directory for replay data."""
+    return tmp_path / "replay_dir"
+
+
+@pytest.fixture
+def user_config_file(tmp_path: Path, cookiecutters_dir: Path, replay_dir: Path) -> Path:
+    """Configure cookiecutter to write to temporary directories."""
+    path = tmp_path / ".cookiecutterrc"
+    config = f"""\
+    cookiecutters_dir: {cookiecutters_dir}
+    replay_dir: {replay_dir}
+    """
+    path.write_text(dedent(config))
+    return path
