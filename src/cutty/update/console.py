@@ -1,4 +1,6 @@
 """Command-line interface."""
+from typing import Optional
+
 import click
 
 from . import core
@@ -15,6 +17,11 @@ from ..types import StrMapping
     help="Prompt for parameters",
     show_default=True,
 )
-def update(extra_context: StrMapping, interactive: bool) -> None:
+@click.option(
+    "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
+)
+def update(
+    extra_context: StrMapping, interactive: bool, checkout: Optional[str],
+) -> None:
     """Update a project from a Cookiecutter template."""
-    core.update(extra_context, interactive=interactive)
+    core.update(extra_context, interactive=interactive, checkout=checkout)

@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 from typing import cast
+from typing import Optional
 
 from cookiecutter.config import get_user_config
 from cookiecutter.generate import generate_files
@@ -19,14 +20,21 @@ def _load_context(context_file: Path) -> StrMapping:
         return cast(StrMapping, json.load(io))
 
 
-def update(extra_context: StrMapping, *, interactive: bool = False) -> None:
+def update(
+    extra_context: StrMapping,
+    *,
+    interactive: bool = False,
+    checkout: Optional[str] = None,
+) -> None:
     """Update a project from a Cookiecutter template."""
     config = get_user_config()
     previous_context = _load_context(Path(".cookiecutter.json"))
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     repository = cache.repository(template)
-    revision = tags.find_latest(repository) or "HEAD"
+    revision = (
+        checkout if checkout is not None else (tags.find_latest(repository) or "HEAD")
+    )
 
     with cache.worktree(template, revision) as worktree:
         context_file = worktree.path / "cookiecutter.json"
