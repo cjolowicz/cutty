@@ -19,7 +19,7 @@ def _load_context(context_file: Path) -> StrMapping:
         return cast(StrMapping, json.load(io))
 
 
-def update(extra_context: StrMapping) -> None:
+def update(extra_context: StrMapping, *, interactive: bool = False) -> None:
     """Update a project from a Cookiecutter template."""
     config = get_user_config()
     previous_context = _load_context(Path(".cookiecutter.json"))
@@ -31,12 +31,13 @@ def update(extra_context: StrMapping) -> None:
     with cache.worktree(template, revision) as worktree:
         context_file = worktree.path / "cookiecutter.json"
         current_context = _load_context(context_file)
-        no_input = not (set(current_context) - set(previous_context))
+        if not interactive:
+            interactive = bool(set(current_context) - set(previous_context))
         context = _create_context(
             context_file,
             template=template,
             extra_context=extra_context,
-            no_input=no_input,
+            no_input=not interactive,
             config=config,
         )
         repo_hash = cache.repository_hash(template)
