@@ -25,6 +25,7 @@ def update(
     *,
     interactive: bool = False,
     checkout: Optional[str] = None,
+    directory: Optional[str] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
     config = get_user_config()
@@ -37,7 +38,10 @@ def update(
     )
 
     with cache.worktree(template, revision) as worktree:
-        context_file = worktree.path / "cookiecutter.json"
+        repo_dir = (
+            worktree.path if directory is None else worktree.path / Path(directory)
+        )
+        context_file = repo_dir / "cookiecutter.json"
         current_context = _load_context(context_file)
         if not interactive:
             interactive = bool(set(current_context) - set(previous_context))
@@ -48,7 +52,9 @@ def update(
             no_input=not interactive,
             config=config,
         )
-        repo_hash = cache.repository_hash(template)
+        repo_hash = cache.repository_hash(
+            template, directory=Path(directory) if directory is not None else None
+        )
         dump(config["replay_dir"], repo_hash, context)
 
         instance = git.Repository()
@@ -56,7 +62,7 @@ def update(
 
         with instance.worktree(project_path, "template", force_remove=True) as project:
             generate_files(
-                repo_dir=str(worktree.path),
+                repo_dir=str(repo_dir),
                 context=context,
                 overwrite_if_exists=True,
                 output_dir=str(project.path.parent),

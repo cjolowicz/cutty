@@ -20,8 +20,20 @@ from ..types import StrMapping
 @click.option(
     "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
 )
+@click.option(
+    "--directory",
+    help=(
+        "Directory within repo that holds cookiecutter.json file "
+        "for advanced repositories with multi templates in it"
+    ),
+)
 def update(
-    extra_context: StrMapping, interactive: bool, checkout: Optional[str],
+    extra_context: StrMapping,
+    interactive: bool,
+    checkout: Optional[str],
+    directory: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    core.update(extra_context, interactive=interactive, checkout=checkout)
+    core.update(
+        extra_context, interactive=interactive, checkout=checkout, directory=directory
+    )
