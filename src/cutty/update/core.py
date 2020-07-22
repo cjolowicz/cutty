@@ -19,11 +19,12 @@ def _load_context(context_file: Path) -> StrMapping:
         return cast(StrMapping, json.load(io))
 
 
-def update() -> None:
+def update(extra_context: StrMapping) -> None:
     """Update a project from a Cookiecutter template."""
     config = get_user_config()
     previous_context = _load_context(Path(".cookiecutter.json"))
-    template = previous_context["_template"]
+    extra_context = {**previous_context, **extra_context}
+    template = extra_context["_template"]
     repository = cache.repository(template)
     revision = tags.find_latest(repository) or "HEAD"
 
@@ -34,7 +35,7 @@ def update() -> None:
         context = _create_context(
             context_file,
             template=template,
-            extra_context=previous_context,
+            extra_context=extra_context,
             no_input=no_input,
             config=config,
         )
