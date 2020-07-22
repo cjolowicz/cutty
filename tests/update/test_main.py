@@ -42,5 +42,4 @@ def test_update(
     template.git("tag", "v1.1.0")
 
     result = runner.invoke(update)
-    print(result.output)
     assert result.exit_code == 0
