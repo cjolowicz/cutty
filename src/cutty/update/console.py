@@ -39,6 +39,12 @@ from ..types import StrMapping
     is_flag=True,
     help="Do not load a config file. Use the defaults instead",
 )
+@click.option(
+    "--debug-file",
+    type=click.Path(),
+    default=None,
+    help="File to be used as a stream for DEBUG logging",
+)
 def update(
     extra_context: StrMapping,
     interactive: bool,
@@ -47,9 +53,11 @@ def update(
     verbose: bool,
     config_file: Optional[str],
     default_config: bool,
+    debug_file: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    configure_logger(stream_level="DEBUG" if verbose else "INFO")
+    configure_logger(stream_level="DEBUG" if verbose else "INFO", debug_file=debug_file)
+
     core.update(
         extra_context,
         interactive=interactive,
