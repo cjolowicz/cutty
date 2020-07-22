@@ -41,5 +41,5 @@ def test_update(
     template.git("commit", "--message=Add LICENSE")
     template.git("tag", "v1.1.0")
 
-    result = runner.invoke(update)
+    result = runner.invoke(update, [f"--config-file={user_config_file}"])
     assert result.exit_code == 0
