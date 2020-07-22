@@ -1,8 +1,10 @@
 """Test fixtures."""
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
+from click.testing import CliRunner
 
 from cutty import cache
 from cutty import git
@@ -36,3 +38,11 @@ def user_cache_dir(monkeypatch: MonkeyPatch, tmp_path: Path) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr("appdirs.user_cache_dir", lambda *args, **kwargs: path)
     return path
+
+
+@pytest.fixture
+def runner() -> Iterator[CliRunner]:
+    """Fixture for invoking command-line interfaces."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        yield runner
