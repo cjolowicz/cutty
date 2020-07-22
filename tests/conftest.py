@@ -63,6 +63,9 @@ def template(repository: git.Repository) -> git.Repository:
     """
 
     (repository.path / "{{cookiecutter.project}}").mkdir()
+    (repository.path / "{{cookiecutter.project}}" / ".cookiecutter.json").write_text(
+        """{{cookiecutter | jsonify}}"""
+    )
     (repository.path / "{{cookiecutter.project}}" / "README.md").write_text(
         dedent(readme)
     )
