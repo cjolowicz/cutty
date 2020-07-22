@@ -2,6 +2,7 @@
 from typing import Optional
 
 import click
+from cookiecutter.log import configure_logger
 
 from . import core
 from ..create.console import validate_extra_context
@@ -27,13 +28,18 @@ from ..types import StrMapping
         "for advanced repositories with multi templates in it"
     ),
 )
+@click.option(
+    "-v", "--verbose", is_flag=True, help="Print debug information", default=False
+)
 def update(
     extra_context: StrMapping,
     interactive: bool,
     checkout: Optional[str],
     directory: Optional[str],
+    verbose: bool,
 ) -> None:
     """Update a project from a Cookiecutter template."""
+    configure_logger(stream_level="DEBUG" if verbose else "INFO")
     core.update(
         extra_context, interactive=interactive, checkout=checkout, directory=directory
     )
