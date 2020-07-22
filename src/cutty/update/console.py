@@ -31,15 +31,23 @@ from ..types import StrMapping
 @click.option(
     "-v", "--verbose", is_flag=True, help="Print debug information", default=False
 )
+@click.option(
+    "--config-file", type=click.Path(), default=None, help="User configuration file"
+)
 def update(
     extra_context: StrMapping,
     interactive: bool,
     checkout: Optional[str],
     directory: Optional[str],
     verbose: bool,
+    config_file: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
     configure_logger(stream_level="DEBUG" if verbose else "INFO")
     core.update(
-        extra_context, interactive=interactive, checkout=checkout, directory=directory
+        extra_context,
+        interactive=interactive,
+        checkout=checkout,
+        directory=directory,
+        config_file=config_file,
     )

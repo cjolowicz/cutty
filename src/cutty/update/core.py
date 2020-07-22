@@ -26,9 +26,10 @@ def update(
     interactive: bool = False,
     checkout: Optional[str] = None,
     directory: Optional[str] = None,
+    config_file: Optional[str] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = get_user_config()
+    config = get_user_config(config_file=config_file)
     previous_context = _load_context(Path(".cookiecutter.json"))
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
