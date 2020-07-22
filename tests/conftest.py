@@ -1,5 +1,6 @@
 """Test fixtures."""
 from pathlib import Path
+from textwrap import dedent
 from typing import Iterator
 
 import pytest
@@ -46,3 +47,29 @@ def runner() -> Iterator[CliRunner]:
     runner = CliRunner()
     with runner.isolated_filesystem():
         yield runner
+
+
+@pytest.fixture
+def template(repository: git.Repository) -> git.Repository:
+    """Set up a minimal template repository."""
+    cookiecutter_json = """\
+    {
+      "project": "example"
+    }
+    """
+
+    readme = """\
+    # {{cookiecutter.project}}
+    """
+
+    (repository.path / "{{cookiecutter.project}}").mkdir()
+    (repository.path / "{{cookiecutter.project}}" / "README.md").write_text(
+        dedent(readme)
+    )
+    (repository.path / "cookiecutter.json").write_text(dedent(cookiecutter_json))
+
+    repository.git("add", ".")
+    repository.git("commit", "--message=Initial commit")
+    repository.git("tag", "v1.0.0")
+
+    return repository

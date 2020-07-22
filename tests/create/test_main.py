@@ -17,32 +17,6 @@ def test_main_succeeds(runner: CliRunner) -> None:
 
 
 @pytest.fixture
-def template(repository: git.Repository) -> git.Repository:
-    """Set up a minimal template repository."""
-    cookiecutter_json = """\
-    {
-      "project": "example"
-    }
-    """
-
-    readme = """\
-    # {{cookiecutter.project}}
-    """
-
-    (repository.path / "{{cookiecutter.project}}").mkdir()
-    (repository.path / "{{cookiecutter.project}}" / "README.md").write_text(
-        dedent(readme)
-    )
-    (repository.path / "cookiecutter.json").write_text(dedent(cookiecutter_json))
-
-    repository.git("add", ".")
-    repository.git("commit", "--message=Initial commit")
-    repository.git("tag", "v1.0.0")
-
-    return repository
-
-
-@pytest.fixture
 def cookiecutters_dir(tmp_path: Path) -> Path:
     """A temporary directory for cookiecutters."""
     return tmp_path / "cookiecutters_dir"
