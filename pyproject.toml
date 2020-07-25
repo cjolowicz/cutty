@@ -8,18 +8,16 @@ readme = "README.rst"
 homepage = "https://github.com/cjolowicz/cutty"
 repository = "https://github.com/cjolowicz/cutty"
 documentation = "https://cutty.readthedocs.io"
-classifiers = [
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-]
 
 [tool.poetry.urls]
 Changelog = "https://github.com/cjolowicz/cutty/releases"
 
 [tool.poetry.dependencies]
-python = "^3.6.1"
+python = "^3.7"
 click = "^7.0"
+appdirs = "^1.4.4"
+packaging = "^20.4"
+cookiecutter = "^1.7.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"

@@ -1,11 +1,16 @@
 """Command-line interface."""
 import click
 
+from .create.console import create
 
-@click.command()
-@click.version_option()
+
+@click.group()
+@click.version_option(None, "-V", "--version")
 def main() -> None:
     """Cutty."""
+
+
+main.add_command(create)
 
 
 if __name__ == "__main__":
