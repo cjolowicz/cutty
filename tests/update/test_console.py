@@ -46,7 +46,7 @@ def test_update(
     template: git.Repository,
     instance: git.Repository,
 ) -> None:
-    """It generates a project from the template."""
+    """It updates the project from the template."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.git("add", ".")
     template.git("commit", "--message=Add LICENSE")
@@ -62,7 +62,7 @@ def test_interactive(
     template: git.Repository,
     instance: git.Repository,
 ) -> None:
-    """It generates a project from the template."""
+    """It reads interactive input."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.git("add", ".")
     template.git("commit", "--message=Add LICENSE")
