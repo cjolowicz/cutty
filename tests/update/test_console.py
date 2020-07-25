@@ -26,7 +26,6 @@ def test_update(
         create,
         [str(template.path), f"--config-file={user_config_file}"],
         input="example",
-        catch_exceptions=False,
     )
 
     instance = git.Repository.init(Path("example"))
@@ -56,7 +55,6 @@ def test_interactive(
         create,
         [str(template.path), f"--config-file={user_config_file}"],
         input="example",
-        catch_exceptions=False,
     )
 
     instance = git.Repository.init(Path("example"))
