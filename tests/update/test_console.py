@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
 from cutty import git
@@ -15,13 +16,14 @@ def test_help_succeeds(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
 
-def test_update(
+@pytest.fixture
+def instance(
     runner: CliRunner,
     user_cache_dir: Path,
     user_config_file: Path,
     template: git.Repository,
-) -> None:
-    """It generates a project from the template."""
+) -> git.Repository:
+    """Fixture with a template instance."""
     runner.invoke(
         create,
         [str(template.path), f"--config-file={user_config_file}"],
@@ -35,6 +37,16 @@ def test_update(
 
     os.chdir(instance.path)
 
+    return instance
+
+
+def test_update(
+    runner: CliRunner,
+    user_config_file: Path,
+    template: git.Repository,
+    instance: git.Repository,
+) -> None:
+    """It generates a project from the template."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.git("add", ".")
     template.git("commit", "--message=Add LICENSE")
@@ -46,24 +58,11 @@ def test_update(
 
 def test_interactive(
     runner: CliRunner,
-    user_cache_dir: Path,
     user_config_file: Path,
     template: git.Repository,
+    instance: git.Repository,
 ) -> None:
     """It generates a project from the template."""
-    runner.invoke(
-        create,
-        [str(template.path), f"--config-file={user_config_file}"],
-        input="example",
-    )
-
-    instance = git.Repository.init(Path("example"))
-    instance.git("add", "--all")
-    instance.git("commit", "--message=Initial")
-    instance.git("branch", "template")
-
-    os.chdir(instance.path)
-
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.git("add", ".")
     template.git("commit", "--message=Add LICENSE")
