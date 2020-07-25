@@ -5,6 +5,7 @@ import subprocess  # noqa: S404
 from pathlib import Path
 from typing import Any
 from typing import List
+from typing import MutableMapping
 from typing import Optional
 from typing import TYPE_CHECKING
 
@@ -52,7 +53,7 @@ class Error(Exception):
         return f"git {self.command}: {self.message}"
 
 
-env = {}
+env: MutableMapping[str, str] = {}
 
 
 def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
