@@ -6,7 +6,7 @@ from typing import Tuple
 import click
 from cookiecutter import cli
 
-from .core import create
+from . import core
 
 
 def validate_extra_context(*args: Any) -> Tuple[str, ...]:
@@ -29,4 +29,4 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.argument("extra_context", nargs=-1, callback=validate_extra_context)
 def create(template: str, extra_context: Tuple[str, ...]) -> None:
     """Create a project from a Cookiecutter template."""
-    create(template, extra_context)
+    core.create(template, extra_context)
