@@ -52,11 +52,19 @@ class Error(Exception):
         return f"git {self.command}: {self.message}"
 
 
+env = {}
+
+
 def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
     """Invoke git."""
     try:
         return subprocess.run(  # noqa: S603,S607
-            ["git", *args], check=check, stderr=subprocess.PIPE, text=True, **kwargs
+            ["git", *args],
+            check=check,
+            stderr=subprocess.PIPE,
+            text=True,
+            env=env or None,
+            **kwargs,
         )
     except subprocess.CalledProcessError as error:
         raise Error(error) from None
