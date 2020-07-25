@@ -15,6 +15,8 @@ def git_author() -> None:
         {
             "GIT_AUTHOR_NAME": "Example Author",
             "GIT_AUTHOR_EMAIL": "example.author@example.com",
+            "GIT_COMMITTER_NAME": "Example Author",
+            "GIT_COMMITTER_EMAIL": "example.author@example.com",
         }
     )
 
