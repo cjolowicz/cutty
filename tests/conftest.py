@@ -8,6 +8,17 @@ from cutty import cache
 from cutty import git
 
 
+@pytest.fixture(scope="session", autouse=True)
+def git_author() -> None:
+    """Provide author information to git commit."""
+    git.env.update(
+        {
+            "GIT_AUTHOR_NAME": "Example Author",
+            "GIT_AUTHOR_EMAIL": "example.author@example.com",
+        }
+    )
+
+
 @pytest.fixture
 def repository(tmp_path: Path) -> git.Repository:
     """Initialize repository in a temporary directory."""
