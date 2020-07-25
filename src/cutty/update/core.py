@@ -66,7 +66,9 @@ def update(
         instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
 
-        with instance.worktree(project_path, "template", force_remove=True) as project:
+        with instance.worktree(
+            project_path, "template", checkout=False, force_remove=True
+        ) as project:
             generate_files(
                 repo_dir=str(repo_dir),
                 context=context,
