@@ -140,10 +140,15 @@ class Repository:
         return process.stdout.split()
 
     def add_worktree(
-        self, path: Path, ref: str, *, detach: Optional[bool] = None,
+        self,
+        path: Path,
+        ref: str,
+        *,
+        checkout: Optional[bool] = None,
+        detach: Optional[bool] = None,
     ) -> Repository:
         """Add a worktree."""
-        options = _format_boolean_options(detach=detach)
+        options = _format_boolean_options(checkout=checkout, detach=detach)
         self.git("worktree", "add", *options, str(path), ref)
 
         return Repository(path)
@@ -159,11 +164,12 @@ class Repository:
         path: Path,
         ref: str,
         *,
+        checkout: Optional[bool] = None,
         detach: Optional[bool] = None,
         force_remove: Optional[bool] = None,
     ) -> Iterator[Repository]:
         """Context manager to add and remove a worktree."""
-        worktree = self.add_worktree(path, ref, detach=detach)
+        worktree = self.add_worktree(path, ref, checkout=checkout, detach=detach)
 
         try:
             yield worktree
