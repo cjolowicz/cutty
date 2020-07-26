@@ -225,3 +225,7 @@ class Repository:
             self.git("tag", name, ref)
         else:
             self.git("tag", name)
+
+    def merge(self, ref: str) -> None:
+        """Join two development histories together."""
+        self.git("merge", ref)
