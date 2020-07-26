@@ -190,3 +190,11 @@ class Repository:
         options = _format_options(short=short, verify=verify)
         process = self.git("rev-parse", *options, rev, stdout=subprocess.PIPE)
         return process.stdout.strip()
+
+    def describe(
+        self, ref: str, *, tags: Optional[bool] = None, exact: Optional[bool] = None,
+    ) -> str:
+        """Give an object a human readable name based on an available ref."""
+        options = _format_options(tags=tags, exact=exact)
+        process = self.git("describe", *options, ref, stdout=subprocess.PIPE)
+        return process.stdout.strip()
