@@ -183,8 +183,10 @@ class Repository:
 
     worktree.__annotations__["return"] = contextlib.AbstractContextManager
 
-    def rev_parse(self, rev: str, *, verify: Optional[bool] = None) -> str:
+    def rev_parse(
+        self, rev: str, *, short: Optional[bool] = None, verify: Optional[bool] = None
+    ) -> str:
         """Return the SHA1 hash for the given revision."""
-        options = _format_options(verify=verify)
+        options = _format_options(short=short, verify=verify)
         process = self.git("rev-parse", *options, rev, stdout=subprocess.PIPE)
         return process.stdout.strip()
