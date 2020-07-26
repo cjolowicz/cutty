@@ -50,7 +50,7 @@ def test_update(
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
     template.commit(message="Add LICENSE")
-    template.git("tag", "v1.1.0")
+    template.tag("v1.1.0")
 
     result = runner.invoke(update, [f"--config-file={user_config_file}"])
     assert result.exit_code == 0
@@ -66,7 +66,7 @@ def test_interactive(
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
     template.commit(message="Add LICENSE")
-    template.git("tag", "v1.1.0")
+    template.tag("v1.1.0")
 
     result = runner.invoke(
         update, [f"--config-file={user_config_file}", "--interactive"], input="example",
@@ -85,7 +85,7 @@ def test_no_previous_context(
         "rm", str(template.path / "{{cookiecutter.project}}" / ".cookiecutter.json")
     )
     template.commit(message="Remove .cookiecutter.json")
-    template.git("tag", "v1.1.0")
+    template.tag("v1.1.0")
 
     result = runner.invoke(update, [f"--config-file={user_config_file}"])
     git.Repository().git("merge", "template")
@@ -93,7 +93,7 @@ def test_no_previous_context(
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
     template.commit(message="Add LICENSE")
-    template.git("tag", "v1.2.0")
+    template.tag("v1.2.0")
 
     result = runner.invoke(
         update,

@@ -73,7 +73,7 @@ def template(repository: git.Repository) -> git.Repository:
 
     repository.add(".")
     repository.commit(message="Initial commit")
-    repository.git("tag", "v1.0.0")
+    repository.tag("v1.0.0")
 
     return repository
 
