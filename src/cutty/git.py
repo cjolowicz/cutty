@@ -194,3 +194,8 @@ class Repository:
         options = _format_options(tags=tags, exact=exact)
         process = self.git("describe", *options, ref, stdout=subprocess.PIPE)
         return process.stdout.strip()
+
+    def add(self, *paths: StrPath, all: Optional[bool] = None) -> None:
+        """Add file contents to the index."""
+        options = _format_options(all=all)
+        self.git("add", *options, "--", *paths)
