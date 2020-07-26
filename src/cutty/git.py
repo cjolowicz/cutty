@@ -9,14 +9,9 @@ from typing import Iterator
 from typing import List
 from typing import MutableMapping
 from typing import Optional
-from typing import TYPE_CHECKING
 from typing import TypeVar
 
-
-if TYPE_CHECKING:
-    CompletedProcess = subprocess.CompletedProcess[str]  # pragma: no cover
-else:
-    CompletedProcess = subprocess.CompletedProcess
+from .types import CompletedProcess
 
 
 def removeprefix(string: str, prefix: str) -> str:
