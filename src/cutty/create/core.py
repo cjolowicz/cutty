@@ -1,44 +1,17 @@
 """Create a project."""
-import logging
 from pathlib import Path
-from typing import cast
 from typing import Optional
 
 from cookiecutter import exceptions
 from cookiecutter.config import get_user_config
-from cookiecutter.generate import generate_context
 from cookiecutter.generate import generate_files
-from cookiecutter.prompt import prompt_for_config
 from cookiecutter.replay import dump
 from cookiecutter.replay import load
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
+from ..context import create_context
 from ..types import StrMapping
-
-
-logger = logging.getLogger(__name__)
-
-
-def _create_context(
-    context_file: Path,
-    *,
-    template: str,
-    extra_context: StrMapping,
-    no_input: bool,
-    config: StrMapping,
-) -> StrMapping:
-    logger.debug("context_file is %s", context_file)
-
-    context = generate_context(
-        context_file=context_file,
-        default_context=config["default_context"],
-        extra_context=extra_context,
-    )
-    context["cookiecutter"] = prompt_for_config(context, no_input)
-    context["cookiecutter"]["_template"] = template
-
-    return cast(StrMapping, context)
 
 
 def create(
@@ -78,7 +51,7 @@ def create(
             context = load(config["replay_dir"], repo_hash)
         else:
             context_file = repo_dir / "cookiecutter.json"
-            context = _create_context(
+            context = create_context(
                 context_file,
                 template=template,
                 extra_context=extra_context,

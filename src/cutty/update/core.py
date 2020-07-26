@@ -11,7 +11,7 @@ from cookiecutter.replay import dump
 from .. import cache
 from .. import git
 from .. import tags
-from ..create.core import _create_context
+from ..context import create_context
 from ..types import StrMapping
 
 
@@ -48,7 +48,7 @@ def update(
         current_context = _load_context(context_file)
         if not interactive:
             interactive = bool(set(current_context) - set(previous_context))
-        context = _create_context(
+        context = create_context(
             context_file,
             template=template,
             extra_context=extra_context,
