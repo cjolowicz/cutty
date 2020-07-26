@@ -47,7 +47,7 @@ def test_undefined_variable(
 
     template.add(".")
     template.commit(message="Typo")
-    template.git("tag", "v1.0.1")
+    template.tag("v1.0.1")
 
     result = runner.invoke(
         create,

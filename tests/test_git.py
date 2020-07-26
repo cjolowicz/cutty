@@ -18,7 +18,7 @@ def mirror(tmp_path: Path, repository: git.Repository) -> git.Repository:
 def test_tags(repository: git.Repository) -> None:
     """It returns the tags."""
     commit(repository)
-    repository.git("tag", "v1.0.0")
+    repository.tag("v1.0.0")
     assert repository.tags() == ["v1.0.0"]
 
 
