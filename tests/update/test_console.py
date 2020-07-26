@@ -33,7 +33,7 @@ def instance(
     instance = git.Repository.init(Path("example"))
     instance.add(all=True)
     instance.commit(message="Initial")
-    instance.git("branch", "template")
+    instance.branch("template")
 
     os.chdir(instance.path)
 
