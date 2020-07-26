@@ -42,3 +42,11 @@ def find_latest(repository: git.Repository) -> Optional[str]:
         return latest.name
 
     return None
+
+
+def describe(repository: git.Repository) -> str:
+    """Return the version tag for HEAD, falling back to the short SHA-1."""
+    with contextlib.suppress(git.Error, InvalidVersion):
+        tag = repository.describe("HEAD", tags=True, exact=True)
+        return VersionTag.create(tag).name
+    return repository.rev_parse("HEAD", short=True)
