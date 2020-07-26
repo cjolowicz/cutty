@@ -1,7 +1,5 @@
 """Update a project."""
-import json
 from pathlib import Path
-from typing import cast
 from typing import Optional
 
 from cookiecutter.config import get_user_config
@@ -12,12 +10,8 @@ from .. import cache
 from .. import git
 from .. import tags
 from ..context import create_context
+from ..context import load_context
 from ..types import StrMapping
-
-
-def _load_context(context_file: Path) -> StrMapping:
-    with context_file.open() as io:
-        return cast(StrMapping, json.load(io))
 
 
 def update(
@@ -33,7 +27,7 @@ def update(
     config = get_user_config(config_file=config_file, default_config=default_config)
     previous_context_file = Path(".cookiecutter.json")
     if previous_context_file.exists():
-        previous_context = _load_context(previous_context_file)
+        previous_context = load_context(previous_context_file)
     else:
         previous_context = {}
     extra_context = {**previous_context, **extra_context}
@@ -45,7 +39,7 @@ def update(
             worktree.path if directory is None else worktree.path / Path(directory)
         )
         context_file = repo_dir / "cookiecutter.json"
-        current_context = _load_context(context_file)
+        current_context = load_context(context_file)
         if not interactive:
             interactive = bool(set(current_context) - set(previous_context))
         context = create_context(
