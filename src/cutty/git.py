@@ -1,9 +1,11 @@
 """Git interface."""
 from __future__ import annotations
 
+import contextlib
 import subprocess  # noqa: S404
 from pathlib import Path
 from typing import Any
+from typing import Iterator
 from typing import List
 from typing import MutableMapping
 from typing import Optional
@@ -71,9 +73,19 @@ def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
         raise Error(error) from None
 
 
-def _format_boolean_options(**kwargs: bool) -> List[str]:
+def _format_boolean_option(key: str, value: bool) -> str:
+    """Convert a key-value pair to a boolean command-line option."""
+    name = key.replace("_", "-")
+    return f"--{name}" if value else f"--no-{name}"
+
+
+def _format_boolean_options(**kwargs: Optional[bool]) -> List[str]:
     """Convert keyword arguments to boolean command-line options."""
-    return [f"--{key}" for key, value in kwargs.items() if value]
+    return [
+        _format_boolean_option(key, value)
+        for key, value in kwargs.items()
+        if value is not None
+    ]
 
 
 class Repository:
@@ -95,8 +107,8 @@ class Repository:
         location: str,
         *,
         destination: Optional[Path] = None,
-        quiet: bool = False,
-        mirror: bool = False,
+        quiet: Optional[bool] = None,
+        mirror: Optional[bool] = None,
     ) -> Repository:
         """Clone a repository."""
         options = _format_boolean_options(quiet=quiet, mirror=mirror)
@@ -112,7 +124,7 @@ class Repository:
         """Invoke git."""
         return git(*args, cwd=self.path, **kwargs)
 
-    def update_remote(self, prune: bool = False) -> None:
+    def update_remote(self, prune: Optional[bool] = None) -> None:
         """Fetch updates for remotes in the repository."""
         options = _format_boolean_options(prune=prune)
         self.git("remote", "update", *options, stdout=subprocess.PIPE)
@@ -127,17 +139,44 @@ class Repository:
         )
         return process.stdout.split()
 
-    def add_worktree(self, path: Path, ref: str, *, detach: bool = False) -> Repository:
+    def add_worktree(
+        self,
+        path: Path,
+        ref: str,
+        *,
+        checkout: Optional[bool] = None,
+        detach: Optional[bool] = None,
+    ) -> Repository:
         """Add a worktree."""
-        options = _format_boolean_options(detach=detach)
+        options = _format_boolean_options(checkout=checkout, detach=detach)
         self.git("worktree", "add", *options, str(path), ref)
 
         return Repository(path)
 
-    def remove_worktree(self, path: Path, *, force: bool = False) -> None:
+    def remove_worktree(self, path: Path, *, force: Optional[bool] = None) -> None:
         """Remove a worktree."""
         options = _format_boolean_options(force=force)
         self.git("worktree", "remove", *options, str(path))
+
+    @contextlib.contextmanager
+    def worktree(
+        self,
+        path: Path,
+        ref: str,
+        *,
+        checkout: Optional[bool] = None,
+        detach: Optional[bool] = None,
+        force_remove: Optional[bool] = None,
+    ) -> Iterator[Repository]:
+        """Context manager to add and remove a worktree."""
+        worktree = self.add_worktree(path, ref, checkout=checkout, detach=detach)
+
+        try:
+            yield worktree
+        finally:
+            self.remove_worktree(path, force=force_remove)
+
+    worktree.__annotations__["return"] = contextlib.AbstractContextManager
 
     def rev_parse(self, rev: str) -> str:
         """Return the SHA1 hash for the given revision."""

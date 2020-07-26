@@ -65,12 +65,8 @@ def worktree(location: str, ref: str) -> Iterator[git.Repository]:
     repository = _get_repository(location)
     sha1 = repository.rev_parse(ref)
     path = _get_worktree_path(location, sha1)
-    worktree = repository.add_worktree(path, sha1, detach=True)
-
-    try:
+    with repository.worktree(path, sha1, detach=True, force_remove=True) as worktree:
         yield worktree
-    finally:
-        repository.remove_worktree(path, force=True)
 
 
 worktree.__annotations__["return"] = contextlib.AbstractContextManager
