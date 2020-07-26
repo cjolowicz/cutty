@@ -214,3 +214,7 @@ class Repository:
             message=message,
         )
         self.git("commit", *options, "--", *paths)
+
+    def branch(self, name: str) -> None:
+        """Create a branch."""
+        self.git("branch", name)
