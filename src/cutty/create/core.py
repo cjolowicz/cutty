@@ -14,17 +14,10 @@ from cookiecutter.replay import load
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
-from .. import git
-from .. import tags
 from ..types import StrMapping
 
 
 logger = logging.getLogger(__name__)
-
-
-def _determine_revision(repository: git.Repository) -> str:
-    tag = tags.find_latest(repository)
-    return tag if tag is not None else "HEAD"
 
 
 def _create_context(
@@ -73,9 +66,7 @@ def create(
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
-    repository = cache.repository(template)
-    revision = checkout if checkout is not None else _determine_revision(repository)
-    with cache.worktree(template, revision) as worktree:
+    with cache.checkout(template, revision=checkout) as worktree:
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )

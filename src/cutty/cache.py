@@ -8,6 +8,7 @@ from typing import Optional
 import appdirs
 
 from . import git
+from . import tags
 
 
 appname = "cutty"
@@ -70,3 +71,18 @@ def worktree(location: str, ref: str) -> Iterator[git.Repository]:
 
 
 worktree.__annotations__["return"] = contextlib.AbstractContextManager
+
+
+@contextlib.contextmanager
+def checkout(
+    location: str, *, revision: Optional[str] = None
+) -> Iterator[git.Repository]:
+    """Get a repository with the latest release checked out."""
+    repository_ = repository(location)
+    if revision is None:
+        revision = tags.find_latest(repository_) or "HEAD"
+    with worktree(location, revision) as worktree_:
+        yield worktree_
+
+
+checkout.__annotations__["return"] = contextlib.AbstractContextManager
