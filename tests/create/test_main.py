@@ -46,7 +46,7 @@ def test_undefined_variable(
     _replace(template.path / "cookiecutter.json", "project", "XXproject")
 
     template.add(".")
-    template.git("commit", "--message=Typo")
+    template.commit(message="Typo")
     template.git("tag", "v1.0.1")
 
     result = runner.invoke(
@@ -92,7 +92,7 @@ def test_checkout(
     )
 
     template.add(".")
-    template.git("commit", "--message=Style")
+    template.commit(message="Style")
 
     runner.invoke(
         create,

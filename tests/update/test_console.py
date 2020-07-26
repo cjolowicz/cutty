@@ -32,7 +32,7 @@ def instance(
 
     instance = git.Repository.init(Path("example"))
     instance.add(all=True)
-    instance.git("commit", "--message=Initial")
+    instance.commit(message="Initial")
     instance.git("branch", "template")
 
     os.chdir(instance.path)
@@ -49,7 +49,7 @@ def test_update(
     """It updates the project from the template."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
-    template.git("commit", "--message=Add LICENSE")
+    template.commit(message="Add LICENSE")
     template.git("tag", "v1.1.0")
 
     result = runner.invoke(update, [f"--config-file={user_config_file}"])
@@ -65,7 +65,7 @@ def test_interactive(
     """It reads interactive input."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
-    template.git("commit", "--message=Add LICENSE")
+    template.commit(message="Add LICENSE")
     template.git("tag", "v1.1.0")
 
     result = runner.invoke(
@@ -84,7 +84,7 @@ def test_no_previous_context(
     template.git(
         "rm", str(template.path / "{{cookiecutter.project}}" / ".cookiecutter.json")
     )
-    template.git("commit", "--message=Remove .cookiecutter.json")
+    template.commit(message="Remove .cookiecutter.json")
     template.git("tag", "v1.1.0")
 
     result = runner.invoke(update, [f"--config-file={user_config_file}"])
@@ -92,7 +92,7 @@ def test_no_previous_context(
 
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
-    template.git("commit", "--message=Add LICENSE")
+    template.commit(message="Add LICENSE")
     template.git("tag", "v1.2.0")
 
     result = runner.invoke(
