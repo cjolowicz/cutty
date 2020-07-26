@@ -218,3 +218,10 @@ class Repository:
     def branch(self, name: str) -> None:
         """Create a branch."""
         self.git("branch", name)
+
+    def tag(self, name: str, ref: Optional[str] = None) -> None:
+        """Create a tag."""
+        if ref is not None:
+            self.git("tag", name, ref)
+        else:
+            self.git("tag", name)
