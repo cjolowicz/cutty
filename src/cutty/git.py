@@ -200,6 +200,10 @@ class Repository:
         options = _format_options(all=all)
         self.git("add", *options, "--", *paths)
 
+    def rm(self, *paths: StrPath) -> None:
+        """Remove files from the working tree and from the index."""
+        self.git("rm", *paths)
+
     def commit(
         self,
         *paths: StrPath,
