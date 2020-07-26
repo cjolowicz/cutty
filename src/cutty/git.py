@@ -199,3 +199,18 @@ class Repository:
         """Add file contents to the index."""
         options = _format_options(all=all)
         self.git("add", *options, "--", *paths)
+
+    def commit(
+        self,
+        *paths: StrPath,
+        allow_empty: Optional[bool] = None,
+        allow_empty_message: Optional[bool] = None,
+        message: Optional[str] = None,
+    ) -> None:
+        """Record changes to the repository."""
+        options = _format_options(
+            allow_empty=allow_empty,
+            allow_empty_message=allow_empty_message,
+            message=message,
+        )
+        self.git("commit", *options, "--", *paths)
