@@ -81,9 +81,7 @@ def test_no_previous_context(
     instance: git.Repository,
 ) -> None:
     """It updates the project from the template."""
-    template.git(
-        "rm", str(template.path / "{{cookiecutter.project}}" / ".cookiecutter.json")
-    )
+    template.rm(template.path / "{{cookiecutter.project}}" / ".cookiecutter.json")
     template.commit(message="Remove .cookiecutter.json")
     template.tag("v1.1.0")
 
