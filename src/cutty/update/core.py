@@ -75,5 +75,5 @@ def update(
                 overwrite_if_exists=True,
                 output_dir=str(project.path.parent),
             )
-            project.git("add", "--all")
+            project.add(all=True)
             project.git("commit", f"--message=Update template to {revision}")
