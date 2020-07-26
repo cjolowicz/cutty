@@ -27,7 +27,7 @@ def test_worktree(
 ) -> None:
     """It adds and removes a worktree."""
     (repository.path / "README").touch()
-    repository.git("add", "README")
+    repository.add("README")
     commit(repository)
     mirror.git("remote", "update")
     path = tmp_path / "worktree"

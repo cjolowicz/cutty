@@ -71,7 +71,7 @@ def template(repository: git.Repository) -> git.Repository:
     )
     (repository.path / "cookiecutter.json").write_text(dedent(cookiecutter_json))
 
-    repository.git("add", ".")
+    repository.add(".")
     repository.git("commit", "--message=Initial commit")
     repository.git("tag", "v1.0.0")
 

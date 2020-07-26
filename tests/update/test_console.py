@@ -31,7 +31,7 @@ def instance(
     )
 
     instance = git.Repository.init(Path("example"))
-    instance.git("add", "--all")
+    instance.add(all=True)
     instance.git("commit", "--message=Initial")
     instance.git("branch", "template")
 
@@ -48,7 +48,7 @@ def test_update(
 ) -> None:
     """It updates the project from the template."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
-    template.git("add", ".")
+    template.add(".")
     template.git("commit", "--message=Add LICENSE")
     template.git("tag", "v1.1.0")
 
@@ -64,7 +64,7 @@ def test_interactive(
 ) -> None:
     """It reads interactive input."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
-    template.git("add", ".")
+    template.add(".")
     template.git("commit", "--message=Add LICENSE")
     template.git("tag", "v1.1.0")
 
@@ -91,7 +91,7 @@ def test_no_previous_context(
     git.Repository().git("merge", "template")
 
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
-    template.git("add", ".")
+    template.add(".")
     template.git("commit", "--message=Add LICENSE")
     template.git("tag", "v1.2.0")
 
