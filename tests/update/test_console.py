@@ -88,7 +88,7 @@ def test_no_previous_context(
     template.tag("v1.1.0")
 
     result = runner.invoke(update, [f"--config-file={user_config_file}"])
-    git.Repository().git("merge", "template")
+    git.Repository().merge("template")
 
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
     template.add(".")
