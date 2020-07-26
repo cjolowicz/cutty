@@ -29,7 +29,7 @@ def test_worktree(
     (repository.path / "README").touch()
     repository.add("README")
     commit(repository)
-    mirror.git("remote", "update")
+    mirror.update_remote()
     path = tmp_path / "worktree"
     worktree = mirror.add_worktree(path, "HEAD", detach=True)
     assert (worktree.path / "README").is_file()
