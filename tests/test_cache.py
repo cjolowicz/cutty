@@ -1,5 +1,4 @@
 """Tests for the cache module."""
-import subprocess  # noqa: S404
 from pathlib import Path
 
 from .utils import commit
@@ -12,9 +11,7 @@ def test_repository_clones(user_cache_dir: Path, repository: git.Repository) -> 
     commit(repository)
     location = str(repository.path)
     mirror = cache.repository(location)
-    origin = mirror.git(
-        "remote", "get-url", "origin", stdout=subprocess.PIPE
-    ).stdout.strip()
+    origin = mirror.get_remote_url("origin")
     assert origin == location
 
 
