@@ -10,9 +10,9 @@ from cutty import git
 @pytest.fixture
 def mirror(tmp_path: Path, repository: git.Repository) -> git.Repository:
     """Mirror repository in a temporary directory."""
-    path = tmp_path / "mirror"
-    git.git("clone", "--mirror", str(repository.path), str(path))
-    return git.Repository(path)
+    return git.Repository.clone(
+        str(repository.path), destination=tmp_path / "mirror", mirror=True
+    )
 
 
 def test_tags(repository: git.Repository) -> None:
