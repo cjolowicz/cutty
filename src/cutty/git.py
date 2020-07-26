@@ -10,6 +10,7 @@ from typing import List
 from typing import MutableMapping
 from typing import Optional
 from typing import TYPE_CHECKING
+from typing import TypeVar
 
 
 if TYPE_CHECKING:
@@ -73,18 +74,22 @@ def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
         raise Error(error) from None
 
 
-def _format_boolean_option(key: str, value: bool) -> str:
-    """Convert a key-value pair to a boolean command-line option."""
+T = TypeVar("T")
+
+
+def _format_option(key: str, value: T) -> str:
+    """Convert a key-value pair to a command-line option."""
     name = key.replace("_", "-")
-    return f"--{name}" if value else f"--no-{name}"
+    if isinstance(value, bool):
+        return f"--{name}" if value else f"--no-{name}"
+    else:
+        return f"--{name}={value}"
 
 
-def _format_boolean_options(**kwargs: Optional[bool]) -> List[str]:
-    """Convert keyword arguments to boolean command-line options."""
+def _format_options(**kwargs: Optional[T]) -> List[str]:
+    """Convert keyword arguments to command-line options."""
     return [
-        _format_boolean_option(key, value)
-        for key, value in kwargs.items()
-        if value is not None
+        _format_option(key, value) for key, value in kwargs.items() if value is not None
     ]
 
 
@@ -111,7 +116,7 @@ class Repository:
         mirror: Optional[bool] = None,
     ) -> Repository:
         """Clone a repository."""
-        options = _format_boolean_options(quiet=quiet, mirror=mirror)
+        options = _format_options(quiet=quiet, mirror=mirror)
 
         if destination is None:
             git("clone", *options, location)
@@ -126,7 +131,7 @@ class Repository:
 
     def update_remote(self, prune: Optional[bool] = None) -> None:
         """Fetch updates for remotes in the repository."""
-        options = _format_boolean_options(prune=prune)
+        options = _format_options(prune=prune)
         self.git("remote", "update", *options, stdout=subprocess.PIPE)
 
     def tags(self) -> List[str]:
@@ -148,14 +153,14 @@ class Repository:
         detach: Optional[bool] = None,
     ) -> Repository:
         """Add a worktree."""
-        options = _format_boolean_options(checkout=checkout, detach=detach)
+        options = _format_options(checkout=checkout, detach=detach)
         self.git("worktree", "add", *options, str(path), ref)
 
         return Repository(path)
 
     def remove_worktree(self, path: Path, *, force: Optional[bool] = None) -> None:
         """Remove a worktree."""
-        options = _format_boolean_options(force=force)
+        options = _format_options(force=force)
         self.git("worktree", "remove", *options, str(path))
 
     @contextlib.contextmanager
