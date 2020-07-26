@@ -1,6 +1,7 @@
 """Create a project."""
 import logging
 from pathlib import Path
+from textwrap import dedent
 from typing import cast
 from typing import Optional
 
@@ -14,6 +15,8 @@ from cookiecutter.replay import load
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
+from .. import git
+from .. import tags
 from ..types import StrMapping
 
 
@@ -39,6 +42,25 @@ def _create_context(
     context["cookiecutter"]["_template"] = template
 
     return cast(StrMapping, context)
+
+
+def _create_repository(project: Path, template: str, revision: str) -> None:
+    message = f"""\
+    Initial project structure
+
+    This project structure was generated from a project template:
+
+    - Template: {template}
+    - Revision: {revision}
+    """
+    repository = (
+        git.Repository(project)
+        if (project / ".git").is_dir()
+        else git.Repository.init(project)
+    )
+    repository.git("add", ".")
+    repository.git("commit", f"--message={dedent(message)}")
+    repository.git("branch", "template")
 
 
 def create(
@@ -67,6 +89,7 @@ def create(
         template=template, abbreviations=config["abbreviations"]
     )
     with cache.checkout(template, revision=checkout) as worktree:
+        revision = tags.describe(worktree)
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
@@ -87,10 +110,12 @@ def create(
             )
             dump(config["replay_dir"], repo_hash, context)
 
-        generate_files(
+        project = generate_files(
             repo_dir=str(repo_dir),
             context=context,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
         )
+
+    _create_repository(Path(project), template, revision)
