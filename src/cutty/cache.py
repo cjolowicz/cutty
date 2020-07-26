@@ -63,7 +63,7 @@ def repository(location: str) -> git.Repository:
 def worktree(location: str, ref: str) -> Iterator[git.Repository]:
     """Context manager to add and remove a worktree."""
     repository = _get_repository(location)
-    sha1 = repository.rev_parse(ref)
+    sha1 = repository.rev_parse(ref, verify=True)
     path = _get_worktree_path(location, sha1)
     with repository.worktree(path, sha1, detach=True, force_remove=True) as worktree:
         yield worktree
