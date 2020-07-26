@@ -76,4 +76,4 @@ def update(
                 output_dir=str(project.path.parent),
             )
             project.add(all=True)
-            project.git("commit", f"--message=Update template to {revision}")
+            project.commit(message=f"Update template to {revision}")
