@@ -12,6 +12,7 @@ from typing import Optional
 from typing import TypeVar
 
 from .types import CompletedProcess
+from .types import StrPath
 
 
 def removeprefix(string: str, prefix: str) -> str:
@@ -54,7 +55,7 @@ class Error(Exception):
 env: MutableMapping[str, str] = {}
 
 
-def git(*args: str, check: bool = True, **kwargs: Any) -> CompletedProcess:
+def git(*args: StrPath, check: bool = True, **kwargs: Any) -> CompletedProcess:
     """Invoke git."""
     try:
         return subprocess.run(  # noqa: S603,S607
@@ -120,7 +121,7 @@ class Repository:
 
         return Repository(destination)
 
-    def git(self, *args: str, **kwargs: Any) -> CompletedProcess:
+    def git(self, *args: StrPath, **kwargs: Any) -> CompletedProcess:
         """Invoke git."""
         return git(*args, cwd=self.path, **kwargs)
 
