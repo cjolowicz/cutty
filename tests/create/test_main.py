@@ -45,7 +45,7 @@ def test_undefined_variable(
     """It displays an informative error message if a variable is undefined."""
     _replace(template.path / "cookiecutter.json", "project", "XXproject")
 
-    template.git("add", ".")
+    template.add(".")
     template.git("commit", "--message=Typo")
     template.git("tag", "v1.0.1")
 
@@ -91,7 +91,7 @@ def test_checkout(
         "## {{cookiecutter.project}}",
     )
 
-    template.git("add", ".")
+    template.add(".")
     template.git("commit", "--message=Style")
 
     runner.invoke(
