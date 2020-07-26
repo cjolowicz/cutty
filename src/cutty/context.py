@@ -1,4 +1,5 @@
 """Helper functions for contexts."""
+import json
 import logging
 from pathlib import Path
 from typing import cast
@@ -10,6 +11,12 @@ from .types import StrMapping
 
 
 logger = logging.getLogger(__name__)
+
+
+def load_context(context_file: Path) -> StrMapping:
+    """Load context from disk."""
+    with context_file.open() as io:
+        return cast(StrMapping, json.load(io))
 
 
 def create_context(
