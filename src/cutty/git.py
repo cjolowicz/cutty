@@ -130,6 +130,11 @@ class Repository:
         options = _format_options(prune=prune)
         self.git("remote", "update", *options, stdout=subprocess.PIPE)
 
+    def get_remote_url(self, remote: str) -> str:
+        """Retrieve the URL for a remote."""
+        process = self.git("remote", "get-url", remote, stdout=subprocess.PIPE)
+        return process.stdout.strip()
+
     def tags(self) -> List[str]:
         """Return the tags."""
         process = self.git(
