@@ -10,6 +10,7 @@ from cookiecutter.replay import dump
 
 from .. import cache
 from .. import git
+from .. import tags
 from ..create.core import _create_context
 from ..types import StrMapping
 
@@ -39,6 +40,7 @@ def update(
     template = extra_context["_template"]
 
     with cache.checkout(template, revision=checkout) as worktree:
+        revision = tags.describe(worktree)
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
@@ -71,4 +73,4 @@ def update(
                 output_dir=str(project.path.parent),
             )
             project.add(all=True)
-            project.commit(message="Update template")
+            project.commit(message=f"Update template to {revision}")
