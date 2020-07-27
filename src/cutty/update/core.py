@@ -4,7 +4,6 @@ from typing import Optional
 
 from cookiecutter.config import get_user_config
 from cookiecutter.generate import generate_files
-from cookiecutter.replay import dump
 
 from .. import cache
 from .. import git
@@ -49,10 +48,11 @@ def update(
             no_input=not interactive,
             config=config,
         )
-        repo_hash = cache.repository_hash(
-            template, directory=Path(directory) if directory is not None else None
+        cache.dump_context(
+            template,
+            context,
+            directory=Path(directory) if directory is not None else None,
         )
-        dump(config["replay_dir"], repo_hash, context)
 
         instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
