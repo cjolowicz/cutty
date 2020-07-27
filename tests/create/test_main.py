@@ -109,7 +109,6 @@ def test_replay_dump(
     runner: CliRunner,
     user_cache_dir: Path,
     user_config_file: Path,
-    replay_dir: Path,
     template: git.Repository,
 ) -> None:
     """It dumps the context."""
@@ -127,7 +126,6 @@ def test_replay_load(
     runner: CliRunner,
     user_cache_dir: Path,
     user_config_file: Path,
-    replay_dir: Path,
     template: git.Repository,
 ) -> None:
     """It loads the context."""
