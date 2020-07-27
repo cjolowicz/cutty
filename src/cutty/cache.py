@@ -32,6 +32,7 @@ class Entry:
         """Initialize."""
         self.hash = _hash_location(location)
         self.root = repositories / self.hash[:2] / self.hash
+        self.directory = directory
 
         repository_path = self.root / "repo.git"
 
@@ -63,7 +64,10 @@ class Entry:
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
-            yield worktree.path
+            if self.directory is not None:
+                yield worktree.path / self.directory
+            else:
+                yield worktree.path
 
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
 

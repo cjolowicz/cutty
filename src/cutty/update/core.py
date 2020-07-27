@@ -36,8 +36,7 @@ def update(
         revision=checkout,
     )
 
-    with entry.checkout() as worktree:
-        repo_dir = worktree if directory is None else worktree / Path(directory)
+    with entry.checkout() as repo_dir:
         context_file = repo_dir / "cookiecutter.json"
         current_context = load_context(context_file)
         if not interactive:

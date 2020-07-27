@@ -42,8 +42,7 @@ def create(
         directory=Path(directory) if directory is not None else None,
         revision=checkout,
     )
-    with entry.checkout() as worktree:
-        repo_dir = worktree if directory is None else worktree / Path(directory)
+    with entry.checkout() as repo_dir:
         if replay:
             context = entry.load_context()
         else:
