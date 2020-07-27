@@ -6,9 +6,11 @@ from typing import Iterator
 from typing import Optional
 
 import appdirs
+from cookiecutter import replay
 
 from . import git
 from . import tags
+from .types import StrMapping
 
 
 appname = "cutty"
@@ -90,3 +92,19 @@ def checkout(
 
 
 checkout.__annotations__["return"] = contextlib.AbstractContextManager
+
+
+def load_context(location: str, *, directory: Optional[Path] = None) -> StrMapping:
+    """Load the context for replay."""
+    root = _get_repository_root(location)
+    hash = root.name if directory is None else _get_repository_hash(str(directory))
+    return replay.load(str(root), hash)
+
+
+def dump_context(
+    location: str, context: StrMapping, *, directory: Optional[Path] = None
+) -> None:
+    """Dump the context for replay."""
+    root = _get_repository_root(location)
+    hash = root.name if directory is None else _get_repository_hash(str(directory))
+    return replay.dump(str(root), hash, context)
