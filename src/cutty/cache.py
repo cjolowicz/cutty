@@ -33,6 +33,12 @@ class Entry:
         self.location = location
         self.directory = directory
         self.revision = revision
+        self.root = _get_repository_root(location)
+        self.hash = (
+            self.root.name
+            if directory is None
+            else _get_repository_hash(str(directory))
+        )
 
     @contextlib.contextmanager
     def checkout(self) -> Iterator[git.Repository]:
@@ -44,24 +50,12 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        root = _get_repository_root(self.location)
-        hash = (
-            root.name
-            if self.directory is None
-            else _get_repository_hash(str(self.directory))
-        )
-        context = replay.load(str(root), hash)
+        context = replay.load(str(self.root), self.hash)
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        root = _get_repository_root(self.location)
-        hash = (
-            root.name
-            if self.directory is None
-            else _get_repository_hash(str(self.directory))
-        )
-        replay.dump(str(root), hash, context)
+        replay.dump(str(self.root), self.hash, context)
 
 
 def _get_repository_hash(location: str, *, length: int = 64) -> str:
