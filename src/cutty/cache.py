@@ -60,7 +60,9 @@ class Entry:
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
-        path = _get_worktree_path(self.location, sha1)
+        hash = _get_repository_hash(self.location)
+        name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
+        path = repositories / hash[:2] / hash / "worktrees" / sha1 / name
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
@@ -82,9 +84,3 @@ def _get_repository_hash(location: str, *, length: int = 64) -> str:
     # Avoid "Filename too long" error with Git for Windows.
     # https://stackoverflow.com/a/22575737/1355754
     return hashlib.blake2b(location.encode()).hexdigest()[:length]
-
-
-def _get_worktree_path(location: str, sha1: str) -> Path:
-    hash = _get_repository_hash(location)
-    name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
-    return repositories / hash[:2] / hash / "worktrees" / sha1 / name
