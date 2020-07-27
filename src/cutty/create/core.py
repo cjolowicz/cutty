@@ -37,14 +37,17 @@ def create(
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
-    with cache.checkout(template, revision=checkout) as worktree:
+    entry = cache.Entry(
+        template,
+        directory=Path(directory) if directory is not None else None,
+        revision=checkout,
+    )
+    with entry.checkout() as worktree:
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
         if replay:
-            context = cache.load_context(
-                template, directory=Path(directory) if directory is not None else None
-            )
+            context = entry.load_context()
         else:
             context_file = repo_dir / "cookiecutter.json"
             context = create_context(
@@ -54,11 +57,7 @@ def create(
                 no_input=no_input,
                 config=config,
             )
-            cache.dump_context(
-                template,
-                context,
-                directory=Path(directory) if directory is not None else None,
-            )
+            entry.dump_context(context)
 
         generate_files(
             repo_dir=str(repo_dir),
