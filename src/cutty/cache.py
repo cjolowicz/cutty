@@ -56,14 +56,14 @@ class Entry:
             self.replay_hash = _hash_location(str(directory))
 
     @contextlib.contextmanager
-    def checkout(self) -> Iterator[git.Repository]:
+    def checkout(self) -> Iterator[Path]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
         path = self.root / "worktrees" / sha1
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
-            yield worktree
+            yield worktree.path
 
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
 

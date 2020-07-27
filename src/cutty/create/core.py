@@ -43,9 +43,7 @@ def create(
         revision=checkout,
     )
     with entry.checkout() as worktree:
-        repo_dir = (
-            worktree.path if directory is None else worktree.path / Path(directory)
-        )
+        repo_dir = worktree if directory is None else worktree / Path(directory)
         if replay:
             context = entry.load_context()
         else:
