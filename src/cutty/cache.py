@@ -44,13 +44,6 @@ def _get_worktree_path(location: str, sha1: str) -> Path:
     return repositories / hash[:2] / hash / "worktrees" / sha1 / name
 
 
-def repository_hash(location: str, *, directory: Optional[Path] = None) -> str:
-    """Return a unique hash for the template."""
-    return _get_repository_hash(
-        location if directory is None else "/".join((location, *directory.parts))
-    )
-
-
 def repository(location: str) -> git.Repository:
     """Clone or update repository."""
     path = _get_repository_path(location)
