@@ -7,7 +7,6 @@ from cookiecutter.generate import generate_files
 
 from .. import cache
 from .. import git
-from .. import tags
 from ..context import create_context
 from ..context import load_context
 from ..types import StrMapping
@@ -38,7 +37,6 @@ def update(
     )
 
     with entry.checkout() as worktree:
-        revision = tags.describe(worktree)
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
@@ -68,4 +66,4 @@ def update(
                 output_dir=str(project.path.parent),
             )
             project.add(all=True)
-            project.commit(message=f"Update template to {revision}")
+            project.commit(message=f"Update template to {entry.describe}")
