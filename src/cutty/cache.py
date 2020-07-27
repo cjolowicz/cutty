@@ -48,6 +48,8 @@ class Entry:
         else:
             self.revision = revision
 
+        self.describe = tags.describe(self.repository, ref=self.revision)
+
         if directory is None:
             self.replay_hash = self.hash
         else:
