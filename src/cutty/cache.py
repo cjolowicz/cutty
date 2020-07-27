@@ -22,9 +22,13 @@ def _get_repository_hash(location: str) -> str:
     return hashlib.blake2b(location.encode()).hexdigest()[:64]
 
 
-def _get_repository_path(location: str) -> Path:
+def _get_repository_root(location: str) -> Path:
     hash = _get_repository_hash(location)
-    return repositories / hash[:2] / hash / "repo.git"
+    return repositories / hash[:2] / hash
+
+
+def _get_repository_path(location: str) -> Path:
+    return _get_repository_root(location) / "repo.git"
 
 
 def _get_repository(location: str) -> git.Repository:
