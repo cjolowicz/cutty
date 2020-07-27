@@ -5,8 +5,6 @@ from typing import Optional
 from cookiecutter import exceptions
 from cookiecutter.config import get_user_config
 from cookiecutter.generate import generate_files
-from cookiecutter.replay import dump
-from cookiecutter.replay import load
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
@@ -43,12 +41,10 @@ def create(
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )
-        repo_hash = cache.repository_hash(
-            template, directory=Path(directory) if directory is not None else None
-        )
-
         if replay:
-            context = load(config["replay_dir"], repo_hash)
+            context = cache.load_context(
+                template, directory=Path(directory) if directory is not None else None
+            )
         else:
             context_file = repo_dir / "cookiecutter.json"
             context = create_context(
@@ -58,7 +54,11 @@ def create(
                 no_input=no_input,
                 config=config,
             )
-            dump(config["replay_dir"], repo_hash, context)
+            cache.dump_context(
+                template,
+                context,
+                directory=Path(directory) if directory is not None else None,
+            )
 
         generate_files(
             repo_dir=str(repo_dir),
