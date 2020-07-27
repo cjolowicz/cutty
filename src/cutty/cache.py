@@ -32,7 +32,11 @@ class Entry:
         """Initialize."""
         self.location = location
         self.directory = directory
-        self.revision = revision
+        self.repository = repository(self.location)
+        if revision is None:
+            self.revision = tags.find_latest(self.repository) or "HEAD"
+        else:
+            self.revision = revision
         self.root = _get_repository_root(location)
         self.hash = (
             self.root.name
@@ -43,12 +47,7 @@ class Entry:
     @contextlib.contextmanager
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
-        repository_ = repository(self.location)
-        if self.revision is None:
-            revision = tags.find_latest(repository_) or "HEAD"
-        else:
-            revision = self.revision
-        with worktree(self.location, revision) as worktree_:
+        with worktree(self.location, self.revision) as worktree_:
             yield worktree_
 
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
