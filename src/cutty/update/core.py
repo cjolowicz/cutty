@@ -31,8 +31,13 @@ def update(
         previous_context = {}
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
+    entry = cache.Entry(
+        template,
+        directory=Path(directory) if directory is not None else None,
+        revision=checkout,
+    )
 
-    with cache.checkout(template, revision=checkout) as worktree:
+    with entry.checkout() as worktree:
         revision = tags.describe(worktree)
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
@@ -48,11 +53,7 @@ def update(
             no_input=not interactive,
             config=config,
         )
-        cache.dump_context(
-            template,
-            context,
-            directory=Path(directory) if directory is not None else None,
-        )
+        entry.dump_context(context)
 
         instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
