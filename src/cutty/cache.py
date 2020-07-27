@@ -33,7 +33,7 @@ class Entry:
         self.location = location
         self.directory = directory
 
-        hash = _get_repository_hash(self.location)
+        hash = _hash_location(self.location)
         self.root = repositories / hash[:2] / hash
         path = self.root / "repo.git"
 
@@ -51,9 +51,7 @@ class Entry:
             self.revision = revision
 
         self.hash = (
-            self.root.name
-            if directory is None
-            else _get_repository_hash(str(directory))
+            self.root.name if directory is None else _hash_location(str(directory))
         )
 
     @contextlib.contextmanager
@@ -80,7 +78,7 @@ class Entry:
         replay.dump(str(self.root), self.hash, context)
 
 
-def _get_repository_hash(location: str, *, length: int = 64) -> str:
+def _hash_location(location: str, *, length: int = 64) -> str:
     # Avoid "Filename too long" error with Git for Windows.
     # https://stackoverflow.com/a/22575737/1355754
     return hashlib.blake2b(location.encode()).hexdigest()[:length]
