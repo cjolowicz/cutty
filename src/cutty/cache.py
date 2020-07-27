@@ -50,7 +50,7 @@ class Entry:
         else:
             self.revision = revision
 
-        self.hash = (
+        self.hash_with_directory = (
             self.root.name if directory is None else _hash_location(str(directory))
         )
 
@@ -70,12 +70,12 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        context = replay.load(str(self.root), self.hash)
+        context = replay.load(str(self.root), self.hash_with_directory)
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        replay.dump(str(self.root), self.hash, context)
+        replay.dump(str(self.root), self.hash_with_directory, context)
 
 
 def _hash_location(location: str, *, length: int = 64) -> str:
