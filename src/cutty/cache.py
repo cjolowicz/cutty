@@ -44,7 +44,14 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        return load_context(self.location, directory=self.directory)
+        root = _get_repository_root(self.location)
+        hash = (
+            root.name
+            if self.directory is None
+            else _get_repository_hash(str(self.directory))
+        )
+        context = replay.load(str(root), hash)
+        return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
@@ -118,14 +125,6 @@ def checkout(
 
 
 checkout.__annotations__["return"] = contextlib.AbstractContextManager
-
-
-def load_context(location: str, *, directory: Optional[Path] = None) -> StrMapping:
-    """Load the context for replay."""
-    root = _get_repository_root(location)
-    hash = root.name if directory is None else _get_repository_hash(str(directory))
-    context = replay.load(str(root), hash)
-    return cast(StrMapping, context)
 
 
 def dump_context(
