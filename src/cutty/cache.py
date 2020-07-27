@@ -30,10 +30,7 @@ class Entry:
         revision: Optional[str] = None,
     ) -> None:
         """Initialize."""
-        self.location = location
-        self.directory = directory
-
-        self.hash = _hash_location(self.location)
+        self.hash = _hash_location(location)
         self.root = repositories / self.hash[:2] / self.hash
         path = self.root / "repo.git"
 
@@ -42,7 +39,7 @@ class Entry:
             self.repository.update_remote(prune=True)
         else:
             self.repository = git.Repository.clone(
-                self.location, destination=path, mirror=True, quiet=True
+                location, destination=path, mirror=True, quiet=True
             )
 
         if revision is None:
