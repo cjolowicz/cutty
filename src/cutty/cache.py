@@ -33,7 +33,8 @@ class Entry:
         self.location = location
         self.directory = directory
 
-        path = _get_repository_path(self.location)
+        self.root = _get_repository_root(location)
+        path = self.root / "repo.git"
 
         if path.exists():
             self.repository = git.Repository(path)
@@ -47,7 +48,7 @@ class Entry:
             self.revision = tags.find_latest(self.repository) or "HEAD"
         else:
             self.revision = revision
-        self.root = _get_repository_root(location)
+
         self.hash = (
             self.root.name
             if directory is None
@@ -85,10 +86,6 @@ def _get_repository_hash(location: str, *, length: int = 64) -> str:
 def _get_repository_root(location: str) -> Path:
     hash = _get_repository_hash(location)
     return repositories / hash[:2] / hash
-
-
-def _get_repository_path(location: str) -> Path:
-    return _get_repository_root(location) / "repo.git"
 
 
 def _get_worktree_path(location: str, sha1: str) -> Path:
