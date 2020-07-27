@@ -33,14 +33,14 @@ class Entry:
         self.hash = _hash_location(location)
         self.root = repositories / self.hash[:2] / self.hash
 
-        path = self.root / "repo.git"
+        repository_path = self.root / "repo.git"
 
-        if path.exists():
-            self.repository = git.Repository(path)
+        if repository_path.exists():
+            self.repository = git.Repository(repository_path)
             self.repository.update_remote(prune=True)
         else:
             self.repository = git.Repository.clone(
-                location, destination=path, mirror=True, quiet=True
+                location, destination=repository_path, mirror=True, quiet=True
             )
 
         if revision is None:
