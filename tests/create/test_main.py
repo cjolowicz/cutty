@@ -4,6 +4,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
+from cutty import cache
 from cutty import git
 from cutty.create.console import create
 
@@ -118,7 +119,8 @@ def test_replay_dump(
         input="example",
         catch_exceptions=False,
     )
-    assert replay_dir.exists()
+    entry = cache.Entry(str(template.path))
+    assert entry.load_context()
 
 
 def test_replay_load(
