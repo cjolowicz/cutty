@@ -16,10 +16,10 @@ path = Path(appdirs.user_cache_dir(appname=appname, appauthor=appname))
 repositories = path / "repositories"
 
 
-def _get_repository_hash(location: str) -> str:
+def _get_repository_hash(location: str, *, length: int = 64) -> str:
     # Avoid "Filename too long" error with Git for Windows.
     # https://stackoverflow.com/a/22575737/1355754
-    return hashlib.blake2b(location.encode()).hexdigest()[:64]
+    return hashlib.blake2b(location.encode()).hexdigest()[:length]
 
 
 def _get_repository_root(location: str) -> Path:
