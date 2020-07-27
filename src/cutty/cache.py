@@ -33,7 +33,8 @@ class Entry:
         self.location = location
         self.directory = directory
 
-        self.root = _get_repository_root(location)
+        hash = _get_repository_hash(self.location)
+        self.root = repositories / hash[:2] / hash
         path = self.root / "repo.git"
 
         if path.exists():
@@ -81,11 +82,6 @@ def _get_repository_hash(location: str, *, length: int = 64) -> str:
     # Avoid "Filename too long" error with Git for Windows.
     # https://stackoverflow.com/a/22575737/1355754
     return hashlib.blake2b(location.encode()).hexdigest()[:length]
-
-
-def _get_repository_root(location: str) -> Path:
-    hash = _get_repository_hash(location)
-    return repositories / hash[:2] / hash
 
 
 def _get_worktree_path(location: str, sha1: str) -> Path:
