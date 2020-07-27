@@ -60,7 +60,7 @@ class Entry:
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
-        hash = _get_repository_hash(self.location)
+        hash = self.root.name
         name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
         path = repositories / hash[:2] / hash / "worktrees" / sha1 / name
         with self.repository.worktree(
