@@ -32,7 +32,17 @@ class Entry:
         """Initialize."""
         self.location = location
         self.directory = directory
-        self.repository = repository(self.location)
+
+        path = _get_repository_path(self.location)
+
+        if path.exists():
+            self.repository = git.Repository(path)
+            self.repository.update_remote(prune=True)
+        else:
+            self.repository = git.Repository.clone(
+                self.location, destination=path, mirror=True, quiet=True
+            )
+
         if revision is None:
             self.revision = tags.find_latest(self.repository) or "HEAD"
         else:
@@ -90,18 +100,3 @@ def _get_worktree_path(location: str, sha1: str) -> Path:
     hash = _get_repository_hash(location)
     name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
     return repositories / hash[:2] / hash / "worktrees" / sha1 / name
-
-
-def repository(location: str) -> git.Repository:
-    """Clone or update repository."""
-    path = _get_repository_path(location)
-
-    if path.exists():
-        repository = git.Repository(path)
-        repository.update_remote(prune=True)
-    else:
-        repository = git.Repository.clone(
-            location, destination=path, mirror=True, quiet=True
-        )
-
-    return repository

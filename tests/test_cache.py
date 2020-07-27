@@ -10,7 +10,7 @@ def test_repository_clones(user_cache_dir: Path, repository: git.Repository) -> 
     """It clones the repository if it does not exist."""
     commit(repository)
     location = str(repository.path)
-    mirror = cache.repository(location)
+    mirror = cache.Entry(location).repository
     origin = mirror.get_remote_url("origin")
     assert origin == location
 
@@ -21,8 +21,8 @@ def test_repository_uses_unique_path(
     """It returns the same path when called multiple times."""
     commit(repository)
     location = str(repository.path)
-    mirror1 = cache.repository(location)
-    mirror2 = cache.repository(location)
+    mirror1 = cache.Entry(location).repository
+    mirror2 = cache.Entry(location).repository
     assert mirror1.path == mirror2.path
 
 
@@ -30,9 +30,9 @@ def test_repository_updates(user_cache_dir: Path, repository: git.Repository) ->
     """It updates the repository if it exists."""
     commit(repository)
     location = str(repository.path)
-    cache.repository(location)
+    cache.Entry(location)
     head = commit(repository)
-    mirror = cache.repository(location)
+    mirror = cache.Entry(location).repository
     assert mirror.rev_parse("HEAD") == head
 
 
