@@ -91,11 +91,6 @@ def _get_repository_path(location: str) -> Path:
     return _get_repository_root(location) / "repo.git"
 
 
-def _get_repository(location: str) -> git.Repository:
-    path = _get_repository_path(location)
-    return git.Repository(path)
-
-
 def _get_worktree_path(location: str, sha1: str) -> Path:
     hash = _get_repository_hash(location)
     name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
