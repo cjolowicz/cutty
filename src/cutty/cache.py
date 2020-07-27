@@ -48,9 +48,10 @@ class Entry:
         else:
             self.revision = revision
 
-        self.hash_with_directory = (
-            self.hash if directory is None else _hash_location(str(directory))
-        )
+        if directory is None:
+            self.hash_with_directory = self.hash
+        else:
+            self.hash_with_directory = _hash_location(str(directory))
 
     @contextlib.contextmanager
     def checkout(self) -> Iterator[git.Repository]:
