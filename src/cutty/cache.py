@@ -2,6 +2,7 @@
 import contextlib
 import hashlib
 from pathlib import Path
+from typing import cast
 from typing import Iterator
 from typing import Optional
 
@@ -123,7 +124,8 @@ def load_context(location: str, *, directory: Optional[Path] = None) -> StrMappi
     """Load the context for replay."""
     root = _get_repository_root(location)
     hash = root.name if directory is None else _get_repository_hash(str(directory))
-    return replay.load(str(root), hash)
+    context = replay.load(str(root), hash)
+    return cast(StrMapping, context)
 
 
 def dump_context(
@@ -132,4 +134,4 @@ def dump_context(
     """Dump the context for replay."""
     root = _get_repository_root(location)
     hash = root.name if directory is None else _get_repository_hash(str(directory))
-    return replay.dump(str(root), hash, context)
+    replay.dump(str(root), hash, context)
