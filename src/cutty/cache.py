@@ -18,6 +18,38 @@ path = Path(appdirs.user_cache_dir(appname=appname, appauthor=appname))
 repositories = path / "repositories"
 
 
+class Entry:
+    """Cache entry for a repository."""
+
+    def __init__(
+        self,
+        location: str,
+        *,
+        directory: Optional[Path] = None,
+        revision: Optional[str] = None,
+    ) -> None:
+        """Initialize."""
+        self.location = location
+        self.directory = directory
+        self.revision = revision
+
+    @contextlib.contextmanager
+    def checkout(self) -> Iterator[git.Repository]:
+        """Get a repository with the latest release checked out."""
+        with checkout(self.location, revision=self.revision) as repository:
+            yield repository
+
+    checkout.__annotations__["return"] = contextlib.AbstractContextManager
+
+    def load_context(self) -> StrMapping:
+        """Load the context for replay."""
+        return load_context(self.location, directory=self.directory)
+
+    def dump_context(self, context: StrMapping) -> None:
+        """Dump the context for replay."""
+        return dump_context(self.location, context, directory=self.directory)
+
+
 def _get_repository_hash(location: str, *, length: int = 64) -> str:
     # Avoid "Filename too long" error with Git for Windows.
     # https://stackoverflow.com/a/22575737/1355754
