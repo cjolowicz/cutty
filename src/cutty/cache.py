@@ -32,6 +32,7 @@ class Entry:
         """Initialize."""
         self.hash = _hash_location(location)
         self.root = repositories / self.hash[:2] / self.hash
+
         path = self.root / "repo.git"
 
         if path.exists():
