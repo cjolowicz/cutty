@@ -33,8 +33,8 @@ class Entry:
         self.location = location
         self.directory = directory
 
-        hash = _hash_location(self.location)
-        self.root = repositories / hash[:2] / hash
+        self.hash = _hash_location(self.location)
+        self.root = repositories / self.hash[:2] / self.hash
         path = self.root / "repo.git"
 
         if path.exists():
@@ -51,16 +51,15 @@ class Entry:
             self.revision = revision
 
         self.hash_with_directory = (
-            self.root.name if directory is None else _hash_location(str(directory))
+            self.hash if directory is None else _hash_location(str(directory))
         )
 
     @contextlib.contextmanager
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
-        hash = self.root.name
-        name = hash[:7]  # This should be stable for Cookiecutter's replay feature.
-        path = repositories / hash[:2] / hash / "worktrees" / sha1 / name
+        name = self.hash[:7]  # This should be stable for Cookiecutter's replay feature.
+        path = repositories / self.hash[:2] / self.hash / "worktrees" / sha1 / name
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
