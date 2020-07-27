@@ -55,7 +55,13 @@ class Entry:
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        return dump_context(self.location, context, directory=self.directory)
+        root = _get_repository_root(self.location)
+        hash = (
+            root.name
+            if self.directory is None
+            else _get_repository_hash(str(self.directory))
+        )
+        replay.dump(str(root), hash, context)
 
 
 def _get_repository_hash(location: str, *, length: int = 64) -> str:
@@ -125,12 +131,3 @@ def checkout(
 
 
 checkout.__annotations__["return"] = contextlib.AbstractContextManager
-
-
-def dump_context(
-    location: str, context: StrMapping, *, directory: Optional[Path] = None
-) -> None:
-    """Dump the context for replay."""
-    root = _get_repository_root(location)
-    hash = root.name if directory is None else _get_repository_hash(str(directory))
-    replay.dump(str(root), hash, context)
