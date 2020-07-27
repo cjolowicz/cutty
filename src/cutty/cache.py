@@ -47,8 +47,12 @@ class Entry:
     @contextlib.contextmanager
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
-        with worktree(self.location, self.revision) as worktree_:
-            yield worktree_
+        sha1 = self.repository.rev_parse(self.revision, verify=True)
+        path = _get_worktree_path(self.location, sha1)
+        with self.repository.worktree(
+            path, sha1, detach=True, force_remove=True
+        ) as worktree:
+            yield worktree
 
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
 
@@ -101,16 +105,3 @@ def repository(location: str) -> git.Repository:
         )
 
     return repository
-
-
-@contextlib.contextmanager
-def worktree(location: str, ref: str) -> Iterator[git.Repository]:
-    """Context manager to add and remove a worktree."""
-    repository = _get_repository(location)
-    sha1 = repository.rev_parse(ref, verify=True)
-    path = _get_worktree_path(location, sha1)
-    with repository.worktree(path, sha1, detach=True, force_remove=True) as worktree:
-        yield worktree
-
-
-worktree.__annotations__["return"] = contextlib.AbstractContextManager

@@ -40,8 +40,8 @@ def test_worktree_creates(user_cache_dir: Path, repository: git.Repository) -> N
     """It creates a worktree."""
     head = commit(repository)
     location = str(repository.path)
-    cache.repository(location)
-    with cache.worktree(location, "HEAD") as worktree:
+    entry = cache.Entry(location, revision="HEAD")
+    with entry.checkout() as worktree:
         assert worktree.rev_parse("HEAD") == head
 
 
@@ -49,7 +49,7 @@ def test_worktree_removes(user_cache_dir: Path, repository: git.Repository) -> N
     """It removes the worktree after use."""
     commit(repository)
     location = str(repository.path)
-    cache.repository(location)
-    with cache.worktree(location, "HEAD") as worktree:
+    entry = cache.Entry(location, revision="HEAD")
+    with entry.checkout() as worktree:
         path = worktree.path
     assert not path.exists()
