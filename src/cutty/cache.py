@@ -55,7 +55,7 @@ class Entry:
     def checkout(self) -> Iterator[git.Repository]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
-        path = repositories / self.hash[:2] / self.hash / "worktrees" / sha1
+        path = self.root / "worktrees" / sha1
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
