@@ -13,11 +13,7 @@ from typing import TypeVar
 
 from .types import CompletedProcess
 from .types import StrPath
-
-
-def removeprefix(string: str, prefix: str) -> str:
-    """Remove prefix from string, if present."""
-    return string[len(prefix) :] if string.startswith(prefix) else string
+from .utils import removeprefix
 
 
 class Error(Exception):
