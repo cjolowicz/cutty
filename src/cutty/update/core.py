@@ -10,6 +10,7 @@ from .. import git
 from ..context import create_context
 from ..context import load_context
 from ..types import StrMapping
+from ..utils import as_optional_str
 
 
 def update(
@@ -17,12 +18,14 @@ def update(
     *,
     interactive: bool = False,
     checkout: Optional[str] = None,
-    config_file: Optional[str] = None,
     directory: Optional[Path] = None,
+    config_file: Optional[Path] = None,
     default_config: bool = False,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = get_user_config(config_file=config_file, default_config=default_config)
+    config = get_user_config(
+        config_file=as_optional_str(config_file), default_config=default_config
+    )
     previous_context_file = Path(".cookiecutter.json")
     if previous_context_file.exists():
         previous_context = load_context(previous_context_file)

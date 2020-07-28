@@ -63,7 +63,7 @@ def update(
         extra_context,
         interactive=interactive,
         checkout=checkout,
-        config_file=config_file,
         directory=as_optional_path(directory),
+        config_file=as_optional_path(config_file),
         default_config=default_config,
     )
