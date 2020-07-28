@@ -150,7 +150,7 @@ def create(
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
-            config_file=config_file,
+            config_file=as_optional_path(config_file),
             default_config=default_config,
         )
     except errors as error:
