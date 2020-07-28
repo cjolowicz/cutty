@@ -7,6 +7,7 @@ from cookiecutter.log import configure_logger
 from . import core
 from ..create.console import validate_extra_context
 from ..types import StrMapping
+from ..utils import as_optional_path
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
@@ -62,7 +63,7 @@ def update(
         extra_context,
         interactive=interactive,
         checkout=checkout,
-        directory=directory,
         config_file=config_file,
+        directory=as_optional_path(directory),
         default_config=default_config,
     )
