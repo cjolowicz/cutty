@@ -17,8 +17,8 @@ def update(
     *,
     interactive: bool = False,
     checkout: Optional[str] = None,
-    directory: Optional[str] = None,
     config_file: Optional[str] = None,
+    directory: Optional[Path] = None,
     default_config: bool = False,
 ) -> None:
     """Update a project from a Cookiecutter template."""
@@ -30,11 +30,7 @@ def update(
         previous_context = {}
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
-    entry = cache.Entry(
-        template,
-        directory=Path(directory) if directory is not None else None,
-        revision=checkout,
-    )
+    entry = cache.Entry(template, directory=directory, revision=checkout)
 
     with entry.checkout() as repo_dir:
         context_file = repo_dir / "cookiecutter.json"
