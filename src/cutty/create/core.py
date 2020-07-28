@@ -10,6 +10,7 @@ from cookiecutter.repository import expand_abbreviations
 from .. import cache
 from ..context import create_context
 from ..types import StrMapping
+from ..utils import as_optional_str
 
 
 def create(
@@ -23,7 +24,7 @@ def create(
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
     output_dir: str = ".",
-    config_file: Optional[str] = None,
+    config_file: Optional[Path] = None,
     default_config: bool = False,
 ) -> None:
     """Create a project from a Cookiecutter template."""
@@ -33,7 +34,9 @@ def create(
             "at the same time."
         )
 
-    config = get_user_config(config_file=config_file, default_config=default_config)
+    config = get_user_config(
+        config_file=as_optional_str(config_file), default_config=default_config
+    )
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
