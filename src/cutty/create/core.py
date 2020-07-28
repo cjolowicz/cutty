@@ -18,7 +18,7 @@ def create(
     *,
     no_input: bool = False,
     checkout: Optional[str] = None,
-    directory: Optional[str] = None,
+    directory: Optional[Path] = None,
     replay: bool = False,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
@@ -37,11 +37,7 @@ def create(
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
-    entry = cache.Entry(
-        template,
-        directory=Path(directory) if directory is not None else None,
-        revision=checkout,
-    )
+    entry = cache.Entry(template, directory=directory, revision=checkout)
     with entry.checkout() as repo_dir:
         if replay:
             context = entry.load_context()

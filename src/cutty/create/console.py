@@ -14,6 +14,7 @@ from cookiecutter.log import configure_logger
 from . import core
 from .. import git
 from ..types import StrMapping
+from ..utils import as_optional_path
 
 
 errors = (
@@ -144,7 +145,7 @@ def create(
             extra_context,
             no_input=no_input,
             checkout=checkout,
-            directory=directory,
+            directory=as_optional_path(directory),
             replay=replay,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
