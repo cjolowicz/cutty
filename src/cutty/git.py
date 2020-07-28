@@ -19,29 +19,25 @@ from .utils import removeprefix
 class Error(Exception):
     """Git error."""
 
-    def __init__(self, error: subprocess.CalledProcessError) -> None:
+    @classmethod
+    def from_subprocess(cls, error: subprocess.CalledProcessError) -> Error:
+        """Create an error from subprocess.CalledProcessError."""
+        command = "".join(error.cmd[1:2])
+
+        if command == "rev-parse" and "Needed a single revision" in error.stderr:
+            message = f"unknown revision {error.cmd[-1]!r}"
+        elif not error.stderr:
+            message = f"returned non-zero exit status {error.returncode}"
+        else:
+            message = error.stderr.splitlines()[-1]
+            message = removeprefix(message, "fatal: ")
+
+        return cls(command, message)
+
+    def __init__(self, command: str, message: str) -> None:
         """Initialize."""
-        self.error = error
-
-    @property
-    def command(self) -> str:
-        """Return the git command."""
-        return "".join(self.error.cmd[1:2])
-
-    @property
-    def message(self) -> str:
-        """Return a friendly error message."""
-        if (
-            self.command == "rev-parse"
-            and "Needed a single revision" in self.error.stderr
-        ):
-            return f"unknown revision {self.error.cmd[-1]!r}"
-
-        if not self.error.stderr:
-            return f"returned non-zero exit status {self.error.returncode}"
-
-        message = self.error.stderr.splitlines()[-1]
-        return removeprefix(message, "fatal: ")
+        self.command = command
+        self.message = message
 
     def __str__(self) -> str:
         """Return a friendly error message, prefixed by the command."""
@@ -63,7 +59,7 @@ def git(*args: StrPath, check: bool = True, **kwargs: Any) -> CompletedProcess:
             **kwargs,
         )
     except subprocess.CalledProcessError as error:
-        raise Error(error) from None
+        raise Error.from_subprocess(error) from None
 
 
 T = TypeVar("T")
