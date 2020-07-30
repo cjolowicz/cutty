@@ -46,7 +46,7 @@ def update(
         context_file = repo_dir / "cookiecutter.json"
         current_context = load_context(context_file)
         if not interactive:
-            interactive = bool(set(current_context) - set(previous_context))
+            interactive = bool(current_context.keys() - previous_context.keys())
         context = create_context(
             context_file,
             template=template,
