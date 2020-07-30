@@ -37,10 +37,7 @@ def update(
     instance = git.Repository()
     _ensure_branch_exists(instance, "template")
     previous_context_file = Path(".cookiecutter.json")
-    if previous_context_file.exists():
-        previous_context = load_context(previous_context_file)
-    else:
-        previous_context = {}
+    previous_context = load_context(previous_context_file, default={})
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     entry = cache.Entry(template, directory=directory, revision=checkout)
