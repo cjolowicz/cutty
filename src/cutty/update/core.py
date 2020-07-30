@@ -13,6 +13,14 @@ from ..types import StrMapping
 from ..utils import as_optional_str
 
 
+def _ensure_branch_exists(repository: git.Repository, branch: str):
+    try:
+        repository.rev_parse(branch, verify=True, quiet=True)
+    except git.Error:
+        (firstref,) = repository.rev_list(max_count=1, max_parents=0)
+        repository.branch(branch, firstref)
+
+
 def update(
     extra_context: StrMapping,
     *,
@@ -27,11 +35,7 @@ def update(
         config_file=as_optional_str(config_file), default_config=default_config
     )
     instance = git.Repository()
-    try:
-        instance.rev_parse("template", verify=True, quiet=True)
-    except git.Error:
-        (firstref,) = instance.rev_list(max_count=1, max_parents=0)
-        instance.branch("template", firstref)
+    _ensure_branch_exists(instance, "template")
     previous_context_file = Path(".cookiecutter.json")
     if previous_context_file.exists():
         previous_context = load_context(previous_context_file)
