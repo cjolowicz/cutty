@@ -232,9 +232,12 @@ class Repository:
         )
         self.git("commit", *options, "--", *paths)
 
-    def branch(self, name: str) -> None:
+    def branch(self, name: str, ref: Optional[str] = None) -> None:
         """Create a branch."""
-        self.git("branch", name)
+        if ref is not None:
+            self.git("branch", name, ref)
+        else:
+            self.git("branch", name)
 
     def tag(self, name: str, ref: Optional[str] = None) -> None:
         """Create a tag."""
