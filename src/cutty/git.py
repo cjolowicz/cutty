@@ -189,6 +189,17 @@ class Repository:
         process = self.git("rev-parse", *options, rev, stdout=subprocess.PIPE)
         return process.stdout.strip()
 
+    def rev_list(
+        self,
+        *commits: str,
+        max_count: Optional[int] = None,
+        max_parents: Optional[int] = None,
+    ) -> List[str]:
+        """Lists commit objects in reverse chronological order."""
+        options = _format_options(max_count=max_count, max_parents=max_parents)
+        process = self.git("rev-list", *options, *commits, stdout=subprocess.PIPE)
+        return process.stdout.split()
+
     def describe(
         self, ref: str, *, tags: Optional[bool] = None, exact: Optional[bool] = None,
     ) -> str:
