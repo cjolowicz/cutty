@@ -3,6 +3,7 @@ import json
 import logging
 from pathlib import Path
 from typing import cast
+from typing import Optional
 
 from cookiecutter.generate import generate_context
 from cookiecutter.prompt import prompt_for_config
@@ -13,8 +14,12 @@ from .types import StrMapping
 logger = logging.getLogger(__name__)
 
 
-def load_context(context_file: Path) -> StrMapping:
+def load_context(
+    context_file: Path, *, default: Optional[StrMapping] = None
+) -> StrMapping:
     """Load context from disk."""
+    if default is not None and not context_file.exists():
+        return default
     with context_file.open() as io:
         return cast(StrMapping, json.load(io))
 
