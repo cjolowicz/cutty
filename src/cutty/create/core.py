@@ -3,14 +3,13 @@ from pathlib import Path
 from typing import Optional
 
 from cookiecutter import exceptions
-from cookiecutter.config import get_user_config
 from cookiecutter.generate import generate_files
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
+from ..config import get_user_config
 from ..context import create_context
 from ..types import StrMapping
-from ..utils import as_optional_str
 
 
 def create(
@@ -34,9 +33,7 @@ def create(
             "at the same time."
         )
 
-    config = get_user_config(
-        config_file=as_optional_str(config_file), default_config=default_config
-    )
+    config = get_user_config(config_file=config_file, default_config=default_config)
     template = expand_abbreviations(
         template=template, abbreviations=config["abbreviations"]
     )
