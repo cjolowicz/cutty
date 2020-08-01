@@ -29,8 +29,11 @@ class Error(Exception):
         elif not error.stderr:
             message = f"returned non-zero exit status {error.returncode}"
         else:
-            message = error.stderr.splitlines()[-1]
-            message = removeprefix(message, "fatal: ")
+            line = error.stderr.splitlines()[-1]
+            if line.startswith("fatal: "):
+                message = removeprefix(line, "fatal: ")
+            else:
+                message = error.stderr
 
         return cls(command, message)
 
