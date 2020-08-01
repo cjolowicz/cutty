@@ -4,6 +4,7 @@ from typing import Optional
 
 from cookiecutter.config import get_user_config
 from cookiecutter.generate import generate_files
+from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
 from .. import git
@@ -40,6 +41,9 @@ def update(
     previous_context = load_context(previous_context_file, default={})
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
+    template = expand_abbreviations(
+        template=template, abbreviations=config["abbreviations"]
+    )
     entry = cache.Entry(template, directory=directory, revision=checkout)
 
     with entry.checkout() as repo_dir:
