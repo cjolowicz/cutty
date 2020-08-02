@@ -5,8 +5,8 @@ from typing import Optional
 
 import cookiecutter.config
 
-from ..types import StrMapping
-from ..utils import as_optional_str
+from .types import StrMapping
+from .utils import as_optional_str
 
 
 def get_user_config(
