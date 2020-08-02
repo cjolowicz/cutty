@@ -5,7 +5,8 @@ from typing import Any
 from typing import Mapping
 from typing import Optional
 
-import cookiecutter.config
+import cookiecutter.exceptions
+import poyo.exceptions
 
 
 DEFAULT_PATH = Path("~/.cookiecutterrc").expanduser()
@@ -24,6 +25,32 @@ class Config:
     abbreviations: Mapping[str, str] = DEFAULT_ABBREVIATIONS
 
 
+def get_config(config_path: Path) -> Config:
+    """Retrieve the config from the specified path, returning a config."""
+    if not config_path.exists():
+        raise cookiecutter.exceptions.ConfigDoesNotExistException(
+            f"Config file {config_path} does not exist."
+        )
+
+    text = config_path.read_text()
+    try:
+        data = poyo.parse_string(text)
+    except poyo.exceptions.PoyoException as error:
+        raise cookiecutter.exceptions.InvalidConfiguration(
+            f"Unable to parse YAML file {config_path}. Error: {error}"
+        )
+
+    config = Config()
+
+    if "default_context" in data:
+        config.default_context = data["default_context"]
+
+    if "abbreviations" in data:
+        config.abbreviations = {**config.abbreviations, **data["abbreviations"]}
+
+    return Config(**data)
+
+
 def get_user_config(
     config_file: Optional[Path] = None, default_config: bool = False
 ) -> Config:
@@ -32,8 +59,4 @@ def get_user_config(
         return Config()
 
     path = config_file if config_file is not None else DEFAULT_PATH
-    config = cookiecutter.config.get_config(str(path))
-    return Config(
-        default_context=config["default_context"],
-        abbreviations=config["abbreviations"],
-    )
+    return get_config(path)
