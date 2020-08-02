@@ -39,7 +39,7 @@ def update(
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     template = expand_abbreviations(
-        template=template, abbreviations=config["abbreviations"]
+        template=template, abbreviations=config.abbreviations
     )
     entry = cache.Entry(template, directory=directory, revision=checkout)
 
@@ -53,7 +53,7 @@ def update(
             template=template,
             extra_context=extra_context,
             no_input=not interactive,
-            default_context=config["default_context"],
+            default_context=config.default_context,
         )
         entry.dump_context(context)
 

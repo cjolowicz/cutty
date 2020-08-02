@@ -35,7 +35,7 @@ def create(
 
     config = get_user_config(config_file=config_file, default_config=default_config)
     template = expand_abbreviations(
-        template=template, abbreviations=config["abbreviations"]
+        template=template, abbreviations=config.abbreviations
     )
     entry = cache.Entry(template, directory=directory, revision=checkout)
     with entry.checkout() as repo_dir:
@@ -48,7 +48,7 @@ def create(
                 template=template,
                 extra_context=extra_context,
                 no_input=no_input,
-                default_context=config["default_context"],
+                default_context=config.default_context,
             )
             entry.dump_context(context)
 
