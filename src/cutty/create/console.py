@@ -108,7 +108,11 @@ def validate_extra_context(*args: Any) -> StrMapping:
     help="Where to output the generated project dir into",
 )
 @click.option(
-    "--config-file", type=click.Path(), default=None, help="User configuration file"
+    "--config-file",
+    type=click.Path(),
+    default=None,
+    help="User configuration file",
+    envvar="CUTTY_CONFIG",
 )
 @click.option(
     "--default-config",
