@@ -31,13 +31,12 @@ def get_user_config(
     config_file: Optional[Path] = None, default_config: bool = False
 ) -> Config:
     """Return the user configuration."""
+    if default_config or (config_file is None and not DEFAULT_PATH.exists()):
+        return DEFAULT_CONFIG
+
     path = config_file if config_file is not None else DEFAULT_PATH
-
-    if not default_config and path.exists():
-        config = cookiecutter.config.get_config(str(path))
-        return Config(
-            default_context=config["default_context"],
-            abbreviations=config["abbreviations"],
-        )
-
-    return DEFAULT_CONFIG
+    config = cookiecutter.config.get_config(str(path))
+    return Config(
+        default_context=config["default_context"],
+        abbreviations=config["abbreviations"],
+    )
