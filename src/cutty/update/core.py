@@ -13,7 +13,7 @@ from ..context import load_context
 from ..types import StrMapping
 
 
-def _ensure_branch_exists(repository: git.Repository, branch: str):
+def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
     try:
         repository.rev_parse(branch, verify=True, quiet=True)
     except git.Error:
