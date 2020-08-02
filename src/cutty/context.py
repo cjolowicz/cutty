@@ -30,14 +30,14 @@ def create_context(
     template: str,
     extra_context: StrMapping,
     no_input: bool,
-    config: StrMapping,
+    default_context: StrMapping,
 ) -> StrMapping:
     """Load context from disk."""
     logger.debug("context_file is %s", context_file)
 
     context = generate_context(
         context_file=context_file,
-        default_context=config["default_context"],
+        default_context=default_context,
         extra_context=extra_context,
     )
     context["cookiecutter"] = prompt_for_config(context, no_input)

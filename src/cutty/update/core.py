@@ -53,7 +53,7 @@ def update(
             template=template,
             extra_context=extra_context,
             no_input=not interactive,
-            config=config,
+            default_context=config["default_context"],
         )
         entry.dump_context(context)
 

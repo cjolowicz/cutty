@@ -48,7 +48,7 @@ def create(
                 template=template,
                 extra_context=extra_context,
                 no_input=no_input,
-                config=config,
+                default_context=config["default_context"],
             )
             entry.dump_context(context)
 
