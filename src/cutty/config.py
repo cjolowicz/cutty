@@ -8,23 +8,20 @@ from typing import Optional
 import cookiecutter.config
 
 
+DEFAULT_PATH = Path("~/.cookiecutterrc").expanduser()
+DEFAULT_ABBREVIATIONS = {
+    "gh": "https://github.com/{}.git",
+    "gl": "https://gitlab.com/{}.git",
+    "bb": "https://bitbucket.org/{}",
+}
+
+
 @dataclass
 class Config:
     """Configuration."""
 
-    default_context: Mapping[str, Any]
-    abbreviations: Mapping[str, str]
-
-
-DEFAULT_PATH = Path("~/.cookiecutterrc").expanduser()
-DEFAULT_CONFIG = Config(
-    default_context={},
-    abbreviations={
-        "gh": "https://github.com/{}.git",
-        "gl": "https://gitlab.com/{}.git",
-        "bb": "https://bitbucket.org/{}",
-    },
-)
+    default_context: Mapping[str, Any] = {}
+    abbreviations: Mapping[str, str] = DEFAULT_ABBREVIATIONS
 
 
 def get_user_config(
@@ -32,7 +29,7 @@ def get_user_config(
 ) -> Config:
     """Return the user configuration."""
     if default_config or (config_file is None and not DEFAULT_PATH.exists()):
-        return DEFAULT_CONFIG
+        return Config()
 
     path = config_file if config_file is not None else DEFAULT_PATH
     config = cookiecutter.config.get_config(str(path))
