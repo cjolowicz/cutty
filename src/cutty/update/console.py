@@ -33,7 +33,11 @@ from ..utils import as_optional_path
     "-v", "--verbose", is_flag=True, help="Print debug information", default=False
 )
 @click.option(
-    "--config-file", type=click.Path(), default=None, help="User configuration file"
+    "--config-file",
+    type=click.Path(),
+    default=None,
+    help="User configuration file",
+    envvar="CUTTY_CONFIG",
 )
 @click.option(
     "--default-config",
