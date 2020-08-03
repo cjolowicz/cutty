@@ -55,7 +55,7 @@ def create_context(
 
     try:
         with context_file.open() as io:
-            obj = json.load(io)
+            data = json.load(io)
     except ValueError as e:
         # JSON decoding error.  Let's throw a new exception that is more
         # friendly for the developer or user.
@@ -68,14 +68,14 @@ def create_context(
         raise ContextDecodingException(our_exc_message)
 
     # Add the Python object to the context dictionary
-    context = {context_file.stem: obj}
+    context = {context_file.stem: data}
 
     # Overwrite context variable defaults with the default context from the
     # user's global config, if available
     if default_context:
-        apply_overwrites_to_context(obj, default_context)
+        apply_overwrites_to_context(data, default_context)
     if extra_context:
-        apply_overwrites_to_context(obj, extra_context)
+        apply_overwrites_to_context(data, extra_context)
 
     logger.debug("Context generated is %s", context)
 
