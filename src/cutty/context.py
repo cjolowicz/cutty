@@ -67,9 +67,6 @@ def create_context(
         )
         raise ContextDecodingException(our_exc_message)
 
-    # Add the Python object to the context dictionary
-    context = {context_file.stem: data}
-
     # Overwrite context variable defaults with the default context from the
     # user's global config, if available
     if default_context:
@@ -77,9 +74,11 @@ def create_context(
     if extra_context:
         apply_overwrites_to_context(data, extra_context)
 
+    context = {"cookiecutter": data}
+
     logger.debug("Context generated is %s", context)
 
-    context["cookiecutter"] = prompt_for_config(context, no_input)
-    context["cookiecutter"]["_template"] = template
+    data = prompt_for_config(context, no_input)
+    data["_template"] = template
 
     return context
