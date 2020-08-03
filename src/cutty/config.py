@@ -51,9 +51,7 @@ def get_config(path: Path) -> Config:
     return Config(**data)
 
 
-def get_user_config(
-    config_file: Optional[Path] = None, default_config: bool = False
-) -> Config:
+def load(config_file: Optional[Path] = None, default_config: bool = False) -> Config:
     """Return the user configuration."""
     if default_config or (config_file is None and not DEFAULT_PATH.exists()):
         return Config()
