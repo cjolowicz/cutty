@@ -9,7 +9,6 @@ from typing import Optional
 from cookiecutter.exceptions import ContextDecodingException
 from cookiecutter.prompt import prompt_for_config
 
-from .types import MutableStrMapping
 from .types import StrMapping
 
 
@@ -38,11 +37,13 @@ def _override_value(value: Any, other: Any) -> Any:
     return other
 
 
-def _override_context(context: MutableStrMapping, *others: StrMapping) -> None:
-    for other in others:
-        for variable, override in other.items():
-            with contextlib.suppress(KeyError):
-                context[variable] = _override_value(context[variable], override)
+def _override_context(context: StrMapping, *others: StrMapping) -> StrMapping:
+    def _generate():
+        other = {key: value for other in others for key, value in other.items()}
+        for key, value in context.items():
+            yield key, _override_value(value, other[key]) if key in other else value
+
+    return dict(_generate())
 
 
 def create_context(
@@ -69,9 +70,7 @@ def create_context(
         The generated context.
     """
     data = load_context(path)
-
-    _override_context(data, default_context, extra_context)
-
+    data = _override_context(data, default_context, extra_context)
     data = prompt_for_config({"cookiecutter": data}, no_input)
     data["_template"] = template
 
