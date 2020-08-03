@@ -56,16 +56,11 @@ def create_context(
     try:
         with context_file.open() as io:
             data = json.load(io)
-    except ValueError as e:
-        # JSON decoding error.  Let's throw a new exception that is more
-        # friendly for the developer or user.
-        full_fpath = context_file.resolve()
-        json_exc_message = str(e)
-        our_exc_message = (
-            'JSON decoding error while loading "{0}".  Decoding'
-            ' error details: "{1}"'.format(full_fpath, json_exc_message)
+    except ValueError as error:
+        raise ContextDecodingException(
+            "JSON decoding error while loading '{}'."
+            "  Decoding error details: '{}'".format(context_file.resolve(), error)
         )
-        raise ContextDecodingException(our_exc_message)
 
     # Overwrite context variable defaults with the default context from the
     # user's global config, if available
