@@ -3,9 +3,7 @@ import json
 import logging
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any
 from typing import cast
-from typing import Dict
 from typing import Optional
 
 from cookiecutter.exceptions import ContextDecodingException
@@ -28,8 +26,13 @@ def load_context(
         return cast(StrMapping, json.load(io))
 
 
-def generate_context(
-    context_file: Path, default_context: StrMapping, extra_context: StrMapping,
+def create_context(
+    context_file: Path,
+    *,
+    template: str,
+    extra_context: StrMapping,
+    no_input: bool,
+    default_context: StrMapping,
 ) -> StrMapping:
     """Generate the context for a Cookiecutter project template.
 
@@ -38,8 +41,10 @@ def generate_context(
     Args:
         context_file: JSON file containing key/value pairs for populating
             the cookiecutter's variables.  # noqa: RST203
-        default_context: Dictionary containing config to take into account.
+        template: Project template location
         extra_context: Dictionary containing configuration overrides
+        no_input: If True, do not ask for user input.
+        default_context: Dictionary containing config to take into account.
 
     Returns:
         The generated context.
@@ -47,6 +52,8 @@ def generate_context(
     Raises:
         ContextDecodingException: The JSON file is invalid.
     """
+    logger.debug("context_file is %s", context_file)
+
     context = OrderedDict([])
 
     try:
@@ -74,27 +81,7 @@ def generate_context(
         apply_overwrites_to_context(obj, extra_context)
 
     logger.debug("Context generated is %s", context)
-    return context
 
-
-def create_context(
-    context_file: Path,
-    *,
-    template: str,
-    extra_context: StrMapping,
-    no_input: bool,
-    default_context: StrMapping,
-) -> StrMapping:
-    """Load context from disk."""
-    logger.debug("context_file is %s", context_file)
-
-    context: Dict[str, Any] = dict(
-        generate_context(
-            context_file=context_file,
-            default_context=default_context,
-            extra_context=extra_context,
-        )
-    )
     context["cookiecutter"] = prompt_for_config(context, no_input)
     context["cookiecutter"]["_template"] = template
 
