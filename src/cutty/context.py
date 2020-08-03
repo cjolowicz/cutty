@@ -25,8 +25,8 @@ def load_context(
 
 def _override_value(value: Any, other: Any) -> Any:
     if isinstance(value, list):
-        # Set other as default for the choice variable.
         with contextlib.suppress(ValueError):
+            # Set other as default for the choice variable.
             value.remove(other)
             return [other, *value]
         return value
