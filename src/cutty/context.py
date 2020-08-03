@@ -69,18 +69,8 @@ def create_context(
 
     Returns:
         The generated context.
-
-    Raises:
-        ContextDecodingException: The JSON file is invalid.
     """
-    try:
-        with context_file.open() as io:
-            data = json.load(io)
-    except ValueError as error:
-        raise ContextDecodingException(
-            "JSON decoding error while loading '{}'."
-            "  Decoding error details: '{}'".format(context_file.resolve(), error)
-        )
+    data = load_context(context_file)
 
     _override_context(data, default_context, extra_context)
 
