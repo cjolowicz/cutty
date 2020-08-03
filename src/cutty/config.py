@@ -30,7 +30,9 @@ class Config:
     )
 
     @classmethod
-    def load(cls, path: Optional[Path] = None, ignore_config: bool = False) -> Config:
+    def load(
+        cls, path: Optional[Path] = None, *, ignore_config: bool = False
+    ) -> Config:
         """Return the user configuration."""
         if ignore_config or (path is None and not DEFAULT_PATH.exists()):
             return cls()
