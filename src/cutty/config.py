@@ -25,8 +25,13 @@ class Config:
     abbreviations: Mapping[str, str] = DEFAULT_ABBREVIATIONS
 
 
-def get_config(path: Path) -> Config:
-    """Retrieve the config from the specified path, returning a config."""
+def load(config_file: Optional[Path] = None, default_config: bool = False) -> Config:
+    """Return the user configuration."""
+    if default_config or (config_file is None and not DEFAULT_PATH.exists()):
+        return Config()
+
+    path = config_file if config_file is not None else DEFAULT_PATH
+
     if not path.exists():
         raise cookiecutter.exceptions.ConfigDoesNotExistException(
             f"Config file {path} does not exist."
@@ -49,12 +54,3 @@ def get_config(path: Path) -> Config:
         config.abbreviations = {**config.abbreviations, **data["abbreviations"]}
 
     return Config(**data)
-
-
-def load(config_file: Optional[Path] = None, default_config: bool = False) -> Config:
-    """Return the user configuration."""
-    if default_config or (config_file is None and not DEFAULT_PATH.exists()):
-        return Config()
-
-    path = config_file if config_file is not None else DEFAULT_PATH
-    return get_config(path)
