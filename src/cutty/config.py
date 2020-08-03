@@ -37,8 +37,7 @@ class Config:
 
         if path is None:
             path = DEFAULT_PATH
-
-        if not path.exists():
+        elif not path.exists():
             raise cookiecutter.exceptions.ConfigDoesNotExistException(
                 f"Config file {path} does not exist."
             )
