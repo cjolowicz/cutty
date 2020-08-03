@@ -28,8 +28,10 @@ def load_context(
 
 
 def generate_context(
-    context_file="cookiecutter.json", default_context=None, extra_context=None
-):
+    context_file: str = "cookiecutter.json",
+    default_context: StrMapping = None,
+    extra_context: StrMapping = None,
+) -> StrMapping:
     """Generate the context for a Cookiecutter project template.
 
     Loads the JSON file as a Python object, with key being the JSON filename.
