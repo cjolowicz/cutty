@@ -43,7 +43,9 @@ def _override_context(context: StrMapping, *others: StrMapping) -> StrMapping:
     def _generate() -> Iterator[Tuple[str, Any]]:
         other = {key: value for other in others for key, value in other.items()}
         for key, value in context.items():
-            yield key, _override_value(value, other[key]) if key in other else value
+            if key in other:
+                value = _override_value(value, other[key])
+            yield key, value
 
     return dict(_generate())
 
