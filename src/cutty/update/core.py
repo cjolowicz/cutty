@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Optional
 
 from cookiecutter.generate import generate_files
-from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
 from .. import git
 from ..config import Config
+from ..config import expand_abbreviations
 from ..context import create_context
 from ..context import load_context
 from ..types import StrMapping
