@@ -7,8 +7,8 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from click.testing import CliRunner
 
-from cutty import cache
 from cutty import git
+from cutty import locations
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -35,7 +35,7 @@ def repository(tmp_path: Path) -> git.Repository:
 @pytest.fixture
 def user_cache_dir(monkeypatch: MonkeyPatch, tmp_path: Path) -> Path:
     """Replace the application cache directory by a temporary directory."""
-    path = tmp_path / ".cache" / cache.appname
+    path = tmp_path / ".cache" / locations.cache.name
     path.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr("appdirs.user_cache_dir", lambda *args, **kwargs: path)
     return path
