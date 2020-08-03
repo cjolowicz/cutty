@@ -34,10 +34,17 @@ def generate_context(
 
     Loads the JSON file as a Python object, with key being the JSON filename.
 
-    :param context_file: JSON file containing key/value pairs for populating
-        the cookiecutter's variables.
-    :param default_context: Dictionary containing config to take into account.
-    :param extra_context: Dictionary containing configuration overrides
+    Args:
+        context_file: JSON file containing key/value pairs for populating
+            the cookiecutter's variables.  # noqa: RST203
+        default_context: Dictionary containing config to take into account.
+        extra_context: Dictionary containing configuration overrides
+
+    Returns:
+        The generated context.
+
+    Raises:
+        ContextDecodingException: The JSON file is invalid.
     """
     context = OrderedDict([])
 
