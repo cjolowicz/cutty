@@ -1,7 +1,9 @@
 """Helper functions for contexts."""
+import contextlib
 import json
 import logging
 from pathlib import Path
+from typing import Any
 from typing import cast
 from typing import Optional
 
@@ -25,28 +27,20 @@ def load_context(
         return cast(StrMapping, json.load(io))
 
 
-def apply_override_to_context(
-    context: MutableStrMapping, override_context: StrMapping
-) -> None:
-    """Modify the given context in place based on the override_context."""
-    for variable, override in override_context.items():
-        if variable not in context:
-            # Do not include variables which are not used in the template
-            continue
+def _override_value(value: Any, other: Any) -> Any:
+    if isinstance(value, list):
+        # Set other as default for the choice variable.
+        with contextlib.suppress(ValueError):
+            value.remove(other)
+            return [other, *value]
+        return value
+    return other
 
-        context_value = context[variable]
 
-        if isinstance(context_value, list):
-            # We are dealing with a choice variable
-            if override in context_value:
-                # This override is actually valid for the given context
-                # Let's set it as default (by definition first item in list)
-                # see ``cookiecutter.prompt.prompt_choice_for_config``
-                context_value.remove(override)
-                context_value.insert(0, override)
-        else:
-            # Simply override the value for this variable
-            context[variable] = override
+def _override_context(context: MutableStrMapping, other: StrMapping) -> None:
+    for variable, override in other.items():
+        with contextlib.suppress(KeyError):
+            context[variable] = _override_value(context[variable], override)
 
 
 def create_context(
@@ -87,10 +81,10 @@ def create_context(
         )
 
     if default_context:
-        apply_override_to_context(data, default_context)
+        _override_context(data, default_context)
 
     if extra_context:
-        apply_override_to_context(data, extra_context)
+        _override_context(data, extra_context)
 
     context = {"cookiecutter": data}
 
