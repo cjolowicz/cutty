@@ -80,11 +80,8 @@ def create_context(
             "  Decoding error details: '{}'".format(context_file.resolve(), error)
         )
 
-    if default_context:
-        _override_context(data, default_context)
-
-    if extra_context:
-        _override_context(data, extra_context)
+    _override_context(data, default_context)
+    _override_context(data, extra_context)
 
     context = {"cookiecutter": data}
 
