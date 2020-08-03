@@ -7,7 +7,6 @@ from cookiecutter.generate import generate_files
 
 from .. import cache
 from ..config import Config
-from ..config import expand_abbreviations
 from ..context import create_context
 from ..types import StrMapping
 
@@ -34,9 +33,7 @@ def create(
         )
 
     config = Config.load(config_file, ignore_config=default_config)
-    template = expand_abbreviations(
-        template=template, abbreviations=config.abbreviations
-    )
+    template = config.expand_abbreviations(template)
     entry = cache.Entry(template, directory=directory, revision=checkout)
     with entry.checkout() as repo_dir:
         if replay:
