@@ -3,7 +3,9 @@ import json
 import logging
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 from typing import cast
+from typing import Dict
 from typing import Optional
 
 from cookiecutter.exceptions import ContextDecodingException
@@ -86,10 +88,12 @@ def create_context(
     """Load context from disk."""
     logger.debug("context_file is %s", context_file)
 
-    context = generate_context(
-        context_file=context_file,
-        default_context=default_context,
-        extra_context=extra_context,
+    context: Dict[str, Any] = dict(
+        generate_context(
+            context_file=context_file,
+            default_context=default_context,
+            extra_context=extra_context,
+        )
     )
     context["cookiecutter"] = prompt_for_config(context, no_input)
     context["cookiecutter"]["_template"] = template
