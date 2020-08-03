@@ -11,8 +11,9 @@ from typing import Optional
 import cookiecutter.exceptions
 import poyo.exceptions
 
+from . import locations
 
-DEFAULT_PATH = Path("~/.cookiecutterrc").expanduser()
+
 DEFAULT_ABBREVIATIONS = {
     "gh": "https://github.com/{}.git",
     "gl": "https://gitlab.com/{}.git",
@@ -34,11 +35,11 @@ class Config:
         cls, path: Optional[Path] = None, *, ignore_config: bool = False
     ) -> Config:
         """Return the user configuration."""
-        if ignore_config or (path is None and not DEFAULT_PATH.exists()):
+        if ignore_config or (path is None and not locations.config.exists()):
             return cls()
 
         if path is None:
-            path = DEFAULT_PATH
+            path = locations.config
         elif not path.exists():
             raise cookiecutter.exceptions.ConfigDoesNotExistException(
                 f"Config file {path} does not exist."
