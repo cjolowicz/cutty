@@ -6,17 +6,15 @@ from typing import cast
 from typing import Iterator
 from typing import Optional
 
-import appdirs
 from cookiecutter import replay
 
 from . import git
+from . import locations
 from . import tags
 from .types import StrMapping
 
 
-appname = "cutty"
-path = Path(appdirs.user_cache_dir(appname=appname, appauthor=appname))
-repositories = path / "repositories"
+repositories = locations.cache / "repositories"
 
 
 class Entry:
