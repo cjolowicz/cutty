@@ -64,6 +64,7 @@ def create_context(
 
     if default_context:
         apply_overwrites_to_context(data, default_context)
+
     if extra_context:
         apply_overwrites_to_context(data, extra_context)
 
