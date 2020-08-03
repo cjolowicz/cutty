@@ -1,6 +1,7 @@
 """Helper functions for contexts."""
 import contextlib
 import json
+from collections import ChainMap
 from pathlib import Path
 from typing import Any
 from typing import cast
@@ -41,7 +42,7 @@ def _override_value(value: Any, other: Any) -> Any:
 
 def _override_context(context: StrMapping, *others: StrMapping) -> StrMapping:
     def _generate() -> Iterator[Tuple[str, Any]]:
-        other = {key: value for other in others for key, value in other.items()}
+        other = ChainMap(*reversed(others))
         for key, value in context.items():
             if key in other:
                 value = _override_value(value, other[key])
