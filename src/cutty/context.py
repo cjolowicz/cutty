@@ -13,20 +13,18 @@ from .types import MutableStrMapping
 from .types import StrMapping
 
 
-def load_context(
-    context_file: Path, *, default: Optional[StrMapping] = None
-) -> StrMapping:
+def load_context(path: Path, *, default: Optional[StrMapping] = None) -> StrMapping:
     """Load context from disk."""
-    if default is not None and not context_file.exists():
+    if default is not None and not path.exists():
         return default
 
     try:
-        with context_file.open() as io:
+        with path.open() as io:
             return cast(StrMapping, json.load(io))
     except ValueError as error:
         raise ContextDecodingException(
             "JSON decoding error while loading '{}'."
-            "  Decoding error details: '{}'".format(context_file.resolve(), error)
+            "  Decoding error details: '{}'".format(path.resolve(), error)
         )
 
 
@@ -48,7 +46,7 @@ def _override_context(context: MutableStrMapping, *others: StrMapping) -> None:
 
 
 def create_context(
-    context_file: Path,
+    path: Path,
     *,
     template: str,
     extra_context: StrMapping,
@@ -60,7 +58,7 @@ def create_context(
     Loads the JSON file as a Python object, with key being the JSON filename.
 
     Args:
-        context_file: JSON file containing key/value pairs for populating
+        path: JSON file containing key/value pairs for populating
             the cookiecutter's variables.  # noqa: RST203
         template: Project template location
         extra_context: Dictionary containing configuration overrides
@@ -70,7 +68,7 @@ def create_context(
     Returns:
         The generated context.
     """
-    data = load_context(context_file)
+    data = load_context(path)
 
     _override_context(data, default_context, extra_context)
 
