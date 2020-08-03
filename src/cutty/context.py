@@ -94,4 +94,4 @@ def create_context(
     context["cookiecutter"] = prompt_for_config(context, no_input)
     context["cookiecutter"]["_template"] = template
 
-    return cast(StrMapping, context)
+    return context
