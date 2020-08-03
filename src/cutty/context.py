@@ -28,9 +28,7 @@ def load_context(
 
 
 def generate_context(
-    context_file: str = "cookiecutter.json",
-    default_context: StrMapping = None,
-    extra_context: StrMapping = None,
+    context_file: str, default_context: StrMapping, extra_context: StrMapping,
 ) -> StrMapping:
     """Generate the context for a Cookiecutter project template.
 
