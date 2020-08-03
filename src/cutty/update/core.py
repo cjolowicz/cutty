@@ -37,7 +37,7 @@ def update(
     previous_context = load_context(previous_context_file, default={})
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
-    template = config.expand_abbreviations(template)
+    template = config.abbreviations.expand(template)
     entry = cache.Entry(template, directory=directory, revision=checkout)
 
     with entry.checkout() as repo_dir:

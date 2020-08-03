@@ -88,14 +88,3 @@ class Config:
             config.abbreviations.update(data["abbreviations"])
 
         return config
-
-    def expand_abbreviations(self, template: str) -> str:
-        """Expand abbreviations in a template name.
-
-        Args:
-            template: The project template location.
-
-        Returns:
-            The expanded project template.
-        """
-        return self.abbreviations.expand(template)
