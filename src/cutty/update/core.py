@@ -7,7 +7,6 @@ from cookiecutter.generate import generate_files
 from .. import cache
 from .. import git
 from ..config import Config
-from ..config import expand_abbreviations
 from ..context import create_context
 from ..context import load_context
 from ..types import StrMapping
@@ -38,9 +37,7 @@ def update(
     previous_context = load_context(previous_context_file, default={})
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
-    template = expand_abbreviations(
-        template=template, abbreviations=config.abbreviations
-    )
+    template = config.expand_abbreviations(template)
     entry = cache.Entry(template, directory=directory, revision=checkout)
 
     with entry.checkout() as repo_dir:

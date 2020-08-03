@@ -64,22 +64,20 @@ class Config:
 
         return config
 
+    def expand_abbreviations(self, template: str) -> str:
+        """Expand abbreviations in a template name.
 
-def expand_abbreviations(template: str, abbreviations: Mapping[str, str]) -> str:
-    """Expand abbreviations in a template name.
+        Args:
+            template: The project template location.
 
-    Args:
-        template: The project template location.
-        abbreviations: Abbreviation definitions.
+        Returns:
+            The expanded project template.
+        """
+        if template in self.abbreviations:
+            return self.abbreviations[template]
 
-    Returns:
-        The expanded project template.
-    """
-    if template in abbreviations:
-        return abbreviations[template]
+        prefix, _, rest = template.partition(":")
+        if prefix in self.abbreviations:
+            return self.abbreviations[prefix].format(rest)
 
-    prefix, _, rest = template.partition(":")
-    if prefix in abbreviations:
-        return abbreviations[prefix].format(rest)
-
-    return template
+        return template
