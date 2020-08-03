@@ -41,8 +41,9 @@ def _override_value(value: Any, other: Any) -> Any:
 
 
 def _override_context(context: StrMapping, *others: StrMapping) -> StrMapping:
+    other = ChainMap(*reversed(others))
+
     def _generate() -> Iterator[Tuple[str, Any]]:
-        other = ChainMap(*reversed(others))
         for key, value in context.items():
             try:
                 yield key, _override_value(value, other[key])
