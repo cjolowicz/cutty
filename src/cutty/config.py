@@ -30,14 +30,13 @@ class Config:
     )
 
     @classmethod
-    def load(
-        cls, config_file: Optional[Path] = None, default_config: bool = False
-    ) -> Config:
+    def load(cls, path: Optional[Path] = None, default_config: bool = False) -> Config:
         """Return the user configuration."""
-        if default_config or (config_file is None and not DEFAULT_PATH.exists()):
+        if default_config or (path is None and not DEFAULT_PATH.exists()):
             return cls()
 
-        path = config_file if config_file is not None else DEFAULT_PATH
+        if path is None:
+            path = DEFAULT_PATH
 
         if not path.exists():
             raise cookiecutter.exceptions.ConfigDoesNotExistException(
