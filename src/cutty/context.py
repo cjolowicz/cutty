@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 from typing import Any
 from typing import cast
+from typing import Iterator
 from typing import Optional
+from typing import Tuple
 
 from cookiecutter.exceptions import ContextDecodingException
 from cookiecutter.prompt import prompt_for_config
@@ -38,7 +40,7 @@ def _override_value(value: Any, other: Any) -> Any:
 
 
 def _override_context(context: StrMapping, *others: StrMapping) -> StrMapping:
-    def _generate():
+    def _generate() -> Iterator[Tuple[str, Any]]:
         other = {key: value for other in others for key, value in other.items()}
         for key, value in context.items():
             yield key, _override_value(value, other[key]) if key in other else value
