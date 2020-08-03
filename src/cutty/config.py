@@ -25,19 +25,19 @@ class Config:
     abbreviations: Mapping[str, str] = DEFAULT_ABBREVIATIONS
 
 
-def get_config(config_path: Path) -> Config:
+def get_config(path: Path) -> Config:
     """Retrieve the config from the specified path, returning a config."""
-    if not config_path.exists():
+    if not path.exists():
         raise cookiecutter.exceptions.ConfigDoesNotExistException(
-            f"Config file {config_path} does not exist."
+            f"Config file {path} does not exist."
         )
 
-    text = config_path.read_text()
+    text = path.read_text()
     try:
         data = poyo.parse_string(text)
     except poyo.exceptions.PoyoException as error:
         raise cookiecutter.exceptions.InvalidConfiguration(
-            f"Unable to parse YAML file {config_path}. Error: {error}"
+            f"Unable to parse YAML file {path}. Error: {error}"
         )
 
     config = Config()
