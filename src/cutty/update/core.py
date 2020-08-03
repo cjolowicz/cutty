@@ -6,8 +6,8 @@ from cookiecutter.generate import generate_files
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
-from .. import config as _config
 from .. import git
+from ..config import Config
 from ..context import create_context
 from ..context import load_context
 from ..types import StrMapping
@@ -31,7 +31,7 @@ def update(
     default_config: bool = False,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = _config.load(config_file=config_file, default_config=default_config)
+    config = Config.load(config_file=config_file, default_config=default_config)
     instance = git.Repository()
     _ensure_branch_exists(instance, "template")
     previous_context_file = Path(".cookiecutter.json")

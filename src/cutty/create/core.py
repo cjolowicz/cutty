@@ -7,7 +7,7 @@ from cookiecutter.generate import generate_files
 from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
-from .. import config as _config
+from ..config import Config
 from ..context import create_context
 from ..types import StrMapping
 
@@ -33,7 +33,7 @@ def create(
             "at the same time."
         )
 
-    config = _config.load(config_file=config_file, default_config=default_config)
+    config = Config.load(config_file=config_file, default_config=default_config)
     template = expand_abbreviations(
         template=template, abbreviations=config.abbreviations
     )
