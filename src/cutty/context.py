@@ -62,8 +62,6 @@ def create_context(
             "  Decoding error details: '{}'".format(context_file.resolve(), error)
         )
 
-    # Overwrite context variable defaults with the default context from the
-    # user's global config, if available
     if default_context:
         apply_overwrites_to_context(data, default_context)
     if extra_context:
