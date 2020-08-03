@@ -37,10 +37,11 @@ def _override_value(value: Any, other: Any) -> Any:
     return other
 
 
-def _override_context(context: MutableStrMapping, other: StrMapping) -> None:
-    for variable, override in other.items():
-        with contextlib.suppress(KeyError):
-            context[variable] = _override_value(context[variable], override)
+def _override_context(context: MutableStrMapping, *others: StrMapping) -> None:
+    for other in others:
+        for variable, override in other.items():
+            with contextlib.suppress(KeyError):
+                context[variable] = _override_value(context[variable], override)
 
 
 def create_context(
@@ -80,8 +81,7 @@ def create_context(
             "  Decoding error details: '{}'".format(context_file.resolve(), error)
         )
 
-    _override_context(data, default_context)
-    _override_context(data, extra_context)
+    _override_context(data, default_context, extra_context)
 
     context = {"cookiecutter": data}
 
