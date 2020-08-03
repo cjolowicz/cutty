@@ -1,7 +1,6 @@
 """Helper functions for contexts."""
 import json
 import logging
-import os
 from collections import OrderedDict
 from pathlib import Path
 from typing import cast
@@ -28,7 +27,7 @@ def load_context(
 
 
 def generate_context(
-    context_file: str, default_context: StrMapping, extra_context: StrMapping,
+    context_file: Path, default_context: StrMapping, extra_context: StrMapping,
 ) -> StrMapping:
     """Generate the context for a Cookiecutter project template.
 
@@ -49,12 +48,12 @@ def generate_context(
     context = OrderedDict([])
 
     try:
-        with open(context_file) as file_handle:
+        with context_file.open() as file_handle:
             obj = json.load(file_handle, object_pairs_hook=OrderedDict)
     except ValueError as e:
         # JSON decoding error.  Let's throw a new exception that is more
         # friendly for the developer or user.
-        full_fpath = os.path.abspath(context_file)
+        full_fpath = context_file.resolve()
         json_exc_message = str(e)
         our_exc_message = (
             'JSON decoding error while loading "{0}".  Decoding'
@@ -63,9 +62,7 @@ def generate_context(
         raise ContextDecodingException(our_exc_message)
 
     # Add the Python object to the context dictionary
-    file_name = os.path.split(context_file)[1]
-    file_stem = file_name.split(".")[0]
-    context[file_stem] = obj
+    context[context_file.stem] = obj
 
     # Overwrite context variable defaults with the default context from the
     # user's global config, if available
