@@ -62,3 +62,23 @@ class Config:
             config.abbreviations = {**config.abbreviations, **data["abbreviations"]}
 
         return config
+
+
+def expand_abbreviations(template: str, abbreviations: Mapping[str, str]) -> str:
+    """Expand abbreviations in a template name.
+
+    Args:
+        template: The project template location.
+        abbreviations: Abbreviation definitions.
+
+    Returns:
+        The expanded project template.
+    """
+    if template in abbreviations:
+        return abbreviations[template]
+
+    prefix, _, rest = template.partition(":")
+    if prefix in abbreviations:
+        return abbreviations[prefix].format(rest)
+
+    return template
