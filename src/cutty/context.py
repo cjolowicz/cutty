@@ -54,8 +54,8 @@ def create_context(
     logger.debug("context_file is %s", context_file)
 
     try:
-        with context_file.open() as file_handle:
-            obj = json.load(file_handle)
+        with context_file.open() as io:
+            obj = json.load(io)
     except ValueError as e:
         # JSON decoding error.  Let's throw a new exception that is more
         # friendly for the developer or user.
