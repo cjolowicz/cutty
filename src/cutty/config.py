@@ -14,11 +14,38 @@ import poyo.exceptions
 from . import locations
 
 
-DEFAULT_ABBREVIATIONS = {
-    "gh": "https://github.com/{}.git",
-    "gl": "https://gitlab.com/{}.git",
-    "bb": "https://bitbucket.org/{}",
-}
+class Abbreviations:
+    """Abbreviations for template locations."""
+
+    def __init__(self) -> None:
+        """Initialize."""
+        self.abbreviations = {
+            "gh": "https://github.com/{}.git",
+            "gl": "https://gitlab.com/{}.git",
+            "bb": "https://bitbucket.org/{}",
+        }
+
+    def update(self, abbreviations: Mapping[str, str]) -> None:
+        """Update the registered abbreviations."""
+        self.abbreviations.update(abbreviations)
+
+    def expand(self, template: str) -> str:
+        """Expand abbreviations in a template location.
+
+        Args:
+            template: The project template location.
+
+        Returns:
+            The expanded project template.
+        """
+        if template in self.abbreviations:
+            return self.abbreviations[template]
+
+        prefix, _, rest = template.partition(":")
+        if prefix in self.abbreviations:
+            return self.abbreviations[prefix].format(rest)
+
+        return template
 
 
 @dataclass
@@ -26,9 +53,7 @@ class Config:
     """Configuration."""
 
     default_context: Mapping[str, Any] = field(default_factory=dict)
-    abbreviations: Mapping[str, str] = field(
-        default_factory=lambda: dict(DEFAULT_ABBREVIATIONS)
-    )
+    abbreviations: Abbreviations = field(default_factory=Abbreviations)
 
     @classmethod
     def load(
@@ -60,7 +85,7 @@ class Config:
             config.default_context = data["default_context"]
 
         if "abbreviations" in data:
-            config.abbreviations = {**config.abbreviations, **data["abbreviations"]}
+            config.abbreviations.update(data["abbreviations"])
 
         return config
 
@@ -73,11 +98,4 @@ class Config:
         Returns:
             The expanded project template.
         """
-        if template in self.abbreviations:
-            return self.abbreviations[template]
-
-        prefix, _, rest = template.partition(":")
-        if prefix in self.abbreviations:
-            return self.abbreviations[prefix].format(rest)
-
-        return template
+        return self.abbreviations.expand(template)
