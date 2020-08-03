@@ -4,10 +4,10 @@ from typing import Optional
 
 from cookiecutter import exceptions
 from cookiecutter.generate import generate_files
-from cookiecutter.repository import expand_abbreviations
 
 from .. import cache
 from ..config import Config
+from ..config import expand_abbreviations
 from ..context import create_context
 from ..types import StrMapping
 
