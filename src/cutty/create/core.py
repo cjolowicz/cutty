@@ -33,7 +33,7 @@ def create(
         )
 
     config = Config.load(config_file, ignore_config=default_config)
-    template = config.expand_abbreviations(template)
+    template = config.abbreviations.expand(template)
     entry = cache.Entry(template, directory=directory, revision=checkout)
     with entry.checkout() as repo_dir:
         if replay:
