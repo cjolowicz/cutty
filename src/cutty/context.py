@@ -1,7 +1,6 @@
 """Helper functions for contexts."""
 import json
 import logging
-from collections import OrderedDict
 from pathlib import Path
 from typing import cast
 from typing import Optional
@@ -54,11 +53,9 @@ def create_context(
     """
     logger.debug("context_file is %s", context_file)
 
-    context = OrderedDict([])
-
     try:
         with context_file.open() as file_handle:
-            obj = json.load(file_handle, object_pairs_hook=OrderedDict)
+            obj = json.load(file_handle)
     except ValueError as e:
         # JSON decoding error.  Let's throw a new exception that is more
         # friendly for the developer or user.
@@ -71,7 +68,7 @@ def create_context(
         raise ContextDecodingException(our_exc_message)
 
     # Add the Python object to the context dictionary
-    context[context_file.stem] = obj
+    context = {context_file.stem: obj}
 
     # Overwrite context variable defaults with the default context from the
     # user's global config, if available
