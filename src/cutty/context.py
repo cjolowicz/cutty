@@ -19,8 +19,15 @@ def load_context(
     """Load context from disk."""
     if default is not None and not context_file.exists():
         return default
-    with context_file.open() as io:
-        return cast(StrMapping, json.load(io))
+
+    try:
+        with context_file.open() as io:
+            return cast(StrMapping, json.load(io))
+    except ValueError as error:
+        raise ContextDecodingException(
+            "JSON decoding error while loading '{}'."
+            "  Decoding error details: '{}'".format(context_file.resolve(), error)
+        )
 
 
 def _override_value(value: Any, other: Any) -> Any:
