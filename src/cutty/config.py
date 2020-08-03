@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Mapping
@@ -23,8 +24,10 @@ DEFAULT_ABBREVIATIONS = {
 class Config:
     """Configuration."""
 
-    default_context: Mapping[str, Any] = {}
-    abbreviations: Mapping[str, str] = DEFAULT_ABBREVIATIONS
+    default_context: Mapping[str, Any] = field(default_factory=dict)
+    abbreviations: Mapping[str, str] = field(
+        default_factory=lambda: dict(DEFAULT_ABBREVIATIONS)
+    )
 
     @classmethod
     def load(
