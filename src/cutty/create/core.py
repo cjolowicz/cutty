@@ -33,7 +33,7 @@ def create(
             "at the same time."
         )
 
-    config = Config.load(config_file, default_config=default_config)
+    config = Config.load(config_file, ignore_config=default_config)
     template = expand_abbreviations(
         template=template, abbreviations=config.abbreviations
     )

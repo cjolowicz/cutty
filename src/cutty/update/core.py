@@ -31,7 +31,7 @@ def update(
     default_config: bool = False,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = Config.load(config_file, default_config=default_config)
+    config = Config.load(config_file, ignore_config=default_config)
     instance = git.Repository()
     _ensure_branch_exists(instance, "template")
     previous_context_file = Path(".cookiecutter.json")
