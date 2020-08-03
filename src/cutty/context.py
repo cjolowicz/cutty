@@ -1,7 +1,6 @@
 """Helper functions for contexts."""
 import contextlib
 import json
-import logging
 from pathlib import Path
 from typing import Any
 from typing import cast
@@ -12,9 +11,6 @@ from cookiecutter.prompt import prompt_for_config
 
 from .types import MutableStrMapping
 from .types import StrMapping
-
-
-logger = logging.getLogger(__name__)
 
 
 def load_context(
@@ -70,8 +66,6 @@ def create_context(
     Raises:
         ContextDecodingException: The JSON file is invalid.
     """
-    logger.debug("context_file is %s", context_file)
-
     try:
         with context_file.open() as io:
             data = json.load(io)
@@ -84,8 +78,6 @@ def create_context(
     _override_context(data, default_context, extra_context)
 
     context = {"cookiecutter": data}
-
-    logger.debug("Context generated is %s", context)
 
     data = prompt_for_config(context, no_input)
     data["_template"] = template
