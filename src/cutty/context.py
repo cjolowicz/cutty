@@ -25,11 +25,11 @@ def load_context(
         return cast(StrMapping, json.load(io))
 
 
-def apply_overwrites_to_context(
-    context: MutableStrMapping, overwrite_context: StrMapping
+def apply_override_to_context(
+    context: MutableStrMapping, override_context: StrMapping
 ) -> None:
-    """Modify the given context in place based on the overwrite_context."""
-    for variable, overwrite in overwrite_context.items():
+    """Modify the given context in place based on the override_context."""
+    for variable, override in override_context.items():
         if variable not in context:
             # Do not include variables which are not used in the template
             continue
@@ -38,15 +38,15 @@ def apply_overwrites_to_context(
 
         if isinstance(context_value, list):
             # We are dealing with a choice variable
-            if overwrite in context_value:
-                # This overwrite is actually valid for the given context
+            if override in context_value:
+                # This override is actually valid for the given context
                 # Let's set it as default (by definition first item in list)
                 # see ``cookiecutter.prompt.prompt_choice_for_config``
-                context_value.remove(overwrite)
-                context_value.insert(0, overwrite)
+                context_value.remove(override)
+                context_value.insert(0, override)
         else:
-            # Simply overwrite the value for this variable
-            context[variable] = overwrite
+            # Simply override the value for this variable
+            context[variable] = override
 
 
 def create_context(
@@ -87,10 +87,10 @@ def create_context(
         )
 
     if default_context:
-        apply_overwrites_to_context(data, default_context)
+        apply_override_to_context(data, default_context)
 
     if extra_context:
-        apply_overwrites_to_context(data, extra_context)
+        apply_override_to_context(data, extra_context)
 
     context = {"cookiecutter": data}
 
