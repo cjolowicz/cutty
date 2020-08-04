@@ -13,7 +13,7 @@ from .types import StrMapping
 
 
 def prompt_for_config(  # noqa: C901
-    context: StrMapping, no_input: bool = False
+    context: StrMapping, *, no_input: bool = False
 ) -> StrMapping:
     """Prompt user to enter a new config.
 
