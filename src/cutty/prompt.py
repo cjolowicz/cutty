@@ -110,9 +110,9 @@ def prompt_choice_for_config(
     context: StrMapping,
     env: StrictEnvironment,
     key: str,
-    values: List[str],
+    values: List[Any],
     no_input: bool,
-) -> str:
+) -> Any:
     """Prompt user with a set of values to choose from.
 
     Each of the possible choices is rendered beforehand.
