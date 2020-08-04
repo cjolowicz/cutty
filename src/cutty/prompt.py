@@ -3,14 +3,24 @@ from typing import Any
 from typing import cast
 from typing import List
 
+import click
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.prompt import read_user_choice
 from cookiecutter.prompt import read_user_dict
-from cookiecutter.prompt import read_user_variable
 from jinja2.exceptions import UndefinedError
 
 from .types import StrMapping
+
+
+def read_user_variable(var_name, default_value):
+    """Prompt user for variable and return the entered value or given default.
+
+    :param str var_name: Variable of the context to query the user
+    :param default_value: Value that will be returned if no input happens
+    """
+    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
+    return click.prompt(var_name, default=default_value)
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
