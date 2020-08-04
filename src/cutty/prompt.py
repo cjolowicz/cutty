@@ -72,7 +72,6 @@ def read_user_dict(variable: str, default_value: Any) -> Any:
     Raises:
         TypeError: the default is not a dict
     """
-    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     if not isinstance(default_value, dict):
         raise TypeError
 
