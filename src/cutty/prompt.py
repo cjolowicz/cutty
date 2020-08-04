@@ -24,10 +24,11 @@ def prompt_choice_for_config(
 
     Each of the possible choices is rendered beforehand.
     """
+    if no_input:
+        return cast(str, render_variable(env, values[0], context))
+
     values: List[str] = [render_variable(env, value, context) for value in values]
 
-    if no_input:
-        return values[0]
     return cast(str, read_user_choice(key, values))
 
 
