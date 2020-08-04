@@ -25,11 +25,13 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
 
     This is then presented to the user as the default.
 
-    :param Environment env: A Jinja2 Environment object.
-    :param value: The next value to be prompted for by the user.
-    :param dict context: The current context as it's gradually
-        being populated with variables.
-    :return: The rendered value for the default variable.
+    Args:
+        env: A Jinja2 Environment object.
+        value: The next value to be prompted for by the user.
+        context: The current context as it's gradually being populated with variables.
+
+    Returns:
+        The rendered value for the default variable.
     """
     if value is None:
         return None
