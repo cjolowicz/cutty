@@ -17,8 +17,15 @@ def prompt_for_config(  # noqa: C901
 ) -> StrMapping:
     """Prompt user to enter a new config.
 
-    :param dict context: Source for field names and sample values.
-    :param no_input: Prompt the user at command line for manual configuration?
+    Args:
+        context: Source for field names and sample values.
+        no_input: Prompt the user at command line for manual configuration?
+
+    Returns:
+        The generated context (the object under the "cookiecutter" key).
+
+    Raises:
+        UndefinedVariableInTemplate: Cannot render a template variable.
     """
     cookiecutter_dict = OrderedDict([])
     env = StrictEnvironment(context=context)
