@@ -44,10 +44,7 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
     if isinstance(value, list):
         return [render_variable(env, item, context) for item in value]
 
-    if not isinstance(value, str):
-        value = str(value)
-
-    template = env.from_string(value)
+    template = env.from_string(str(value))
 
     return template.render(cookiecutter=context)
 
