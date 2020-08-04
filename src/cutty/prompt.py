@@ -17,20 +17,18 @@ def prompt_choice_for_config(
     context: StrMapping,
     env: StrictEnvironment,
     key: str,
-    options: List[str],
+    values: List[str],
     no_input: bool,
 ) -> str:
-    """Prompt user with a set of options to choose from.
+    """Prompt user with a set of values to choose from.
 
     Each of the possible choices is rendered beforehand.
     """
-    rendered_options: List[str] = [
-        render_variable(env, raw, context) for raw in options
-    ]
+    rendered_values: List[str] = [render_variable(env, raw, context) for raw in values]
 
     if no_input:
-        return rendered_options[0]
-    return cast(str, read_user_choice(key, rendered_options))
+        return rendered_values[0]
+    return cast(str, read_user_choice(key, rendered_values))
 
 
 def prompt_for_config(  # noqa: C901
