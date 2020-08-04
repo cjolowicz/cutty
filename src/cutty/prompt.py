@@ -49,8 +49,7 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
 
     template = env.from_string(value)
 
-    rendered_template = template.render(cookiecutter=context)
-    return rendered_template
+    return template.render(cookiecutter=context)
 
 
 def prompt_choice_for_config(
