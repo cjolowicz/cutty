@@ -47,11 +47,11 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     numbers = choices.keys()
     default = "1"
 
-    choice_lines = ["{} - {}".format(*c) for c in choices.items()]
+    lines = ["{} - {}".format(*c) for c in choices.items()]
     prompt = "\n".join(
         (
             "Select {}:".format(variable),
-            "\n".join(choice_lines),
+            "\n".join(lines),
             "Choose from {}".format(", ".join(numbers)),
         )
     )
