@@ -87,6 +87,8 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
 def process_json(value: Optional[str]) -> Any:
     """Load user-supplied value as a JSON dict.
 
+    This function raises click.UsageError to cause click to ask the user again.
+
     Args:
         value: User-supplied value to load as a JSON dict
 
@@ -100,11 +102,9 @@ def process_json(value: Optional[str]) -> Any:
     try:
         result = json.loads(value)
     except Exception:
-        # Leave it up to click to ask the user again
         raise click.UsageError("Unable to decode to JSON.")
 
     if not isinstance(result, dict):
-        # Leave it up to click to ask the user again
         raise click.UsageError("Requires JSON dict.")
 
     return result
