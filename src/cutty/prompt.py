@@ -76,13 +76,11 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
     if not isinstance(default, dict):
         raise TypeError
 
-    default_display = "default"
-
     user_value = click.prompt(
-        variable, default=default_display, type=click.STRING, value_proc=process_json
+        variable, default="default", type=click.STRING, value_proc=process_json
     )
 
-    if user_value == default_display:
+    if user_value == "default":
         # Return the given default w/o any processing
         return default
     return cast(Dict[Any, Any], user_value)
