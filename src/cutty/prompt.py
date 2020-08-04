@@ -78,13 +78,13 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
         raise TypeError
 
     value = click.prompt(
-        variable, default="default", type=click.STRING, value_proc=process_json
+        variable, default="default", type=click.STRING, value_proc=load_json_dict
     )
 
     return cast(Dict[Any, Any], value) if value != "default" else default
 
 
-def process_json(value: Optional[str]) -> Any:
+def load_json_dict(value: Optional[str]) -> Any:
     """Load user-supplied value as a JSON dict.
 
     This function raises click.UsageError to cause click to ask the user again.
