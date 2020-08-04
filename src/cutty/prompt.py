@@ -60,12 +60,12 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     return choices[choice]
 
 
-def read_user_dict(variable: str, default_value: Dict[Any, Any]) -> Dict[Any, Any]:
+def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
     """Prompt the user to provide a dictionary of data.
 
     Args:
         variable: Variable as specified in the context
-        default_value: Value that will be returned if no input is provided
+        default: Value that will be returned if no input is provided
 
     Returns:
         A Python dictionary to use in the context.
@@ -73,7 +73,7 @@ def read_user_dict(variable: str, default_value: Dict[Any, Any]) -> Dict[Any, An
     Raises:
         TypeError: the default is not a dict
     """
-    if not isinstance(default_value, dict):
+    if not isinstance(default, dict):
         raise TypeError
 
     default_display = "default"
@@ -84,7 +84,7 @@ def read_user_dict(variable: str, default_value: Dict[Any, Any]) -> Dict[Any, An
 
     if user_value == default_display:
         # Return the given default w/o any processing
-        return default_value
+        return default
     return cast(Dict[Any, Any], user_value)
 
 
