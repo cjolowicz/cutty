@@ -85,11 +85,11 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
     return cast(Dict[Any, Any], value) if value != "default" else default
 
 
-def process_json(user_value: Optional[str]) -> Any:
+def process_json(value: Optional[str]) -> Any:
     """Load user-supplied value as a JSON dict.
 
     Args:
-        user_value: User-supplied value to load as a JSON dict
+        value: User-supplied value to load as a JSON dict
 
     Returns:
         A JSON dict.
@@ -97,9 +97,9 @@ def process_json(user_value: Optional[str]) -> Any:
     Raises:
         UsageError: The input is not a JSON dict, or not JSON.
     """
-    assert user_value is not None  # noqa: S101
+    assert value is not None  # noqa: S101
     try:
-        user_dict = json.loads(user_value, object_pairs_hook=OrderedDict)
+        user_dict = json.loads(value, object_pairs_hook=OrderedDict)
     except Exception:
         # Leave it up to click to ask the user again
         raise click.UsageError("Unable to decode to JSON.")
