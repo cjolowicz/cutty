@@ -24,7 +24,7 @@ def prompt_choice_for_config(
 
     Each of the possible choices is rendered beforehand.
     """
-    values: List[str] = [render_variable(env, raw, context) for raw in values]
+    values: List[str] = [render_variable(env, value, context) for value in values]
 
     if no_input:
         return values[0]
