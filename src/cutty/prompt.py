@@ -1,4 +1,5 @@
 """Prompt for user input."""
+from collections import OrderedDict
 from typing import Any
 from typing import cast
 from typing import List
@@ -6,7 +7,6 @@ from typing import List
 import click
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.prompt import read_user_choice
 from cookiecutter.prompt import read_user_dict
 from jinja2.exceptions import UndefinedError
 
@@ -24,6 +24,43 @@ def read_user_variable(variable: str, default: Any) -> Any:
         The entered value or given default.
     """
     return click.prompt(variable, default=default)
+
+
+def read_user_choice(var_name, options):
+    """Prompt the user to choose from several options for the given variable.
+
+    The first item will be returned if no input happens.
+
+    :param str var_name: Variable as specified in the context
+    :param list options: Sequence of options that are available to select from
+    :return: Exactly one item of ``options`` that has been chosen by the user
+    """
+    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
+    if not isinstance(options, list):
+        raise TypeError
+
+    if not options:
+        raise ValueError
+
+    choice_map = OrderedDict(
+        ("{}".format(i), value) for i, value in enumerate(options, 1)
+    )
+    choices = choice_map.keys()
+    default = "1"
+
+    choice_lines = ["{} - {}".format(*c) for c in choice_map.items()]
+    prompt = "\n".join(
+        (
+            "Select {}:".format(var_name),
+            "\n".join(choice_lines),
+            "Choose from {}".format(", ".join(choices)),
+        )
+    )
+
+    user_choice = click.prompt(
+        prompt, type=click.Choice(choices), default=default, show_choices=False
+    )
+    return choice_map[user_choice]
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
