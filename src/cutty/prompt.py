@@ -1,13 +1,15 @@
 """Prompt for user input."""
+import json
+from collections import OrderedDict
 from typing import Any
 from typing import cast
 from typing import Dict
 from typing import List
+from typing import Optional
 
 import click
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.prompt import process_json
 from jinja2.exceptions import UndefinedError
 
 from .types import StrMapping
@@ -81,6 +83,25 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
     )
 
     return cast(Dict[Any, Any], value) if value != "default" else default
+
+
+def process_json(user_value: Optional[str]) -> Any:
+    """Load user-supplied value as a JSON dict.
+
+    :param str user_value: User-supplied value to load as a JSON dict
+    """
+    assert user_value is not None  # noqa: S101
+    try:
+        user_dict = json.loads(user_value, object_pairs_hook=OrderedDict)
+    except Exception:
+        # Leave it up to click to ask the user again
+        raise click.UsageError("Unable to decode to JSON.")
+
+    if not isinstance(user_dict, dict):
+        # Leave it up to click to ask the user again
+        raise click.UsageError("Requires JSON dict.")
+
+    return user_dict
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
