@@ -43,7 +43,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     if not values:
         raise ValueError
 
-    choices = {"{}".format(i): value for i, value in enumerate(values, 1)}
+    choices = {str(number): value for number, value in enumerate(values, 1)}
     numbers = choices.keys()
     default = "1"
 
