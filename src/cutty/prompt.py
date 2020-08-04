@@ -76,14 +76,14 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
     if not isinstance(default, dict):
         raise TypeError
 
-    user_value = click.prompt(
+    value = click.prompt(
         variable, default="default", type=click.STRING, value_proc=process_json
     )
 
-    if user_value == "default":
+    if value == "default":
         # Return the given default w/o any processing
         return default
-    return cast(Dict[Any, Any], user_value)
+    return cast(Dict[Any, Any], value)
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
