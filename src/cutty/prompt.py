@@ -13,7 +13,7 @@ from jinja2.exceptions import UndefinedError
 from .types import StrMapping
 
 
-def read_user_variable(var_name, default_value):
+def read_user_variable(var_name: str, default_value: Any) -> Any:
     """Prompt user for variable and return the entered value or given default.
 
     Args:
