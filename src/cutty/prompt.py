@@ -1,6 +1,5 @@
 """Prompt for user input."""
 import json
-from collections import OrderedDict
 from typing import Any
 from typing import cast
 from typing import Dict
@@ -99,7 +98,7 @@ def process_json(value: Optional[str]) -> Any:
     """
     assert value is not None  # noqa: S101
     try:
-        result = json.loads(value, object_pairs_hook=OrderedDict)
+        result = json.loads(value)
     except Exception:
         # Leave it up to click to ask the user again
         raise click.UsageError("Unable to decode to JSON.")
