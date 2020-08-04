@@ -23,7 +23,6 @@ def read_user_variable(variable: str, default: Any) -> Any:
     Returns:
         The entered value or given default.
     """
-    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     return click.prompt(variable, default=default)
 
 
