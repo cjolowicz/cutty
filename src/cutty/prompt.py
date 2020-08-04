@@ -62,9 +62,15 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
 def read_user_dict(var_name: str, default_value: Any) -> Any:
     """Prompt the user to provide a dictionary of data.
 
-    :param str var_name: Variable as specified in the context
-    :param default_value: Value that will be returned if no input is provided
-    :return: A Python dictionary to use in the context.
+    Args:
+        var_name: Variable as specified in the context
+        default_value: Value that will be returned if no input is provided
+
+    Returns:
+        A Python dictionary to use in the context.
+
+    Raises:
+        TypeError: the default is not a dict
     """
     # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     if not isinstance(default_value, dict):
