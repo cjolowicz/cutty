@@ -13,18 +13,18 @@ from jinja2.exceptions import UndefinedError
 from .types import StrMapping
 
 
-def read_user_variable(variable: str, default_value: Any) -> Any:
+def read_user_variable(variable: str, default: Any) -> Any:
     """Prompt user for variable and return the entered value or given default.
 
     Args:
         variable: Variable of the context to query the user
-        default_value: Value that will be returned if no input happens
+        default: Value that will be returned if no input happens
 
     Returns:
         The entered value or given default.
     """
     # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
-    return click.prompt(variable, default=default_value)
+    return click.prompt(variable, default=default)
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
