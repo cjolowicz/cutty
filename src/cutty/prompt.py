@@ -14,7 +14,7 @@ from .types import StrMapping
 
 
 def prompt_choice_for_config(
-    cookiecutter_dict: StrMapping,
+    context: StrMapping,
     env: StrictEnvironment,
     key: str,
     options: List[str],
@@ -25,7 +25,7 @@ def prompt_choice_for_config(
     Each of the possible choices is rendered beforehand.
     """
     rendered_options: List[str] = [
-        render_variable(env, raw, cookiecutter_dict) for raw in options
+        render_variable(env, raw, context) for raw in options
     ]
 
     if no_input:
