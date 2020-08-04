@@ -58,7 +58,6 @@ def prompt_for_config(  # noqa: C901
 
     # Second pass; handle the dictionaries.
     for key, value in context.items():
-
         try:
             if isinstance(value, dict):
                 # We are dealing with a dict variable
