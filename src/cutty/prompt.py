@@ -16,7 +16,8 @@ def prompt_for_config(  # noqa: C901
     """Prompt user to enter a new config.
 
     Args:
-        context: Source for field names and sample values.
+        context: Source for field names and sample values (the object under
+            the "cookiecutter" key).  # noqa: RST203
         no_input: Prompt the user at command line for manual configuration?
 
     Returns:
@@ -26,12 +27,12 @@ def prompt_for_config(  # noqa: C901
         UndefinedVariableInTemplate: Cannot render a template variable.
     """
     result = {}
-    env = StrictEnvironment(context=context)
+    env = StrictEnvironment(context={"cookiecutter": context})
 
     # First pass: Handle simple and raw variables, plus choices.
     # These must be done first because the dictionaries keys and
     # values might refer to them.
-    for key, raw in context["cookiecutter"].items():
+    for key, raw in context.items():
         if key.startswith("_"):
             result[key] = raw
             continue
@@ -51,10 +52,10 @@ def prompt_for_config(  # noqa: C901
                 result[key] = val
         except UndefinedError as err:
             msg = "Unable to render variable '{}'".format(key)
-            raise UndefinedVariableInTemplate(msg, err, context)
+            raise UndefinedVariableInTemplate(msg, err, {"cookiecutter": context})
 
     # Second pass; handle the dictionaries.
-    for key, raw in context["cookiecutter"].items():
+    for key, raw in context.items():
 
         try:
             if isinstance(raw, dict):
@@ -67,6 +68,6 @@ def prompt_for_config(  # noqa: C901
                 result[key] = val
         except UndefinedError as err:
             msg = "Unable to render variable '{}'".format(key)
-            raise UndefinedVariableInTemplate(msg, err, context)
+            raise UndefinedVariableInTemplate(msg, err, {"cookiecutter": context})
 
     return result
