@@ -40,8 +40,9 @@ def prompt_for_config(  # noqa: C901
         try:
             if isinstance(value, list):
                 # We are dealing with a choice variable
-                value = prompt_choice_for_config(result, env, key, value, no_input)
-                result[key] = value
+                result[key] = prompt_choice_for_config(
+                    result, env, key, value, no_input
+                )
             elif not isinstance(value, dict):
                 # We are dealing with a regular variable
                 value = render_variable(env, value, result)
