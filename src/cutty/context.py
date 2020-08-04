@@ -10,8 +10,8 @@ from typing import Optional
 from typing import Tuple
 
 from cookiecutter.exceptions import ContextDecodingException
-from cookiecutter.prompt import prompt_for_config
 
+from .prompt import prompt_for_config
 from .types import StrMapping
 
 
