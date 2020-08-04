@@ -6,7 +6,7 @@ from typing import List
 import click
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.prompt import read_user_dict
+from cookiecutter.prompt import process_json
 from jinja2.exceptions import UndefinedError
 
 from .types import StrMapping
@@ -57,6 +57,29 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     )
 
     return choices[choice]
+
+
+def read_user_dict(var_name: str, default_value: Any) -> Any:
+    """Prompt the user to provide a dictionary of data.
+
+    :param str var_name: Variable as specified in the context
+    :param default_value: Value that will be returned if no input is provided
+    :return: A Python dictionary to use in the context.
+    """
+    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
+    if not isinstance(default_value, dict):
+        raise TypeError
+
+    default_display = "default"
+
+    user_value = click.prompt(
+        var_name, default=default_display, type=click.STRING, value_proc=process_json
+    )
+
+    if user_value == default_display:
+        # Return the given default w/o any processing
+        return default_value
+    return user_value
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
