@@ -1,13 +1,25 @@
 """Prompt for user input."""
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.prompt import prompt_choice_for_config
+from cookiecutter.prompt import read_user_choice
 from cookiecutter.prompt import read_user_dict
 from cookiecutter.prompt import read_user_variable
 from cookiecutter.prompt import render_variable
 from jinja2.exceptions import UndefinedError
 
 from .types import StrMapping
+
+
+def prompt_choice_for_config(cookiecutter_dict, env, key, options, no_input):
+    """Prompt user with a set of options to choose from.
+
+    Each of the possible choices is rendered beforehand.
+    """
+    rendered_options = [render_variable(env, raw, cookiecutter_dict) for raw in options]
+
+    if no_input:
+        return rendered_options[0]
+    return read_user_choice(key, rendered_options)
 
 
 def prompt_for_config(  # noqa: C901
