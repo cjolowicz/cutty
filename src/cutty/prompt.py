@@ -14,7 +14,7 @@ from jinja2.exceptions import UndefinedError
 from .types import StrMapping
 
 
-def render_variable(env: StrictEnvironment, raw: Any, context: StrMapping) -> str:
+def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> str:
     """Render the next variable to be displayed in the user prompt.
 
     Inside the prompting taken from the cookiecutter.json file, this renders
@@ -26,24 +26,24 @@ def render_variable(env: StrictEnvironment, raw: Any, context: StrMapping) -> st
     This is then presented to the user as the default.
 
     :param Environment env: A Jinja2 Environment object.
-    :param raw: The next value to be prompted for by the user.
+    :param value: The next value to be prompted for by the user.
     :param dict context: The current context as it's gradually
         being populated with variables.
     :return: The rendered value for the default variable.
     """
-    if raw is None:
+    if value is None:
         return None
-    elif isinstance(raw, dict):
+    elif isinstance(value, dict):
         return {
             render_variable(env, k, context): render_variable(env, v, context)
-            for k, v in raw.items()
+            for k, v in value.items()
         }
-    elif isinstance(raw, list):
-        return [render_variable(env, v, context) for v in raw]
-    elif not isinstance(raw, six.string_types):
-        raw = str(raw)
+    elif isinstance(value, list):
+        return [render_variable(env, v, context) for v in value]
+    elif not isinstance(value, six.string_types):
+        value = str(value)
 
-    template = env.from_string(raw)
+    template = env.from_string(value)
 
     rendered_template = template.render(cookiecutter=context)
     return rendered_template
