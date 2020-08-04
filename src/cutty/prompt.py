@@ -16,8 +16,12 @@ from .types import StrMapping
 def read_user_variable(var_name, default_value):
     """Prompt user for variable and return the entered value or given default.
 
-    :param str var_name: Variable of the context to query the user
-    :param default_value: Value that will be returned if no input happens
+    Args:
+        var_name: Variable of the context to query the user
+        default_value: Value that will be returned if no input happens
+
+    Returns:
+        The entered value or given default.
     """
     # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     return click.prompt(var_name, default=default_value)
