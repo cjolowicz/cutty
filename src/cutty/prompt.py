@@ -26,7 +26,7 @@ def read_user_variable(variable: str, default: Any) -> Any:
     return click.prompt(variable, default=default)
 
 
-def read_user_choice(var_name, options):
+def read_user_choice(var_name: str, options: List[Any]) -> Any:
     """Prompt the user to choose from several options for the given variable.
 
     The first item will be returned if no input happens.
