@@ -33,8 +33,8 @@ def prompt_for_config(  # noqa: C901
     # First pass: Handle simple and raw variables, plus choices.
     # These must be done first because the dictionaries keys and
     # values might refer to them.
-    for key, raw in context[u"cookiecutter"].items():
-        if key.startswith(u"_"):
+    for key, raw in context["cookiecutter"].items():
+        if key.startswith("_"):
             cookiecutter_dict[key] = raw
             continue
 
@@ -58,7 +58,7 @@ def prompt_for_config(  # noqa: C901
             raise UndefinedVariableInTemplate(msg, err, context)
 
     # Second pass; handle the dictionaries.
-    for key, raw in context[u"cookiecutter"].items():
+    for key, raw in context["cookiecutter"].items():
 
         try:
             if isinstance(raw, dict):
