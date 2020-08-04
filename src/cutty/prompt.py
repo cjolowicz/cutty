@@ -3,7 +3,6 @@ from typing import Any
 from typing import cast
 from typing import List
 
-import six
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.prompt import read_user_choice
@@ -45,7 +44,7 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
     if isinstance(value, list):
         return [render_variable(env, item, context) for item in value]
 
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         value = str(value)
 
     template = env.from_string(value)
