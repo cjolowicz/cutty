@@ -43,7 +43,7 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
         )
 
     if isinstance(value, list):
-        return [render_variable(env, v, context) for v in value]
+        return [render_variable(env, item, context) for item in value]
 
     if not isinstance(value, six.string_types):
         value = str(value)
