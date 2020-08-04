@@ -44,7 +44,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
         raise ValueError
 
     choice_map = {"{}".format(i): value for i, value in enumerate(values, 1)}
-    choices = choice_map.keys()
+    numbers = choice_map.keys()
     default = "1"
 
     choice_lines = ["{} - {}".format(*c) for c in choice_map.items()]
@@ -52,12 +52,12 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
         (
             "Select {}:".format(variable),
             "\n".join(choice_lines),
-            "Choose from {}".format(", ".join(choices)),
+            "Choose from {}".format(", ".join(numbers)),
         )
     )
 
     user_choice = click.prompt(
-        prompt, type=click.Choice(choices), default=default, show_choices=False
+        prompt, type=click.Choice(numbers), default=default, show_choices=False
     )
     return choice_map[user_choice]
 
