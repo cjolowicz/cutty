@@ -1,4 +1,5 @@
 """Prompt for user input."""
+from typing import Any
 from typing import cast
 from typing import List
 
@@ -13,7 +14,9 @@ from jinja2.exceptions import UndefinedError
 from .types import StrMapping
 
 
-def render_variable(env, raw, cookiecutter_dict):
+def render_variable(
+    env: StrictEnvironment, raw: Any, cookiecutter_dict: StrMapping
+) -> str:
     """Render the next variable to be displayed in the user prompt.
 
     Inside the prompting taken from the cookiecutter.json file, this renders
