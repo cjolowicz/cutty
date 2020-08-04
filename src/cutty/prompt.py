@@ -31,9 +31,16 @@ def read_user_choice(var_name, options):
 
     The first item will be returned if no input happens.
 
-    :param str var_name: Variable as specified in the context
-    :param list options: Sequence of options that are available to select from
-    :return: Exactly one item of ``options`` that has been chosen by the user
+    Args:
+        var_name: Variable as specified in the context
+        options: Sequence of options that are available to select from
+
+    Returns:
+        Exactly one item of ``options`` that has been chosen by the user
+
+    Raises:
+        TypeError: ``options`` is not a list
+        ValueError: ``options`` is empty
     """
     # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     if not isinstance(options, list):
