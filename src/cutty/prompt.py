@@ -50,9 +50,10 @@ def prompt_for_config(  # noqa: C901
                     val = read_user_variable(key, val)
 
                 result[key] = val
-        except UndefinedError as err:
-            msg = "Unable to render variable '{}'".format(key)
-            raise UndefinedVariableInTemplate(msg, err, {"cookiecutter": context})
+        except UndefinedError as error:
+            raise UndefinedVariableInTemplate(
+                f"Unable to render variable {key!r}", error, {"cookiecutter": context}
+            )
 
     # Second pass; handle the dictionaries.
     for key, raw in context.items():
@@ -66,8 +67,9 @@ def prompt_for_config(  # noqa: C901
                     val = read_user_dict(key, val)
 
                 result[key] = val
-        except UndefinedError as err:
-            msg = "Unable to render variable '{}'".format(key)
-            raise UndefinedVariableInTemplate(msg, err, {"cookiecutter": context})
+        except UndefinedError as error:
+            raise UndefinedVariableInTemplate(
+                f"Unable to render variable {key!r}", error, {"cookiecutter": context}
+            )
 
     return result
