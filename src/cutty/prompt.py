@@ -88,7 +88,14 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
 def process_json(user_value: Optional[str]) -> Any:
     """Load user-supplied value as a JSON dict.
 
-    :param str user_value: User-supplied value to load as a JSON dict
+    Args:
+        user_value: User-supplied value to load as a JSON dict
+
+    Returns:
+        A JSON dict.
+
+    Raises:
+        UsageError: The input is not a JSON dict, or not JSON.
     """
     assert user_value is not None  # noqa: S101
     try:
