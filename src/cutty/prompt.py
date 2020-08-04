@@ -1,6 +1,4 @@
 """Prompt for user input."""
-from collections import OrderedDict
-
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.prompt import prompt_choice_for_config
@@ -27,7 +25,7 @@ def prompt_for_config(  # noqa: C901
     Raises:
         UndefinedVariableInTemplate: Cannot render a template variable.
     """
-    result = OrderedDict([])
+    result = {}
     env = StrictEnvironment(context=context)
 
     # First pass: Handle simple and raw variables, plus choices.
