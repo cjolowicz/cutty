@@ -39,12 +39,8 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
         Exactly one item of ``values`` that has been chosen by the user
 
     Raises:
-        TypeError: ``values`` is not a list
         ValueError: ``values`` is empty
     """
-    if not isinstance(values, list):
-        raise TypeError
-
     if not values:
         raise ValueError
 
