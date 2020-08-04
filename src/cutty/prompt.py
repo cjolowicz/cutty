@@ -35,14 +35,17 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
     """
     if value is None:
         return None
-    elif isinstance(value, dict):
+
+    if isinstance(value, dict):
         return {
             render_variable(env, k, context): render_variable(env, v, context)
             for k, v in value.items()
         }
-    elif isinstance(value, list):
+
+    if isinstance(value, list):
         return [render_variable(env, v, context) for v in value]
-    elif not isinstance(value, six.string_types):
+
+    if not isinstance(value, six.string_types):
         value = str(value)
 
     template = env.from_string(value)
