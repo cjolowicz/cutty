@@ -37,10 +37,10 @@ def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> 
         return None
 
     if isinstance(value, dict):
-        return {
-            render_variable(env, k, context): render_variable(env, v, context)
-            for k, v in value.items()
-        }
+        return dict(
+            tuple(render_variable(env, part, context) for part in item)
+            for item in value.items()
+        )
 
     if isinstance(value, list):
         return [render_variable(env, v, context) for v in value]
