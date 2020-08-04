@@ -13,7 +13,7 @@ from jinja2.exceptions import UndefinedError
 from .types import StrMapping
 
 
-def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> str:
+def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
     """Render the next variable to be displayed in the user prompt.
 
     Inside the prompting taken from the cookiecutter.json file, this renders
