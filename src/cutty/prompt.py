@@ -1,6 +1,7 @@
 """Prompt for user input."""
 from typing import Any
 from typing import cast
+from typing import Dict
 from typing import List
 
 import click
@@ -59,7 +60,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     return choices[choice]
 
 
-def read_user_dict(variable: str, default_value: Any) -> Any:
+def read_user_dict(variable: str, default_value: Dict[Any, Any]) -> Dict[Any, Any]:
     """Prompt the user to provide a dictionary of data.
 
     Args:
@@ -84,7 +85,7 @@ def read_user_dict(variable: str, default_value: Any) -> Any:
     if user_value == default_display:
         # Return the given default w/o any processing
         return default_value
-    return user_value
+    return cast(Dict[Any, Any], user_value)
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
