@@ -26,31 +26,31 @@ def read_user_variable(variable: str, default: Any) -> Any:
     return click.prompt(variable, default=default)
 
 
-def read_user_choice(variable: str, options: List[Any]) -> Any:
-    """Prompt the user to choose from several options for the given variable.
+def read_user_choice(variable: str, values: List[Any]) -> Any:
+    """Prompt the user to choose from several values for the given variable.
 
     The first item will be returned if no input happens.
 
     Args:
         variable: Variable as specified in the context
-        options: Sequence of options that are available to select from
+        values: Sequence of values that are available to select from
 
     Returns:
-        Exactly one item of ``options`` that has been chosen by the user
+        Exactly one item of ``values`` that has been chosen by the user
 
     Raises:
-        TypeError: ``options`` is not a list
-        ValueError: ``options`` is empty
+        TypeError: ``values`` is not a list
+        ValueError: ``values`` is empty
     """
     # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
-    if not isinstance(options, list):
+    if not isinstance(values, list):
         raise TypeError
 
-    if not options:
+    if not values:
         raise ValueError
 
     choice_map = OrderedDict(
-        ("{}".format(i), value) for i, value in enumerate(options, 1)
+        ("{}".format(i), value) for i, value in enumerate(values, 1)
     )
     choices = choice_map.keys()
     default = "1"
