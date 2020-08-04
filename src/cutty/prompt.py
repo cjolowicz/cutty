@@ -59,11 +59,11 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     return choices[choice]
 
 
-def read_user_dict(var_name: str, default_value: Any) -> Any:
+def read_user_dict(variable: str, default_value: Any) -> Any:
     """Prompt the user to provide a dictionary of data.
 
     Args:
-        var_name: Variable as specified in the context
+        variable: Variable as specified in the context
         default_value: Value that will be returned if no input is provided
 
     Returns:
@@ -79,7 +79,7 @@ def read_user_dict(var_name: str, default_value: Any) -> Any:
     default_display = "default"
 
     user_value = click.prompt(
-        var_name, default=default_display, type=click.STRING, value_proc=process_json
+        variable, default=default_display, type=click.STRING, value_proc=process_json
     )
 
     if user_value == default_display:
