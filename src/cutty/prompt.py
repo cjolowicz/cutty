@@ -42,7 +42,6 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
         TypeError: ``values`` is not a list
         ValueError: ``values`` is empty
     """
-    # Please see https://click.palletsprojects.com/en/7.x/api/#click.prompt
     if not isinstance(values, list):
         raise TypeError
 
