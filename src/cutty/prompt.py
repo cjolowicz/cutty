@@ -54,10 +54,10 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     ]
     prompt = "\n".join(lines)
 
-    user_choice = click.prompt(
+    choice = click.prompt(
         prompt, type=click.Choice(numbers), default="1", show_choices=False
     )
-    return choices[user_choice]
+    return choices[choice]
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
