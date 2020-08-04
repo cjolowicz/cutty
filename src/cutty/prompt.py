@@ -48,13 +48,12 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     default = "1"
 
     lines = [f"{number} - {value}" for number, value in choices.items()]
-    prompt = "\n".join(
-        (
-            f"Select {variable}:",
-            "\n".join(lines),
-            "Choose from {}".format(", ".join(numbers)),
-        )
-    )
+    lines = [
+        f"Select {variable}:",
+        *lines,
+        "Choose from {}".format(", ".join(numbers)),
+    ]
+    prompt = "\n".join(lines)
 
     user_choice = click.prompt(
         prompt, type=click.Choice(numbers), default=default, show_choices=False
