@@ -99,16 +99,16 @@ def process_json(value: Optional[str]) -> Any:
     """
     assert value is not None  # noqa: S101
     try:
-        user_dict = json.loads(value, object_pairs_hook=OrderedDict)
+        result = json.loads(value, object_pairs_hook=OrderedDict)
     except Exception:
         # Leave it up to click to ask the user again
         raise click.UsageError("Unable to decode to JSON.")
 
-    if not isinstance(user_dict, dict):
+    if not isinstance(result, dict):
         # Leave it up to click to ask the user again
         raise click.UsageError("Requires JSON dict.")
 
-    return user_dict
+    return result
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
