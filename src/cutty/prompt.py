@@ -27,7 +27,7 @@ def prompt_for_config(  # noqa: C901
     Raises:
         UndefinedVariableInTemplate: Cannot render a template variable.
     """
-    cookiecutter_dict = OrderedDict([])
+    result = OrderedDict([])
     env = StrictEnvironment(context=context)
 
     # First pass: Handle simple and raw variables, plus choices.
@@ -35,24 +35,22 @@ def prompt_for_config(  # noqa: C901
     # values might refer to them.
     for key, raw in context["cookiecutter"].items():
         if key.startswith("_"):
-            cookiecutter_dict[key] = raw
+            result[key] = raw
             continue
 
         try:
             if isinstance(raw, list):
                 # We are dealing with a choice variable
-                val = prompt_choice_for_config(
-                    cookiecutter_dict, env, key, raw, no_input
-                )
-                cookiecutter_dict[key] = val
+                val = prompt_choice_for_config(result, env, key, raw, no_input)
+                result[key] = val
             elif not isinstance(raw, dict):
                 # We are dealing with a regular variable
-                val = render_variable(env, raw, cookiecutter_dict)
+                val = render_variable(env, raw, result)
 
                 if not no_input:
                     val = read_user_variable(key, val)
 
-                cookiecutter_dict[key] = val
+                result[key] = val
         except UndefinedError as err:
             msg = "Unable to render variable '{}'".format(key)
             raise UndefinedVariableInTemplate(msg, err, context)
@@ -63,14 +61,14 @@ def prompt_for_config(  # noqa: C901
         try:
             if isinstance(raw, dict):
                 # We are dealing with a dict variable
-                val = render_variable(env, raw, cookiecutter_dict)
+                val = render_variable(env, raw, result)
 
                 if not no_input:
                     val = read_user_dict(key, val)
 
-                cookiecutter_dict[key] = val
+                result[key] = val
         except UndefinedError as err:
             msg = "Unable to render variable '{}'".format(key)
             raise UndefinedVariableInTemplate(msg, err, context)
 
-    return cookiecutter_dict
+    return result
