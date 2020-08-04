@@ -32,41 +32,41 @@ def prompt_for_config(  # noqa: C901
     # First pass: Handle simple and raw variables, plus choices.
     # These must be done first because the dictionaries keys and
     # values might refer to them.
-    for key, raw in context.items():
+    for key, value in context.items():
         if key.startswith("_"):
-            result[key] = raw
+            result[key] = value
             continue
 
         try:
-            if isinstance(raw, list):
+            if isinstance(value, list):
                 # We are dealing with a choice variable
-                val = prompt_choice_for_config(result, env, key, raw, no_input)
-                result[key] = val
-            elif not isinstance(raw, dict):
+                value = prompt_choice_for_config(result, env, key, value, no_input)
+                result[key] = value
+            elif not isinstance(value, dict):
                 # We are dealing with a regular variable
-                val = render_variable(env, raw, result)
+                value = render_variable(env, value, result)
 
                 if not no_input:
-                    val = read_user_variable(key, val)
+                    value = read_user_variable(key, value)
 
-                result[key] = val
+                result[key] = value
         except UndefinedError as error:
             raise UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
             )
 
     # Second pass; handle the dictionaries.
-    for key, raw in context.items():
+    for key, value in context.items():
 
         try:
-            if isinstance(raw, dict):
+            if isinstance(value, dict):
                 # We are dealing with a dict variable
-                val = render_variable(env, raw, result)
+                value = render_variable(env, value, result)
 
                 if not no_input:
-                    val = read_user_dict(key, val)
+                    value = read_user_dict(key, value)
 
-                result[key] = val
+                result[key] = value
         except UndefinedError as error:
             raise UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
