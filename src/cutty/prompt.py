@@ -9,8 +9,12 @@ from cookiecutter.prompt import read_user_variable
 from cookiecutter.prompt import render_variable
 from jinja2.exceptions import UndefinedError
 
+from .types import StrMapping
 
-def prompt_for_config(context, no_input=False):  # noqa: C901
+
+def prompt_for_config(  # noqa: C901
+    context: StrMapping, no_input: bool = False
+) -> StrMapping:
     """Prompt user to enter a new config.
 
     :param dict context: Source for field names and sample values.
