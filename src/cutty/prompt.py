@@ -43,11 +43,11 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     if not values:
         raise ValueError
 
-    choice_map = {"{}".format(i): value for i, value in enumerate(values, 1)}
-    numbers = choice_map.keys()
+    choices = {"{}".format(i): value for i, value in enumerate(values, 1)}
+    numbers = choices.keys()
     default = "1"
 
-    choice_lines = ["{} - {}".format(*c) for c in choice_map.items()]
+    choice_lines = ["{} - {}".format(*c) for c in choices.items()]
     prompt = "\n".join(
         (
             "Select {}:".format(variable),
@@ -59,7 +59,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     user_choice = click.prompt(
         prompt, type=click.Choice(numbers), default=default, show_choices=False
     )
-    return choice_map[user_choice]
+    return choices[user_choice]
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
