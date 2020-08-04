@@ -80,10 +80,7 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
         variable, default="default", type=click.STRING, value_proc=process_json
     )
 
-    if value == "default":
-        # Return the given default w/o any processing
-        return default
-    return cast(Dict[Any, Any], value)
+    return cast(Dict[Any, Any], value) if value != "default" else default
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
