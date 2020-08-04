@@ -1,5 +1,4 @@
 """Prompt for user input."""
-from collections import OrderedDict
 from typing import Any
 from typing import cast
 from typing import List
@@ -44,9 +43,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
     if not values:
         raise ValueError
 
-    choice_map = OrderedDict(
-        ("{}".format(i), value) for i, value in enumerate(values, 1)
-    )
+    choice_map = {"{}".format(i): value for i, value in enumerate(values, 1)}
     choices = choice_map.keys()
     default = "1"
 
