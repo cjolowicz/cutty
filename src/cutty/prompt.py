@@ -63,7 +63,7 @@ def prompt_choice_for_config(
     if no_input:
         return cast(str, render_variable(env, values[0], context))
 
-    values = [render_variable(env, value, context) for value in values]
+    values = render_variable(env, values, context)
 
     return cast(str, read_user_choice(key, values))
 
