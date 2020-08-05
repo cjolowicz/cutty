@@ -68,12 +68,9 @@ def load_json_dict(value: Optional[str]) -> Any:
 
 
 def prompt_choice_for_config(
-    context: StrMapping, env: Environment, key: str, values: List[Any], no_input: bool,
+    context: StrMapping, env: Environment, key: str, values: List[Any]
 ) -> Any:
     """Prompt user with a set of values to choose from."""
-    if no_input:
-        return cast(str, render_variable(env, values[0], context))
-
     values = render_variable(env, values, context)
 
     return cast(str, read_user_choice(key, values))
@@ -97,9 +94,10 @@ def prompt_for_config(  # noqa: C901
         try:
             if isinstance(value, list):
                 # We are dealing with a choice variable
-                result[key] = prompt_choice_for_config(
-                    result, env, key, value, no_input
-                )
+                if no_input:
+                    result[key] = render_variable(env, value[0], context)
+                else:
+                    result[key] = prompt_choice_for_config(result, env, key, value)
             elif not isinstance(value, dict):
                 # We are dealing with a regular variable
                 value = render_variable(env, value, result)
