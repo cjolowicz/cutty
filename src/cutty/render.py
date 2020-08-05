@@ -1,8 +1,7 @@
 """Render templates."""
 from typing import Any
 
-from cookiecutter.environment import StrictEnvironment
-
+from .environment import StrictEnvironment
 from .types import StrMapping
 
 

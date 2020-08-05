@@ -7,10 +7,10 @@ from typing import List
 from typing import Optional
 
 import click
-from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from jinja2.exceptions import UndefinedError
 
+from .environment import StrictEnvironment
 from .render import render_variable
 from .types import StrMapping
 
