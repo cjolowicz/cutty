@@ -11,6 +11,7 @@ from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from jinja2.exceptions import UndefinedError
 
+from .render import render_variable
 from .types import StrMapping
 
 
@@ -64,25 +65,6 @@ def load_json_dict(value: Optional[str]) -> Any:
         raise click.UsageError("Requires JSON dict.")
 
     return result
-
-
-def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
-    """Render the next variable to be displayed in the user prompt."""
-    if value is None:
-        return None
-
-    if isinstance(value, dict):
-        return {
-            render_variable(env, key, context): render_variable(env, val, context)
-            for key, val in value.items()
-        }
-
-    if isinstance(value, list):
-        return [render_variable(env, item, context) for item in value]
-
-    template = env.from_string(str(value))
-
-    return template.render(cookiecutter=context)
 
 
 def prompt_choice_for_config(
