@@ -104,19 +104,7 @@ def prompt_choice_for_config(
 def prompt_for_config(  # noqa: C901
     context: StrMapping, *, no_input: bool = False
 ) -> StrMapping:
-    """Prompt user to enter a new config.
-
-    Args:
-        context: Source for field names and sample values (the object under
-            the "cookiecutter" key).  # noqa: RST203
-        no_input: Prompt the user at command line for manual configuration?
-
-    Returns:
-        The generated context (the object under the "cookiecutter" key).
-
-    Raises:
-        UndefinedVariableInTemplate: Cannot render a template variable.
-    """
+    """Prompt user to enter a new config."""
     result = {}
     env = StrictEnvironment(context={"cookiecutter": context})
 
