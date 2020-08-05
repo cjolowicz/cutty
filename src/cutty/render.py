@@ -1,11 +1,11 @@
 """Render templates."""
 from typing import Any
 
-from .environment import StrictEnvironment
+from .environment import Environment
 from .types import StrMapping
 
 
-def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
+def render_variable(env: Environment, value: Any, context: StrMapping) -> Any:
     """Render the next variable to be displayed in the user prompt."""
     if value is None:
         return None

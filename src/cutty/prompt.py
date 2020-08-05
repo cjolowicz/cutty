@@ -10,7 +10,7 @@ import click
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from jinja2.exceptions import UndefinedError
 
-from .environment import StrictEnvironment
+from .environment import Environment
 from .render import render_variable
 from .types import StrMapping
 
@@ -68,11 +68,7 @@ def load_json_dict(value: Optional[str]) -> Any:
 
 
 def prompt_choice_for_config(
-    context: StrMapping,
-    env: StrictEnvironment,
-    key: str,
-    values: List[Any],
-    no_input: bool,
+    context: StrMapping, env: Environment, key: str, values: List[Any], no_input: bool,
 ) -> Any:
     """Prompt user with a set of values to choose from."""
     if no_input:
@@ -88,7 +84,7 @@ def prompt_for_config(  # noqa: C901
 ) -> StrMapping:
     """Prompt user to enter a new config."""
     result = {}
-    env = StrictEnvironment(context={"cookiecutter": context})
+    env = Environment(context={"cookiecutter": context})
 
     # First pass: Handle simple and raw variables, plus choices.
     # These must be done first because the dictionaries keys and
