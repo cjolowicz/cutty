@@ -20,20 +20,7 @@ def read_user_variable(variable: str, default: Any) -> Any:
 
 
 def read_user_choice(variable: str, values: List[Any]) -> Any:
-    """Prompt the user to choose from several values for the given variable.
-
-    The first item will be returned if no input happens.
-
-    Args:
-        variable: Variable as specified in the context
-        values: Sequence of values that are available to select from
-
-    Returns:
-        Exactly one item of ``values`` that has been chosen by the user
-
-    Raises:
-        ValueError: ``values`` is empty
-    """
+    """Prompt the user to choose from several values for the given variable."""
     if not values:
         raise ValueError
 
