@@ -67,24 +67,7 @@ def load_json_dict(value: Optional[str]) -> Any:
 
 
 def render_variable(env: StrictEnvironment, value: Any, context: StrMapping) -> Any:
-    """Render the next variable to be displayed in the user prompt.
-
-    Inside the prompting taken from the cookiecutter.json file, this renders
-    the next variable. For example, if a project_name is "Peanut Butter
-    Cookie", the repo_name could be be rendered with:
-
-        `{{ cookiecutter.project_name.replace(" ", "_") }}`.
-
-    This is then presented to the user as the default.
-
-    Args:
-        env: A Jinja2 Environment object.
-        value: The next value to be prompted for by the user.
-        context: The current context as it's gradually being populated with variables.
-
-    Returns:
-        The rendered value for the default variable.
-    """
+    """Render the next variable to be displayed in the user prompt."""
     if value is None:
         return None
 
