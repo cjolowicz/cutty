@@ -41,18 +41,7 @@ def read_user_choice(variable: str, values: List[Any]) -> Any:
 
 
 def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
-    """Prompt the user to provide a dictionary of data.
-
-    Args:
-        variable: Variable as specified in the context
-        default: Value that will be returned if no input is provided
-
-    Returns:
-        A Python dictionary to use in the context.
-
-    Raises:
-        TypeError: the default is not a dict
-    """
+    """Prompt the user to provide a dictionary of data."""
     if not isinstance(default, dict):
         raise TypeError
 
