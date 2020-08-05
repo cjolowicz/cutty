@@ -92,10 +92,7 @@ def prompt_choice_for_config(
     values: List[Any],
     no_input: bool,
 ) -> Any:
-    """Prompt user with a set of values to choose from.
-
-    Each of the possible choices is rendered beforehand.
-    """
+    """Prompt user with a set of values to choose from."""
     if no_input:
         return cast(str, render_variable(env, values[0], context))
 
