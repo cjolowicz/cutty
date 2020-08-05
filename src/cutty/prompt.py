@@ -53,19 +53,7 @@ def read_user_dict(variable: str, default: Dict[Any, Any]) -> Dict[Any, Any]:
 
 
 def load_json_dict(value: Optional[str]) -> Any:
-    """Load user-supplied value as a JSON dict.
-
-    This function raises click.UsageError to cause click to ask the user again.
-
-    Args:
-        value: User-supplied value to load as a JSON dict
-
-    Returns:
-        A JSON dict.
-
-    Raises:
-        UsageError: The input is not a JSON dict, or not JSON.
-    """
+    """Load user-supplied value as a JSON dict."""
     assert value is not None  # noqa: S101
     try:
         result = json.loads(value)
