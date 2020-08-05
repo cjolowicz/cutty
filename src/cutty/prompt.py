@@ -15,15 +15,7 @@ from .types import StrMapping
 
 
 def read_user_variable(variable: str, default: Any) -> Any:
-    """Prompt user for variable and return the entered value or given default.
-
-    Args:
-        variable: Variable of the context to query the user
-        default: Value that will be returned if no input happens
-
-    Returns:
-        The entered value or given default.
-    """
+    """Prompt user for variable and return the entered value or given default."""
     return click.prompt(variable, default=default)
 
 
