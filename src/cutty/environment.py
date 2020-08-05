@@ -16,8 +16,8 @@ DEFAULT_EXTENSIONS = [
 ]
 
 
-class StrictEnvironment(jinja2.Environment):
-    """Strict Jinja2 environment."""
+class Environment(jinja2.Environment):
+    """Jinja2 environment."""
 
     def __init__(self, context: Optional[StrMapping] = None, **kwargs: Any) -> None:
         """Initialize."""
