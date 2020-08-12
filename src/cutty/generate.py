@@ -39,11 +39,7 @@ def render_directory(
 
 
 def is_copy_only_path(path: str, context: StrMapping) -> bool:
-    """Check whether the given `path` should only be copied and not rendered.
-
-    Returns True if `path` matches a pattern in the given `context` dict,
-    otherwise False.
-    """
+    """Check whether the given `path` should only be copied and not rendered."""
     patterns = context["cookiecutter"].get("_copy_without_render", [])
 
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
