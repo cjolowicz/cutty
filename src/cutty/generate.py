@@ -29,6 +29,28 @@ def find_template(repo_dir: Path) -> Path:
         raise NonTemplatedInputDirException
 
 
+def render_directory(
+    dirname: str, context: StrMapping, environment: Environment, output_dir: Path
+) -> Path:
+    """Render name of a directory, return its path."""
+    template = environment.from_string(dirname)
+    dirname = template.render(**context)
+    return Path(os.path.normpath(output_dir / dirname))
+
+
+def create_directory(directory: Path, overwrite_if_exists: bool = False,) -> bool:
+    """Create the directory, return True if created."""
+    if not directory.exists():
+        make_sure_path_exists(str(directory))
+        return True
+
+    if not overwrite_if_exists:
+        msg = 'Error: "{}" directory already exists'.format(directory)
+        raise OutputDirExistsException(msg)
+
+    return False
+
+
 def render_and_create_dir(
     dirname: str,
     context: StrMapping,
@@ -37,20 +59,9 @@ def render_and_create_dir(
     overwrite_if_exists: bool = False,
 ) -> Tuple[str, bool]:
     """Render name of a directory, create the directory, return its path."""
-    template = environment.from_string(dirname)
-    dirname = template.render(**context)
-
-    directory = os.path.normpath(output_dir / dirname)
-
-    directory_exists = os.path.exists(directory)
-
-    if not directory_exists:
-        make_sure_path_exists(directory)
-    elif not overwrite_if_exists:
-        msg = 'Error: "{}" directory already exists'.format(directory)
-        raise OutputDirExistsException(msg)
-
-    return directory, not directory_exists
+    directory = render_directory(dirname, context, environment, output_dir)
+    directory_created = create_directory(directory, overwrite_if_exists)
+    return str(directory), directory_created
 
 
 def generate_files(  # noqa: C901
