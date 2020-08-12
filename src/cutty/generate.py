@@ -1,5 +1,4 @@
 """Generating projects from the template."""
-import logging
 import os.path
 import shutil
 from typing import Optional
@@ -20,9 +19,6 @@ from .environment import Environment
 from .types import StrMapping
 
 
-logger = logging.getLogger(__name__)
-
-
 def generate_files(  # noqa: C901
     repo_dir: str,
     context: Optional[StrMapping] = None,
@@ -33,7 +29,6 @@ def generate_files(  # noqa: C901
     """Render the templates and saves them to files."""
     project_dir: str
     template_dir = find_template(repo_dir)
-    logger.debug("Generating project from %s...", template_dir)
     context = context or {}
 
     unrendered_dir = os.path.split(template_dir)[1]
@@ -55,7 +50,6 @@ def generate_files(  # noqa: C901
     # absolute path for the target folder (project_dir)
 
     project_dir = os.path.abspath(project_dir)
-    logger.debug("Project directory is %s", project_dir)
 
     # if we created the output directory, then it's ok to remove it
     # if rendering fails
@@ -88,7 +82,6 @@ def generate_files(  # noqa: C901
             for copy_dir in copy_dirs:
                 indir = os.path.normpath(os.path.join(root, copy_dir))
                 outdir = os.path.normpath(os.path.join(project_dir, indir))
-                logger.debug("Copying dir %s to %s without rendering", indir, outdir)
                 shutil.copytree(indir, outdir)
 
             # We mutate ``dirs``, because we only want to go through these dirs
@@ -113,9 +106,6 @@ def generate_files(  # noqa: C901
                     outfile_tmpl = env.from_string(infile)
                     outfile_rendered = outfile_tmpl.render(**context)
                     outfile = os.path.join(project_dir, outfile_rendered)
-                    logger.debug(
-                        "Copying file %s to %s without rendering", infile, outfile
-                    )
                     shutil.copyfile(infile, outfile)
                     shutil.copymode(infile, outfile)
                     continue
