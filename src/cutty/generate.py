@@ -53,15 +53,7 @@ def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool
 def _run_hook_from_repo_dir(
     repo_dir, hook_name, project_dir, context, delete_project_on_failure
 ):
-    """Run hook from repo directory, clean project directory if hook fails.
-
-    :param repo_dir: Project template input directory.
-    :param hook_name: The hook to execute.
-    :param project_dir: The directory to execute the script from.
-    :param context: Cookiecutter project context.
-    :param delete_project_on_failure: Delete the project directory on hook
-        failure?
-    """
+    """Run hook from repo directory, clean project directory if hook fails."""
     with work_in(repo_dir):
         try:
             run_hook(hook_name, project_dir, context)
