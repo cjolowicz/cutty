@@ -45,8 +45,8 @@ def is_copy_only_path(path, context):
     otherwise False.
     """
     try:
-        for dont_render in context["cookiecutter"]["_copy_without_render"]:
-            if fnmatch.fnmatch(path, dont_render):
+        for pattern in context["cookiecutter"]["_copy_without_render"]:
+            if fnmatch.fnmatch(path, pattern):
                 return True
     except KeyError:
         return False
