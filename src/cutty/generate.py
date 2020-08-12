@@ -3,12 +3,13 @@ import os.path
 import shutil
 from pathlib import Path
 
+from cookiecutter.exceptions import FailedHookException
 from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.generate import _run_hook_from_repo_dir
 from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
+from cookiecutter.hooks import run_hook
 from cookiecutter.utils import rmtree
 from cookiecutter.utils import work_in
 from jinja2 import FileSystemLoader
@@ -47,6 +48,27 @@ def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool
         raise OutputDirExistsException(msg)
 
     return False
+
+
+def _run_hook_from_repo_dir(
+    repo_dir, hook_name, project_dir, context, delete_project_on_failure
+):
+    """Run hook from repo directory, clean project directory if hook fails.
+
+    :param repo_dir: Project template input directory.
+    :param hook_name: The hook to execute.
+    :param project_dir: The directory to execute the script from.
+    :param context: Cookiecutter project context.
+    :param delete_project_on_failure: Delete the project directory on hook
+        failure?
+    """
+    with work_in(repo_dir):
+        try:
+            run_hook(hook_name, project_dir, context)
+        except FailedHookException:
+            if delete_project_on_failure:
+                rmtree(project_dir)
+            raise
 
 
 def generate_files(  # noqa: C901
