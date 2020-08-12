@@ -77,9 +77,11 @@ def generate_files(  # noqa: C901
     """Render the templates and saves them to files."""
     template_dir = find_template(repo_dir)
 
-    env = Environment(context=context, keep_trailing_newline=True)
+    environment = Environment(context=context, keep_trailing_newline=True)
     try:
-        directory = render_directory(template_dir.name, context, env, output_dir)
+        directory = render_directory(
+            template_dir.name, context, environment, output_dir
+        )
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
@@ -104,7 +106,7 @@ def generate_files(  # noqa: C901
     )
 
     with chdir(template_dir):
-        env.loader = FileSystemLoader(".")
+        environment.loader = FileSystemLoader(".")
 
         for root, dirs, files in os.walk("."):
             # We must separate the two types of dirs into different lists.
@@ -135,7 +137,7 @@ def generate_files(  # noqa: C901
                 unrendered_dir = os.path.join(project_dir, root, d)
                 try:
                     directory = render_directory(
-                        unrendered_dir, context, env, output_dir
+                        unrendered_dir, context, environment, output_dir
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
@@ -149,7 +151,7 @@ def generate_files(  # noqa: C901
             for f in files:
                 infile = os.path.normpath(os.path.join(root, f))
                 if is_copy_only_path(infile, context):
-                    outfile_tmpl = env.from_string(infile)
+                    outfile_tmpl = environment.from_string(infile)
                     outfile_rendered = outfile_tmpl.render(**context)
                     outfile = os.path.join(project_dir, outfile_rendered)
                     shutil.copyfile(infile, outfile)
@@ -157,7 +159,11 @@ def generate_files(  # noqa: C901
                     continue
                 try:
                     generate_file(
-                        str(project_dir), infile, context, env, skip_if_file_exists
+                        str(project_dir),
+                        infile,
+                        context,
+                        environment,
+                        skip_if_file_exists,
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
