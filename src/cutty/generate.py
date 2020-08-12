@@ -16,7 +16,7 @@ from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
 from .types import StrMapping
-from .utils import work_in
+from .utils import chdir
 
 
 def find_template(repo_dir: Path) -> Path:
@@ -58,7 +58,7 @@ def _run_hook_from_repo_dir(
     delete_project_on_failure: bool,
 ) -> None:
     """Run hook from repo directory, clean project directory if hook fails."""
-    with work_in(str(repo_dir)):
+    with chdir(repo_dir):
         try:
             run_hook(hook_name, str(project_dir), context)
         except FailedHookException:
@@ -103,7 +103,7 @@ def generate_files(  # noqa: C901
         repo_dir, "pre_gen_project", project_dir, context, delete_project_on_failure,
     )
 
-    with work_in(str(template_dir)):
+    with chdir(template_dir):
         env.loader = FileSystemLoader(".")
 
         for root, dirs, files in os.walk("."):
