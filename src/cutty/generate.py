@@ -10,13 +10,13 @@ from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
 from cookiecutter.hooks import run_hook
-from cookiecutter.utils import rmtree
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
 from .types import StrMapping
 from .utils import chdir
+from .utils import rmtree
 
 
 def find_template(repo_dir: Path) -> Path:
@@ -63,7 +63,7 @@ def _run_hook_from_repo_dir(
             run_hook(hook_name, str(project_dir), context)
         except FailedHookException:
             if delete_project_on_failure:
-                rmtree(str(project_dir))
+                rmtree(project_dir)
             raise
 
 
@@ -139,7 +139,7 @@ def generate_files(  # noqa: C901
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
-                        rmtree(str(project_dir))
+                        rmtree(project_dir)
                     _dir = os.path.relpath(unrendered_dir, output_dir)
                     msg = "Unable to create directory '{}'".format(_dir)
                     raise UndefinedVariableInTemplate(msg, err, context)
@@ -161,7 +161,7 @@ def generate_files(  # noqa: C901
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
-                        rmtree(str(project_dir))
+                        rmtree(project_dir)
                     msg = "Unable to create file '{}'".format(infile)
                     raise UndefinedVariableInTemplate(msg, err, context)
 
