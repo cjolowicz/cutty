@@ -39,7 +39,7 @@ def generate_files(  # noqa: C901
     project_dir: str
     template_dir = find_template(repo_dir)
 
-    unrendered_dir = os.path.split(template_dir)[1]
+    unrendered_dir = template_dir.name
     ensure_dir_is_templated(unrendered_dir)
     env = Environment(context=context, keep_trailing_newline=True)
     try:
