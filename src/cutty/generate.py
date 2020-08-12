@@ -68,7 +68,7 @@ def generate_file(
     if skip_if_file_exists and outfile.exists():
         return
 
-    if is_binary(str(infile)):
+    if is_binary(infile):
         shutil.copyfile(infile, outfile)
     else:
         try:
