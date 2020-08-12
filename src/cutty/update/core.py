@@ -63,7 +63,7 @@ def update(
                 repo_dir=repo_dir,
                 context=context,
                 overwrite_if_exists=True,
-                output_dir=str(project.path.parent),
+                output_dir=project.path.parent,
             )
             project.add(all=True)
             project.commit(message=f"Update template to {entry.describe}")

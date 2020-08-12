@@ -22,7 +22,7 @@ from .types import StrMapping
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
-    output_dir: str,
+    output_dir: Path,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
 ) -> str:
@@ -35,7 +35,7 @@ def generate_files(  # noqa: C901
     env = Environment(context=context, keep_trailing_newline=True)
     try:
         project_dir, output_directory_created = render_and_create_dir(
-            unrendered_dir, context, output_dir, env, overwrite_if_exists
+            unrendered_dir, context, str(output_dir), env, overwrite_if_exists
         )
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(unrendered_dir)
@@ -94,7 +94,11 @@ def generate_files(  # noqa: C901
                 unrendered_dir = os.path.join(project_dir, root, d)
                 try:
                     render_and_create_dir(
-                        unrendered_dir, context, output_dir, env, overwrite_if_exists
+                        unrendered_dir,
+                        context,
+                        str(output_dir),
+                        env,
+                        overwrite_if_exists,
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
