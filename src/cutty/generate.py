@@ -85,9 +85,9 @@ def generate_file(
             # information about syntax error location
             exception.translated = False
             raise
-        rendered_file = template.render(**context)
+        text = template.render(**context)
 
-        outfile.write_text(rendered_file)
+        outfile.write_text(text)
 
     # Apply file permissions to output file
     shutil.copymode(infile, outfile)
