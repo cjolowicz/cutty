@@ -81,13 +81,13 @@ def generate_file(
 
         # Render the file
         try:
-            tmpl = environment.get_template(infile_fwd_slashes)
+            template = environment.get_template(infile_fwd_slashes)
         except TemplateSyntaxError as exception:
             # Disable translated so that printed exception contains verbose
             # information about syntax error location
             exception.translated = False
             raise
-        rendered_file = tmpl.render(**context)
+        rendered_file = template.render(**context)
 
         with io.open(outfile, "w", encoding="utf-8") as fh:
             fh.write(rendered_file)
