@@ -40,7 +40,7 @@ def render_directory(
 
 
 def generate_file(
-    project_dir: str,
+    project_dir: Path,
     infile: str,
     context: StrMapping,
     env: Environment,
@@ -196,11 +196,7 @@ def generate_files(  # noqa: C901
                     continue
                 try:
                     generate_file(
-                        str(project_dir),
-                        infile,
-                        context,
-                        environment,
-                        skip_if_file_exists,
+                        project_dir, infile, context, environment, skip_if_file_exists,
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
