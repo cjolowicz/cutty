@@ -4,11 +4,12 @@ import shutil
 from pathlib import Path
 
 from cookiecutter.exceptions import NonTemplatedInputDirException
+from cookiecutter.exceptions import OutputDirExistsException
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.generate import _run_hook_from_repo_dir
 from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
-from cookiecutter.generate import render_and_create_dir
+from cookiecutter.utils import make_sure_path_exists
 from cookiecutter.utils import rmtree
 from cookiecutter.utils import work_in
 from jinja2 import FileSystemLoader
@@ -25,6 +26,27 @@ def find_template(repo_dir: Path) -> Path:
             return item
     else:
         raise NonTemplatedInputDirException
+
+
+def render_and_create_dir(
+    dirname, context, output_dir, environment, overwrite_if_exists=False
+):
+    """Render name of a directory, create the directory, return its path."""
+    name_tmpl = environment.from_string(dirname)
+    rendered_dirname = name_tmpl.render(**context)
+
+    dir_to_create = os.path.normpath(os.path.join(output_dir, rendered_dirname))
+
+    output_dir_exists = os.path.exists(dir_to_create)
+
+    if output_dir_exists:
+        if not overwrite_if_exists:
+            msg = 'Error: "{}" directory already exists'.format(dir_to_create)
+            raise OutputDirExistsException(msg)
+    else:
+        make_sure_path_exists(dir_to_create)
+
+    return dir_to_create, not output_dir_exists
 
 
 def generate_files(  # noqa: C901
