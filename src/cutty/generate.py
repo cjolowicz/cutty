@@ -2,7 +2,6 @@
 import os.path
 import shutil
 from pathlib import Path
-from typing import Tuple
 
 from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
@@ -51,19 +50,6 @@ def create_directory(directory: Path, overwrite_if_exists: bool = False,) -> boo
     return False
 
 
-def render_and_create_dir(
-    dirname: str,
-    context: StrMapping,
-    output_dir: Path,
-    environment: Environment,
-    overwrite_if_exists: bool = False,
-) -> Tuple[str, bool]:
-    """Render name of a directory, create the directory, return its path."""
-    directory = render_directory(dirname, context, environment, output_dir)
-    directory_created = create_directory(directory, overwrite_if_exists)
-    return str(directory), directory_created
-
-
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
@@ -77,12 +63,12 @@ def generate_files(  # noqa: C901
 
     env = Environment(context=context, keep_trailing_newline=True)
     try:
-        project_dir, output_directory_created = render_and_create_dir(
-            template_dir.name, context, output_dir, env, overwrite_if_exists
-        )
+        directory = render_directory(template_dir.name, context, env, output_dir)
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
+
+    output_directory_created = create_directory(directory, overwrite_if_exists)
 
     # We want the Jinja path and the OS paths to match. Consequently, we'll:
     #   + CD to the template folder
@@ -91,7 +77,7 @@ def generate_files(  # noqa: C901
     #  In order to build our files to the correct folder(s), we'll use an
     # absolute path for the target folder (project_dir)
 
-    project_dir = os.path.abspath(project_dir)
+    project_dir = os.path.abspath(directory)
 
     # if we created the output directory, then it's ok to remove it
     # if rendering fails
@@ -136,8 +122,8 @@ def generate_files(  # noqa: C901
             for d in dirs:
                 unrendered_dir = os.path.join(project_dir, root, d)
                 try:
-                    render_and_create_dir(
-                        unrendered_dir, context, output_dir, env, overwrite_if_exists,
+                    directory = render_directory(
+                        unrendered_dir, context, env, output_dir
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
@@ -145,6 +131,8 @@ def generate_files(  # noqa: C901
                     _dir = os.path.relpath(unrendered_dir, output_dir)
                     msg = "Unable to create directory '{}'".format(_dir)
                     raise UndefinedVariableInTemplate(msg, err, context)
+
+                create_directory(directory, overwrite_if_exists)
 
             for f in files:
                 infile = os.path.normpath(os.path.join(root, f))
