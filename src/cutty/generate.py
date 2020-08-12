@@ -2,6 +2,7 @@
 import os.path
 import shutil
 from pathlib import Path
+from typing import Tuple
 
 from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
@@ -29,8 +30,12 @@ def find_template(repo_dir: Path) -> Path:
 
 
 def render_and_create_dir(
-    dirname, context, output_dir, environment, overwrite_if_exists=False
-):
+    dirname: str,
+    context: StrMapping,
+    output_dir: str,
+    environment: Environment,
+    overwrite_if_exists: bool = False,
+) -> Tuple[str, bool]:
     """Render name of a directory, create the directory, return its path."""
     name_tmpl = environment.from_string(dirname)
     rendered_dirname = name_tmpl.render(**context)
