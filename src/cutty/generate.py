@@ -39,15 +39,14 @@ def generate_files(  # noqa: C901
     project_dir: str
     template_dir = find_template(repo_dir)
 
-    unrendered_dir = template_dir.name
-    ensure_dir_is_templated(unrendered_dir)
+    ensure_dir_is_templated(template_dir.name)
     env = Environment(context=context, keep_trailing_newline=True)
     try:
         project_dir, output_directory_created = render_and_create_dir(
-            unrendered_dir, context, str(output_dir), env, overwrite_if_exists
+            template_dir.name, context, str(output_dir), env, overwrite_if_exists
         )
     except UndefinedError as err:
-        msg = "Unable to create project directory '{}'".format(unrendered_dir)
+        msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
 
     # We want the Jinja path and the OS paths to match. Consequently, we'll:
