@@ -19,11 +19,11 @@ from .environment import Environment
 from .types import StrMapping
 
 
-def find_template(repo_dir: str) -> str:
+def find_template(repo_dir: Path) -> Path:
     """Determine which child directory of `repo_dir` is the project template."""
-    for item in os.listdir(repo_dir):
-        if "cookiecutter" in item and "{{" in item and "}}" in item:
-            return os.path.join(repo_dir, item)
+    for item in repo_dir.iterdir():
+        if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
+            return item
     else:
         raise NonTemplatedInputDirException
 
@@ -37,7 +37,7 @@ def generate_files(  # noqa: C901
 ) -> Path:
     """Render the templates and saves them to files."""
     project_dir: str
-    template_dir = find_template(str(repo_dir))
+    template_dir = find_template(repo_dir)
 
     unrendered_dir = os.path.split(template_dir)[1]
     ensure_dir_is_templated(unrendered_dir)
@@ -71,7 +71,7 @@ def generate_files(  # noqa: C901
         delete_project_on_failure,
     )
 
-    with work_in(template_dir):
+    with work_in(str(template_dir)):
         env.loader = FileSystemLoader(".")
 
         for root, dirs, files in os.walk("."):
