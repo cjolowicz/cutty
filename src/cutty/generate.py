@@ -44,12 +44,11 @@ def render_and_create_dir(
 
     output_dir_exists = os.path.exists(dir_to_create)
 
-    if output_dir_exists:
-        if not overwrite_if_exists:
-            msg = 'Error: "{}" directory already exists'.format(dir_to_create)
-            raise OutputDirExistsException(msg)
-    else:
+    if not output_dir_exists:
         make_sure_path_exists(dir_to_create)
+    elif not overwrite_if_exists:
+        msg = 'Error: "{}" directory already exists'.format(dir_to_create)
+        raise OutputDirExistsException(msg)
 
     return dir_to_create, not output_dir_exists
 
