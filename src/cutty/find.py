@@ -8,11 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def find_template(repo_dir: str) -> str:
-    """Determine which child directory of `repo_dir` is the project template.
-
-    :param repo_dir: Local directory of newly cloned repo.
-    :returns project_template: Relative path to project template.
-    """
+    """Determine which child directory of `repo_dir` is the project template."""
     logger.debug("Searching %s for the project template.", repo_dir)
 
     repo_dir_contents = os.listdir(repo_dir)
