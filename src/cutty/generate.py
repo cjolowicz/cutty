@@ -38,9 +38,9 @@ def render_and_create_dir(
 ) -> Tuple[str, bool]:
     """Render name of a directory, create the directory, return its path."""
     template = environment.from_string(dirname)
-    rendered_dirname = template.render(**context)
+    dirname = template.render(**context)
 
-    dir_to_create = os.path.normpath(os.path.join(output_dir, rendered_dirname))
+    dir_to_create = os.path.normpath(os.path.join(output_dir, dirname))
 
     output_dir_exists = os.path.exists(dir_to_create)
 
