@@ -42,15 +42,15 @@ def render_and_create_dir(
 
     directory = os.path.normpath(output_dir / dirname)
 
-    output_dir_exists = os.path.exists(directory)
+    directory_exists = os.path.exists(directory)
 
-    if not output_dir_exists:
+    if not directory_exists:
         make_sure_path_exists(directory)
     elif not overwrite_if_exists:
         msg = 'Error: "{}" directory already exists'.format(directory)
         raise OutputDirExistsException(msg)
 
-    return directory, not output_dir_exists
+    return directory, not directory_exists
 
 
 def generate_files(  # noqa: C901
