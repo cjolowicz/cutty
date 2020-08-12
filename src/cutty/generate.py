@@ -43,10 +43,6 @@ def is_copy_only_path(path, context):
 
     Returns True if `path` matches a pattern in the given `context` dict,
     otherwise False.
-
-    :param path: A file-system path referring to a file or dir that
-        should be rendered or just copied.
-    :param context: cookiecutter context.
     """
     try:
         for dont_render in context["cookiecutter"]["_copy_without_render"]:
