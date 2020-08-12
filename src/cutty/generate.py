@@ -32,7 +32,7 @@ def find_template(repo_dir: Path) -> Path:
 def render_and_create_dir(
     dirname: str,
     context: StrMapping,
-    output_dir: str,
+    output_dir: Path,
     environment: Environment,
     overwrite_if_exists: bool = False,
 ) -> Tuple[str, bool]:
@@ -67,7 +67,7 @@ def generate_files(  # noqa: C901
     env = Environment(context=context, keep_trailing_newline=True)
     try:
         project_dir, output_directory_created = render_and_create_dir(
-            template_dir.name, context, str(output_dir), env, overwrite_if_exists
+            template_dir.name, context, output_dir, env, overwrite_if_exists
         )
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(template_dir.name)
@@ -126,11 +126,7 @@ def generate_files(  # noqa: C901
                 unrendered_dir = os.path.join(project_dir, root, d)
                 try:
                     render_and_create_dir(
-                        unrendered_dir,
-                        context,
-                        str(output_dir),
-                        env,
-                        overwrite_if_exists,
+                        unrendered_dir, context, output_dir, env, overwrite_if_exists,
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
