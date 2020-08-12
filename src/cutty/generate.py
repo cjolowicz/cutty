@@ -40,7 +40,7 @@ def render_directory(
 
 def generate_file(
     project_dir: Path,
-    infile: str,
+    infile: Path,
     context: StrMapping,
     environment: Environment,
     skip_if_file_exists: bool,
@@ -60,7 +60,7 @@ def generate_file(
         way to perform this directory change.
     """
     # Render the path to the output file (not including the root project dir)
-    template = environment.from_string(infile)
+    template = environment.from_string(str(infile))
 
     outfile = project_dir / template.render(**context)
     if outfile.is_dir():
@@ -70,16 +70,14 @@ def generate_file(
         return
 
     # Just copy over binary files. Don't render.
-    if is_binary(infile):
+    if is_binary(str(infile)):
         shutil.copyfile(infile, outfile)
     else:
-        # Force fwd slashes on Windows for get_template
-        # This is a by-design Jinja issue
-        infile_fwd_slashes = infile.replace(os.path.sep, "/")
-
         # Render the file
         try:
-            template = environment.get_template(infile_fwd_slashes)
+            # Force fwd slashes on Windows for get_template
+            # This is a by-design Jinja issue
+            template = environment.get_template(infile.as_posix())
         except TemplateSyntaxError as exception:
             # Disable translated so that printed exception contains verbose
             # information about syntax error location
@@ -193,7 +191,11 @@ def generate_files(  # noqa: C901
                     continue
                 try:
                     generate_file(
-                        project_dir, infile, context, environment, skip_if_file_exists,
+                        project_dir,
+                        Path(infile),
+                        context,
+                        environment,
+                        skip_if_file_exists,
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
