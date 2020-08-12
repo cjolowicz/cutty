@@ -31,14 +31,7 @@ def generate_files(  # noqa: C901
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
 ) -> str:
-    """Render the templates and saves them to files.
-
-    :param repo_dir: Project template input directory.
-    :param context: Dict for populating the template's variables.
-    :param output_dir: Where to output the generated project dir into.
-    :param overwrite_if_exists: Overwrite the contents of the output directory
-        if it exists.
-    """
+    """Render the templates and saves them to files."""
     project_dir: str
     template_dir = find_template(repo_dir)
     logger.debug("Generating project from %s...", template_dir)
