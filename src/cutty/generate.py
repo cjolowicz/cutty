@@ -1,6 +1,7 @@
 """Generating projects from the template."""
 import os.path
 import shutil
+from pathlib import Path
 from typing import Optional
 
 from cookiecutter.exceptions import UndefinedVariableInTemplate
@@ -20,7 +21,7 @@ from .types import StrMapping
 
 
 def generate_files(  # noqa: C901
-    repo_dir: str,
+    repo_dir: Path,
     context: Optional[StrMapping] = None,
     output_dir: str = ".",
     overwrite_if_exists: bool = False,
@@ -28,7 +29,7 @@ def generate_files(  # noqa: C901
 ) -> str:
     """Render the templates and saves them to files."""
     project_dir: str
-    template_dir = find_template(repo_dir)
+    template_dir = find_template(str(repo_dir))
     context = context or {}
 
     unrendered_dir = os.path.split(template_dir)[1]
@@ -56,7 +57,11 @@ def generate_files(  # noqa: C901
     delete_project_on_failure = output_directory_created
 
     _run_hook_from_repo_dir(
-        repo_dir, "pre_gen_project", project_dir, context, delete_project_on_failure
+        str(repo_dir),
+        "pre_gen_project",
+        project_dir,
+        context,
+        delete_project_on_failure,
     )
 
     with work_in(template_dir):
@@ -120,7 +125,11 @@ def generate_files(  # noqa: C901
                     raise UndefinedVariableInTemplate(msg, err, context)
 
     _run_hook_from_repo_dir(
-        repo_dir, "post_gen_project", project_dir, context, delete_project_on_failure
+        str(repo_dir),
+        "post_gen_project",
+        project_dir,
+        context,
+        delete_project_on_failure,
     )
 
     return project_dir
