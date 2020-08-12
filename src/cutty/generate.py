@@ -4,7 +4,6 @@ import shutil
 from pathlib import Path
 
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.find import find_template
 from cookiecutter.generate import _run_hook_from_repo_dir
 from cookiecutter.generate import ensure_dir_is_templated
 from cookiecutter.generate import generate_file
@@ -16,6 +15,7 @@ from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
+from .find import find_template
 from .types import StrMapping
 
 
