@@ -1,4 +1,5 @@
 """Generating projects from the template."""
+import errno
 import os.path
 import shutil
 from pathlib import Path
@@ -9,7 +10,6 @@ from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.generate import _run_hook_from_repo_dir
 from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
-from cookiecutter.utils import make_sure_path_exists
 from cookiecutter.utils import rmtree
 from cookiecutter.utils import work_in
 from jinja2 import FileSystemLoader
@@ -35,6 +35,19 @@ def render_directory(
     template = environment.from_string(dirname)
     dirname = template.render(**context)
     return Path(os.path.normpath(output_dir / dirname))
+
+
+def make_sure_path_exists(path):
+    """Ensure that a directory exists.
+
+    :param path: A directory path.
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            return False
+    return True
 
 
 def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool:
