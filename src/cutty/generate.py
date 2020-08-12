@@ -37,23 +37,6 @@ def render_directory(
     return Path(os.path.normpath(output_dir / dirname))
 
 
-def _run_hook_from_repo_dir(
-    repo_dir: Path,
-    hook_name: str,
-    project_dir: Path,
-    context: StrMapping,
-    delete_project_on_failure: bool,
-) -> None:
-    """Run hook from repo directory, clean project directory if hook fails."""
-    with chdir(repo_dir):
-        try:
-            run_hook(hook_name, str(project_dir), context)
-        except FailedHookException:
-            if delete_project_on_failure:
-                rmtree(project_dir)
-            raise
-
-
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
@@ -92,9 +75,13 @@ def generate_files(  # noqa: C901
 
     project_dir = Path(os.path.abspath(directory))
 
-    _run_hook_from_repo_dir(
-        repo_dir, "pre_gen_project", project_dir, context, delete_project_on_failure,
-    )
+    with chdir(repo_dir):
+        try:
+            run_hook("pre_gen_project", str(project_dir), context)
+        except FailedHookException:
+            if delete_project_on_failure:
+                rmtree(project_dir)
+            raise
 
     with chdir(template_dir):
         environment.loader = FileSystemLoader(".")
@@ -162,8 +149,12 @@ def generate_files(  # noqa: C901
                     msg = "Unable to create file '{}'".format(infile)
                     raise UndefinedVariableInTemplate(msg, err, context)
 
-    _run_hook_from_repo_dir(
-        repo_dir, "post_gen_project", project_dir, context, delete_project_on_failure,
-    )
+    with chdir(repo_dir):
+        try:
+            run_hook("post_gen_project", str(project_dir), context)
+        except FailedHookException:
+            if delete_project_on_failure:
+                rmtree(project_dir)
+            raise
 
     return project_dir
