@@ -60,7 +60,7 @@ def update(
             project_path, "template", checkout=False, force_remove=True
         ) as project:
             generate_files(
-                repo_dir=str(repo_dir),
+                repo_dir=repo_dir,
                 context=context,
                 overwrite_if_exists=True,
                 output_dir=str(project.path.parent),
