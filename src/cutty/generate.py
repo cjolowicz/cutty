@@ -1,4 +1,5 @@
 """Generating projects from the template."""
+import fnmatch
 import os.path
 import shutil
 from pathlib import Path
@@ -9,7 +10,6 @@ from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
 from cookiecutter.exceptions import TemplateSyntaxError
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.generate import is_copy_only_path
 from cookiecutter.hooks import run_hook
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
@@ -36,6 +36,26 @@ def render_directory(
     template = environment.from_string(dirname)
     dirname = template.render(**context)
     return Path(os.path.normpath(output_dir / dirname))
+
+
+def is_copy_only_path(path, context):
+    """Check whether the given `path` should only be copied and not rendered.
+
+    Returns True if `path` matches a pattern in the given `context` dict,
+    otherwise False.
+
+    :param path: A file-system path referring to a file or dir that
+        should be rendered or just copied.
+    :param context: cookiecutter context.
+    """
+    try:
+        for dont_render in context["cookiecutter"]["_copy_without_render"]:
+            if fnmatch.fnmatch(path, dont_render):
+                return True
+    except KeyError:
+        return False
+
+    return False
 
 
 def generate_file(
