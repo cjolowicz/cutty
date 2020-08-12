@@ -40,7 +40,7 @@ def render_and_create_dir(
     template = environment.from_string(dirname)
     dirname = template.render(**context)
 
-    dir_to_create = os.path.normpath(os.path.join(output_dir, dirname))
+    dir_to_create = os.path.normpath(output_dir / dirname)
 
     output_dir_exists = os.path.exists(dir_to_create)
 
