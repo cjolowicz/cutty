@@ -53,12 +53,6 @@ def generate_file(project_dir, infile, context, env, skip_if_file_exists=False):
         When calling `generate_file()`, the root template dir must be the
         current working directory. Using `utils.work_in()` is the recommended
         way to perform this directory change.
-
-    :param project_dir: Absolute path to the resulting generated project.
-    :param infile: Input file to generate the file from. Relative to the root
-        template dir.
-    :param context: Dict for populating the cookiecutter's variables.
-    :param env: Jinja2 template execution environment.
     """
     # Render the path to the output file (not including the root project dir)
     outfile_tmpl = env.from_string(infile)
