@@ -43,7 +43,7 @@ def generate_file(
     infile: str,
     context: StrMapping,
     environment: Environment,
-    skip_if_file_exists: bool = False,
+    skip_if_file_exists: bool,
 ) -> None:
     """Render filename of infile as name of outfile, handle infile correctly.
 
