@@ -11,12 +11,12 @@ from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
 from cookiecutter.hooks import run_hook
 from cookiecutter.utils import rmtree
-from cookiecutter.utils import work_in
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
 from .types import StrMapping
+from .utils import work_in
 
 
 def find_template(repo_dir: Path) -> Path:
