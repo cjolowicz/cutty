@@ -27,14 +27,6 @@ def find_template(repo_dir: Path) -> Path:
         raise NonTemplatedInputDirException
 
 
-def ensure_dir_is_templated(dirname):
-    """Ensure that dirname is a templated directory name."""
-    if "{{" in dirname and "}}" in dirname:
-        return True
-    else:
-        raise NonTemplatedInputDirException
-
-
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
@@ -46,7 +38,6 @@ def generate_files(  # noqa: C901
     project_dir: str
     template_dir = find_template(repo_dir)
 
-    ensure_dir_is_templated(template_dir.name)
     env = Environment(context=context, keep_trailing_newline=True)
     try:
         project_dir, output_directory_created = render_and_create_dir(
