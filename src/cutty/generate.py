@@ -57,7 +57,6 @@ def generate_files(  # noqa: C901
     skip_if_file_exists: bool = False,
 ) -> Path:
     """Render the templates and saves them to files."""
-    project_dir: str
     template_dir = find_template(repo_dir)
 
     env = Environment(context=context, keep_trailing_newline=True)
@@ -76,7 +75,7 @@ def generate_files(  # noqa: C901
     #  In order to build our files to the correct folder(s), we'll use an
     # absolute path for the target folder (project_dir)
 
-    project_dir = os.path.abspath(directory)
+    project_dir = Path(os.path.abspath(directory))
 
     # if we created the output directory, then it's ok to remove it
     # if rendering fails
@@ -85,7 +84,7 @@ def generate_files(  # noqa: C901
     _run_hook_from_repo_dir(
         str(repo_dir),
         "pre_gen_project",
-        project_dir,
+        str(project_dir),
         context,
         delete_project_on_failure,
     )
@@ -126,7 +125,7 @@ def generate_files(  # noqa: C901
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
-                        rmtree(project_dir)
+                        rmtree(str(project_dir))
                     _dir = os.path.relpath(unrendered_dir, output_dir)
                     msg = "Unable to create directory '{}'".format(_dir)
                     raise UndefinedVariableInTemplate(msg, err, context)
@@ -144,20 +143,20 @@ def generate_files(  # noqa: C901
                     continue
                 try:
                     generate_file(
-                        project_dir, infile, context, env, skip_if_file_exists
+                        str(project_dir), infile, context, env, skip_if_file_exists
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
-                        rmtree(project_dir)
+                        rmtree(str(project_dir))
                     msg = "Unable to create file '{}'".format(infile)
                     raise UndefinedVariableInTemplate(msg, err, context)
 
     _run_hook_from_repo_dir(
         str(repo_dir),
         "post_gen_project",
-        project_dir,
+        str(project_dir),
         context,
         delete_project_on_failure,
     )
 
-    return Path(project_dir)
+    return project_dir
