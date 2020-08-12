@@ -1,13 +1,15 @@
 """Generating projects from the template."""
+import io
 import os.path
 import shutil
 from pathlib import Path
 
+from binaryornot.check import is_binary
 from cookiecutter.exceptions import FailedHookException
 from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
+from cookiecutter.exceptions import TemplateSyntaxError
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
 from cookiecutter.hooks import run_hook
 from jinja2 import FileSystemLoader
@@ -35,6 +37,63 @@ def render_directory(
     template = environment.from_string(dirname)
     dirname = template.render(**context)
     return Path(os.path.normpath(output_dir / dirname))
+
+
+def generate_file(project_dir, infile, context, env, skip_if_file_exists=False):
+    """Render filename of infile as name of outfile, handle infile correctly.
+
+    Dealing with infile appropriately:
+
+        a. If infile is a binary file, copy it over without rendering.
+        b. If infile is a text file, render its contents and write the
+           rendered infile to outfile.
+
+    Precondition:
+
+        When calling `generate_file()`, the root template dir must be the
+        current working directory. Using `utils.work_in()` is the recommended
+        way to perform this directory change.
+
+    :param project_dir: Absolute path to the resulting generated project.
+    :param infile: Input file to generate the file from. Relative to the root
+        template dir.
+    :param context: Dict for populating the cookiecutter's variables.
+    :param env: Jinja2 template execution environment.
+    """
+    # Render the path to the output file (not including the root project dir)
+    outfile_tmpl = env.from_string(infile)
+
+    outfile = os.path.join(project_dir, outfile_tmpl.render(**context))
+    file_name_is_empty = os.path.isdir(outfile)
+    if file_name_is_empty:
+        return
+
+    if skip_if_file_exists and os.path.exists(outfile):
+        return
+
+    # Just copy over binary files. Don't render.
+    if is_binary(infile):
+        shutil.copyfile(infile, outfile)
+    else:
+        # Force fwd slashes on Windows for get_template
+        # This is a by-design Jinja issue
+        infile_fwd_slashes = infile.replace(os.path.sep, "/")
+
+        # Render the file
+        try:
+            tmpl = env.get_template(infile_fwd_slashes)
+        except TemplateSyntaxError as exception:
+            # Disable translated so that printed exception contains verbose
+            # information about syntax error location
+            exception.translated = False
+            raise
+        rendered_file = tmpl.render(**context)
+
+        with io.open(outfile, "w", encoding="utf-8") as fh:
+            fh.write(rendered_file)
+
+    # Apply file permissions to output file
+    shutil.copymode(infile, outfile)
 
 
 def generate_files(  # noqa: C901
