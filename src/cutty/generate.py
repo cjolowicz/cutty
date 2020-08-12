@@ -25,7 +25,7 @@ def generate_files(  # noqa: C901
     output_dir: Path,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
-) -> str:
+) -> Path:
     """Render the templates and saves them to files."""
     project_dir: str
     template_dir = find_template(str(repo_dir))
@@ -134,4 +134,4 @@ def generate_files(  # noqa: C901
         delete_project_on_failure,
     )
 
-    return project_dir
+    return Path(project_dir)
