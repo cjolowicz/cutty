@@ -22,7 +22,7 @@ from .types import StrMapping
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
-    output_dir: str = ".",
+    output_dir: str,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
 ) -> str:
