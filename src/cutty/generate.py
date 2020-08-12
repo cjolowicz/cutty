@@ -2,7 +2,6 @@
 import os.path
 import shutil
 from pathlib import Path
-from typing import Optional
 
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.find import find_template
@@ -22,7 +21,7 @@ from .types import StrMapping
 
 def generate_files(  # noqa: C901
     repo_dir: Path,
-    context: Optional[StrMapping] = None,
+    context: StrMapping,
     output_dir: str = ".",
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
@@ -30,7 +29,6 @@ def generate_files(  # noqa: C901
     """Render the templates and saves them to files."""
     project_dir: str
     template_dir = find_template(str(repo_dir))
-    context = context or {}
 
     unrendered_dir = os.path.split(template_dir)[1]
     ensure_dir_is_templated(unrendered_dir)
