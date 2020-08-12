@@ -1,7 +1,10 @@
 """General-purpose utilities."""
 import contextlib
 import os
+import shutil
+import stat
 from pathlib import Path
+from typing import Any
 from typing import Iterator
 from typing import Optional
 
@@ -26,3 +29,19 @@ def chdir(path: Path) -> Iterator[None]:
         yield
     finally:
         os.chdir(cwd)
+
+
+def rmtree(path: Path) -> None:
+    """Remove a directory tree.
+
+    On Windows, read-only files cannot be removed. Use the `onerror` callback
+    to clear the read-only bit and retry.
+
+    See https://docs.python.org/3/library/shutil.html#rmtree-example
+    """
+
+    def _onerror(function: Any, path: Any, excinfo: Any) -> Any:
+        os.chmod(path, stat.S_IWRITE)
+        function(path)
+
+    shutil.rmtree(path, onerror=_onerror)
