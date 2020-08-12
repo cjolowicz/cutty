@@ -59,7 +59,6 @@ def generate_file(
         current working directory. Using `utils.work_in()` is the recommended
         way to perform this directory change.
     """
-    # Render the path to the output file (not including the root project dir)
     template = environment.from_string(str(infile))
 
     outfile = project_dir / template.render(**context)
@@ -69,11 +68,9 @@ def generate_file(
     if skip_if_file_exists and outfile.exists():
         return
 
-    # Just copy over binary files. Don't render.
     if is_binary(str(infile)):
         shutil.copyfile(infile, outfile)
     else:
-        # Render the file
         try:
             # Force fwd slashes on Windows for get_template
             # This is a by-design Jinja issue
@@ -87,7 +84,6 @@ def generate_file(
 
         outfile.write_text(text)
 
-    # Apply file permissions to output file
     shutil.copymode(infile, outfile)
 
 
