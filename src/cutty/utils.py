@@ -1,4 +1,6 @@
 """General-purpose utilities."""
+import contextlib
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -11,3 +13,18 @@ def as_optional_path(argument: Optional[str]) -> Optional[Path]:
 def removeprefix(string: str, prefix: str) -> str:
     """Remove prefix from string, if present."""
     return string[len(prefix) :] if string.startswith(prefix) else string
+
+
+@contextlib.contextmanager
+def work_in(dirname=None):
+    """Context manager version of os.chdir.
+
+    When exited, returns to the working directory prior to entering.
+    """
+    curdir = os.getcwd()
+    try:
+        if dirname is not None:
+            os.chdir(dirname)
+        yield
+    finally:
+        os.chdir(curdir)
