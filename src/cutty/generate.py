@@ -6,7 +6,6 @@ from pathlib import Path
 from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.generate import _run_hook_from_repo_dir
-from cookiecutter.generate import ensure_dir_is_templated
 from cookiecutter.generate import generate_file
 from cookiecutter.generate import is_copy_only_path
 from cookiecutter.generate import render_and_create_dir
@@ -24,6 +23,14 @@ def find_template(repo_dir: Path) -> Path:
     for item in repo_dir.iterdir():
         if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
             return item
+    else:
+        raise NonTemplatedInputDirException
+
+
+def ensure_dir_is_templated(dirname):
+    """Ensure that dirname is a templated directory name."""
+    if "{{" in dirname and "}}" in dirname:
+        return True
     else:
         raise NonTemplatedInputDirException
 
