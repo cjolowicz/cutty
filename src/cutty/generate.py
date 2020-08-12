@@ -38,7 +38,7 @@ def render_directory(
     return Path(os.path.normpath(output_dir / dirname))
 
 
-def is_copy_only_path(path, context):
+def is_copy_only_path(path: str, context: StrMapping) -> bool:
     """Check whether the given `path` should only be copied and not rendered.
 
     Returns True if `path` matches a pattern in the given `context` dict,
