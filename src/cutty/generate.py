@@ -2,7 +2,6 @@
 import logging
 import os.path
 import shutil
-from collections import OrderedDict
 from typing import Optional
 
 from cookiecutter.exceptions import UndefinedVariableInTemplate
@@ -35,7 +34,7 @@ def generate_files(  # noqa: C901
     project_dir: str
     template_dir = find_template(repo_dir)
     logger.debug("Generating project from %s...", template_dir)
-    context = context or OrderedDict([])
+    context = context or {}
 
     unrendered_dir = os.path.split(template_dir)[1]
     ensure_dir_is_templated(unrendered_dir)
