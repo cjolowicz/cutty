@@ -40,17 +40,17 @@ def render_and_create_dir(
     template = environment.from_string(dirname)
     dirname = template.render(**context)
 
-    dir_to_create = os.path.normpath(output_dir / dirname)
+    directory = os.path.normpath(output_dir / dirname)
 
-    output_dir_exists = os.path.exists(dir_to_create)
+    output_dir_exists = os.path.exists(directory)
 
     if not output_dir_exists:
-        make_sure_path_exists(dir_to_create)
+        make_sure_path_exists(directory)
     elif not overwrite_if_exists:
-        msg = 'Error: "{}" directory already exists'.format(dir_to_create)
+        msg = 'Error: "{}" directory already exists'.format(directory)
         raise OutputDirExistsException(msg)
 
-    return dir_to_create, not output_dir_exists
+    return directory, not output_dir_exists
 
 
 def generate_files(  # noqa: C901
