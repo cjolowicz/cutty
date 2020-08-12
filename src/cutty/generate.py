@@ -44,14 +44,9 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
     Returns True if `path` matches a pattern in the given `context` dict,
     otherwise False.
     """
-    try:
-        for pattern in context["cookiecutter"]["_copy_without_render"]:
-            if fnmatch.fnmatch(path, pattern):
-                return True
-    except KeyError:
-        return False
+    patterns = context["cookiecutter"].get("_copy_without_render", [])
 
-    return False
+    return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
 
 def generate_file(
