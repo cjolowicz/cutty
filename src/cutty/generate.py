@@ -53,17 +53,17 @@ def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool
 def _run_hook_from_repo_dir(
     repo_dir: Path,
     hook_name: str,
-    project_dir: str,
+    project_dir: Path,
     context: StrMapping,
     delete_project_on_failure: bool,
 ) -> None:
     """Run hook from repo directory, clean project directory if hook fails."""
     with work_in(str(repo_dir)):
         try:
-            run_hook(hook_name, project_dir, context)
+            run_hook(hook_name, str(project_dir), context)
         except FailedHookException:
             if delete_project_on_failure:
-                rmtree(project_dir)
+                rmtree(str(project_dir))
             raise
 
 
@@ -100,11 +100,7 @@ def generate_files(  # noqa: C901
     delete_project_on_failure = output_directory_created
 
     _run_hook_from_repo_dir(
-        repo_dir,
-        "pre_gen_project",
-        str(project_dir),
-        context,
-        delete_project_on_failure,
+        repo_dir, "pre_gen_project", project_dir, context, delete_project_on_failure,
     )
 
     with work_in(str(template_dir)):
@@ -170,11 +166,7 @@ def generate_files(  # noqa: C901
                     raise UndefinedVariableInTemplate(msg, err, context)
 
     _run_hook_from_repo_dir(
-        repo_dir,
-        "post_gen_project",
-        str(project_dir),
-        context,
-        delete_project_on_failure,
+        repo_dir, "post_gen_project", project_dir, context, delete_project_on_failure,
     )
 
     return project_dir
