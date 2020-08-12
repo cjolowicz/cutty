@@ -17,7 +17,7 @@ from cookiecutter.utils import work_in
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
-from .environment import Environment as StrictEnvironment
+from .environment import Environment
 from .types import StrMapping
 
 
@@ -39,7 +39,7 @@ def generate_files(  # noqa: C901
 
     unrendered_dir = os.path.split(template_dir)[1]
     ensure_dir_is_templated(unrendered_dir)
-    env = StrictEnvironment(context=context, keep_trailing_newline=True)
+    env = Environment(context=context, keep_trailing_newline=True)
     try:
         project_dir, output_directory_created = render_and_create_dir(
             unrendered_dir, context, output_dir, env, overwrite_if_exists
