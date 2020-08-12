@@ -7,7 +7,7 @@ from cookiecutter.exceptions import NonTemplatedInputDirException
 logger = logging.getLogger(__name__)
 
 
-def find_template(repo_dir):
+def find_template(repo_dir: str) -> str:
     """Determine which child directory of `repo_dir` is the project template.
 
     :param repo_dir: Local directory of newly cloned repo.
