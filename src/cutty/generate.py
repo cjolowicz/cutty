@@ -43,7 +43,7 @@ def generate_file(
     project_dir: Path,
     infile: str,
     context: StrMapping,
-    env: Environment,
+    environment: Environment,
     skip_if_file_exists: bool = False,
 ) -> None:
     """Render filename of infile as name of outfile, handle infile correctly.
@@ -61,7 +61,7 @@ def generate_file(
         way to perform this directory change.
     """
     # Render the path to the output file (not including the root project dir)
-    outfile_tmpl = env.from_string(infile)
+    outfile_tmpl = environment.from_string(infile)
 
     outfile = os.path.join(project_dir, outfile_tmpl.render(**context))
     file_name_is_empty = os.path.isdir(outfile)
@@ -81,7 +81,7 @@ def generate_file(
 
         # Render the file
         try:
-            tmpl = env.get_template(infile_fwd_slashes)
+            tmpl = environment.get_template(infile_fwd_slashes)
         except TemplateSyntaxError as exception:
             # Disable translated so that printed exception contains verbose
             # information about syntax error location
