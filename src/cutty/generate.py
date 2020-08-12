@@ -61,9 +61,9 @@ def generate_file(
         way to perform this directory change.
     """
     # Render the path to the output file (not including the root project dir)
-    outfile_tmpl = environment.from_string(infile)
+    template = environment.from_string(infile)
 
-    outfile = os.path.join(project_dir, outfile_tmpl.render(**context))
+    outfile = os.path.join(project_dir, template.render(**context))
     file_name_is_empty = os.path.isdir(outfile)
     if file_name_is_empty:
         return
