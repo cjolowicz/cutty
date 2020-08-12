@@ -37,7 +37,7 @@ def render_directory(
     return Path(os.path.normpath(output_dir / dirname))
 
 
-def create_directory(directory: Path, overwrite_if_exists: bool = False,) -> bool:
+def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool:
     """Create the directory, return True if created."""
     if not directory.exists():
         make_sure_path_exists(str(directory))
