@@ -63,8 +63,7 @@ def generate_file(
     template = environment.from_string(infile)
 
     outfile = project_dir / template.render(**context)
-    file_name_is_empty = outfile.is_dir()
-    if file_name_is_empty:
+    if outfile.is_dir():
         return
 
     if skip_if_file_exists and outfile.exists():
