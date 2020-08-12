@@ -60,8 +60,8 @@ def generate_file(
         way to perform this directory change.
     """
     template = environment.from_string(str(infile))
-
     outfile = project_dir / template.render(**context)
+
     if outfile.is_dir():
         return
 
@@ -79,8 +79,8 @@ def generate_file(
             # information about syntax error location
             exception.translated = False
             raise
-        text = template.render(**context)
 
+        text = template.render(**context)
         outfile.write_text(text)
 
     shutil.copymode(infile, outfile)
