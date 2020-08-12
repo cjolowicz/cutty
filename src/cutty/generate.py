@@ -72,8 +72,7 @@ def generate_file(
         shutil.copyfile(infile, outfile)
     else:
         try:
-            # Force fwd slashes on Windows for get_template
-            # This is a by-design Jinja issue
+            # https://github.com/pallets/jinja/issues/767
             template = environment.get_template(infile.as_posix())
         except TemplateSyntaxError as exception:
             # Disable translated so that printed exception contains verbose
