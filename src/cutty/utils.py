@@ -17,15 +17,12 @@ def removeprefix(string: str, prefix: str) -> str:
 
 
 @contextlib.contextmanager
-def work_in(dirname: Optional[str] = None) -> Iterator[None]:
-    """Context manager version of os.chdir.
+def chdir(path: Path) -> Iterator[None]:
+    """Context manager for changing the directory."""
+    cwd = Path.cwd()
+    os.chdir(path)
 
-    When exited, returns to the working directory prior to entering.
-    """
-    curdir = os.getcwd()
     try:
-        if dirname is not None:
-            os.chdir(dirname)
         yield
     finally:
-        os.chdir(curdir)
+        os.chdir(cwd)
