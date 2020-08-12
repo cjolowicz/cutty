@@ -3,6 +3,7 @@ import os.path
 import shutil
 from pathlib import Path
 
+from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import UndefinedVariableInTemplate
 from cookiecutter.generate import _run_hook_from_repo_dir
 from cookiecutter.generate import ensure_dir_is_templated
@@ -15,8 +16,16 @@ from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
-from .find import find_template
 from .types import StrMapping
+
+
+def find_template(repo_dir: str) -> str:
+    """Determine which child directory of `repo_dir` is the project template."""
+    for item in os.listdir(repo_dir):
+        if "cookiecutter" in item and "{{" in item and "}}" in item:
+            return os.path.join(repo_dir, item)
+    else:
+        raise NonTemplatedInputDirException
 
 
 def generate_files(  # noqa: C901
