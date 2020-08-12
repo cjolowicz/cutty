@@ -2,6 +2,7 @@
 import contextlib
 import os
 from pathlib import Path
+from typing import Iterator
 from typing import Optional
 
 
@@ -16,7 +17,7 @@ def removeprefix(string: str, prefix: str) -> str:
 
 
 @contextlib.contextmanager
-def work_in(dirname=None):
+def work_in(dirname: Optional[str] = None) -> Iterator[None]:
     """Context manager version of os.chdir.
 
     When exited, returns to the working directory prior to entering.
