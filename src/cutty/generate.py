@@ -37,19 +37,6 @@ def render_directory(
     return Path(os.path.normpath(output_dir / dirname))
 
 
-def create_directory(directory: Path, overwrite_if_exists: bool = False) -> bool:
-    """Create the directory, return True if created."""
-    if not directory.exists():
-        directory.mkdir(parents=True)
-        return True
-
-    if not overwrite_if_exists:
-        msg = 'Error: "{}" directory already exists'.format(directory)
-        raise OutputDirExistsException(msg)
-
-    return False
-
-
 def _run_hook_from_repo_dir(
     repo_dir: Path,
     hook_name: str,
@@ -86,7 +73,15 @@ def generate_files(  # noqa: C901
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
 
-    output_directory_created = create_directory(directory, overwrite_if_exists)
+    # If we create the output directory, then it's ok to remove it
+    # if rendering fails.
+    delete_project_on_failure = not directory.exists()
+
+    if directory.exists() and not overwrite_if_exists:
+        msg = 'Error: "{}" directory already exists'.format(directory)
+        raise OutputDirExistsException(msg)
+
+    directory.mkdir(parents=True, exist_ok=True)
 
     # We want the Jinja path and the OS paths to match. Consequently, we'll:
     #   + CD to the template folder
@@ -96,10 +91,6 @@ def generate_files(  # noqa: C901
     # absolute path for the target folder (project_dir)
 
     project_dir = Path(os.path.abspath(directory))
-
-    # if we created the output directory, then it's ok to remove it
-    # if rendering fails
-    delete_project_on_failure = output_directory_created
 
     _run_hook_from_repo_dir(
         repo_dir, "pre_gen_project", project_dir, context, delete_project_on_failure,
@@ -146,7 +137,7 @@ def generate_files(  # noqa: C901
                     msg = "Unable to create directory '{}'".format(_dir)
                     raise UndefinedVariableInTemplate(msg, err, context)
 
-                create_directory(directory, overwrite_if_exists)
+                directory.mkdir(parents=True, exist_ok=True)
 
             for f in files:
                 infile = os.path.normpath(os.path.join(root, f))
