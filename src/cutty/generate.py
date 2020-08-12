@@ -1,5 +1,4 @@
 """Generating projects from the template."""
-import io
 import os.path
 import shutil
 from pathlib import Path
@@ -63,12 +62,12 @@ def generate_file(
     # Render the path to the output file (not including the root project dir)
     template = environment.from_string(infile)
 
-    outfile = os.path.join(project_dir, template.render(**context))
-    file_name_is_empty = os.path.isdir(outfile)
+    outfile = project_dir / template.render(**context)
+    file_name_is_empty = outfile.is_dir()
     if file_name_is_empty:
         return
 
-    if skip_if_file_exists and os.path.exists(outfile):
+    if skip_if_file_exists and outfile.exists():
         return
 
     # Just copy over binary files. Don't render.
@@ -89,8 +88,7 @@ def generate_file(
             raise
         rendered_file = template.render(**context)
 
-        with io.open(outfile, "w", encoding="utf-8") as fh:
-            fh.write(rendered_file)
+        outfile.write_text(rendered_file)
 
     # Apply file permissions to output file
     shutil.copymode(infile, outfile)
