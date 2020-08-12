@@ -39,7 +39,13 @@ def render_directory(
     return Path(os.path.normpath(output_dir / dirname))
 
 
-def generate_file(project_dir, infile, context, env, skip_if_file_exists=False):
+def generate_file(
+    project_dir: str,
+    infile: str,
+    context: StrMapping,
+    env: Environment,
+    skip_if_file_exists: bool = False,
+) -> None:
     """Render filename of infile as name of outfile, handle infile correctly.
 
     Dealing with infile appropriately:
