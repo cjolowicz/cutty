@@ -64,8 +64,6 @@ def generate_files(  # noqa: C901
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
 
-    # If we create the output directory, then it's ok to remove it
-    # if rendering fails.
     delete_project_on_failure = not directory.exists()
 
     if directory.exists() and not overwrite_if_exists:
@@ -74,13 +72,7 @@ def generate_files(  # noqa: C901
 
     directory.mkdir(parents=True, exist_ok=True)
 
-    # We want the Jinja path and the OS paths to match. Consequently, we'll:
-    #   + CD to the template folder
-    #   + Set Jinja's path to '.'
-    #
-    #  In order to build our files to the correct folder(s), we'll use an
-    # absolute path for the target folder (project_dir)
-
+    # Use an absolute path. We will chdir to template_dir for Jinja.
     project_dir = Path(os.path.abspath(directory))
 
     with chdir(repo_dir):
@@ -95,17 +87,11 @@ def generate_files(  # noqa: C901
         environment.loader = FileSystemLoader(".")
 
         for root, dirs, files in os.walk("."):
-            # We must separate the two types of dirs into different lists.
-            # The reason is that we don't want ``os.walk`` to go through the
-            # unrendered directories, since they will just be copied.
             copy_dirs = []
             render_dirs = []
 
             for d in dirs:
                 d_ = os.path.normpath(os.path.join(root, d))
-                # We check the full path, because that's how it can be
-                # specified in the ``_copy_without_render`` setting, but
-                # we store just the dir name
                 if is_copy_only_path(d_, context):
                     copy_dirs.append(d)
                 else:
@@ -116,8 +102,7 @@ def generate_files(  # noqa: C901
                 outdir = os.path.normpath(os.path.join(project_dir, indir))
                 shutil.copytree(indir, outdir)
 
-            # We mutate ``dirs``, because we only want to go through these dirs
-            # recursively
+            # Mutate dirs to exclude copied directories from traversal.
             dirs[:] = render_dirs
             for d in dirs:
                 unrendered_dir = os.path.join(project_dir, root, d)
@@ -161,7 +146,7 @@ def generate_files(  # noqa: C901
                             template = environment.get_template(Path(infile).as_posix())
                         except TemplateSyntaxError as exception:
                             # Disable translated so that printed exception contains
-                            # verbose information about syntax error location
+                            # verbose information about syntax error location.
                             exception.translated = False
                             raise
 
