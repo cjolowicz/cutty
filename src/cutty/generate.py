@@ -124,7 +124,7 @@ def _generate_files(  # noqa: C901
                 )
 
 
-def generate_files(  # noqa: C901
+def generate_files(
     repo_dir: Path,
     context: StrMapping,
     output_dir: Path,
