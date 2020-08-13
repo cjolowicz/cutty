@@ -73,7 +73,7 @@ def generate_files(  # noqa: C901
     directory.mkdir(parents=True, exist_ok=True)
 
     # Use an absolute path. We will chdir to template_dir for Jinja.
-    project_dir = Path(os.path.abspath(directory))
+    project_dir = directory.resolve()
 
     with chdir(repo_dir):
         try:
