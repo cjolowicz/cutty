@@ -57,23 +57,23 @@ def generate_files(  # noqa: C901
     environment = Environment(context=context, keep_trailing_newline=True)
 
     try:
-        directory = render_directory(
+        project_dir = render_directory(
             template_dir.name, context, environment, output_dir
         )
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
 
-    delete_project_on_failure = not directory.exists()
+    delete_project_on_failure = not project_dir.exists()
 
-    if directory.exists() and not overwrite_if_exists:
-        msg = 'Error: "{}" directory already exists'.format(directory)
+    if project_dir.exists() and not overwrite_if_exists:
+        msg = 'Error: "{}" directory already exists'.format(project_dir)
         raise OutputDirExistsException(msg)
 
-    directory.mkdir(parents=True, exist_ok=True)
+    project_dir.mkdir(parents=True, exist_ok=True)
 
     # Use an absolute path. We will chdir to template_dir for Jinja.
-    project_dir = directory.resolve()
+    project_dir = project_dir.resolve()
 
     with chdir(repo_dir):
         try:
