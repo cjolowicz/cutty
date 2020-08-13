@@ -124,14 +124,16 @@ def generate_files(  # noqa: C901
 
             for f in files:
                 infile = os.path.normpath(path / f)
-                template = environment.from_string(infile)
-                outfile = project_dir / template.render(**context)
 
-                if is_copy_only_path(infile, context):
-                    shutil.copyfile(infile, outfile)
-                    shutil.copymode(infile, outfile)
-                    continue
                 try:
+                    template = environment.from_string(infile)
+                    outfile = project_dir / template.render(**context)
+
+                    if is_copy_only_path(infile, context):
+                        shutil.copyfile(infile, outfile)
+                        shutil.copymode(infile, outfile)
+                        continue
+
                     if outfile.is_dir():
                         continue
 
