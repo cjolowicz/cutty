@@ -45,7 +45,7 @@ def _generate_files(  # noqa: C901
     output_dir: Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
-) -> Path:
+) -> None:
     with chdir(repo_dir):
         run_hook("pre_gen_project", str(project_dir), context)
 
@@ -130,8 +130,6 @@ def _generate_files(  # noqa: C901
     with chdir(repo_dir):
         run_hook("post_gen_project", str(project_dir), context)
 
-    return project_dir
-
 
 def generate_files(  # noqa: C901
     repo_dir: Path,
@@ -165,7 +163,7 @@ def generate_files(  # noqa: C901
     project_dir = project_dir.resolve()
 
     try:
-        return _generate_files(
+        _generate_files(
             repo_dir,
             template_dir,
             project_dir,
@@ -178,3 +176,5 @@ def generate_files(  # noqa: C901
         if delete_project_on_failure:
             rmtree(project_dir)
         raise
+
+    return project_dir
