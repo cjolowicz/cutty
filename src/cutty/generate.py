@@ -45,15 +45,9 @@ def _generate_files(  # noqa: C901
     output_dir: Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
-    delete_project_on_failure: bool,
 ) -> Path:
     with chdir(repo_dir):
-        try:
-            run_hook("pre_gen_project", str(project_dir), context)
-        except FailedHookException:
-            if delete_project_on_failure:
-                rmtree(project_dir)
-            raise
+        run_hook("pre_gen_project", str(project_dir), context)
 
     with chdir(template_dir):
         environment.loader = FileSystemLoader(".")
@@ -87,8 +81,6 @@ def _generate_files(  # noqa: C901
                         os.path.normpath(output_dir / template.render(**context))
                     )
                 except UndefinedError as error:
-                    if delete_project_on_failure:
-                        rmtree(project_dir)
                     _dir = unrendered_dir.relative_to(output_dir)
                     raise UndefinedVariableInTemplate(
                         f"Unable to create directory {_dir!r}", error, context
@@ -131,19 +123,12 @@ def _generate_files(  # noqa: C901
 
                     shutil.copymode(infile, outfile)
                 except UndefinedError as error:
-                    if delete_project_on_failure:
-                        rmtree(project_dir)
                     raise UndefinedVariableInTemplate(
                         f"Unable to create file '{infile}'", error, context
                     )
 
     with chdir(repo_dir):
-        try:
-            run_hook("post_gen_project", str(project_dir), context)
-        except FailedHookException:
-            if delete_project_on_failure:
-                rmtree(project_dir)
-            raise
+        run_hook("post_gen_project", str(project_dir), context)
 
     return project_dir
 
@@ -179,13 +164,17 @@ def generate_files(  # noqa: C901
     # Use an absolute path. We will chdir to template_dir for Jinja.
     project_dir = project_dir.resolve()
 
-    return _generate_files(
-        repo_dir,
-        template_dir,
-        project_dir,
-        context,
-        output_dir,
-        overwrite_if_exists,
-        skip_if_file_exists,
-        delete_project_on_failure,
-    )
+    try:
+        return _generate_files(
+            repo_dir,
+            template_dir,
+            project_dir,
+            context,
+            output_dir,
+            overwrite_if_exists,
+            skip_if_file_exists,
+        )
+    except (FailedHookException, UndefinedVariableInTemplate):
+        if delete_project_on_failure:
+            rmtree(project_dir)
+        raise
