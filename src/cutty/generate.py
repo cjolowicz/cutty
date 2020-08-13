@@ -41,7 +41,6 @@ def _generate_files(  # noqa: C901
     environment: Environment,
     context: StrMapping,
     output_dir: Path,
-    overwrite_if_exists: bool,
     skip_if_file_exists: bool,
 ) -> None:
     environment.loader = FileSystemLoader(".")
@@ -159,11 +158,7 @@ def generate_files(
 
         with chdir(template_dir):
             _generate_files(
-                project_dir,
-                context,
-                output_dir,
-                overwrite_if_exists,
-                skip_if_file_exists,
+                project_dir, context, output_dir, skip_if_file_exists,
             )
 
         with chdir(repo_dir):
