@@ -37,7 +37,6 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
 
 
 def _generate_files(  # noqa: C901
-    repo_dir: Path,
     template_dir: Path,
     project_dir: Path,
     environment: Environment,
@@ -161,7 +160,6 @@ def generate_files(
 
         with chdir(template_dir):
             _generate_files(
-                repo_dir,
                 template_dir,
                 project_dir,
                 context,
