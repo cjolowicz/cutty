@@ -45,54 +45,6 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
 
-def generate_file(
-    project_dir: Path,
-    infile: Path,
-    context: StrMapping,
-    environment: Environment,
-    skip_if_file_exists: bool,
-) -> None:
-    """Render filename of infile as name of outfile, handle infile correctly.
-
-    Dealing with infile appropriately:
-
-        a. If infile is a binary file, copy it over without rendering.
-        b. If infile is a text file, render its contents and write the
-           rendered infile to outfile.
-
-    Precondition:
-
-        When calling `generate_file()`, the root template dir must be the
-        current working directory. Using `utils.work_in()` is the recommended
-        way to perform this directory change.
-    """
-    template = environment.from_string(str(infile))
-    outfile = project_dir / template.render(**context)
-
-    if outfile.is_dir():
-        return
-
-    if skip_if_file_exists and outfile.exists():
-        return
-
-    if is_binary(infile):
-        shutil.copyfile(infile, outfile)
-    else:
-        try:
-            # https://github.com/pallets/jinja/issues/767
-            template = environment.get_template(infile.as_posix())
-        except TemplateSyntaxError as exception:
-            # Disable translated so that printed exception contains verbose
-            # information about syntax error location
-            exception.translated = False
-            raise
-
-        text = template.render(**context)
-        outfile.write_text(text)
-
-    shutil.copymode(infile, outfile)
-
-
 def generate_files(  # noqa: C901
     repo_dir: Path,
     context: StrMapping,
@@ -192,13 +144,31 @@ def generate_files(  # noqa: C901
                     shutil.copymode(infile, outfile)
                     continue
                 try:
-                    generate_file(
-                        project_dir,
-                        Path(infile),
-                        context,
-                        environment,
-                        skip_if_file_exists,
-                    )
+                    template = environment.from_string(infile)
+                    outfile = project_dir / template.render(**context)
+
+                    if outfile.is_dir():
+                        continue
+
+                    if skip_if_file_exists and outfile.exists():
+                        continue
+
+                    if is_binary(infile):
+                        shutil.copyfile(infile, outfile)
+                    else:
+                        try:
+                            # https://github.com/pallets/jinja/issues/767
+                            template = environment.get_template(Path(infile).as_posix())
+                        except TemplateSyntaxError as exception:
+                            # Disable translated so that printed exception contains
+                            # verbose information about syntax error location
+                            exception.translated = False
+                            raise
+
+                        text = template.render(**context)
+                        outfile.write_text(text)
+
+                    shutil.copymode(infile, outfile)
                 except UndefinedError as err:
                     if delete_project_on_failure:
                         rmtree(project_dir)
