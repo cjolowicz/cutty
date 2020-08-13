@@ -46,89 +46,82 @@ def _generate_files(  # noqa: C901
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
 ) -> None:
-    with chdir(repo_dir):
-        run_hook("pre_gen_project", str(project_dir), context)
+    environment.loader = FileSystemLoader(".")
 
-    with chdir(template_dir):
-        environment.loader = FileSystemLoader(".")
+    for root, dirs, files in os.walk("."):
+        path = Path(root)
 
-        for root, dirs, files in os.walk("."):
-            path = Path(root)
+        copy_dirs = []
+        render_dirs = []
 
-            copy_dirs = []
-            render_dirs = []
+        for d in dirs:
+            d_ = os.path.normpath(path / d)
+            if is_copy_only_path(d_, context):
+                copy_dirs.append(d)
+            else:
+                render_dirs.append(d)
 
-            for d in dirs:
-                d_ = os.path.normpath(path / d)
-                if is_copy_only_path(d_, context):
-                    copy_dirs.append(d)
-                else:
-                    render_dirs.append(d)
+        for copy_dir in copy_dirs:
+            indir = os.path.normpath(path / copy_dir)
+            outdir = os.path.normpath(project_dir / indir)
+            shutil.copytree(indir, outdir)
 
-            for copy_dir in copy_dirs:
-                indir = os.path.normpath(path / copy_dir)
-                outdir = os.path.normpath(project_dir / indir)
-                shutil.copytree(indir, outdir)
+        # Mutate dirs to exclude copied directories from traversal.
+        dirs[:] = render_dirs
 
-            # Mutate dirs to exclude copied directories from traversal.
-            dirs[:] = render_dirs
+        for d in dirs:
+            unrendered_dir = project_dir / path / d
+            try:
+                template = environment.from_string(str(unrendered_dir))
+                directory = Path(
+                    os.path.normpath(output_dir / template.render(**context))
+                )
+            except UndefinedError as error:
+                _dir = unrendered_dir.relative_to(output_dir)
+                raise UndefinedVariableInTemplate(
+                    f"Unable to create directory {_dir!r}", error, context
+                )
 
-            for d in dirs:
-                unrendered_dir = project_dir / path / d
-                try:
-                    template = environment.from_string(str(unrendered_dir))
-                    directory = Path(
-                        os.path.normpath(output_dir / template.render(**context))
-                    )
-                except UndefinedError as error:
-                    _dir = unrendered_dir.relative_to(output_dir)
-                    raise UndefinedVariableInTemplate(
-                        f"Unable to create directory {_dir!r}", error, context
-                    )
+            directory.mkdir(parents=True, exist_ok=True)
 
-                directory.mkdir(parents=True, exist_ok=True)
+        for f in files:
+            infile = os.path.normpath(path / f)
 
-            for f in files:
-                infile = os.path.normpath(path / f)
+            try:
+                template = environment.from_string(infile)
+                outfile = project_dir / template.render(**context)
 
-                try:
-                    template = environment.from_string(infile)
-                    outfile = project_dir / template.render(**context)
-
-                    if is_copy_only_path(infile, context):
-                        shutil.copyfile(infile, outfile)
-                        shutil.copymode(infile, outfile)
-                        continue
-
-                    if outfile.is_dir():
-                        continue
-
-                    if skip_if_file_exists and outfile.exists():
-                        continue
-
-                    if is_binary(infile):
-                        shutil.copyfile(infile, outfile)
-                    else:
-                        try:
-                            # https://github.com/pallets/jinja/issues/767
-                            template = environment.get_template(Path(infile).as_posix())
-                        except TemplateSyntaxError as exception:
-                            # Disable translated so that printed exception contains
-                            # verbose information about syntax error location.
-                            exception.translated = False
-                            raise
-
-                        text = template.render(**context)
-                        outfile.write_text(text)
-
+                if is_copy_only_path(infile, context):
+                    shutil.copyfile(infile, outfile)
                     shutil.copymode(infile, outfile)
-                except UndefinedError as error:
-                    raise UndefinedVariableInTemplate(
-                        f"Unable to create file '{infile}'", error, context
-                    )
+                    continue
 
-    with chdir(repo_dir):
-        run_hook("post_gen_project", str(project_dir), context)
+                if outfile.is_dir():
+                    continue
+
+                if skip_if_file_exists and outfile.exists():
+                    continue
+
+                if is_binary(infile):
+                    shutil.copyfile(infile, outfile)
+                else:
+                    try:
+                        # https://github.com/pallets/jinja/issues/767
+                        template = environment.get_template(Path(infile).as_posix())
+                    except TemplateSyntaxError as exception:
+                        # Disable translated so that printed exception contains
+                        # verbose information about syntax error location.
+                        exception.translated = False
+                        raise
+
+                    text = template.render(**context)
+                    outfile.write_text(text)
+
+                shutil.copymode(infile, outfile)
+            except UndefinedError as error:
+                raise UndefinedVariableInTemplate(
+                    f"Unable to create file '{infile}'", error, context
+                )
 
 
 def generate_files(  # noqa: C901
@@ -163,15 +156,22 @@ def generate_files(  # noqa: C901
     project_dir = project_dir.resolve()
 
     try:
-        _generate_files(
-            repo_dir,
-            template_dir,
-            project_dir,
-            context,
-            output_dir,
-            overwrite_if_exists,
-            skip_if_file_exists,
-        )
+        with chdir(repo_dir):
+            run_hook("pre_gen_project", str(project_dir), context)
+
+        with chdir(template_dir):
+            _generate_files(
+                repo_dir,
+                template_dir,
+                project_dir,
+                context,
+                output_dir,
+                overwrite_if_exists,
+                skip_if_file_exists,
+            )
+
+        with chdir(repo_dir):
+            run_hook("post_gen_project", str(project_dir), context)
     except (FailedHookException, UndefinedVariableInTemplate):
         if delete_project_on_failure:
             rmtree(project_dir)
