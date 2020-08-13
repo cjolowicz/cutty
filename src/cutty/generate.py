@@ -87,45 +87,47 @@ def generate_files(  # noqa: C901
         environment.loader = FileSystemLoader(".")
 
         for root, dirs, files in os.walk("."):
+            path = Path(root)
+
             copy_dirs = []
             render_dirs = []
 
             for d in dirs:
-                d_ = os.path.normpath(os.path.join(root, d))
+                d_ = os.path.normpath(path / d)
                 if is_copy_only_path(d_, context):
                     copy_dirs.append(d)
                 else:
                     render_dirs.append(d)
 
             for copy_dir in copy_dirs:
-                indir = os.path.normpath(os.path.join(root, copy_dir))
-                outdir = os.path.normpath(os.path.join(project_dir, indir))
+                indir = os.path.normpath(path / copy_dir)
+                outdir = os.path.normpath(project_dir / indir)
                 shutil.copytree(indir, outdir)
 
             # Mutate dirs to exclude copied directories from traversal.
             dirs[:] = render_dirs
 
             for d in dirs:
-                unrendered_dir = os.path.join(project_dir, root, d)
+                unrendered_dir = project_dir / path / d
                 try:
                     directory = render_directory(
-                        unrendered_dir, context, environment, output_dir
+                        str(unrendered_dir), context, environment, output_dir
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
                         rmtree(project_dir)
-                    _dir = os.path.relpath(unrendered_dir, output_dir)
+                    _dir = os.path.relpath(str(unrendered_dir), output_dir)
                     msg = "Unable to create directory '{}'".format(_dir)
                     raise UndefinedVariableInTemplate(msg, err, context)
 
                 directory.mkdir(parents=True, exist_ok=True)
 
             for f in files:
-                infile = os.path.normpath(os.path.join(root, f))
+                infile = os.path.normpath(path / f)
                 if is_copy_only_path(infile, context):
                     outfile_tmpl = environment.from_string(infile)
                     outfile_rendered = outfile_tmpl.render(**context)
-                    outfile = os.path.join(project_dir, outfile_rendered)
+                    outfile = project_dir / outfile_rendered
                     shutil.copyfile(infile, outfile)
                     shutil.copymode(infile, outfile)
                     continue
