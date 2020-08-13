@@ -47,6 +47,12 @@ def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[No
         raise UndefinedVariableInTemplate(message, error, context)
 
 
+def render_string(string: str, environment: Environment, context: StrMapping) -> str:
+    """Render the given string."""
+    template = environment.from_string(string)
+    return template.render(**context)
+
+
 def _generate_files(  # noqa: C901
     project_dir: Path,
     environment: Environment,
@@ -83,11 +89,10 @@ def _generate_files(  # noqa: C901
             with handle_undefined_variables(
                 f"Unable to create directory {_dir!r}", context
             ):
-                template = environment.from_string(str(unrendered_dir))
-                directory = Path(
-                    os.path.normpath(output_dir / template.render(**context))
+                directory = output_dir / render_string(
+                    str(unrendered_dir), environment, context
                 )
-
+                directory = Path(os.path.normpath(directory))
             directory.mkdir(parents=True, exist_ok=True)
 
         for f in files:
@@ -96,8 +101,7 @@ def _generate_files(  # noqa: C901
             with handle_undefined_variables(
                 f"Unable to create file '{infile}'", context
             ):
-                template = environment.from_string(infile)
-                outfile = project_dir / template.render(**context)
+                outfile = project_dir / render_string(infile, environment, context)
 
                 if is_copy_only_path(infile, context):
                     shutil.copyfile(infile, outfile)
@@ -142,8 +146,10 @@ def generate_files(
     with handle_undefined_variables(
         f"Unable to create project directory {template_dir.name!r}", context
     ):
-        template = environment.from_string(template_dir.name)
-        project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
+        project_dir = output_dir / render_string(
+            template_dir.name, environment, context
+        )
+        project_dir = Path(os.path.normpath(project_dir))
 
     delete_project_on_failure = not project_dir.exists()
 
