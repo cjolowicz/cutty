@@ -125,8 +125,8 @@ def generate_files(  # noqa: C901
             for f in files:
                 infile = os.path.normpath(path / f)
                 if is_copy_only_path(infile, context):
-                    outfile_tmpl = environment.from_string(infile)
-                    outfile_rendered = outfile_tmpl.render(**context)
+                    template = environment.from_string(infile)
+                    outfile_rendered = template.render(**context)
                     outfile = project_dir / outfile_rendered
                     shutil.copyfile(infile, outfile)
                     shutil.copymode(infile, outfile)
