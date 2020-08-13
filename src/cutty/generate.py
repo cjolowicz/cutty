@@ -36,37 +36,17 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
 
-def generate_files(  # noqa: C901
+def _generate_files(  # noqa: C901
     repo_dir: Path,
+    template_dir: Path,
+    project_dir: Path,
+    environment: Environment,
     context: StrMapping,
     output_dir: Path,
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    delete_project_on_failure: bool,
 ) -> Path:
-    """Render the template to disk."""
-    template_dir = find_template(repo_dir)
-    environment = Environment(context=context, keep_trailing_newline=True)
-
-    try:
-        template = environment.from_string(template_dir.name)
-        project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
-    except UndefinedError as error:
-        raise UndefinedVariableInTemplate(
-            f"Unable to create project directory {template_dir.name!r}", error, context
-        )
-
-    delete_project_on_failure = not project_dir.exists()
-
-    if project_dir.exists() and not overwrite_if_exists:
-        raise OutputDirExistsException(
-            f'Error: "{project_dir}" directory already exists'
-        )
-
-    project_dir.mkdir(parents=True, exist_ok=True)
-
-    # Use an absolute path. We will chdir to template_dir for Jinja.
-    project_dir = project_dir.resolve()
-
     with chdir(repo_dir):
         try:
             run_hook("pre_gen_project", str(project_dir), context)
@@ -166,3 +146,46 @@ def generate_files(  # noqa: C901
             raise
 
     return project_dir
+
+
+def generate_files(  # noqa: C901
+    repo_dir: Path,
+    context: StrMapping,
+    output_dir: Path,
+    overwrite_if_exists: bool = False,
+    skip_if_file_exists: bool = False,
+) -> Path:
+    """Render the template to disk."""
+    template_dir = find_template(repo_dir)
+    environment = Environment(context=context, keep_trailing_newline=True)
+
+    try:
+        template = environment.from_string(template_dir.name)
+        project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
+    except UndefinedError as error:
+        raise UndefinedVariableInTemplate(
+            f"Unable to create project directory {template_dir.name!r}", error, context
+        )
+
+    delete_project_on_failure = not project_dir.exists()
+
+    if project_dir.exists() and not overwrite_if_exists:
+        raise OutputDirExistsException(
+            f'Error: "{project_dir}" directory already exists'
+        )
+
+    project_dir.mkdir(parents=True, exist_ok=True)
+
+    # Use an absolute path. We will chdir to template_dir for Jinja.
+    project_dir = project_dir.resolve()
+
+    return _generate_files(
+        repo_dir,
+        template_dir,
+        project_dir,
+        context,
+        output_dir,
+        overwrite_if_exists,
+        skip_if_file_exists,
+        delete_project_on_failure,
+    )
