@@ -50,15 +50,17 @@ def generate_files(  # noqa: C901
     try:
         template = environment.from_string(template_dir.name)
         project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
-    except UndefinedError as err:
-        msg = "Unable to create project directory '{}'".format(template_dir.name)
-        raise UndefinedVariableInTemplate(msg, err, context)
+    except UndefinedError as error:
+        raise UndefinedVariableInTemplate(
+            f"Unable to create project directory {template_dir.name!r}", error, context
+        )
 
     delete_project_on_failure = not project_dir.exists()
 
     if project_dir.exists() and not overwrite_if_exists:
-        msg = 'Error: "{}" directory already exists'.format(project_dir)
-        raise OutputDirExistsException(msg)
+        raise OutputDirExistsException(
+            f'Error: "{project_dir}" directory already exists'
+        )
 
     project_dir.mkdir(parents=True, exist_ok=True)
 
@@ -104,12 +106,13 @@ def generate_files(  # noqa: C901
                     directory = Path(
                         os.path.normpath(output_dir / template.render(**context))
                     )
-                except UndefinedError as err:
+                except UndefinedError as error:
                     if delete_project_on_failure:
                         rmtree(project_dir)
                     _dir = os.path.relpath(str(unrendered_dir), output_dir)
-                    msg = "Unable to create directory '{}'".format(_dir)
-                    raise UndefinedVariableInTemplate(msg, err, context)
+                    raise UndefinedVariableInTemplate(
+                        f"Unable to create directory {_dir!r}", error, context
+                    )
 
                 directory.mkdir(parents=True, exist_ok=True)
 
@@ -147,11 +150,12 @@ def generate_files(  # noqa: C901
                         outfile.write_text(text)
 
                     shutil.copymode(infile, outfile)
-                except UndefinedError as err:
+                except UndefinedError as error:
                     if delete_project_on_failure:
                         rmtree(project_dir)
-                    msg = "Unable to create file '{}'".format(infile)
-                    raise UndefinedVariableInTemplate(msg, err, context)
+                    raise UndefinedVariableInTemplate(
+                        f"Unable to create file '{infile}'", error, context
+                    )
 
     with chdir(repo_dir):
         try:
