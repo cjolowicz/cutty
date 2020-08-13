@@ -53,6 +53,44 @@ def render_string(string: str, environment: Environment, context: StrMapping) ->
     return template.render(**context)
 
 
+def _generate_file(
+    project_dir: Path,
+    infile: str,
+    environment: Environment,
+    context: StrMapping,
+    skip_if_file_exists: bool,
+) -> None:
+    outfile = project_dir / render_string(infile, environment, context)
+
+    if is_copy_only_path(infile, context):
+        shutil.copyfile(infile, outfile)
+        shutil.copymode(infile, outfile)
+        return
+
+    if outfile.is_dir():
+        return
+
+    if skip_if_file_exists and outfile.exists():
+        return
+
+    if is_binary(infile):
+        shutil.copyfile(infile, outfile)
+    else:
+        try:
+            # https://github.com/pallets/jinja/issues/767
+            template = environment.get_template(Path(infile).as_posix())
+        except TemplateSyntaxError as exception:
+            # Disable translated so that printed exception contains
+            # verbose information about syntax error location.
+            exception.translated = False
+            raise
+
+        text = template.render(**context)
+        outfile.write_text(text)
+
+    shutil.copymode(infile, outfile)
+
+
 def _generate_files(  # noqa: C901
     project_dir: Path,
     environment: Environment,
@@ -101,35 +139,9 @@ def _generate_files(  # noqa: C901
             with handle_undefined_variables(
                 f"Unable to create file '{infile}'", context
             ):
-                outfile = project_dir / render_string(infile, environment, context)
-
-                if is_copy_only_path(infile, context):
-                    shutil.copyfile(infile, outfile)
-                    shutil.copymode(infile, outfile)
-                    continue
-
-                if outfile.is_dir():
-                    continue
-
-                if skip_if_file_exists and outfile.exists():
-                    continue
-
-                if is_binary(infile):
-                    shutil.copyfile(infile, outfile)
-                else:
-                    try:
-                        # https://github.com/pallets/jinja/issues/767
-                        template = environment.get_template(Path(infile).as_posix())
-                    except TemplateSyntaxError as exception:
-                        # Disable translated so that printed exception contains
-                        # verbose information about syntax error location.
-                        exception.translated = False
-                        raise
-
-                    text = template.render(**context)
-                    outfile.write_text(text)
-
-                shutil.copymode(infile, outfile)
+                _generate_file(
+                    project_dir, infile, environment, context, skip_if_file_exists
+                )
 
 
 def generate_files(
