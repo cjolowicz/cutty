@@ -29,15 +29,6 @@ def find_template(repo_dir: Path) -> Path:
         raise NonTemplatedInputDirException
 
 
-def render_directory(
-    dirname: str, context: StrMapping, environment: Environment, output_dir: Path
-) -> Path:
-    """Render name of a directory, return its path."""
-    template = environment.from_string(dirname)
-    dirname = template.render(**context)
-    return Path(os.path.normpath(output_dir / dirname))
-
-
 def is_copy_only_path(path: str, context: StrMapping) -> bool:
     """Check whether the given `path` should only be copied and not rendered."""
     patterns = context["cookiecutter"].get("_copy_without_render", [])
@@ -57,9 +48,8 @@ def generate_files(  # noqa: C901
     environment = Environment(context=context, keep_trailing_newline=True)
 
     try:
-        project_dir = render_directory(
-            template_dir.name, context, environment, output_dir
-        )
+        template = environment.from_string(template_dir.name)
+        project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
     except UndefinedError as err:
         msg = "Unable to create project directory '{}'".format(template_dir.name)
         raise UndefinedVariableInTemplate(msg, err, context)
@@ -110,8 +100,9 @@ def generate_files(  # noqa: C901
             for d in dirs:
                 unrendered_dir = project_dir / path / d
                 try:
-                    directory = render_directory(
-                        str(unrendered_dir), context, environment, output_dir
+                    template = environment.from_string(str(unrendered_dir))
+                    directory = Path(
+                        os.path.normpath(output_dir / template.render(**context))
                     )
                 except UndefinedError as err:
                     if delete_project_on_failure:
