@@ -109,7 +109,7 @@ def generate_files(  # noqa: C901
                 except UndefinedError as error:
                     if delete_project_on_failure:
                         rmtree(project_dir)
-                    _dir = os.path.relpath(str(unrendered_dir), output_dir)
+                    _dir = unrendered_dir.relative_to(output_dir)
                     raise UndefinedVariableInTemplate(
                         f"Unable to create directory {_dir!r}", error, context
                     )
