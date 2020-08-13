@@ -54,8 +54,8 @@ def generate_files(  # noqa: C901
 ) -> Path:
     """Render the templates and saves them to files."""
     template_dir = find_template(repo_dir)
-
     environment = Environment(context=context, keep_trailing_newline=True)
+
     try:
         directory = render_directory(
             template_dir.name, context, environment, output_dir
@@ -104,6 +104,7 @@ def generate_files(  # noqa: C901
 
             # Mutate dirs to exclude copied directories from traversal.
             dirs[:] = render_dirs
+
             for d in dirs:
                 unrendered_dir = os.path.join(project_dir, root, d)
                 try:
