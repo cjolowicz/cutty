@@ -1,8 +1,10 @@
 """Generating projects from the template."""
+import contextlib
 import fnmatch
 import os.path
 import shutil
 from pathlib import Path
+from typing import Iterator
 
 from binaryornot.check import is_binary
 from cookiecutter.exceptions import FailedHookException
@@ -34,6 +36,15 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
     patterns = context["cookiecutter"].get("_copy_without_render", [])
 
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
+
+
+@contextlib.contextmanager
+def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[None]:
+    """Re-raise UndefinedError as UndefinedVariableInTemplate."""
+    try:
+        yield
+    except UndefinedError as error:
+        raise UndefinedVariableInTemplate(message, error, context)
 
 
 def _generate_files(  # noqa: C901
@@ -68,15 +79,13 @@ def _generate_files(  # noqa: C901
 
         for d in dirs:
             unrendered_dir = project_dir / path / d
-            try:
+            _dir = unrendered_dir.relative_to(output_dir)
+            with handle_undefined_variables(
+                f"Unable to create directory {_dir!r}", context
+            ):
                 template = environment.from_string(str(unrendered_dir))
                 directory = Path(
                     os.path.normpath(output_dir / template.render(**context))
-                )
-            except UndefinedError as error:
-                _dir = unrendered_dir.relative_to(output_dir)
-                raise UndefinedVariableInTemplate(
-                    f"Unable to create directory {_dir!r}", error, context
                 )
 
             directory.mkdir(parents=True, exist_ok=True)
@@ -84,7 +93,9 @@ def _generate_files(  # noqa: C901
         for f in files:
             infile = os.path.normpath(path / f)
 
-            try:
+            with handle_undefined_variables(
+                f"Unable to create file '{infile}'", context
+            ):
                 template = environment.from_string(infile)
                 outfile = project_dir / template.render(**context)
 
@@ -115,10 +126,6 @@ def _generate_files(  # noqa: C901
                     outfile.write_text(text)
 
                 shutil.copymode(infile, outfile)
-            except UndefinedError as error:
-                raise UndefinedVariableInTemplate(
-                    f"Unable to create file '{infile}'", error, context
-                )
 
 
 def generate_files(
@@ -132,13 +139,11 @@ def generate_files(
     template_dir = find_template(repo_dir)
     environment = Environment(context=context, keep_trailing_newline=True)
 
-    try:
+    with handle_undefined_variables(
+        f"Unable to create project directory {template_dir.name!r}", context
+    ):
         template = environment.from_string(template_dir.name)
         project_dir = Path(os.path.normpath(output_dir / template.render(**context)))
-    except UndefinedError as error:
-        raise UndefinedVariableInTemplate(
-            f"Unable to create project directory {template_dir.name!r}", error, context
-        )
 
     delete_project_on_failure = not project_dir.exists()
 
