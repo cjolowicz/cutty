@@ -52,7 +52,7 @@ def generate_files(  # noqa: C901
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
 ) -> Path:
-    """Render the templates and saves them to files."""
+    """Render the template to disk."""
     template_dir = find_template(repo_dir)
     environment = Environment(context=context, keep_trailing_newline=True)
 
