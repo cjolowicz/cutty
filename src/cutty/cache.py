@@ -70,12 +70,12 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        context = replay.load(str(self.root), self.replay_hash)
+        context = replay.load(self.root, self.replay_hash)
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        replay.dump(str(self.root), self.replay_hash, context)
+        replay.dump(self.root, self.replay_hash, context)
 
 
 def _hash_location(location: str, *, length: int = 64) -> str:
