@@ -7,11 +7,12 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-from cookiecutter import utils
 from cookiecutter.exceptions import FailedHookException
 
 from .environment import Environment
 from .types import StrMapping
+from .utils import make_executable
+
 
 _HOOKS_DIR = Path("hooks")
 _HOOKS = [
@@ -54,7 +55,7 @@ def run_script(script_path: Path, cwd: Path) -> None:
     else:
         script_command = [script_path]
 
-    utils.make_executable(str(script_path))
+    make_executable(script_path)
 
     try:
         proc = subprocess.Popen(
