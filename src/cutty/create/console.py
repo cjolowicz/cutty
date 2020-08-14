@@ -9,7 +9,6 @@ from typing import Tuple
 
 import click
 from cookiecutter import exceptions
-from cookiecutter.log import configure_logger
 
 from . import core
 from .. import git
@@ -82,9 +81,6 @@ def validate_extra_context(ctx: Any, param: Any, values: Tuple[str, ...]) -> Str
     ),
 )
 @click.option(
-    "-v", "--verbose", is_flag=True, help="Print debug information", default=False
-)
-@click.option(
     "--replay",
     is_flag=True,
     help="Do not prompt for parameters and only use information entered previously",
@@ -121,30 +117,20 @@ def validate_extra_context(ctx: Any, param: Any, values: Tuple[str, ...]) -> Str
     is_flag=True,
     help="Do not load a config file. Use the defaults instead",
 )
-@click.option(
-    "--debug-file",
-    type=click.Path(),
-    default=None,
-    help="File to be used as a stream for DEBUG logging",
-)
 def create(
     template: str,
     extra_context: StrMapping,
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],
-    verbose: bool,
     replay: bool,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     output_dir: str,
     config_file: Optional[str],
     default_config: bool,
-    debug_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    configure_logger(stream_level="DEBUG" if verbose else "INFO", debug_file=debug_file)
-
     try:
         core.create(
             template,
