@@ -21,12 +21,7 @@ EXIT_SUCCESS = 0
 
 
 def valid_hook(hook_file, hook_name):
-    """Determine if a hook file is valid.
-
-    :param hook_file: The hook file to consider for validity
-    :param hook_name: The hook to find
-    :return: The hook file validity
-    """
+    """Determine if a hook file is valid."""
     filename = os.path.basename(hook_file)
     basename = os.path.splitext(filename)[0]
 
@@ -44,10 +39,6 @@ def find_hook(hook_name, hooks_dir="hooks"):
     Dict's key will be the hook/script's name, without extension, while values
     will be the absolute path to the script. Missing scripts will not be
     included in the returned dict.
-
-    :param hook_name: The hook to find
-    :param hooks_dir: The hook directory in the template
-    :return: The absolute path to the hook script or None
     """
     if not os.path.isdir(hooks_dir):
         return None
@@ -60,11 +51,7 @@ def find_hook(hook_name, hooks_dir="hooks"):
 
 
 def run_script(script_path, cwd="."):
-    """Execute a script from a working directory.
-
-    :param script_path: Absolute path to the script to run.
-    :param cwd: The directory to run the script from.
-    """
+    """Execute a script from a working directory."""
     run_thru_shell = sys.platform.startswith("win")
     if script_path.endswith(".py"):
         script_command = [sys.executable, script_path]
@@ -91,12 +78,7 @@ def run_script(script_path, cwd="."):
 
 
 def run_script_with_context(script_path, cwd, context):
-    """Execute a script after rendering it with Jinja.
-
-    :param script_path: Absolute path to the script to run.
-    :param cwd: The directory to run the script from.
-    :param context: Cookiecutter project template context.
-    """
+    """Execute a script after rendering it with Jinja."""
     _, extension = os.path.splitext(script_path)
 
     with io.open(script_path, "r", encoding="utf-8") as file:
@@ -112,12 +94,7 @@ def run_script_with_context(script_path, cwd, context):
 
 
 def run_hook(hook_name, project_dir, context):
-    """Try to find and execute a hook from the specified project directory.
-
-    :param hook_name: The hook to execute.
-    :param project_dir: The directory to execute the script from.
-    :param context: Cookiecutter project context.
-    """
+    """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is None:
         return
