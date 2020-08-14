@@ -27,7 +27,9 @@ class Entry:
         revision: Optional[str] = None,
     ) -> None:
         """Initialize."""
-        self.hash = _hash_location(location)
+        # Avoid "Filename too long" error with Git for Windows.
+        # https://stackoverflow.com/a/22575737/1355754
+        self.hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
         self.root = repositories / self.hash[:2] / self.hash
         self.directory = directory
 
@@ -77,9 +79,3 @@ class Entry:
         """Dump the context for replay."""
         with self.replay.open(mode="w") as io:
             json.dump(context, io, indent=2)
-
-
-def _hash_location(location: str, *, length: int = 64) -> str:
-    # Avoid "Filename too long" error with Git for Windows.
-    # https://stackoverflow.com/a/22575737/1355754
-    return hashlib.blake2b(location.encode()).hexdigest()[:length]
