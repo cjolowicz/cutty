@@ -1,6 +1,5 @@
 """Functions for discovering and executing various cookiecutter hooks."""
 import errno
-import os
 import subprocess  # noqa: S404
 import sys
 import tempfile
@@ -21,14 +20,11 @@ _HOOKS = [
 ]
 
 
-def valid_hook(hook_file: str, hook_name: str) -> bool:
+def valid_hook(path: Path, hook_name: str) -> bool:
     """Determine if a hook file is valid."""
-    filename = os.path.basename(hook_file)
-    basename = os.path.splitext(filename)[0]
-
-    matching_hook = basename == hook_name
-    supported_hook = basename in _HOOKS
-    backup_file = filename.endswith("~")
+    matching_hook = path.stem == hook_name
+    supported_hook = path.stem in _HOOKS
+    backup_file = path.name.endswith("~")
 
     return matching_hook and supported_hook and not backup_file
 
