@@ -1,6 +1,5 @@
 """Jinja2 environment and extensions loading."""
 from typing import Any
-from typing import Optional
 
 import jinja2
 from cookiecutter.exceptions import UnknownExtension
@@ -19,11 +18,8 @@ DEFAULT_EXTENSIONS = [
 class Environment(jinja2.Environment):
     """Jinja2 environment."""
 
-    def __init__(self, context: Optional[StrMapping] = None, **kwargs: Any) -> None:
+    def __init__(self, context: StrMapping, **kwargs: Any) -> None:
         """Initialize."""
-        if context is None:
-            context = {}
-
         extensions = context.get("cookiecutter", {}).get("_extensions", [])
         extensions = [str(extension) for extension in extensions]
         extensions = DEFAULT_EXTENSIONS + extensions
