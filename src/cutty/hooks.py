@@ -14,7 +14,7 @@ from cookiecutter.exceptions import FailedHookException
 from .environment import Environment
 from .types import StrMapping
 
-_HOOKS_DIR = "hooks"
+_HOOKS_DIR = Path("hooks")
 _HOOKS = [
     "pre_gen_project",
     "post_gen_project",
@@ -37,12 +37,12 @@ def valid_hook(hook_file: str, hook_name: str) -> bool:
 
 def find_hook(hook_name: str) -> Optional[str]:
     """Return the absolute path of the hook script, or None."""
-    if not os.path.isdir(_HOOKS_DIR):
+    if not _HOOKS_DIR.is_dir():
         return None
 
-    for hook_file in os.listdir(_HOOKS_DIR):
+    for hook_file in _HOOKS_DIR.iterdir():
         if valid_hook(hook_file, hook_name):
-            return os.path.abspath(os.path.join(_HOOKS_DIR, hook_file))
+            return os.path.abspath(_HOOKS_DIR / hook_file)
 
     return None
 
