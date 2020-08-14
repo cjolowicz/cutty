@@ -49,7 +49,6 @@ def find_hook(hook_name: str) -> Optional[Path]:
 
 def run_script(script_path: Path, cwd: Path) -> None:
     """Execute a script from a working directory."""
-    run_thru_shell = sys.platform.startswith("win")
     if script_path.suffix == ".py":
         script_command = [sys.executable, script_path]
     else:
@@ -59,7 +58,7 @@ def run_script(script_path: Path, cwd: Path) -> None:
 
     try:
         proc = subprocess.Popen(
-            script_command, shell=run_thru_shell, cwd=cwd  # noqa: S602
+            script_command, shell=sys.platform == "win32", cwd=cwd  # noqa: S602
         )
         exit_status = proc.wait()
         if exit_status != EXIT_SUCCESS:
