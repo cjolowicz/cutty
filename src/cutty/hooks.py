@@ -40,7 +40,7 @@ def find_hook(hook_name: str) -> Optional[Path]:
 
     for hook_file in _HOOKS_DIR.iterdir():
         if valid_hook(hook_file, hook_name):
-            return (_HOOKS_DIR / hook_file).resolve()
+            return hook_file.resolve()
 
     return None
 
