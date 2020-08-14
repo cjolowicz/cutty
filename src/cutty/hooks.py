@@ -14,7 +14,7 @@ from cookiecutter.exceptions import FailedHookException
 from .environment import Environment
 from .types import StrMapping
 
-
+_HOOKS_DIR = "hooks"
 _HOOKS = [
     "pre_gen_project",
     "post_gen_project",
@@ -35,7 +35,7 @@ def valid_hook(hook_file: str, hook_name: str) -> bool:
     return matching_hook and supported_hook and not backup_file
 
 
-def find_hook(hook_name: str, hooks_dir: str = "hooks") -> Optional[str]:
+def find_hook(hook_name: str) -> Optional[str]:
     """Return a dict of all hook scripts provided.
 
     Must be called with the project template as the current working directory.
@@ -43,12 +43,12 @@ def find_hook(hook_name: str, hooks_dir: str = "hooks") -> Optional[str]:
     will be the absolute path to the script. Missing scripts will not be
     included in the returned dict.
     """
-    if not os.path.isdir(hooks_dir):
+    if not os.path.isdir(_HOOKS_DIR):
         return None
 
-    for hook_file in os.listdir(hooks_dir):
+    for hook_file in os.listdir(_HOOKS_DIR):
         if valid_hook(hook_file, hook_name):
-            return os.path.abspath(os.path.join(hooks_dir, hook_file))
+            return os.path.abspath(os.path.join(_HOOKS_DIR, hook_file))
 
     return None
 
