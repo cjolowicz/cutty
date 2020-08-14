@@ -7,8 +7,6 @@ from .types import StrMapping
 
 def dump(replay_dir: Path, template_name: str, context: StrMapping) -> None:
     """Write json data to file."""
-    replay_dir.mkdir(parents=True, exist_ok=True)
-
     replay_file = replay_dir / f"{template_name}.json"
 
     with replay_file.open("w") as outfile:
