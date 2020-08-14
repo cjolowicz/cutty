@@ -20,8 +20,6 @@ _HOOKS = [
     "post_gen_project",
 ]
 
-EXIT_SUCCESS = 0
-
 
 def valid_hook(hook_file: str, hook_name: str) -> bool:
     """Determine if a hook file is valid."""
@@ -61,7 +59,7 @@ def run_script(script_path: Path, cwd: Path) -> None:
             script_command, shell=sys.platform == "win32", cwd=cwd  # noqa: S602
         )
         exit_status = proc.wait()
-        if exit_status != EXIT_SUCCESS:
+        if exit_status != 0:
             raise FailedHookException(
                 "Hook script failed (exit status: {})".format(exit_status)
             )
