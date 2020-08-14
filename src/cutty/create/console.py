@@ -51,7 +51,7 @@ def validate_extra_context(ctx: Any, param: Any, value: Tuple[str, ...]) -> StrM
         if "=" not in s:
             raise click.BadParameter(
                 "EXTRA_CONTEXT should contain items of the form key=value; "
-                "'{}' doesn't match that form".format(s)
+                f"'{s}' doesn't match that form"
             )
 
     return dict(s.split("=", 1) for s in value)
