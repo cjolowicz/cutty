@@ -5,6 +5,7 @@ import os
 import subprocess  # noqa: S404
 import sys
 import tempfile
+from pathlib import Path
 
 from cookiecutter import utils
 from cookiecutter.exceptions import FailedHookException
@@ -94,8 +95,8 @@ def run_script_with_context(script_path, cwd, context):
     run_script(temp.name, cwd)
 
 
-def run_hook(hook_name: str, project_dir: str, context: StrMapping) -> None:
+def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:
-        run_script_with_context(script, project_dir, context)
+        run_script_with_context(script, str(project_dir), context)

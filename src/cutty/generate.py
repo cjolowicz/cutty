@@ -177,7 +177,7 @@ def generate_files(
 
     try:
         with chdir(repo_dir):
-            run_hook("pre_gen_project", str(project_dir), context)
+            run_hook("pre_gen_project", project_dir, context)
 
         with chdir(template_dir):
             _generate_files(
@@ -185,7 +185,7 @@ def generate_files(
             )
 
         with chdir(repo_dir):
-            run_hook("post_gen_project", str(project_dir), context)
+            run_hook("post_gen_project", project_dir, context)
     except (FailedHookException, UndefinedVariableInTemplate):
         if delete_project_on_failure:
             rmtree(project_dir)
