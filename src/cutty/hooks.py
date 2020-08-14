@@ -96,6 +96,5 @@ def run_script_with_context(script_path, cwd, context):
 def run_hook(hook_name, project_dir, context):
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
-    if script is None:
-        return
-    run_script_with_context(script, project_dir, context)
+    if script is not None:
+        run_script_with_context(script, project_dir, context)
