@@ -54,7 +54,7 @@ def _validate_extra_context(ctx, param, value):
                 "'{}' doesn't match that form".format(s)
             )
 
-    return dict(s.split("=", 1) for s in value) or None
+    return dict(s.split("=", 1) for s in value)
 
 
 def validate_extra_context(*args: Any) -> StrMapping:
@@ -62,14 +62,8 @@ def validate_extra_context(*args: Any) -> StrMapping:
 
     This is a simple wrapper used to simplify the return type.
     """
-    if len(args) != 3:  # pragma: no cover
-        # Typeguard confuses click < 8.0 because click inspects `__code__` to
-        # determine the number of arguments to pass, and Typeguard's wrapper
-        # has an argument count of zero due to the use of `*args`.
-        context, value = args
-        args = (context, None, value)
     result = _validate_extra_context(*args)
-    return cast(StrMapping, {} if result is None else result)
+    return cast(StrMapping, result)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
