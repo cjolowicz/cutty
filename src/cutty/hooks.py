@@ -33,11 +33,10 @@ def find_hook(name: str) -> Optional[Path]:
 def run_script(path: Path, cwd: Path) -> None:
     """Execute a script from a working directory."""
     command = [sys.executable, path] if path.suffix == ".py" else [path]
+    shell = sys.platform == "win32"
 
     try:
-        subprocess.run(
-            command, shell=sys.platform == "win32", cwd=cwd, check=True  # noqa: S602
-        )
+        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
     except subprocess.CalledProcessError as error:
         raise FailedHookException(
             f"Hook script failed (exit status: {error.returncode})"
