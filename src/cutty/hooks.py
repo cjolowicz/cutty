@@ -1,6 +1,5 @@
 """Functions for discovering and executing various cookiecutter hooks."""
 import errno
-import io
 import os
 import subprocess  # noqa: S404
 import sys
@@ -74,14 +73,13 @@ def run_script(script_path: str, cwd: str = ".") -> None:
         raise FailedHookException("Hook script failed (error: {})".format(os_error))
 
 
-def run_script_with_context(script_path: str, cwd: str, context: StrMapping) -> None:
+def run_script_with_context(script_path: Path, cwd: str, context: StrMapping) -> None:
     """Execute a script after rendering it with Jinja."""
-    _, extension = os.path.splitext(script_path)
+    contents = script_path.read_text()
 
-    with io.open(script_path, "r", encoding="utf-8") as file:
-        contents = file.read()
-
-    with tempfile.NamedTemporaryFile(delete=False, mode="wb", suffix=extension) as temp:
+    with tempfile.NamedTemporaryFile(
+        delete=False, mode="wb", suffix=script_path.suffix
+    ) as temp:
         env = Environment(context=context, keep_trailing_newline=True)
         template = env.from_string(contents)
         output = template.render(**context)
@@ -94,4 +92,4 @@ def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:
-        run_script_with_context(str(script), str(project_dir), context)
+        run_script_with_context(script, str(project_dir), context)
