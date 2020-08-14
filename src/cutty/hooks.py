@@ -73,7 +73,7 @@ def run_script(script_path: str, cwd: str = ".") -> None:
         raise FailedHookException("Hook script failed (error: {})".format(os_error))
 
 
-def run_script_with_context(script_path: Path, cwd: str, context: StrMapping) -> None:
+def run_script_with_context(script_path: Path, cwd: Path, context: StrMapping) -> None:
     """Execute a script after rendering it with Jinja."""
     contents = script_path.read_text()
 
@@ -85,11 +85,11 @@ def run_script_with_context(script_path: Path, cwd: str, context: StrMapping) ->
         output = template.render(**context)
         temp.write(output.encode("utf-8"))
 
-    run_script(temp.name, cwd)
+    run_script(temp.name, str(cwd))
 
 
 def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:
-        run_script_with_context(script, str(project_dir), context)
+        run_script_with_context(script, project_dir, context)
