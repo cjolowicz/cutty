@@ -6,10 +6,9 @@ from typing import cast
 from typing import Iterator
 from typing import Optional
 
-from cookiecutter import replay
-
 from . import git
 from . import locations
+from . import replay
 from . import tags
 from .types import StrMapping
 
