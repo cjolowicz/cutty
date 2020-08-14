@@ -36,13 +36,7 @@ def valid_hook(hook_file: str, hook_name: str) -> bool:
 
 
 def find_hook(hook_name: str) -> Optional[str]:
-    """Return a dict of all hook scripts provided.
-
-    Must be called with the project template as the current working directory.
-    Dict's key will be the hook/script's name, without extension, while values
-    will be the absolute path to the script. Missing scripts will not be
-    included in the returned dict.
-    """
+    """Return the absolute path of the hook script, or None."""
     if not os.path.isdir(_HOOKS_DIR):
         return None
 
