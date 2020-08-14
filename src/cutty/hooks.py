@@ -35,14 +35,14 @@ def valid_hook(hook_file: str, hook_name: str) -> bool:
     return matching_hook and supported_hook and not backup_file
 
 
-def find_hook(hook_name: str) -> Optional[str]:
+def find_hook(hook_name: str) -> Optional[Path]:
     """Return the absolute path of the hook script, or None."""
     if not _HOOKS_DIR.is_dir():
         return None
 
     for hook_file in _HOOKS_DIR.iterdir():
         if valid_hook(hook_file, hook_name):
-            return os.path.abspath(_HOOKS_DIR / hook_file)
+            return (_HOOKS_DIR / hook_file).resolve()
 
     return None
 
@@ -94,4 +94,4 @@ def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:
-        run_script_with_context(script, str(project_dir), context)
+        run_script_with_context(str(script), str(project_dir), context)
