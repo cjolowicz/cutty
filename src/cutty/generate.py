@@ -12,11 +12,11 @@ from cookiecutter.exceptions import NonTemplatedInputDirException
 from cookiecutter.exceptions import OutputDirExistsException
 from cookiecutter.exceptions import TemplateSyntaxError
 from cookiecutter.exceptions import UndefinedVariableInTemplate
-from cookiecutter.hooks import run_hook
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import UndefinedError
 
 from .environment import Environment
+from .hooks import run_hook
 from .types import StrMapping
 from .utils import chdir
 from .utils import rmtree
