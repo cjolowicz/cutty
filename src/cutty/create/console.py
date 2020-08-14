@@ -1,5 +1,4 @@
 """Command-line interface."""
-import collections
 import json
 import sys
 from textwrap import dedent
@@ -57,7 +56,7 @@ def _validate_extra_context(ctx, param, value):
 
     # Convert tuple -- e.g.: (u'program_name=foobar', u'startsecs=66')
     # to dict -- e.g.: {'program_name': 'foobar', 'startsecs': '66'}
-    return collections.OrderedDict(s.split("=", 1) for s in value) or None
+    return dict(s.split("=", 1) for s in value) or None
 
 
 def validate_extra_context(*args: Any) -> StrMapping:
