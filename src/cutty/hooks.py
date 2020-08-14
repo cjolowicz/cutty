@@ -32,10 +32,7 @@ def find_hook(name: str) -> Optional[Path]:
 
 def run_script(path: Path, cwd: Path) -> None:
     """Execute a script from a working directory."""
-    if path.suffix == ".py":
-        command = [sys.executable, path]
-    else:
-        command = [path]
+    command = [sys.executable, path] if path.suffix == ".py" else [path]
 
     try:
         proc = subprocess.Popen(
