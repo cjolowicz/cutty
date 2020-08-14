@@ -46,7 +46,7 @@ def find_hook(hook_name: str) -> Optional[Path]:
     return None
 
 
-def run_script(script_path: str, cwd: str = ".") -> None:
+def run_script(script_path: str, cwd: Path) -> None:
     """Execute a script from a working directory."""
     run_thru_shell = sys.platform.startswith("win")
     if script_path.endswith(".py"):
@@ -85,7 +85,7 @@ def run_script_with_context(script_path: Path, cwd: Path, context: StrMapping) -
         output = template.render(**context)
         temp.write(output.encode("utf-8"))
 
-    run_script(temp.name, str(cwd))
+    run_script(temp.name, cwd)
 
 
 def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
