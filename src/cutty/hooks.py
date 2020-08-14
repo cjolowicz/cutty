@@ -37,8 +37,6 @@ def run_script(path: Path, cwd: Path) -> None:
     else:
         script_command = [path]
 
-    make_executable(path)
-
     try:
         proc = subprocess.Popen(
             script_command, shell=sys.platform == "win32", cwd=cwd  # noqa: S602
@@ -68,7 +66,11 @@ def render_script(path: Path, context: StrMapping) -> Path:
         output = template.render(**context)
         temp.write(output.encode("utf-8"))
 
-    return Path(temp.name)
+    path = Path(temp.name)
+
+    make_executable(path)
+
+    return path
 
 
 def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
