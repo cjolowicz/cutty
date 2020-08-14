@@ -2,13 +2,12 @@
 from pathlib import Path
 from typing import Optional
 
-from cookiecutter.generate import generate_files
-
 from .. import cache
 from .. import git
 from ..config import Config
 from ..context import create_context
 from ..context import load_context
+from ..generate import generate_files
 from ..types import StrMapping
 
 
