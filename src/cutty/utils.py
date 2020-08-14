@@ -45,3 +45,9 @@ def rmtree(path: Path) -> None:
         function(path)
 
     shutil.rmtree(path, onerror=_onerror)
+
+
+def make_executable(path: Path) -> None:
+    """Set the executable bit on a file."""
+    status = os.stat(path)
+    os.chmod(path, status.st_mode | stat.S_IEXEC)
