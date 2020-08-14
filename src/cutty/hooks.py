@@ -10,6 +10,7 @@ from cookiecutter import utils
 from cookiecutter.exceptions import FailedHookException
 
 from .environment import Environment
+from .types import StrMapping
 
 
 _HOOKS = [
@@ -93,7 +94,7 @@ def run_script_with_context(script_path, cwd, context):
     run_script(temp.name, cwd)
 
 
-def run_hook(hook_name, project_dir, context):
+def run_hook(hook_name: str, project_dir: str, context: StrMapping) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:
