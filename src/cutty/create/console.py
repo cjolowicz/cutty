@@ -3,6 +3,7 @@ import json
 import sys
 from textwrap import dedent
 from typing import Any
+from typing import Iterator
 from typing import Optional
 from typing import Tuple
 
@@ -47,14 +48,19 @@ def format_error(error: Exception) -> str:
 
 def validate_extra_context(ctx: Any, param: Any, values: Tuple[str, ...]) -> StrMapping:
     """Validate extra_context command-line argument."""
-    for value in values:
-        if "=" not in value:
-            raise click.BadParameter(
-                "EXTRA_CONTEXT should contain items of the form key=value; "
-                f"'{value}' doesn't match that form"
-            )
 
-    return dict(value.split("=", 1) for value in values)
+    def _generate() -> Iterator[Tuple[str, str]]:
+        for value in values:
+            try:
+                key, value = value.split("=", 1)
+            except ValueError:
+                raise click.BadParameter(
+                    "EXTRA_CONTEXT should contain items of the form key=value; "
+                    f"'{value}' doesn't match that form"
+                )
+            yield key, value
+
+    return dict(_generate())
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
