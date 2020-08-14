@@ -45,16 +45,16 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def validate_extra_context(ctx: Any, param: Any, value: Tuple[str, ...]) -> StrMapping:
+def validate_extra_context(ctx: Any, param: Any, values: Tuple[str, ...]) -> StrMapping:
     """Validate extra_context command-line argument."""
-    for s in value:
-        if "=" not in s:
+    for value in values:
+        if "=" not in value:
             raise click.BadParameter(
                 "EXTRA_CONTEXT should contain items of the form key=value; "
-                f"'{s}' doesn't match that form"
+                f"'{value}' doesn't match that form"
             )
 
-    return dict(s.split("=", 1) for s in value)
+    return dict(value.split("=", 1) for value in values)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
