@@ -48,7 +48,7 @@ def run_script(path: Path, cwd: Path) -> None:
             raise FailedHookException(
                 "Hook script failed, might be an empty file or missing a shebang"
             )
-        raise FailedHookException("Hook script failed (error: {})".format(os_error))
+        raise FailedHookException(f"Hook script failed (error: {os_error})")
 
 
 def render_script(path: Path, context: StrMapping) -> Path:
