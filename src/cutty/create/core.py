@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Optional
 
 from cookiecutter import exceptions
-from cookiecutter.generate import generate_files
 
 from .. import cache
 from ..config import Config
 from ..context import create_context
+from ..generate import generate_files
 from ..types import StrMapping
 
 
