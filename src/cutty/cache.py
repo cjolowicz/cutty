@@ -1,6 +1,7 @@
 """Application cache."""
 import contextlib
 import hashlib
+import json
 from pathlib import Path
 from typing import cast
 from typing import Iterator
@@ -8,7 +9,6 @@ from typing import Optional
 
 from . import git
 from . import locations
-from . import replay
 from . import tags
 from .types import StrMapping
 
@@ -70,12 +70,19 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        context = replay.load(self.root, self.replay_hash)
+        path = self.root / f"{self.replay_hash}.json"
+
+        with path.open() as io:
+            context = json.load(io)
+
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        replay.dump(self.root, self.replay_hash, context)
+        path = self.root / f"{self.replay_hash}.json"
+
+        with path.open(mode="w") as io:
+            json.dump(context, io, indent=2)
 
 
 def _hash_location(location: str, *, length: int = 64) -> str:
