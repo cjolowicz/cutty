@@ -47,11 +47,9 @@ class Entry:
             self.revision = revision
 
         self.describe = tags.describe(self.repository, ref=self.revision)
-
-        if directory is None:
-            self.replay_hash = self.hash
-        else:
-            self.replay_hash = _hash_location(str(directory))
+        self.replay = self.root / (
+            "replay.json" if not self.directory else f"replay-{self.directory}.json"
+        )
 
     @contextlib.contextmanager
     def checkout(self) -> Iterator[Path]:
@@ -70,18 +68,14 @@ class Entry:
 
     def load_context(self) -> StrMapping:
         """Load the context for replay."""
-        path = self.root / f"{self.replay_hash}.json"
-
-        with path.open() as io:
+        with self.replay.open() as io:
             context = json.load(io)
 
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
         """Dump the context for replay."""
-        path = self.root / f"{self.replay_hash}.json"
-
-        with path.open(mode="w") as io:
+        with self.replay.open(mode="w") as io:
             json.dump(context, io, indent=2)
 
 
