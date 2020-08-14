@@ -30,14 +30,14 @@ def find_hook(name: str) -> Optional[Path]:
     return None
 
 
-def run_script(script_path: Path, cwd: Path) -> None:
+def run_script(path: Path, cwd: Path) -> None:
     """Execute a script from a working directory."""
-    if script_path.suffix == ".py":
-        script_command = [sys.executable, script_path]
+    if path.suffix == ".py":
+        script_command = [sys.executable, path]
     else:
-        script_command = [script_path]
+        script_command = [path]
 
-    make_executable(script_path)
+    make_executable(path)
 
     try:
         proc = subprocess.Popen(
@@ -56,12 +56,12 @@ def run_script(script_path: Path, cwd: Path) -> None:
         raise FailedHookException("Hook script failed (error: {})".format(os_error))
 
 
-def run_script_with_context(script_path: Path, cwd: Path, context: StrMapping) -> None:
+def run_script_with_context(path: Path, cwd: Path, context: StrMapping) -> None:
     """Execute a script after rendering it with Jinja."""
-    contents = script_path.read_text()
+    contents = path.read_text()
 
     with tempfile.NamedTemporaryFile(
-        delete=False, mode="wb", suffix=script_path.suffix
+        delete=False, mode="wb", suffix=path.suffix
     ) as temp:
         env = Environment(context=context, keep_trailing_newline=True)
         template = env.from_string(contents)
