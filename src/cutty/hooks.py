@@ -31,12 +31,10 @@ def valid_hook(path: Path, hook_name: str) -> bool:
 
 def find_hook(hook_name: str) -> Optional[Path]:
     """Return the absolute path of the hook script, or None."""
-    if not _HOOKS_DIR.is_dir():
-        return None
-
-    for hook_file in _HOOKS_DIR.iterdir():
-        if valid_hook(hook_file, hook_name):
-            return hook_file.resolve()
+    if _HOOKS_DIR.is_dir():
+        for hook_file in _HOOKS_DIR.iterdir():
+            if valid_hook(hook_file, hook_name):
+                return hook_file.resolve()
 
     return None
 
