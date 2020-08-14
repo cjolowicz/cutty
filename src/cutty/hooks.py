@@ -35,13 +35,13 @@ def run_script(path: Path, cwd: Path) -> None:
     command = [sys.executable, path] if path.suffix == ".py" else [path]
 
     try:
-        process = subprocess.run(
-            command, shell=sys.platform == "win32", cwd=cwd  # noqa: S602
+        subprocess.run(
+            command, shell=sys.platform == "win32", cwd=cwd, check=True  # noqa: S602
         )
-        if process.returncode != 0:
-            raise FailedHookException(
-                f"Hook script failed (exit status: {process.returncode})"
-            )
+    except subprocess.CalledProcessError as error:
+        raise FailedHookException(
+            f"Hook script failed (exit status: {error.returncode})"
+        )
     except OSError as error:
         if error.errno == errno.ENOEXEC:
             raise FailedHookException(
