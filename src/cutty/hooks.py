@@ -7,8 +7,9 @@ import sys
 import tempfile
 
 from cookiecutter import utils
-from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import FailedHookException
+
+from .environment import Environment
 
 
 _HOOKS = [
@@ -102,7 +103,7 @@ def run_script_with_context(script_path, cwd, context):
         contents = file.read()
 
     with tempfile.NamedTemporaryFile(delete=False, mode="wb", suffix=extension) as temp:
-        env = StrictEnvironment(context=context, keep_trailing_newline=True)
+        env = Environment(context=context, keep_trailing_newline=True)
         template = env.from_string(contents)
         output = template.render(**context)
         temp.write(output.encode("utf-8"))
