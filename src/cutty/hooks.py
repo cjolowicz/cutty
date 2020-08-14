@@ -38,17 +38,15 @@ def run_script(path: Path, cwd: Path) -> None:
         proc = subprocess.Popen(
             command, shell=sys.platform == "win32", cwd=cwd  # noqa: S602
         )
-        exit_status = proc.wait()
-        if exit_status != 0:
-            raise FailedHookException(
-                f"Hook script failed (exit status: {exit_status})"
-            )
-    except OSError as os_error:
-        if os_error.errno == errno.ENOEXEC:
+        status = proc.wait()
+        if status != 0:
+            raise FailedHookException(f"Hook script failed (exit status: {status})")
+    except OSError as error:
+        if error.errno == errno.ENOEXEC:
             raise FailedHookException(
                 "Hook script failed, might be an empty file or missing a shebang"
             )
-        raise FailedHookException(f"Hook script failed (error: {os_error})")
+        raise FailedHookException(f"Hook script failed (error: {error})")
 
 
 def render_script(path: Path, context: StrMapping) -> Path:
