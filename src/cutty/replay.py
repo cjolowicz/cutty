@@ -4,14 +4,16 @@ import os
 
 from cookiecutter.utils import make_sure_path_exists
 
+from .types import StrMapping
 
-def get_file_name(replay_dir, template_name):
+
+def get_file_name(replay_dir: str, template_name: str) -> str:
     """Get the name of file."""
     file_name = "{}.json".format(template_name)
     return os.path.join(replay_dir, file_name)
 
 
-def dump(replay_dir, template_name, context):
+def dump(replay_dir: str, template_name: str, context: StrMapping) -> None:
     """Write json data to file."""
     if not make_sure_path_exists(replay_dir):
         raise IOError("Unable to create replay dir at {}".format(replay_dir))
@@ -31,7 +33,7 @@ def dump(replay_dir, template_name, context):
         json.dump(context, outfile, indent=2)
 
 
-def load(replay_dir, template_name):
+def load(replay_dir: str, template_name: str) -> StrMapping:
     """Read json data from file."""
     if not isinstance(template_name, str):
         raise TypeError("Template name is required to be of type str")
