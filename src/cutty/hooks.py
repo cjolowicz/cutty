@@ -29,12 +29,12 @@ def valid_hook(path: Path, hook_name: str) -> bool:
     return matching_hook and supported_hook and not backup_file
 
 
-def find_hook(hook_name: str) -> Optional[Path]:
+def find_hook(name: str) -> Optional[Path]:
     """Return the absolute path of the hook script, or None."""
     if _HOOKS_DIR.is_dir():
-        for hook_file in _HOOKS_DIR.iterdir():
-            if valid_hook(hook_file, hook_name):
-                return hook_file.resolve()
+        for path in _HOOKS_DIR.iterdir():
+            if valid_hook(path, name):
+                return path.resolve()
 
     return None
 
