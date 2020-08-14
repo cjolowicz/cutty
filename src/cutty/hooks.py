@@ -61,7 +61,7 @@ def run_script(script_path: Path, cwd: Path) -> None:
         exit_status = proc.wait()
         if exit_status != 0:
             raise FailedHookException(
-                "Hook script failed (exit status: {})".format(exit_status)
+                f"Hook script failed (exit status: {exit_status})"
             )
     except OSError as os_error:
         if os_error.errno == errno.ENOEXEC:
