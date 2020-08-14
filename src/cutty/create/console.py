@@ -3,8 +3,8 @@ import json
 import sys
 from textwrap import dedent
 from typing import Any
-from typing import cast
 from typing import Optional
+from typing import Tuple
 
 import click
 from cookiecutter import exceptions
@@ -45,8 +45,8 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def _validate_extra_context(ctx, param, value):
-    """Validate extra context."""
+def validate_extra_context(ctx: Any, param: Any, value: Tuple[str, ...]) -> StrMapping:
+    """Validate extra_context command-line argument."""
     for s in value:
         if "=" not in s:
             raise click.BadParameter(
@@ -55,15 +55,6 @@ def _validate_extra_context(ctx, param, value):
             )
 
     return dict(s.split("=", 1) for s in value)
-
-
-def validate_extra_context(*args: Any) -> StrMapping:
-    """Validate extra_context command-line argument.
-
-    This is a simple wrapper used to simplify the return type.
-    """
-    result = _validate_extra_context(*args)
-    return cast(StrMapping, result)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
