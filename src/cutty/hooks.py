@@ -1,7 +1,6 @@
 """Functions for discovering and executing various cookiecutter hooks."""
 import errno
 import io
-import logging
 import os
 import subprocess  # noqa: S404
 import sys
@@ -11,8 +10,6 @@ from cookiecutter import utils
 from cookiecutter.environment import StrictEnvironment
 from cookiecutter.exceptions import FailedHookException
 
-
-logger = logging.getLogger(__name__)
 
 _HOOKS = [
     "pre_gen_project",
@@ -51,10 +48,7 @@ def find_hook(hook_name, hooks_dir="hooks"):
     :param hooks_dir: The hook directory in the template
     :return: The absolute path to the hook script or None
     """
-    logger.debug("hooks_dir is %s", os.path.abspath(hooks_dir))
-
     if not os.path.isdir(hooks_dir):
-        logger.debug("No hooks/dir in template_dir")
         return None
 
     for hook_file in os.listdir(hooks_dir):
@@ -125,7 +119,5 @@ def run_hook(hook_name, project_dir, context):
     """
     script = find_hook(hook_name)
     if script is None:
-        logger.debug("No %s hook found", hook_name)
         return
-    logger.debug("Running hook %s", hook_name)
     run_script_with_context(script, project_dir, context)
