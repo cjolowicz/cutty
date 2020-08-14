@@ -49,8 +49,8 @@ class Entry:
             self.revision = revision
 
         self.describe = tags.describe(self.repository, ref=self.revision)
-        self.replay = self.root / (
-            "replay.json" if not self.directory else f"replay-{self.directory}.json"
+        self.context = self.root / (
+            "context.json" if not self.directory else f"context-{self.directory}.json"
         )
 
     @contextlib.contextmanager
@@ -69,13 +69,13 @@ class Entry:
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
 
     def load_context(self) -> StrMapping:
-        """Load the context for replay."""
-        with self.replay.open() as io:
+        """Load the context."""
+        with self.context.open() as io:
             context = json.load(io)
 
         return cast(StrMapping, context)
 
     def dump_context(self, context: StrMapping) -> None:
-        """Dump the context for replay."""
-        with self.replay.open(mode="w") as io:
+        """Dump the context."""
+        with self.context.open(mode="w") as io:
             json.dump(context, io, indent=2)
