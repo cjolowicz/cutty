@@ -56,15 +56,15 @@ def run_script(path: Path, cwd: Path) -> None:
 
 def render_script(path: Path, context: StrMapping) -> Path:
     """Render a script with Jinja."""
-    contents = path.read_text()
+    text = path.read_text()
 
     with tempfile.NamedTemporaryFile(
         delete=False, mode="wb", suffix=path.suffix
     ) as temp:
-        env = Environment(context=context, keep_trailing_newline=True)
-        template = env.from_string(contents)
-        output = template.render(**context)
-        temp.write(output.encode("utf-8"))
+        environment = Environment(context=context, keep_trailing_newline=True)
+        template = environment.from_string(text)
+        text = template.render(**context)
+        temp.write(text.encode("utf-8"))
 
     path = Path(temp.name)
 
