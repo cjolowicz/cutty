@@ -1,4 +1,5 @@
 """Command-line interface."""
+import collections
 import json
 import sys
 from textwrap import dedent
@@ -7,7 +8,6 @@ from typing import cast
 from typing import Optional
 
 import click
-from cookiecutter import cli
 from cookiecutter import exceptions
 from cookiecutter.log import configure_logger
 
@@ -46,6 +46,20 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
+def _validate_extra_context(ctx, param, value):
+    """Validate extra context."""
+    for s in value:
+        if "=" not in s:
+            raise click.BadParameter(
+                "EXTRA_CONTEXT should contain items of the form key=value; "
+                "'{}' doesn't match that form".format(s)
+            )
+
+    # Convert tuple -- e.g.: (u'program_name=foobar', u'startsecs=66')
+    # to dict -- e.g.: {'program_name': 'foobar', 'startsecs': '66'}
+    return collections.OrderedDict(s.split("=", 1) for s in value) or None
+
+
 def validate_extra_context(*args: Any) -> StrMapping:
     """Validate extra_context command-line argument.
 
@@ -57,7 +71,7 @@ def validate_extra_context(*args: Any) -> StrMapping:
         # has an argument count of zero due to the use of `*args`.
         context, value = args
         args = (context, None, value)
-    result = cli.validate_extra_context(*args)
+    result = _validate_extra_context(*args)
     return cast(StrMapping, {} if result is None else result)
 
 
