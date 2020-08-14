@@ -55,13 +55,13 @@ def render_script(path: Path, context: StrMapping) -> Path:
 
     with tempfile.NamedTemporaryFile(
         delete=False, mode="wb", suffix=path.suffix
-    ) as temp:
+    ) as temporary:
         environment = Environment(context=context, keep_trailing_newline=True)
         template = environment.from_string(text)
         text = template.render(**context)
-        temp.write(text.encode("utf-8"))
+        temporary.write(text.encode("utf-8"))
 
-    path = Path(temp.name)
+    path = Path(temporary.name)
 
     make_executable(path)
 
