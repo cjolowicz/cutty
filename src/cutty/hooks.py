@@ -20,20 +20,11 @@ _HOOKS = [
 ]
 
 
-def valid_hook(path: Path, hook_name: str) -> bool:
-    """Determine if a hook file is valid."""
-    matching_hook = path.stem == hook_name
-    supported_hook = path.stem in _HOOKS
-    backup_file = path.name.endswith("~")
-
-    return matching_hook and supported_hook and not backup_file
-
-
 def find_hook(name: str) -> Optional[Path]:
     """Return the absolute path of the hook script, or None."""
-    if _HOOKS_DIR.is_dir():
+    if name in _HOOKS and _HOOKS_DIR.is_dir():
         for path in _HOOKS_DIR.iterdir():
-            if valid_hook(path, name):
+            if path.stem == name and not path.name.endswith("~"):
                 return path.resolve()
 
     return None
