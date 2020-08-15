@@ -29,8 +29,8 @@ class Entry:
         """Initialize."""
         # Avoid "Filename too long" error with Git for Windows.
         # https://stackoverflow.com/a/22575737/1355754
-        self.hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
-        self.root = repositories / self.hash[:2] / self.hash
+        hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
+        self.root = repositories / hash[:2] / hash
         self.directory = directory
 
         repository_path = self.root / "repo.git"
