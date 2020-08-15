@@ -29,7 +29,7 @@ class JsonifyExtension(Extension):
     """Jinja2 extension to convert a Python object to JSON."""
 
     def __init__(self, environment):
-        """Initialize the extension with the given environment."""
+        """Initialize."""
         super().__init__(environment)
         environment.filters["jsonify"] = jsonify
 
@@ -38,15 +38,15 @@ class RandomStringExtension(Extension):
     """Jinja2 extension to create a random string."""
 
     def __init__(self, environment):
-        """Jinja2 Extension Constructor."""
+        """Initialize."""
         super().__init__(environment)
         environment.globals["random_ascii_string"] = random_ascii_string
 
 
 class SlugifyExtension(Extension):
-    """Jinja2 Extension to slugify string."""
+    """Jinja2 extension to slugify a string."""
 
     def __init__(self, environment):
-        """Jinja2 Extension constructor."""
+        """Initialize."""
         super().__init__(environment)
         environment.filters["slugify"] = slugify
