@@ -1,7 +1,6 @@
 """Git interface."""
 from __future__ import annotations
 
-import contextlib
 import subprocess  # noqa: S404
 from pathlib import Path
 from typing import Any
@@ -11,6 +10,7 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 
+from .compat import contextmanager
 from .types import CompletedProcess
 from .types import StrPath
 from .utils import removeprefix
@@ -159,7 +159,7 @@ class Repository:
         options = _format_options(force=force)
         self.git("worktree", "remove", *options, str(path))
 
-    @contextlib.contextmanager
+    @contextmanager
     def worktree(
         self,
         path: Path,
@@ -176,8 +176,6 @@ class Repository:
             yield worktree
         finally:
             self.remove_worktree(path, force=force_remove)
-
-    worktree.__annotations__["return"] = contextlib.AbstractContextManager
 
     def rev_parse(
         self,

@@ -1,5 +1,4 @@
 """Generating projects from the template."""
-import contextlib
 import fnmatch
 import os.path
 import shutil
@@ -11,6 +10,7 @@ from binaryornot.check import is_binary
 from jinja2 import FileSystemLoader
 
 from . import exceptions
+from .compat import contextmanager
 from .environment import Environment
 from .hooks import run_hook
 from .types import StrMapping
@@ -34,16 +34,13 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
 
-@contextlib.contextmanager
+@contextmanager
 def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[None]:
     """Re-raise UndefinedError as UndefinedVariableInTemplate."""
     try:
         yield
     except jinja2.exceptions.UndefinedError as error:
         raise exceptions.UndefinedVariableInTemplate(message, error, context)
-
-
-handle_undefined_variables.__annotations__["return"] = contextlib.AbstractContextManager
 
 
 def render_string(string: str, environment: Environment, context: StrMapping) -> str:
