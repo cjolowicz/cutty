@@ -104,9 +104,9 @@ def prompt_for_config(  # noqa: C901
             if isinstance(value, list):
                 # We are dealing with a choice variable
                 if no_input:
-                    result[key] = render_variable(env, value[0], context)
+                    result[key] = render_variable(env, value[0], result)
                 else:
-                    value = render_variable(env, value, context)
+                    value = render_variable(env, value, result)
                     result[key] = read_user_choice(key, value)
             elif not isinstance(value, dict):
                 # We are dealing with a regular variable
