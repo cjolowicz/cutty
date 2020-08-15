@@ -7,7 +7,7 @@ from typing import List
 from typing import Optional
 
 import click
-from jinja2.exceptions import UndefinedError
+import jinja2.exceptions
 
 from . import exceptions
 from .environment import Environment
@@ -98,7 +98,7 @@ def prompt_for_config(  # noqa: C901
                     value = read_user_variable(key, value)
 
                 result[key] = value
-        except UndefinedError as error:
+        except jinja2.exceptions.UndefinedError as error:
             raise exceptions.UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
             )
@@ -114,7 +114,7 @@ def prompt_for_config(  # noqa: C901
                     value = read_user_dict(key, value)
 
                 result[key] = value
-        except UndefinedError as error:
+        except jinja2.exceptions.UndefinedError as error:
             raise exceptions.UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
             )

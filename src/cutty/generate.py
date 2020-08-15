@@ -6,10 +6,9 @@ import shutil
 from pathlib import Path
 from typing import Iterator
 
+import jinja2.exceptions
 from binaryornot.check import is_binary
 from jinja2 import FileSystemLoader
-from jinja2.exceptions import TemplateSyntaxError
-from jinja2.exceptions import UndefinedError
 
 from . import exceptions
 from .environment import Environment
@@ -40,7 +39,7 @@ def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[No
     """Re-raise UndefinedError as UndefinedVariableInTemplate."""
     try:
         yield
-    except UndefinedError as error:
+    except jinja2.exceptions.UndefinedError as error:
         raise exceptions.UndefinedVariableInTemplate(message, error, context)
 
 
@@ -76,7 +75,7 @@ def _generate_file(
         try:
             # https://github.com/pallets/jinja/issues/767
             template = environment.get_template(Path(infile).as_posix())
-        except TemplateSyntaxError as exception:
+        except jinja2.exceptions.TemplateSyntaxError as exception:
             # Disable translated so that printed exception contains
             # verbose information about syntax error location.
             exception.translated = False
