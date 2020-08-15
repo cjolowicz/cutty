@@ -8,9 +8,9 @@ from typing import Optional
 from typing import Tuple
 
 import click
-from cookiecutter import exceptions
 
 from . import core
+from .. import exceptions
 from .. import git
 from ..types import StrMapping
 from ..utils import as_optional_path

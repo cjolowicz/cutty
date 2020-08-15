@@ -7,9 +7,9 @@ from typing import List
 from typing import Optional
 
 import click
-from cookiecutter.exceptions import UndefinedVariableInTemplate
 from jinja2.exceptions import UndefinedError
 
+from . import exceptions
 from .environment import Environment
 from .render import render_variable
 from .types import StrMapping
@@ -99,7 +99,7 @@ def prompt_for_config(  # noqa: C901
 
                 result[key] = value
         except UndefinedError as error:
-            raise UndefinedVariableInTemplate(
+            raise exceptions.UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
             )
 
@@ -115,7 +115,7 @@ def prompt_for_config(  # noqa: C901
 
                 result[key] = value
         except UndefinedError as error:
-            raise UndefinedVariableInTemplate(
+            raise exceptions.UndefinedVariableInTemplate(
                 f"Unable to render variable {key!r}", error, {"cookiecutter": context}
             )
 

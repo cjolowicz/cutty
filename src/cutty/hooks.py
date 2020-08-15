@@ -6,8 +6,7 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-from cookiecutter.exceptions import FailedHookException
-
+from . import exceptions
 from .environment import Environment
 from .types import StrMapping
 from .utils import make_executable
@@ -38,15 +37,15 @@ def run_script(path: Path, cwd: Path) -> None:
     try:
         subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
     except subprocess.CalledProcessError as error:
-        raise FailedHookException(
+        raise exceptions.FailedHookException(
             f"Hook script failed (exit status: {error.returncode})"
         )
     except OSError as error:
         if error.errno == errno.ENOEXEC:
-            raise FailedHookException(
+            raise exceptions.FailedHookException(
                 "Hook script failed, might be an empty file or missing a shebang"
             )
-        raise FailedHookException(f"Hook script failed (error: {error})")
+        raise exceptions.FailedHookException(f"Hook script failed (error: {error})")
 
 
 def render_script(path: Path, context: StrMapping) -> Path:

@@ -7,14 +7,11 @@ from pathlib import Path
 from typing import Iterator
 
 from binaryornot.check import is_binary
-from cookiecutter.exceptions import FailedHookException
-from cookiecutter.exceptions import NonTemplatedInputDirException
-from cookiecutter.exceptions import OutputDirExistsException
-from cookiecutter.exceptions import TemplateSyntaxError
-from cookiecutter.exceptions import UndefinedVariableInTemplate
 from jinja2 import FileSystemLoader
+from jinja2.exceptions import TemplateSyntaxError
 from jinja2.exceptions import UndefinedError
 
+from . import exceptions
 from .environment import Environment
 from .hooks import run_hook
 from .types import StrMapping
@@ -28,7 +25,7 @@ def find_template(repo_dir: Path) -> Path:
         if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
             return item
     else:
-        raise NonTemplatedInputDirException
+        raise exceptions.NonTemplatedInputDirException
 
 
 def is_copy_only_path(path: str, context: StrMapping) -> bool:
@@ -44,7 +41,7 @@ def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[No
     try:
         yield
     except UndefinedError as error:
-        raise UndefinedVariableInTemplate(message, error, context)
+        raise exceptions.UndefinedVariableInTemplate(message, error, context)
 
 
 def render_string(string: str, environment: Environment, context: StrMapping) -> str:
@@ -166,7 +163,7 @@ def generate_files(
     delete_project_on_failure = not project_dir.exists()
 
     if project_dir.exists() and not overwrite_if_exists:
-        raise OutputDirExistsException(
+        raise exceptions.OutputDirExistsException(
             f'Error: "{project_dir}" directory already exists'
         )
 
@@ -186,7 +183,7 @@ def generate_files(
 
         with chdir(repo_dir):
             run_hook("post_gen_project", project_dir, context)
-    except (FailedHookException, UndefinedVariableInTemplate):
+    except (exceptions.FailedHookException, exceptions.UndefinedVariableInTemplate):
         if delete_project_on_failure:
             rmtree(project_dir)
         raise
