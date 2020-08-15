@@ -72,7 +72,7 @@ def prompt_for_config(  # noqa: C901
 ) -> Context:
     """Prompt user to enter a new config."""
     result = {}
-    env = Environment(context={"cookiecutter": context})
+    env = Environment(context=context)
 
     # First pass: Handle simple and raw variables, plus choices.
     # These must be done first because the dictionaries keys and
@@ -100,7 +100,7 @@ def prompt_for_config(  # noqa: C901
                 result[key] = value
         except jinja2.exceptions.UndefinedError as error:
             raise exceptions.UndefinedVariableInTemplate(
-                f"Unable to render variable {key!r}", error, {"cookiecutter": context}
+                f"Unable to render variable {key!r}", error, context
             )
 
     # Second pass; handle the dictionaries.
@@ -116,7 +116,7 @@ def prompt_for_config(  # noqa: C901
                 result[key] = value
         except jinja2.exceptions.UndefinedError as error:
             raise exceptions.UndefinedVariableInTemplate(
-                f"Unable to render variable {key!r}", error, {"cookiecutter": context}
+                f"Unable to render variable {key!r}", error, context
             )
 
     return result

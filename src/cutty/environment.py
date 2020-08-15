@@ -20,7 +20,7 @@ class Environment(jinja2.Environment):
 
     def __init__(self, context: Context, **kwargs: Any) -> None:
         """Initialize."""
-        extensions = context.get("cookiecutter", {}).get("_extensions", [])
+        extensions = context.get("_extensions", [])
         extensions = [str(extension) for extension in extensions]
         extensions = DEFAULT_EXTENSIONS + extensions
 
