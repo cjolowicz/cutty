@@ -4,7 +4,7 @@ import string
 from secrets import choice
 
 from jinja2.ext import Extension
-from slugify import slugify as pyslugify
+from slugify import slugify
 
 
 def jsonify(obj):
@@ -18,11 +18,6 @@ def random_ascii_string(length, punctuation=False):
     if punctuation:
         corpus += string.punctuation
     return "".join(choice(corpus) for _ in range(length))
-
-
-def slugify(value, **kwargs):
-    """Slugify a string."""
-    return pyslugify(value, **kwargs)
 
 
 class JsonifyExtension(Extension):
