@@ -9,8 +9,7 @@ from typing import Iterator
 from typing import Optional
 from typing import Tuple
 
-from cookiecutter.exceptions import ContextDecodingException
-
+from . import exceptions
 from .prompt import prompt_for_config
 from .types import StrMapping
 
@@ -24,7 +23,7 @@ def load_context(path: Path, *, default: Optional[StrMapping] = None) -> StrMapp
         with path.open() as io:
             return cast(StrMapping, json.load(io))
     except ValueError as error:
-        raise ContextDecodingException(
+        raise exceptions.ContextDecodingException(
             "JSON decoding error while loading '{}'."
             "  Decoding error details: '{}'".format(path.resolve(), error)
         )

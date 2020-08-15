@@ -2,8 +2,8 @@
 from typing import Any
 
 import jinja2
-from cookiecutter.exceptions import UnknownExtension
 
+from . import exceptions
 from .types import StrMapping
 
 
@@ -29,4 +29,4 @@ class Environment(jinja2.Environment):
                 undefined=jinja2.StrictUndefined, extensions=extensions, **kwargs
             )
         except ImportError as error:
-            raise UnknownExtension(f"Unable to load extension: {error}")
+            raise exceptions.UnknownExtension(f"Unable to load extension: {error}")

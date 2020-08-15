@@ -8,9 +8,9 @@ from typing import Any
 from typing import Mapping
 from typing import Optional
 
-import cookiecutter.exceptions
 import poyo.exceptions
 
+from . import exceptions
 from . import locations
 
 
@@ -66,7 +66,7 @@ class Config:
         if path is None:
             path = locations.config
         elif not path.exists():
-            raise cookiecutter.exceptions.ConfigDoesNotExistException(
+            raise exceptions.ConfigDoesNotExistException(
                 f"Config file {path} does not exist."
             )
 
@@ -75,7 +75,7 @@ class Config:
         try:
             data = poyo.parse_string(text)
         except poyo.exceptions.PoyoException as error:
-            raise cookiecutter.exceptions.InvalidConfiguration(
+            raise exceptions.InvalidConfiguration(
                 f"Unable to parse YAML file {path}. Error: {error}"
             )
 
