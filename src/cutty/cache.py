@@ -16,6 +16,15 @@ from .types import StrMapping
 repositories = locations.cache / "repositories"
 
 
+def _clone_or_update(location: str, path: Path) -> git.Repository:
+    if not path.exists():
+        return git.Repository.clone(location, destination=path, mirror=True, quiet=True)
+
+    repository = git.Repository(path)
+    repository.update_remote(prune=True)
+    return repository
+
+
 class Entry:
     """Cache entry for a repository."""
 
@@ -31,26 +40,12 @@ class Entry:
         # https://stackoverflow.com/a/22575737/1355754
         hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
         self.root = repositories / hash[:2] / hash
+        self.repository = _clone_or_update(location, self.root / "repo.git")
         self.directory = directory
-
-        repository_path = self.root / "repo.git"
-
-        if repository_path.exists():
-            self.repository = git.Repository(repository_path)
-            self.repository.update_remote(prune=True)
-        else:
-            self.repository = git.Repository.clone(
-                location, destination=repository_path, mirror=True, quiet=True
-            )
-
-        if revision is None:
-            self.revision = tags.find_latest(self.repository) or "HEAD"
-        else:
-            self.revision = revision
-
+        self.revision = revision or tags.find_latest(self.repository) or "HEAD"
         self.describe = tags.describe(self.repository, ref=self.revision)
         self.context = self.root / (
-            "context.json" if not self.directory else f"context-{self.directory}.json"
+            "context.json" if not directory else f"context-{directory}.json"
         )
 
     @contextlib.contextmanager
