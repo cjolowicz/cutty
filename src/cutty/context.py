@@ -60,21 +60,7 @@ def create_context(
     no_input: bool,
     default_context: Context,
 ) -> Context:
-    """Generate the context for a Cookiecutter project template.
-
-    Loads the JSON file as a Python object, with key being the JSON filename.
-
-    Args:
-        path: JSON file containing key/value pairs for populating
-            the cookiecutter's variables.  # noqa: RST203
-        template: Project template location
-        extra_context: Dictionary containing configuration overrides
-        no_input: If True, do not ask for user input.
-        default_context: Dictionary containing config to take into account.
-
-    Returns:
-        The generated context.
-    """
+    """Generate the context for a Cookiecutter project template."""
     data = load_context(path)
     data = _override_context(data, default_context, extra_context)
     data = prompt_for_config(data, no_input=no_input)
