@@ -1,4 +1,5 @@
 """All exceptions used in the cutty code base are defined here."""
+from .types import StrMapping
 
 
 class CuttyException(Exception):
@@ -68,13 +69,13 @@ class UndefinedVariableInTemplate(CuttyException):
     context.
     """
 
-    def __init__(self, message, error, context):
+    def __init__(self, message: str, error: Exception, context: StrMapping) -> None:
         """Exception for out-of-scope variables."""
         self.message = message
         self.error = error
         self.context = context
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Text representation of UndefinedVariableInTemplate."""
         return (
             "{self.message}. "
