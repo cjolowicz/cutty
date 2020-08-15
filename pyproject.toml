@@ -20,6 +20,7 @@ packaging = "^20.4"
 cookiecutter = "^1.7.2"
 python-slugify = "^4.0.1"
 binaryornot = "^0.4.4"
+jinja2 = "^2.11.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"
