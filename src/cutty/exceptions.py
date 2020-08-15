@@ -16,26 +16,6 @@ class NonTemplatedInputDirException(CuttyException):
     """
 
 
-class UnknownTemplateDirException(CuttyException):
-    """Exception for ambiguous project template directory.
-
-    Raised when cutty cannot determine which directory is the project
-    template, e.g. more than one dir appears to be a template dir.
-    """
-
-    # unused locally
-
-
-class MissingProjectDir(CuttyException):
-    """Exception for missing generated project directory.
-
-    Raised during cleanup when remove_repo() can't find a generated project
-    directory inside of a repo.
-    """
-
-    # unused locally
-
-
 class ConfigDoesNotExistException(CuttyException):
     """Exception for missing config file.
 
@@ -49,20 +29,6 @@ class InvalidConfiguration(CuttyException):
 
     Raised if the global configuration file is not valid YAML or is
     badly constructed.
-    """
-
-
-class UnknownRepoType(CuttyException):
-    """Exception for unknown repo types.
-
-    Raised if a repo's type cannot be determined.
-    """
-
-
-class VCSNotInstalled(CuttyException):
-    """Exception when version control is unavailable.
-
-    Raised if the version control system (git or hg) is not installed.
     """
 
 
@@ -121,26 +87,4 @@ class UnknownExtension(CuttyException):
     """Exception for un-importable extention.
 
     Raised when an environment is unable to import a required extension.
-    """
-
-
-class RepositoryNotFound(CuttyException):
-    """Exception for missing repo.
-
-    Raised when the specified Cookiecutter repository doesn't exist.
-    """
-
-
-class RepositoryCloneFailed(CuttyException):
-    """Exception for un-cloneable repo.
-
-    Raised when a cutty template can't be cloned.
-    """
-
-
-class InvalidZipRepository(CuttyException):
-    """Exception for bad zip repo.
-
-    Raised when the specified Cookiecutter repository isn't a valid
-    Zip archive.
     """
