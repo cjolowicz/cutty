@@ -1,10 +1,10 @@
-"""All exceptions used in the Cookiecutter code base are defined here."""
+"""All exceptions used in the cutty code base are defined here."""
 
 
 class CuttyException(Exception):
     """Base exception class.
 
-    All Cookiecutter-specific exceptions should subclass this class.
+    All cutty-specific exceptions should subclass this class.
     """
 
 
@@ -19,7 +19,7 @@ class NonTemplatedInputDirException(CuttyException):
 class UnknownTemplateDirException(CuttyException):
     """Exception for ambiguous project template directory.
 
-    Raised when Cookiecutter cannot determine which directory is the project
+    Raised when cutty cannot determine which directory is the project
     template, e.g. more than one dir appears to be a template dir.
     """
 
@@ -83,7 +83,7 @@ class OutputDirExistsException(CuttyException):
 class InvalidModeException(CuttyException):
     """Exception for incompatible modes.
 
-    Raised when cookiecutter is called with both `no_input==True` and
+    Raised when cutty is called with both `no_input==True` and
     `replay==True` at the same time.
     """
 
@@ -127,20 +127,20 @@ class UnknownExtension(CuttyException):
 class RepositoryNotFound(CuttyException):
     """Exception for missing repo.
 
-    Raised when the specified cookiecutter repository doesn't exist.
+    Raised when the specified Cookiecutter repository doesn't exist.
     """
 
 
 class RepositoryCloneFailed(CuttyException):
     """Exception for un-cloneable repo.
 
-    Raised when a cookiecutter template can't be cloned.
+    Raised when a cutty template can't be cloned.
     """
 
 
 class InvalidZipRepository(CuttyException):
     """Exception for bad zip repo.
 
-    Raised when the specified cookiecutter repository isn't a valid
+    Raised when the specified Cookiecutter repository isn't a valid
     Zip archive.
     """
