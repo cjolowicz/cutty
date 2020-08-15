@@ -60,7 +60,7 @@ def update(
         ) as project:
             generate_files(
                 repo_dir=repo_dir,
-                context=context,
+                context={"cookiecutter": context},
                 overwrite_if_exists=True,
                 output_dir=project.path.parent,
             )
