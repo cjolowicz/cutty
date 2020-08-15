@@ -1,14 +1,14 @@
 """All exceptions used in the Cookiecutter code base are defined here."""
 
 
-class CookiecutterException(Exception):
+class CuttyException(Exception):
     """Base exception class.
 
     All Cookiecutter-specific exceptions should subclass this class.
     """
 
 
-class NonTemplatedInputDirException(CookiecutterException):
+class NonTemplatedInputDirException(CuttyException):
     """Exception for when a project's input dir is not templated.
 
     The name of the input directory should always contain a string that is
@@ -16,7 +16,7 @@ class NonTemplatedInputDirException(CookiecutterException):
     """
 
 
-class UnknownTemplateDirException(CookiecutterException):
+class UnknownTemplateDirException(CuttyException):
     """Exception for ambiguous project template directory.
 
     Raised when Cookiecutter cannot determine which directory is the project
@@ -26,7 +26,7 @@ class UnknownTemplateDirException(CookiecutterException):
     # unused locally
 
 
-class MissingProjectDir(CookiecutterException):
+class MissingProjectDir(CuttyException):
     """Exception for missing generated project directory.
 
     Raised during cleanup when remove_repo() can't find a generated project
@@ -36,7 +36,7 @@ class MissingProjectDir(CookiecutterException):
     # unused locally
 
 
-class ConfigDoesNotExistException(CookiecutterException):
+class ConfigDoesNotExistException(CuttyException):
     """Exception for missing config file.
 
     Raised when get_config() is passed a path to a config file, but no file
@@ -44,7 +44,7 @@ class ConfigDoesNotExistException(CookiecutterException):
     """
 
 
-class InvalidConfiguration(CookiecutterException):
+class InvalidConfiguration(CuttyException):
     """Exception for invalid configuration file.
 
     Raised if the global configuration file is not valid YAML or is
@@ -52,35 +52,35 @@ class InvalidConfiguration(CookiecutterException):
     """
 
 
-class UnknownRepoType(CookiecutterException):
+class UnknownRepoType(CuttyException):
     """Exception for unknown repo types.
 
     Raised if a repo's type cannot be determined.
     """
 
 
-class VCSNotInstalled(CookiecutterException):
+class VCSNotInstalled(CuttyException):
     """Exception when version control is unavailable.
 
     Raised if the version control system (git or hg) is not installed.
     """
 
 
-class ContextDecodingException(CookiecutterException):
+class ContextDecodingException(CuttyException):
     """Exception for failed JSON decoding.
 
     Raised when a project's JSON context file can not be decoded.
     """
 
 
-class OutputDirExistsException(CookiecutterException):
+class OutputDirExistsException(CuttyException):
     """Exception for existing output directory.
 
     Raised when the output directory of the project exists already.
     """
 
 
-class InvalidModeException(CookiecutterException):
+class InvalidModeException(CuttyException):
     """Exception for incompatible modes.
 
     Raised when cookiecutter is called with both `no_input==True` and
@@ -88,14 +88,14 @@ class InvalidModeException(CookiecutterException):
     """
 
 
-class FailedHookException(CookiecutterException):
+class FailedHookException(CuttyException):
     """Exception for hook failures.
 
     Raised when a hook script fails.
     """
 
 
-class UndefinedVariableInTemplate(CookiecutterException):
+class UndefinedVariableInTemplate(CuttyException):
     """Exception for out-of-scope variables.
 
     Raised when a template uses a variable which is not defined in the
@@ -117,28 +117,28 @@ class UndefinedVariableInTemplate(CookiecutterException):
         ).format(**locals())
 
 
-class UnknownExtension(CookiecutterException):
+class UnknownExtension(CuttyException):
     """Exception for un-importable extention.
 
     Raised when an environment is unable to import a required extension.
     """
 
 
-class RepositoryNotFound(CookiecutterException):
+class RepositoryNotFound(CuttyException):
     """Exception for missing repo.
 
     Raised when the specified cookiecutter repository doesn't exist.
     """
 
 
-class RepositoryCloneFailed(CookiecutterException):
+class RepositoryCloneFailed(CuttyException):
     """Exception for un-cloneable repo.
 
     Raised when a cookiecutter template can't be cloned.
     """
 
 
-class InvalidZipRepository(CookiecutterException):
+class InvalidZipRepository(CuttyException):
     """Exception for bad zip repo.
 
     Raised when the specified cookiecutter repository isn't a valid
