@@ -45,8 +45,15 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def validate_extra_context(ctx: Any, param: Any, values: Tuple[str, ...]) -> StrMapping:
+def validate_extra_context(*args: Any) -> StrMapping:
     """Validate extra_context command-line argument."""
+    try:  # pragma: no cover
+        _, _, values = args
+    except ValueError:
+        # Typeguard confuses click < 8.0 because click inspects `__code__` to
+        # determine the number of arguments to pass, and Typeguard's wrapper
+        # has an argument count of zero due to the use of `*args`.
+        _, values = args
 
     def _generate() -> Iterator[Tuple[str, str]]:
         for value in values:
