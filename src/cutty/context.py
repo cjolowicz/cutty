@@ -61,8 +61,8 @@ def create_context(
     default_context: Context,
 ) -> Context:
     """Generate the context for a Cookiecutter project template."""
-    data = load_context(path)
-    data = _override_context(data, default_context, extra_context)
-    data = prompt_for_config(data, no_input=no_input)
+    context = load_context(path)
+    context = _override_context(context, default_context, extra_context)
+    context = prompt_for_config(context, no_input=no_input)
 
-    return {**data, "_template": template}
+    return {**context, "_template": template}
