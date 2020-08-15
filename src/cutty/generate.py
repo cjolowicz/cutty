@@ -29,7 +29,7 @@ def find_template(repo_dir: Path) -> Path:
 
 def is_copy_only_path(path: str, context: Context) -> bool:
     """Check whether the given `path` should only be copied and not rendered."""
-    patterns = context["cookiecutter"].get("_copy_without_render", [])
+    patterns = context.get("_copy_without_render", [])
 
     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
 
@@ -46,7 +46,7 @@ def handle_undefined_variables(message: str, context: Context) -> Iterator[None]
 def render_string(string: str, environment: Environment, context: Context) -> str:
     """Render the given string."""
     template = environment.from_string(string)
-    return template.render(**context)
+    return template.render(cookiecutter=context)
 
 
 def _generate_file(
@@ -81,7 +81,7 @@ def _generate_file(
             exception.translated = False
             raise
 
-        text = template.render(**context)
+        text = template.render(cookiecutter=context)
         outfile.write_text(text)
 
     shutil.copymode(infile, outfile)

@@ -53,7 +53,7 @@ def render_script(path: Path, context: Context) -> Path:
     environment = Environment(context=context, keep_trailing_newline=True)
     text = path.read_text()
     template = environment.from_string(text)
-    text = template.render(**context)
+    text = template.render(cookiecutter=context)
 
     with tempfile.NamedTemporaryFile(
         delete=False, mode="w", suffix=path.suffix
