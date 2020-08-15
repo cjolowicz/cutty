@@ -18,6 +18,7 @@ click = "^7.0"
 appdirs = "^1.4.4"
 packaging = "^20.4"
 cookiecutter = "^1.7.2"
+python-slugify = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"
