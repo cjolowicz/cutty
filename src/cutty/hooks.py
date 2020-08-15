@@ -31,7 +31,7 @@ def find_hook(name: str) -> Optional[Path]:
 
 def run_script(path: Path, cwd: Path) -> None:
     """Execute a script from a working directory."""
-    command = [sys.executable, path] if path.suffix == ".py" else [path]
+    command = [Path(sys.executable), path] if path.suffix == ".py" else [path]
     shell = sys.platform == "win32"
 
     try:
