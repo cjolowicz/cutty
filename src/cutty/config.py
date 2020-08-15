@@ -30,14 +30,7 @@ class Abbreviations:
         self.abbreviations.update(abbreviations)
 
     def expand(self, template: str) -> str:
-        """Expand abbreviations in a template location.
-
-        Args:
-            template: The project template location.
-
-        Returns:
-            The expanded project template.
-        """
+        """Expand abbreviations in a template location."""
         if template in self.abbreviations:
             return self.abbreviations[template]
 
