@@ -1,15 +1,7 @@
-# -*- coding: utf-8 -*-
-
 """Jinja2 extensions."""
-
 import json
 import string
-
-try:
-    # Python 3.6 and above
-    from secrets import choice
-except ImportError:
-    from random import choice
+from secrets import choice
 
 from jinja2.ext import Extension
 from slugify import slugify as pyslugify
@@ -20,12 +12,12 @@ class JsonifyExtension(Extension):
 
     def __init__(self, environment):
         """Initialize the extension with the given environment."""
-        super(JsonifyExtension, self).__init__(environment)
+        super().__init__(environment)
 
         def jsonify(obj):
             return json.dumps(obj, sort_keys=True, indent=4)
 
-        environment.filters['jsonify'] = jsonify
+        environment.filters["jsonify"] = jsonify
 
 
 class RandomStringExtension(Extension):
@@ -33,7 +25,7 @@ class RandomStringExtension(Extension):
 
     def __init__(self, environment):
         """Jinja2 Extension Constructor."""
-        super(RandomStringExtension, self).__init__(environment)
+        super().__init__(environment)
 
         def random_ascii_string(length, punctuation=False):
             if punctuation:
@@ -50,10 +42,10 @@ class SlugifyExtension(Extension):
 
     def __init__(self, environment):
         """Jinja2 Extension constructor."""
-        super(SlugifyExtension, self).__init__(environment)
+        super().__init__(environment)
 
         def slugify(value, **kwargs):
             """Slugifies the value."""
             return pyslugify(value, **kwargs)
 
-        environment.filters['slugify'] = slugify
+        environment.filters["slugify"] = slugify
