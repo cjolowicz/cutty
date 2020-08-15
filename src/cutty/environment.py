@@ -4,7 +4,7 @@ from typing import Any
 import jinja2
 
 from . import exceptions
-from .types import StrMapping
+from .types import Context
 
 
 DEFAULT_EXTENSIONS = [
@@ -18,7 +18,7 @@ DEFAULT_EXTENSIONS = [
 class Environment(jinja2.Environment):
     """Jinja2 environment."""
 
-    def __init__(self, context: StrMapping, **kwargs: Any) -> None:
+    def __init__(self, context: Context, **kwargs: Any) -> None:
         """Initialize."""
         extensions = context.get("cookiecutter", {}).get("_extensions", [])
         extensions = [str(extension) for extension in extensions]

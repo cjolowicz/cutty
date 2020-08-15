@@ -13,7 +13,7 @@ from . import exceptions
 from .compat import contextmanager
 from .environment import Environment
 from .hooks import run_hook
-from .types import StrMapping
+from .types import Context
 from .utils import chdir
 from .utils import rmtree
 
@@ -27,7 +27,7 @@ def find_template(repo_dir: Path) -> Path:
         raise exceptions.NonTemplatedInputDirException
 
 
-def is_copy_only_path(path: str, context: StrMapping) -> bool:
+def is_copy_only_path(path: str, context: Context) -> bool:
     """Check whether the given `path` should only be copied and not rendered."""
     patterns = context["cookiecutter"].get("_copy_without_render", [])
 
@@ -35,7 +35,7 @@ def is_copy_only_path(path: str, context: StrMapping) -> bool:
 
 
 @contextmanager
-def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[None]:
+def handle_undefined_variables(message: str, context: Context) -> Iterator[None]:
     """Re-raise UndefinedError as UndefinedVariableInTemplate."""
     try:
         yield
@@ -43,7 +43,7 @@ def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[No
         raise exceptions.UndefinedVariableInTemplate(message, error, context)
 
 
-def render_string(string: str, environment: Environment, context: StrMapping) -> str:
+def render_string(string: str, environment: Environment, context: Context) -> str:
     """Render the given string."""
     template = environment.from_string(string)
     return template.render(**context)
@@ -53,7 +53,7 @@ def _generate_file(
     project_dir: Path,
     infile: str,
     environment: Environment,
-    context: StrMapping,
+    context: Context,
     skip_if_file_exists: bool,
 ) -> None:
     outfile = project_dir / render_string(infile, environment, context)
@@ -90,7 +90,7 @@ def _generate_file(
 def _generate_files(  # noqa: C901
     project_dir: Path,
     environment: Environment,
-    context: StrMapping,
+    context: Context,
     output_dir: Path,
     skip_if_file_exists: bool,
 ) -> None:
@@ -142,7 +142,7 @@ def _generate_files(  # noqa: C901
 
 def generate_files(
     repo_dir: Path,
-    context: StrMapping,
+    context: Context,
     output_dir: Path,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,

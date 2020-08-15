@@ -8,7 +8,7 @@ from ..config import Config
 from ..context import create_context
 from ..context import load_context
 from ..generate import generate_files
-from ..types import StrMapping
+from ..types import Context
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
@@ -20,7 +20,7 @@ def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
 
 
 def update(
-    extra_context: StrMapping,
+    extra_context: Context,
     *,
     interactive: bool = False,
     checkout: Optional[str] = None,

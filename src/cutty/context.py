@@ -11,17 +11,17 @@ from typing import Tuple
 
 from . import exceptions
 from .prompt import prompt_for_config
-from .types import StrMapping
+from .types import Context
 
 
-def load_context(path: Path, *, default: Optional[StrMapping] = None) -> StrMapping:
+def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
     """Load context from disk."""
     if default is not None and not path.exists():
         return default
 
     try:
         with path.open() as io:
-            return cast(StrMapping, json.load(io))
+            return cast(Context, json.load(io))
     except ValueError as error:
         raise exceptions.ContextDecodingException(
             "JSON decoding error while loading '{}'."
@@ -39,7 +39,7 @@ def _override_value(value: Any, other: Any) -> Any:
     return other
 
 
-def _override_context(context: StrMapping, *overrides: StrMapping) -> StrMapping:
+def _override_context(context: Context, *overrides: Context) -> Context:
     override = ChainMap(*reversed(overrides))
 
     def _generate() -> Iterator[Tuple[str, Any]]:
@@ -56,10 +56,10 @@ def create_context(
     path: Path,
     *,
     template: str,
-    extra_context: StrMapping,
+    extra_context: Context,
     no_input: bool,
-    default_context: StrMapping,
-) -> StrMapping:
+    default_context: Context,
+) -> Context:
     """Generate the context for a Cookiecutter project template.
 
     Loads the JSON file as a Python object, with key being the JSON filename.

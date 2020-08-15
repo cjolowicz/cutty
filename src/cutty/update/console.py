@@ -5,7 +5,7 @@ import click
 
 from . import core
 from ..create.console import validate_extra_context
-from ..types import StrMapping
+from ..types import Context
 from ..utils import as_optional_path
 
 
@@ -41,7 +41,7 @@ from ..utils import as_optional_path
     help="Do not load a config file. Use the defaults instead",
 )
 def update(
-    extra_context: StrMapping,
+    extra_context: Context,
     interactive: bool,
     checkout: Optional[str],
     directory: Optional[str],

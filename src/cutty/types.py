@@ -14,5 +14,5 @@ else:
     CompletedProcess = subprocess.CompletedProcess
     PathLike = os.PathLike
 
-StrMapping = Mapping[str, Any]
+Context = Mapping[str, Any]
 StrPath = Union[str, PathLike]
