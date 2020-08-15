@@ -28,10 +28,9 @@ class RandomStringExtension(Extension):
         super().__init__(environment)
 
         def random_ascii_string(length, punctuation=False):
+            corpus = string.ascii_letters
             if punctuation:
-                corpus = "".join((string.ascii_letters, string.punctuation))
-            else:
-                corpus = string.ascii_letters
+                corpus += string.punctuation
             return "".join(choice(corpus) for _ in range(length))
 
         environment.globals["random_ascii_string"] = random_ascii_string
