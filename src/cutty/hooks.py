@@ -56,9 +56,9 @@ def render_script(path: Path, context: StrMapping) -> Path:
     text = template.render(**context)
 
     with tempfile.NamedTemporaryFile(
-        delete=False, mode="wb", suffix=path.suffix
+        delete=False, mode="w", suffix=path.suffix
     ) as temporary:
-        temporary.write(text.encode())
+        temporary.write(text)
 
     path = Path(temporary.name)
 
