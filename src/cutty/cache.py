@@ -1,5 +1,4 @@
 """Application cache."""
-import contextlib
 import hashlib
 import json
 from pathlib import Path
@@ -10,6 +9,7 @@ from typing import Optional
 from . import git
 from . import locations
 from . import tags
+from .compat import contextmanager
 from .types import StrMapping
 
 
@@ -48,7 +48,7 @@ class Entry:
             "context.json" if not directory else f"context-{directory}.json"
         )
 
-    @contextlib.contextmanager
+    @contextmanager
     def checkout(self) -> Iterator[Path]:
         """Get a repository with the latest release checked out."""
         sha1 = self.repository.rev_parse(self.revision, verify=True)
@@ -61,8 +61,6 @@ class Entry:
                 if self.directory is None
                 else worktree.path / self.directory
             )
-
-    checkout.__annotations__["return"] = contextlib.AbstractContextManager
 
     def load_context(self) -> StrMapping:
         """Load the context."""
