@@ -56,10 +56,11 @@ class Entry:
         with self.repository.worktree(
             path, sha1, detach=True, force_remove=True
         ) as worktree:
-            if self.directory is not None:
-                yield worktree.path / self.directory
-            else:
-                yield worktree.path
+            yield (
+                worktree.path
+                if self.directory is None
+                else worktree.path / self.directory
+            )
 
     checkout.__annotations__["return"] = contextlib.AbstractContextManager
 
