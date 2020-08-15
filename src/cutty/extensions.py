@@ -34,7 +34,7 @@ class RandomStringExtension(Extension):
                 corpus = string.ascii_letters
             return "".join(choice(corpus) for _ in range(length))
 
-        environment.globals.update(random_ascii_string=random_ascii_string)
+        environment.globals["random_ascii_string"] = random_ascii_string
 
 
 class SlugifyExtension(Extension):
