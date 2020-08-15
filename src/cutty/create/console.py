@@ -12,7 +12,7 @@ import click
 from . import core
 from .. import exceptions
 from .. import git
-from ..types import StrMapping
+from ..types import Context
 from ..utils import as_optional_path
 
 
@@ -45,7 +45,7 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def validate_extra_context(*args: Any) -> StrMapping:
+def validate_extra_context(*args: Any) -> Context:
     """Validate extra_context command-line argument."""
     try:  # pragma: no cover
         _, _, values = args
@@ -126,7 +126,7 @@ def validate_extra_context(*args: Any) -> StrMapping:
 )
 def create(
     template: str,
-    extra_context: StrMapping,
+    extra_context: Context,
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],

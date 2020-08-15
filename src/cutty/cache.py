@@ -10,7 +10,7 @@ from . import git
 from . import locations
 from . import tags
 from .compat import contextmanager
-from .types import StrMapping
+from .types import Context
 
 
 repositories = locations.cache / "repositories"
@@ -62,14 +62,14 @@ class Entry:
                 else worktree.path / self.directory
             )
 
-    def load_context(self) -> StrMapping:
+    def load_context(self) -> Context:
         """Load the context."""
         with self.context.open() as io:
             context = json.load(io)
 
-        return cast(StrMapping, context)
+        return cast(Context, context)
 
-    def dump_context(self, context: StrMapping) -> None:
+    def dump_context(self, context: Context) -> None:
         """Dump the context."""
         with self.context.open(mode="w") as io:
             json.dump(context, io, indent=2)

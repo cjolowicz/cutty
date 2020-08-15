@@ -1,7 +1,7 @@
 """All exceptions used in the cutty code base are defined here."""
 import jinja2.exceptions
 
-from .types import StrMapping
+from .types import Context
 
 
 class CuttyException(Exception):
@@ -72,7 +72,7 @@ class UndefinedVariableInTemplate(CuttyException):
     """
 
     def __init__(
-        self, message: str, error: jinja2.exceptions.UndefinedError, context: StrMapping
+        self, message: str, error: jinja2.exceptions.UndefinedError, context: Context
     ) -> None:
         """Exception for out-of-scope variables."""
         self.message = message

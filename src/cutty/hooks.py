@@ -8,7 +8,7 @@ from typing import Optional
 
 from . import exceptions
 from .environment import Environment
-from .types import StrMapping
+from .types import Context
 from .utils import make_executable
 
 
@@ -48,7 +48,7 @@ def run_script(path: Path, cwd: Path) -> None:
         raise exceptions.FailedHookException(f"Hook script failed (error: {error})")
 
 
-def render_script(path: Path, context: StrMapping) -> Path:
+def render_script(path: Path, context: Context) -> Path:
     """Render a script with Jinja."""
     environment = Environment(context=context, keep_trailing_newline=True)
     text = path.read_text()
@@ -67,7 +67,7 @@ def render_script(path: Path, context: StrMapping) -> Path:
     return path
 
 
-def run_hook(hook_name: str, project_dir: Path, context: StrMapping) -> None:
+def run_hook(hook_name: str, project_dir: Path, context: Context) -> None:
     """Try to find and execute a hook from the specified project directory."""
     script = find_hook(hook_name)
     if script is not None:

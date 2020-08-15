@@ -12,7 +12,7 @@ import jinja2.exceptions
 from . import exceptions
 from .environment import Environment
 from .render import render_variable
-from .types import StrMapping
+from .types import Context
 
 
 def read_user_variable(variable: str, default: Any) -> Any:
@@ -68,8 +68,8 @@ def load_json_dict(value: Optional[str]) -> Any:
 
 
 def prompt_for_config(  # noqa: C901
-    context: StrMapping, *, no_input: bool = False
-) -> StrMapping:
+    context: Context, *, no_input: bool = False
+) -> Context:
     """Prompt user to enter a new config."""
     result = {}
     env = Environment(context={"cookiecutter": context})

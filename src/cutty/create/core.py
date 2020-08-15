@@ -7,12 +7,12 @@ from .. import exceptions
 from ..config import Config
 from ..context import create_context
 from ..generate import generate_files
-from ..types import StrMapping
+from ..types import Context
 
 
 def create(
     template: str,
-    extra_context: StrMapping,
+    extra_context: Context,
     *,
     no_input: bool = False,
     checkout: Optional[str] = None,

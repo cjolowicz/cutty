@@ -2,10 +2,10 @@
 from typing import Any
 
 from .environment import Environment
-from .types import StrMapping
+from .types import Context
 
 
-def render_variable(env: Environment, value: Any, context: StrMapping) -> Any:
+def render_variable(env: Environment, value: Any, context: Context) -> Any:
     """Render the next variable to be displayed in the user prompt."""
     if value is None:
         return None
