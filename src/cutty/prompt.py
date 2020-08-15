@@ -11,7 +11,6 @@ import jinja2.exceptions
 
 from . import exceptions
 from .environment import Environment
-from .render import render_variable
 from .types import Context
 
 
@@ -65,6 +64,25 @@ def load_json_dict(value: Optional[str]) -> Any:
         raise click.UsageError("Requires JSON dict.")
 
     return result
+
+
+def render_variable(env: Environment, value: Any, context: Context) -> Any:
+    """Render the next variable to be displayed in the user prompt."""
+    if value is None:
+        return None
+
+    if isinstance(value, dict):
+        return {
+            render_variable(env, key, context): render_variable(env, val, context)
+            for key, val in value.items()
+        }
+
+    if isinstance(value, list):
+        return [render_variable(env, item, context) for item in value]
+
+    template = env.from_string(str(value))
+
+    return template.render(cookiecutter=context)
 
 
 def prompt_for_config(  # noqa: C901
