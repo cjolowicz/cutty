@@ -43,6 +43,9 @@ def handle_undefined_variables(message: str, context: StrMapping) -> Iterator[No
         raise exceptions.UndefinedVariableInTemplate(message, error, context)
 
 
+handle_undefined_variables.__annotations__["return"] = contextlib.AbstractContextManager
+
+
 def render_string(string: str, environment: Environment, context: StrMapping) -> str:
     """Render the given string."""
     template = environment.from_string(string)
