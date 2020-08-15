@@ -8,9 +8,9 @@ from .types import StrMapping
 
 
 DEFAULT_EXTENSIONS = [
-    "cookiecutter.extensions.JsonifyExtension",
-    "cookiecutter.extensions.RandomStringExtension",
-    "cookiecutter.extensions.SlugifyExtension",
+    "cutty.extensions.JsonifyExtension",
+    "cutty.extensions.RandomStringExtension",
+    "cutty.extensions.SlugifyExtension",
     "jinja2_time.TimeExtension",
 ]
 
