@@ -177,7 +177,7 @@ def generate_files(
 
         with chdir(template_dir):
             _generate_files(
-                project_dir, context, output_dir, skip_if_file_exists,
+                project_dir, environment, context, output_dir, skip_if_file_exists,
             )
 
         with chdir(repo_dir):
