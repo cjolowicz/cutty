@@ -50,7 +50,7 @@ def create(
 
         generate_files(
             repo_dir=repo_dir,
-            context=context,
+            context={"cookiecutter": context},
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
             output_dir=Path(output_dir),

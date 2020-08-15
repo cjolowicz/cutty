@@ -65,4 +65,4 @@ def create_context(
     data = _override_context(data, default_context, extra_context)
     data = prompt_for_config(data, no_input=no_input)
 
-    return {"cookiecutter": {**data, "_template": template}}
+    return {**data, "_template": template}
