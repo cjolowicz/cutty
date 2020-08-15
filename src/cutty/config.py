@@ -4,7 +4,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
-from typing import Any
 from typing import Mapping
 from typing import Optional
 
@@ -12,6 +11,7 @@ import poyo.exceptions
 
 from . import exceptions
 from . import locations
+from .types import Context
 
 
 class Abbreviations:
@@ -45,7 +45,7 @@ class Abbreviations:
 class Config:
     """Configuration."""
 
-    default_context: Mapping[str, Any] = field(default_factory=dict)
+    default_context: Context = field(default_factory=dict)
     abbreviations: Abbreviations = field(default_factory=Abbreviations)
 
     @classmethod
