@@ -3,7 +3,7 @@ import json
 import string
 from secrets import choice
 
-from jinja2.ext import Extension
+import jinja2.ext
 from slugify import slugify
 
 
@@ -20,7 +20,7 @@ def random_ascii_string(length, punctuation=False):
     return "".join(choice(corpus) for _ in range(length))
 
 
-class JsonifyExtension(Extension):
+class JsonifyExtension(jinja2.ext.Extension):
     """Jinja2 extension to convert a Python object to JSON."""
 
     def __init__(self, environment):
@@ -29,7 +29,7 @@ class JsonifyExtension(Extension):
         environment.filters["jsonify"] = jsonify
 
 
-class RandomStringExtension(Extension):
+class RandomStringExtension(jinja2.ext.Extension):
     """Jinja2 extension to create a random string."""
 
     def __init__(self, environment):
@@ -38,7 +38,7 @@ class RandomStringExtension(Extension):
         environment.globals["random_ascii_string"] = random_ascii_string
 
 
-class SlugifyExtension(Extension):
+class SlugifyExtension(jinja2.ext.Extension):
     """Jinja2 extension to slugify a string."""
 
     def __init__(self, environment):
