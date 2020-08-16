@@ -22,6 +22,12 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     return repository
 
 
+def _hash(value: str) -> str:
+    # Avoid "Filename too long" error with Git for Windows.
+    # https://stackoverflow.com/a/22575737/1355754
+    return hashlib.blake2b(value.encode()).hexdigest()[:64]
+
+
 @dataclass
 class Cache:
     """Cache for a project template."""
@@ -40,9 +46,7 @@ class Cache:
         revision: Optional[str] = None,
     ) -> Iterator[Cache]:
         """Load the project template from the cache."""
-        # Avoid "Filename too long" error with Git for Windows.
-        # https://stackoverflow.com/a/22575737/1355754
-        hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
+        hash = _hash(location)
         path = locations.cache / "repositories" / hash[:2] / hash
         repository = _load_repository(location, path / "repo.git")
         if revision is None:
@@ -54,7 +58,8 @@ class Cache:
 
         with repository.worktree(worktree, sha1, detach=True, force_remove=True):
             if directory is not None:
-                context = path / f"context-{directory}.json"
+                hash = _hash(str(directory))
+                context = path / f"context-{hash}.json"
                 worktree = worktree / directory
 
             yield cls(worktree, version, context)
