@@ -2,10 +2,12 @@
 from pathlib import Path
 from typing import Optional
 
-from .. import cache
 from .. import exceptions
+from ..cache import Cache
 from ..config import Config
 from ..context import create_context
+from ..context import dump
+from ..context import load
 from ..generate import generate_files
 from ..types import Context
 
@@ -33,12 +35,12 @@ def create(
 
     config = Config.load(config_file, ignore_config=default_config)
     template = config.abbreviations.expand(template)
-    entry = cache.Entry(template, directory=directory, revision=checkout)
-    with entry.checkout() as repo_dir:
+
+    with Cache.load(template, directory=directory, revision=checkout) as cache:
         if replay:
-            context = entry.load_context()
+            context = load(cache.context)
         else:
-            context_file = repo_dir / "cookiecutter.json"
+            context_file = cache.repository / "cookiecutter.json"
             context = create_context(
                 context_file,
                 template=template,
@@ -46,10 +48,10 @@ def create(
                 no_input=no_input,
                 default_context=config.default_context,
             )
-            entry.dump_context(context)
+            dump(cache.context, context)
 
         generate_files(
-            repo_dir=repo_dir,
+            repo_dir=cache.repository,
             context=context,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
