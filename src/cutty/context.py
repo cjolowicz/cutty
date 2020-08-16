@@ -14,18 +14,24 @@ from .prompt import prompt_for_config
 from .types import Context
 
 
-def load(path: Path) -> Context:
-    """Load the context."""
-    with path.open() as io:
-        context = json.load(io)
+class Store:
+    """File-based storage for context."""
 
-    return cast(Context, context)
+    def __init__(self, path: Path) -> None:
+        """Initialize."""
+        self.path = path
 
+    def load(self) -> Context:
+        """Load the context."""
+        with self.path.open() as io:
+            context = json.load(io)
 
-def dump(path: Path, context: Context) -> None:
-    """Dump the context."""
-    with path.open(mode="w") as io:
-        json.dump(context, io, indent=2)
+        return cast(Context, context)
+
+    def dump(self, context: Context) -> None:
+        """Dump the context."""
+        with self.path.open(mode="w") as io:
+            json.dump(context, io, indent=2)
 
 
 def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
@@ -34,7 +40,7 @@ def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
         return default
 
     try:
-        return load(path)
+        return Store(path).load()
     except ValueError as error:
         raise exceptions.ContextDecodingException(
             f"JSON decoding error while loading '{path.resolve()}'."
