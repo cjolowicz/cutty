@@ -49,7 +49,7 @@ def _clone_or_update(location: str, path: Path) -> git.Repository:
 
 
 class _Entry:
-    """Cache entry for a repository."""
+    """Internal cache entry for a project template."""
 
     def __init__(
         self,
