@@ -7,6 +7,7 @@ from ..cache import Cache
 from ..config import Config
 from ..context import create_context
 from ..context import load_context
+from ..context import Store
 from ..generate import generate_files
 from ..types import Context
 
@@ -32,19 +33,19 @@ def update(
     config = Config.load(config_file, ignore_config=default_config)
     instance = git.Repository()
     _ensure_branch_exists(instance, "template")
-    previous_context_file = Path(".cookiecutter.json")
-    previous_context = load_context(previous_context_file, default={})
+    previous_context_store = Store(Path(".cookiecutter.json"))
+    previous_context = load_context(previous_context_store, default={})
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
-        context_file = cache.repository / "cookiecutter.json"
-        current_context = load_context(context_file)
+        context_store = Store(cache.repository / "cookiecutter.json")
+        current_context = load_context(context_store)
         if not interactive:
             interactive = bool(current_context.keys() - previous_context.keys())
         context = create_context(
-            context_file,
+            context_store.path,
             template=template,
             extra_context=extra_context,
             no_input=not interactive,
