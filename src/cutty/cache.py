@@ -59,25 +59,28 @@ class _Entry:
         # Avoid "Filename too long" error with Git for Windows.
         # https://stackoverflow.com/a/22575737/1355754
         hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
-        self.root = locations.cache / "repositories" / hash[:2] / hash
-        self.repository = _clone_or_update(location, self.root / "repo.git")
+        path = locations.cache / "repositories" / hash[:2] / hash
+        repository = _clone_or_update(location, path / "repo.git")
+        if revision is None:
+            revision = tags.find_latest(repository) or "HEAD"
+        sha1 = repository.rev_parse(revision, verify=True)
+
+        self.repository = repository
         self.directory = directory
-        self.revision = revision or tags.find_latest(self.repository) or "HEAD"
-        self.version = tags.describe(self.repository, ref=self.revision)
-        self.context = self.root / (
+        self.version = tags.describe(repository, ref=revision)
+        self.worktree = path / "worktrees" / sha1
+        self.context = path / (
             "context.json" if not directory else f"context-{directory}.json"
         )
 
     @contextmanager
     def checkout(self) -> Iterator[Path]:
         """Get a repository with the latest release checked out."""
-        sha1 = self.repository.rev_parse(self.revision, verify=True)
-        path = self.root / "worktrees" / sha1
         with self.repository.worktree(
-            path, sha1, detach=True, force_remove=True
-        ) as worktree:
+            self.worktree, self.worktree.name, detach=True, force_remove=True
+        ):
             yield (
-                worktree.path
+                self.worktree
                 if self.directory is None
-                else worktree.path / self.directory
+                else self.worktree / self.directory
             )
