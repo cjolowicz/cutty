@@ -14,6 +14,20 @@ from .prompt import prompt_for_config
 from .types import Context
 
 
+def load(path: Path) -> Context:
+    """Load the context."""
+    with path.open() as io:
+        context = json.load(io)
+
+    return cast(Context, context)
+
+
+def dump(path: Path, context: Context) -> None:
+    """Dump the context."""
+    with path.open(mode="w") as io:
+        json.dump(context, io, indent=2)
+
+
 def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
     """Load context from disk."""
     if default is not None and not path.exists():
