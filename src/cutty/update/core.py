@@ -45,7 +45,7 @@ def update(
         if not interactive:
             interactive = bool(current_context.keys() - previous_context.keys())
         context = create_context(
-            context_store.path,
+            context_store,
             template=template,
             extra_context=extra_context,
             no_input=not interactive,

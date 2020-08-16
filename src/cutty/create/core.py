@@ -6,6 +6,7 @@ from .. import exceptions
 from ..cache import Cache
 from ..config import Config
 from ..context import create_context
+from ..context import Store
 from ..generate import generate_files
 from ..types import Context
 
@@ -38,9 +39,9 @@ def create(
         if replay:
             context = cache.context.load()
         else:
-            context_file = cache.repository / "cookiecutter.json"
+            context_store = Store(cache.repository / "cookiecutter.json")
             context = create_context(
-                context_file,
+                context_store,
                 template=template,
                 extra_context=extra_context,
                 no_input=no_input,
