@@ -2,10 +2,11 @@
 from pathlib import Path
 from typing import Optional
 
-from .. import cache
 from .. import git
+from ..cache import Cache
 from ..config import Config
 from ..context import create_context
+from ..context import dump
 from ..context import load_context
 from ..generate import generate_files
 from ..types import Context
@@ -37,10 +38,9 @@ def update(
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     template = config.abbreviations.expand(template)
-    entry = cache.Entry(template, directory=directory, revision=checkout)
 
-    with entry.checkout() as repo_dir:
-        context_file = repo_dir / "cookiecutter.json"
+    with Cache.load(template, directory=directory, revision=checkout) as cache:
+        context_file = cache.repository / "cookiecutter.json"
         current_context = load_context(context_file)
         if not interactive:
             interactive = bool(current_context.keys() - previous_context.keys())
@@ -51,7 +51,7 @@ def update(
             no_input=not interactive,
             default_context=config.default_context,
         )
-        entry.dump_context(context)
+        dump(cache.context, context)
 
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
 
@@ -59,10 +59,10 @@ def update(
             project_path, "template", checkout=False, force_remove=True
         ) as project:
             generate_files(
-                repo_dir=repo_dir,
+                repo_dir=cache.repository,
                 context=context,
                 overwrite_if_exists=True,
                 output_dir=project.path.parent,
             )
             project.add(all=True)
-            project.commit(message=f"Update template to {entry.describe}")
+            project.commit(message=f"Update template to {cache.version}")
