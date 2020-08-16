@@ -36,7 +36,7 @@ class Cache:
             yield cls(repository, entry.version, entry.context)
 
 
-def _clone_or_update(location: str, path: Path) -> git.Repository:
+def _load_repository(location: str, path: Path) -> git.Repository:
     if not path.exists():
         return git.Repository.clone(location, destination=path, mirror=True, quiet=True)
 
@@ -60,7 +60,7 @@ class _Entry:
         # https://stackoverflow.com/a/22575737/1355754
         hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
         path = locations.cache / "repositories" / hash[:2] / hash
-        repository = _clone_or_update(location, path / "repo.git")
+        repository = _load_repository(location, path / "repo.git")
         if revision is None:
             revision = tags.find_latest(repository) or "HEAD"
         sha1 = repository.rev_parse(revision, verify=True)
