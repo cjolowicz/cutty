@@ -31,7 +31,7 @@ class Cache:
         revision: Optional[str] = None,
     ) -> Iterator[Cache]:
         """Load the project template from the cache."""
-        entry = _Entry(location, directory=directory, revision=revision)
+        entry = _Entry.load(location, directory=directory, revision=revision)
         with entry.checkout() as repository:
             yield cls(repository, entry.version, entry.context)
 
@@ -45,17 +45,24 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     return repository
 
 
+@dataclass
 class _Entry:
     """Internal cache entry for a project template."""
 
-    def __init__(
-        self,
+    repository: git.Repository
+    worktree: Path
+    context: Path
+    directory: Optional[Path]
+    version: str
+
+    @classmethod
+    def load(
+        cls,
         location: str,
         *,
         directory: Optional[Path] = None,
         revision: Optional[str] = None,
-    ) -> None:
-        """Initialize."""
+    ) -> _Entry:
         # Avoid "Filename too long" error with Git for Windows.
         # https://stackoverflow.com/a/22575737/1355754
         hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
@@ -64,14 +71,13 @@ class _Entry:
         if revision is None:
             revision = tags.find_latest(repository) or "HEAD"
         sha1 = repository.rev_parse(revision, verify=True)
-
-        self.repository = repository
-        self.directory = directory
-        self.version = tags.describe(repository, ref=revision)
-        self.worktree = path / "worktrees" / sha1
-        self.context = path / (
+        worktree = path / "worktrees" / sha1
+        version = tags.describe(repository, ref=revision)
+        context = path / (
             "context.json" if not directory else f"context-{directory}.json"
         )
+
+        return cls(repository, worktree, context, directory, version)
 
     @contextmanager
     def checkout(self) -> Iterator[Path]:
