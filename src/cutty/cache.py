@@ -11,6 +11,7 @@ from . import git
 from . import locations
 from . import tags
 from .compat import contextmanager
+from .context import Store
 
 
 def _hash(value: str) -> str:
@@ -34,7 +35,7 @@ class Cache:
 
     repository: Path
     version: str
-    context: Path
+    context: Store
 
     @classmethod
     @contextmanager
@@ -59,7 +60,7 @@ class Cache:
         with repository.worktree(worktree, sha1, detach=True, force_remove=True):
             if directory is not None:
                 hash = _hash(str(directory))
-                context = path / f"context-{hash}.json"
+                context = Store(path / f"context-{hash}.json")
                 worktree = worktree / directory
 
             yield cls(worktree, version, context)
