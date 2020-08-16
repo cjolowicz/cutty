@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
 from typing import Iterator
 from typing import Optional
 
@@ -13,7 +11,6 @@ from . import git
 from . import locations
 from . import tags
 from .compat import contextmanager
-from .types import Context
 
 
 @dataclass
@@ -84,15 +81,3 @@ class _Entry:
                 if self.directory is None
                 else worktree.path / self.directory
             )
-
-    def load_context(self) -> Context:
-        """Load the context."""
-        with self.context.open() as io:
-            context = json.load(io)
-
-        return cast(Context, context)
-
-    def dump_context(self, context: Context) -> None:
-        """Dump the context."""
-        with self.context.open(mode="w") as io:
-            json.dump(context, io, indent=2)
