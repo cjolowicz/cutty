@@ -72,7 +72,7 @@ def _override_context(context: Context, *overrides: Context) -> Context:
 
 
 def create_context(
-    path: Path,
+    store: Store,
     *,
     template: str,
     extra_context: Context,
@@ -80,7 +80,7 @@ def create_context(
     default_context: Context,
 ) -> Context:
     """Generate the context for a Cookiecutter project template."""
-    context = load_context(Store(path))
+    context = load_context(store)
     context = _override_context(context, default_context, extra_context)
     context = prompt_for_config(context, no_input=no_input)
 
