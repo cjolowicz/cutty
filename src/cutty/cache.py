@@ -36,7 +36,7 @@ class Cache:
         """Load the project template from the cache."""
         entry = _Entry(location, directory=directory, revision=revision)
         with entry.checkout() as repository:
-            yield cls(repository, entry.describe, entry.context)
+            yield cls(repository, entry.version, entry.context)
 
 
 def _clone_or_update(location: str, path: Path) -> git.Repository:
@@ -66,7 +66,7 @@ class _Entry:
         self.repository = _clone_or_update(location, self.root / "repo.git")
         self.directory = directory
         self.revision = revision or tags.find_latest(self.repository) or "HEAD"
-        self.describe = tags.describe(self.repository, ref=self.revision)
+        self.version = tags.describe(self.repository, ref=self.revision)
         self.context = self.root / (
             "context.json" if not directory else f"context-{directory}.json"
         )
