@@ -31,8 +31,6 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     config = Config.load(config_file, ignore_config=default_config)
-    instance = git.Repository()
-    _ensure_branch_exists(instance, "template")
     previous_context_store = Store(Path(".cookiecutter.json"))
     previous_context = load_context(previous_context_store, default={})
     extra_context = {**previous_context, **extra_context}
@@ -53,7 +51,9 @@ def update(
         )
         cache.context.dump(context)
 
+        instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
+        _ensure_branch_exists(instance, "template")
 
         with instance.worktree(
             project_path, "template", checkout=False, force_remove=True
