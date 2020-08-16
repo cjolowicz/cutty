@@ -36,8 +36,8 @@ class Cache:
     version: str
     context: Path
 
-    @contextmanager
     @classmethod
+    @contextmanager
     def load(
         cls,
         location: str,
