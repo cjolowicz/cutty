@@ -4,8 +4,8 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from cutty import cache
 from cutty import git
+from cutty.cache import Cache
 from cutty.create.console import create
 
 
@@ -118,8 +118,8 @@ def test_replay_dump(
         input="example",
         catch_exceptions=False,
     )
-    entry = cache.Entry(str(template.path))
-    assert entry.load_context()
+    with Cache.load(str(template.path)) as cache:
+        assert cache.context.exists()
 
 
 def test_replay_load(
