@@ -13,9 +13,6 @@ from .compat import contextmanager
 from .types import Context
 
 
-repositories = locations.cache / "repositories"
-
-
 def _clone_or_update(location: str, path: Path) -> git.Repository:
     if not path.exists():
         return git.Repository.clone(location, destination=path, mirror=True, quiet=True)
@@ -39,7 +36,7 @@ class Entry:
         # Avoid "Filename too long" error with Git for Windows.
         # https://stackoverflow.com/a/22575737/1355754
         hash = hashlib.blake2b(location.encode()).hexdigest()[:64]
-        self.root = repositories / hash[:2] / hash
+        self.root = locations.cache / "repositories" / hash[:2] / hash
         self.repository = _clone_or_update(location, self.root / "repo.git")
         self.directory = directory
         self.revision = revision or tags.find_latest(self.repository) or "HEAD"
