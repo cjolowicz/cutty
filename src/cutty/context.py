@@ -34,8 +34,7 @@ def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
         return default
 
     try:
-        with path.open() as io:
-            return cast(Context, json.load(io))
+        return load(path)
     except ValueError as error:
         raise exceptions.ContextDecodingException(
             f"JSON decoding error while loading '{path.resolve()}'."
