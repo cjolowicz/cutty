@@ -13,6 +13,12 @@ from . import tags
 from .compat import contextmanager
 
 
+def _hash(value: str) -> str:
+    # Avoid "Filename too long" error with Git for Windows.
+    # https://stackoverflow.com/a/22575737/1355754
+    return hashlib.blake2b(value.encode()).hexdigest()[:64]
+
+
 def _load_repository(location: str, path: Path) -> git.Repository:
     if not path.exists():
         return git.Repository.clone(location, destination=path, mirror=True, quiet=True)
@@ -20,12 +26,6 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     repository = git.Repository(path)
     repository.update_remote(prune=True)
     return repository
-
-
-def _hash(value: str) -> str:
-    # Avoid "Filename too long" error with Git for Windows.
-    # https://stackoverflow.com/a/22575737/1355754
-    return hashlib.blake2b(value.encode()).hexdigest()[:64]
 
 
 @dataclass
