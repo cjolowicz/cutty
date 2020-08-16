@@ -1,6 +1,9 @@
 """Application cache."""
+from __future__ import annotations
+
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 from typing import Iterator
@@ -11,6 +14,29 @@ from . import locations
 from . import tags
 from .compat import contextmanager
 from .types import Context
+
+
+@dataclass
+class Cache:
+    """Cache for a project template."""
+
+    repository: Path
+    version: str
+    context: Path
+
+    @contextmanager
+    @classmethod
+    def load(
+        cls,
+        location: str,
+        *,
+        directory: Optional[Path] = None,
+        revision: Optional[str] = None,
+    ) -> Iterator[Cache]:
+        """Load the project template from the cache."""
+        entry = Entry(location, directory=directory, revision=revision)
+        with entry.checkout() as repository:
+            yield cls(repository, entry.describe, entry.context)
 
 
 def _clone_or_update(location: str, path: Path) -> git.Repository:
