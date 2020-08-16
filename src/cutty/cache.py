@@ -34,7 +34,7 @@ class Cache:
         revision: Optional[str] = None,
     ) -> Iterator[Cache]:
         """Load the project template from the cache."""
-        entry = Entry(location, directory=directory, revision=revision)
+        entry = _Entry(location, directory=directory, revision=revision)
         with entry.checkout() as repository:
             yield cls(repository, entry.describe, entry.context)
 
@@ -48,7 +48,7 @@ def _clone_or_update(location: str, path: Path) -> git.Repository:
     return repository
 
 
-class Entry:
+class _Entry:
     """Cache entry for a repository."""
 
     def __init__(
