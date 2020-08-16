@@ -34,16 +34,16 @@ class Store:
             json.dump(context, io, indent=2)
 
 
-def load_context(path: Path, *, default: Optional[Context] = None) -> Context:
+def load_context(store: Store, *, default: Optional[Context] = None) -> Context:
     """Load context from disk."""
-    if default is not None and not path.exists():
+    if default is not None and not store.path.exists():
         return default
 
     try:
-        return Store(path).load()
+        return store.load()
     except ValueError as error:
         raise exceptions.ContextDecodingException(
-            f"JSON decoding error while loading '{path.resolve()}'."
+            f"JSON decoding error while loading '{store.path.resolve()}'."
             f"  Decoding error details: '{error}'"
         )
 
@@ -80,7 +80,7 @@ def create_context(
     default_context: Context,
 ) -> Context:
     """Generate the context for a Cookiecutter project template."""
-    context = load_context(path)
+    context = load_context(Store(path))
     context = _override_context(context, default_context, extra_context)
     context = prompt_for_config(context, no_input=no_input)
 
