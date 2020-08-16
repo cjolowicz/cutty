@@ -7,7 +7,6 @@ from ..cache import Cache
 from ..config import Config
 from ..context import create_context
 from ..context import load_context
-from ..context import Store
 from ..generate import generate_files
 from ..types import Context
 
@@ -51,8 +50,7 @@ def update(
             no_input=not interactive,
             default_context=config.default_context,
         )
-        store = Store(cache.context)
-        store.dump(context)
+        cache.context.dump(context)
 
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
 
