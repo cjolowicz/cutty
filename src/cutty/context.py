@@ -52,9 +52,8 @@ def override_context(context: Context, override: Context) -> Context:
 
     def _generate() -> Iterator[Tuple[str, Any]]:
         for key, value in context.items():
-            try:
-                yield key, _override_value(value, override[key])
-            except KeyError:
-                yield key, value
+            with contextlib.suppress(KeyError):
+                value = _override_value(value, override[key])
+            yield key, value
 
     return dict(_generate())
