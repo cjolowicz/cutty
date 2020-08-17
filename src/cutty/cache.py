@@ -60,7 +60,7 @@ class Cache:
         with repository.worktree(worktree, sha1, detach=True, force_remove=True):
             if directory is not None:
                 hash = _hash(str(directory))
-                context = Store(path / f"context-{hash}.json")
+                context = path / f"context-{hash}.json"
                 worktree = worktree / directory
 
-            yield cls(worktree, version, context)
+            yield cls(worktree, version, Store(context))
