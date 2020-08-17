@@ -6,7 +6,6 @@ from .. import git
 from ..cache import Cache
 from ..config import Config
 from ..context import create_context
-from ..context import load_context
 from ..context import Store
 from ..generate import generate_files
 from ..types import Context
@@ -31,19 +30,19 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     config = Config.load(config_file, ignore_config=default_config)
-    previous_context_store = Store(Path(".cookiecutter.json"))
-    previous_context = load_context(previous_context_store, default={})
+    store = Store(Path(".cookiecutter.json"))
+    previous_context = store.load() if store.path.exists() else {}
     extra_context = {**previous_context, **extra_context}
     template = extra_context["_template"]
     template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
-        context_store = Store(cache.repository / "cookiecutter.json")
-        current_context = load_context(context_store)
+        store = Store(cache.repository / "cookiecutter.json")
+        current_context = store.load()
         if not interactive:
             interactive = bool(current_context.keys() - previous_context.keys())
         context = create_context(
-            context_store,
+            store,
             template=template,
             extra_context=extra_context,
             no_input=not interactive,

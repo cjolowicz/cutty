@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 from typing import cast
 from typing import Iterator
-from typing import Optional
 from typing import Tuple
 
 from . import exceptions
@@ -38,14 +37,6 @@ class Store:
         """Dump the context."""
         with self.path.open(mode="w") as io:
             json.dump(context, io, indent=2)
-
-
-def load_context(store: Store, *, default: Optional[Context] = None) -> Context:
-    """Load context from disk."""
-    if default is not None and not store.path.exists():
-        return default
-
-    return store.load()
 
 
 def _override_value(value: Any, other: Any) -> Any:
@@ -80,7 +71,7 @@ def create_context(
     default_context: Context,
 ) -> Context:
     """Generate the context for a Cookiecutter project template."""
-    context = load_context(store)
+    context = store.load()
     context = _override_context(context, default_context, extra_context)
     context = prompt_for_config(context, no_input=no_input)
 
