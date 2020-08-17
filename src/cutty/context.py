@@ -9,7 +9,6 @@ from typing import Iterator
 from typing import Tuple
 
 from . import exceptions
-from .prompt import prompt_for_config
 from .types import Context
 
 
@@ -60,19 +59,3 @@ def _override_context(context: Context, *overrides: Context) -> Context:
                 yield key, value
 
     return dict(_generate())
-
-
-def create_context(
-    store: Store,
-    *,
-    template: str,
-    extra_context: Context,
-    no_input: bool,
-    default_context: Context,
-) -> Context:
-    """Generate the context for a Cookiecutter project template."""
-    context = store.load()
-    context = _override_context(context, default_context, extra_context)
-    context = prompt_for_config(context, no_input=no_input)
-
-    return {**context, "_template": template}
