@@ -33,7 +33,7 @@ def update(
     config = Config.load(config_file, ignore_config=default_config)
     store = Store(Path(".cookiecutter.json"))
     previous_context = store.load() if store.path.exists() else {}
-    extra_context = {**previous_context, **config.default_context, **extra_context}
+    extra_context = {**config.default_context, **previous_context, **extra_context}
     template = extra_context["_template"]
     template = config.abbreviations.expand(template)
 
