@@ -33,7 +33,7 @@ def update(
     config = Config.load(config_file, ignore_config=default_config)
     store = Store(Path(".cookiecutter.json"))
     previous_context = store.load() if store.path.exists() else {}
-    extra_context = {**previous_context, **extra_context}
+    extra_context = {**previous_context, **config.default_context, **extra_context}
     template = extra_context["_template"]
     template = config.abbreviations.expand(template)
 
@@ -41,7 +41,7 @@ def update(
         context = Store(cache.repository / "cookiecutter.json").load()
         if not interactive:
             interactive = bool(context.keys() - previous_context.keys())
-        context = _override_context(context, config.default_context, extra_context)
+        context = _override_context(context, extra_context)
         context = prompt_for_config(context, no_input=not interactive)
         context = {**context, "_template": template}
         cache.context.dump(context)

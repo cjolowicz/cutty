@@ -41,7 +41,9 @@ def create(
             context = cache.context.load()
         else:
             context = Store(cache.repository / "cookiecutter.json").load()
-            context = _override_context(context, config.default_context, extra_context)
+            context = _override_context(
+                context, {**config.default_context, **extra_context}
+            )
             context = prompt_for_config(context, no_input=no_input)
             context = {**context, "_template": template}
             cache.context.dump(context)
