@@ -39,9 +39,9 @@ def create(
         if replay:
             context = cache.context.load()
         else:
-            context_store = Store(cache.repository / "cookiecutter.json")
+            store = Store(cache.repository / "cookiecutter.json")
             context = create_context(
-                context_store,
+                store,
                 template=template,
                 extra_context=extra_context,
                 no_input=no_input,
