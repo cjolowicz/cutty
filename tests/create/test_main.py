@@ -119,7 +119,7 @@ def test_replay_dump(
         catch_exceptions=False,
     )
     with Cache.load(str(template.path)) as cache:
-        assert cache.context.exists()
+        assert cache.context.path.exists()
 
 
 def test_replay_load(
