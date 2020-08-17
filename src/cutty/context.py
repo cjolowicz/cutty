@@ -47,7 +47,9 @@ def _override_value(value: Any, other: Any) -> Any:
     return other
 
 
-def _override_context(context: Context, override: Context) -> Context:
+def override_context(context: Context, override: Context) -> Context:
+    """Override entries in a context."""
+
     def _generate() -> Iterator[Tuple[str, Any]]:
         for key, value in context.items():
             try:

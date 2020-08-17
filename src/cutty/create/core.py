@@ -5,7 +5,7 @@ from typing import Optional
 from .. import exceptions
 from ..cache import Cache
 from ..config import Config
-from ..context import _override_context
+from ..context import override_context
 from ..context import Store
 from ..generate import generate_files
 from ..prompt import prompt_for_config
@@ -41,7 +41,7 @@ def create(
             context = cache.context.load()
         else:
             context = Store(cache.repository / "cookiecutter.json").load()
-            context = _override_context(
+            context = override_context(
                 context, {**config.default_context, **extra_context}
             )
             context = prompt_for_config(context, no_input=no_input)
