@@ -38,9 +38,9 @@ def update(
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
         store = Store(cache.repository / "cookiecutter.json")
-        current_context = store.load()
+        context = store.load()
         if not interactive:
-            interactive = bool(current_context.keys() - previous_context.keys())
+            interactive = bool(context.keys() - previous_context.keys())
         context = create_context(
             store,
             template=template,
