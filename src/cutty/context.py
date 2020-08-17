@@ -24,7 +24,13 @@ class Store:
     def load(self) -> Context:
         """Load the context."""
         with self.path.open() as io:
-            context = json.load(io)
+            try:
+                context = json.load(io)
+            except ValueError as error:
+                raise exceptions.ContextDecodingException(
+                    f"JSON decoding error while loading '{self.path.resolve()}'."
+                    f"  Decoding error details: '{error}'"
+                )
 
         return cast(Context, context)
 
@@ -39,13 +45,7 @@ def load_context(store: Store, *, default: Optional[Context] = None) -> Context:
     if default is not None and not store.path.exists():
         return default
 
-    try:
-        return store.load()
-    except ValueError as error:
-        raise exceptions.ContextDecodingException(
-            f"JSON decoding error while loading '{store.path.resolve()}'."
-            f"  Decoding error details: '{error}'"
-        )
+    return store.load()
 
 
 def _override_value(value: Any, other: Any) -> Any:
