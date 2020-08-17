@@ -5,9 +5,10 @@ from typing import Optional
 from .. import exceptions
 from ..cache import Cache
 from ..config import Config
-from ..context import create_context
+from ..context import _override_context
 from ..context import Store
 from ..generate import generate_files
+from ..prompt import prompt_for_config
 from ..types import Context
 
 
@@ -39,14 +40,10 @@ def create(
         if replay:
             context = cache.context.load()
         else:
-            store = Store(cache.repository / "cookiecutter.json")
-            context = create_context(
-                store,
-                template=template,
-                extra_context=extra_context,
-                no_input=no_input,
-                default_context=config.default_context,
-            )
+            context = Store(cache.repository / "cookiecutter.json").load()
+            context = _override_context(context, config.default_context, extra_context)
+            context = prompt_for_config(context, no_input=no_input)
+            context = {**context, "_template": template}
             cache.context.dump(context)
 
         generate_files(
