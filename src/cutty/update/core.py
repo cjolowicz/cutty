@@ -27,10 +27,9 @@ def update(
     config_file: Optional[Path] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = Config.load(config_file)
+    Config.load(config_file)
     previous_context = Store(Path(".cookiecutter.json")).load()
     template = previous_context["_template"]
-    template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
         context = Store(cache.repository / "cookiecutter.json").load()
