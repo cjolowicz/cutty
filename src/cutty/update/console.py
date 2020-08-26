@@ -25,23 +25,12 @@ from ..utils import as_optional_path
         "for advanced repositories with multi templates in it"
     ),
 )
-@click.option(
-    "--config-file",
-    type=click.Path(),
-    default=None,
-    help="User configuration file",
-    envvar="CUTTY_CONFIG",
-)
 def update(
-    interactive: bool,
-    checkout: Optional[str],
-    directory: Optional[str],
-    config_file: Optional[str],
+    interactive: bool, checkout: Optional[str], directory: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
     core.update(
         interactive=interactive,
         checkout=checkout,
         directory=as_optional_path(directory),
-        config_file=as_optional_path(config_file),
     )
