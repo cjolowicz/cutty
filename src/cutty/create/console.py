@@ -59,11 +59,6 @@ def format_error(error: Exception) -> str:
     ),
 )
 @click.option(
-    "--replay",
-    is_flag=True,
-    help="Do not prompt for parameters and only use information entered previously",
-)
-@click.option(
     "-f",
     "--overwrite-if-exists",
     is_flag=True,
@@ -100,7 +95,6 @@ def create(
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],
-    replay: bool,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     output_dir: str,
@@ -114,7 +108,6 @@ def create(
             no_input=no_input,
             checkout=checkout,
             directory=as_optional_path(directory),
-            replay=replay,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
