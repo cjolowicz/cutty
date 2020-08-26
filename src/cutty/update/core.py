@@ -42,7 +42,6 @@ def update(
         context = override_context(context, default_context)
         context = prompt_for_config(context, no_input=not interactive)
         context = {**context, "_template": template}
-        cache.context.dump(context)
 
         instance = git.Repository()
         project_path = instance.path / ".git" / "cookiecutter" / instance.path.name
