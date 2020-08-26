@@ -1,31 +1,33 @@
 """Helper functions for contexts."""
+from __future__ import annotations
+
 import contextlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from typing import cast
 from typing import Iterator
 from typing import Tuple
 
 from .types import Context as _Context
 
 
-class Store:
-    """File-based storage for context."""
+@dataclass
+class Context:
+    """A collection of template variables."""
 
-    def __init__(self, path: Path) -> None:
-        """Initialize."""
-        self.path = path
+    data: _Context
 
-    def load(self) -> _Context:
+    @classmethod
+    def load(cls, path: Path) -> Context:
         """Load the context."""
-        with self.path.open() as io:
-            return cast(_Context, json.load(io))
+        with path.open() as io:
+            return cls(json.load(io))
 
-    def dump(self, context: _Context) -> None:
+    def dump(self, path: Path) -> None:
         """Dump the context."""
-        with self.path.open(mode="w") as io:
-            json.dump(context, io, indent=2)
+        with path.open(mode="w") as io:
+            json.dump(self.data, io, indent=2)
 
 
 def _override_value(value: Any, other: Any) -> Any:

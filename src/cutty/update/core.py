@@ -4,8 +4,8 @@ from typing import Optional
 
 from .. import git
 from ..cache import Cache
+from ..context import Context
 from ..context import override_context
-from ..context import Store
 from ..generate import generate_files
 from ..prompt import prompt_for_config
 
@@ -25,11 +25,11 @@ def update(
     directory: Optional[Path] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    previous_context = Store(Path(".cookiecutter.json")).load()
+    previous_context = Context.load(Path(".cookiecutter.json")).data
     template = previous_context["_template"]
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
-        context = Store(cache.repository / "cookiecutter.json").load()
+        context = Context.load(cache.repository / "cookiecutter.json").data
         if not interactive:
             interactive = bool(context.keys() - previous_context.keys())
         context = override_context(context, previous_context)
