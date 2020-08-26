@@ -20,10 +20,9 @@ def create(
     skip_if_file_exists: bool = False,
     output_dir: str = ".",
     config_file: Optional[Path] = None,
-    default_config: bool = False,
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    config = Config.load(config_file, ignore_config=default_config)
+    config = Config.load(config_file)
     template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
