@@ -32,17 +32,11 @@ from ..utils import as_optional_path
     help="User configuration file",
     envvar="CUTTY_CONFIG",
 )
-@click.option(
-    "--default-config",
-    is_flag=True,
-    help="Do not load a config file. Use the defaults instead",
-)
 def update(
     interactive: bool,
     checkout: Optional[str],
     directory: Optional[str],
     config_file: Optional[str],
-    default_config: bool,
 ) -> None:
     """Update a project from a Cookiecutter template."""
     core.update(
@@ -50,5 +44,4 @@ def update(
         checkout=checkout,
         directory=as_optional_path(directory),
         config_file=as_optional_path(config_file),
-        default_config=default_config,
     )
