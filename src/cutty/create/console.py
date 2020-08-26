@@ -111,7 +111,6 @@ def create(
     try:
         core.create(
             template,
-            extra_context={},
             no_input=no_input,
             checkout=checkout,
             directory=as_optional_path(directory),
