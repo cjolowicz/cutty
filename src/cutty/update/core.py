@@ -25,10 +25,9 @@ def update(
     checkout: Optional[str] = None,
     directory: Optional[Path] = None,
     config_file: Optional[Path] = None,
-    default_config: bool = False,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    config = Config.load(config_file, ignore_config=default_config)
+    config = Config.load(config_file)
     store = Store(Path(".cookiecutter.json"))
     previous_context = store.load() if store.path.exists() else {}
     default_context = {**config.default_context, **previous_context}
