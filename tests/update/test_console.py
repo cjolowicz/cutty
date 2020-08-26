@@ -72,30 +72,3 @@ def test_interactive(
         update, [f"--config-file={user_config_file}", "--interactive"], input="example",
     )
     assert result.exit_code == 0
-
-
-def test_no_previous_context(
-    runner: CliRunner,
-    user_config_file: Path,
-    template: git.Repository,
-    instance: git.Repository,
-) -> None:
-    """It updates the project from the template."""
-    template.rm(template.path / "{{cookiecutter.project}}" / ".cookiecutter.json")
-    template.commit(message="Remove .cookiecutter.json")
-    template.tag("v1.1.0")
-
-    result = runner.invoke(update, [f"--config-file={user_config_file}"])
-    git.Repository().merge("template")
-
-    (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
-    template.add(".")
-    template.commit(message="Add LICENSE")
-    template.tag("v1.2.0")
-
-    result = runner.invoke(
-        update,
-        [f"--config-file={user_config_file}", f"_template={template.path}"],
-        input="example",
-    )
-    assert result.exit_code == 0
