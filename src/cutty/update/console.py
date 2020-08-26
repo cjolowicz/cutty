@@ -46,7 +46,6 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     core.update(
-        extra_context={},
         interactive=interactive,
         checkout=checkout,
         directory=as_optional_path(directory),

@@ -9,7 +9,6 @@ from ..context import override_context
 from ..context import Store
 from ..generate import generate_files
 from ..prompt import prompt_for_config
-from ..types import Context
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
@@ -21,7 +20,6 @@ def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
 
 
 def update(
-    extra_context: Context,
     *,
     interactive: bool = False,
     checkout: Optional[str] = None,
@@ -33,15 +31,15 @@ def update(
     config = Config.load(config_file, ignore_config=default_config)
     store = Store(Path(".cookiecutter.json"))
     previous_context = store.load() if store.path.exists() else {}
-    extra_context = {**config.default_context, **previous_context, **extra_context}
-    template = extra_context["_template"]
+    default_context = {**config.default_context, **previous_context}
+    template = default_context["_template"]
     template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
         context = Store(cache.repository / "cookiecutter.json").load()
         if not interactive:
             interactive = bool(context.keys() - previous_context.keys())
-        context = override_context(context, extra_context)
+        context = override_context(context, default_context)
         context = prompt_for_config(context, no_input=not interactive)
         context = {**context, "_template": template}
         cache.context.dump(context)
