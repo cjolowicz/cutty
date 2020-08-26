@@ -85,11 +85,6 @@ def format_error(error: Exception) -> str:
     help="User configuration file",
     envvar="CUTTY_CONFIG",
 )
-@click.option(
-    "--default-config",
-    is_flag=True,
-    help="Do not load a config file. Use the defaults instead",
-)
 def create(
     template: str,
     no_input: bool,
@@ -99,7 +94,6 @@ def create(
     skip_if_file_exists: bool,
     output_dir: str,
     config_file: Optional[str],
-    default_config: bool,
 ) -> None:
     """Create a project from a Cookiecutter template."""
     try:
@@ -112,7 +106,6 @@ def create(
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
             config_file=as_optional_path(config_file),
-            default_config=default_config,
         )
     except errors as error:
         message = format_error(error)
