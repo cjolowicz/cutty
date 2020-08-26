@@ -49,14 +49,12 @@ class Config:
     abbreviations: Abbreviations = field(default_factory=Abbreviations)
 
     @classmethod
-    def load(
-        cls, path: Optional[Path] = None, *, ignore_config: bool = False
-    ) -> Config:
+    def load(cls, path: Optional[Path] = None) -> Config:
         """Return the user configuration."""
-        if ignore_config or (path is None and not locations.config.exists()):
-            return cls()
-
         if path is None:
+            if not locations.config.exists():
+                return cls()
+
             path = locations.config
         elif not path.exists():
             raise exceptions.ConfigDoesNotExistException(
