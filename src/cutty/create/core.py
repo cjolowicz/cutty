@@ -4,7 +4,7 @@ from typing import Optional
 
 from ..cache import Cache
 from ..config import Config
-from ..context import Store
+from ..context import Context
 from ..generate import generate_files
 from ..prompt import prompt_for_config
 
@@ -25,7 +25,7 @@ def create(
     template = config.abbreviations.expand(template)
 
     with Cache.load(template, directory=directory, revision=checkout) as cache:
-        context = Store(cache.repository / "cookiecutter.json").load()
+        context = Context.load(cache.repository / "cookiecutter.json").data
         context = prompt_for_config(context, no_input=no_input)
         context = {**context, "_template": template}
 
