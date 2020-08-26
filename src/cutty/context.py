@@ -7,7 +7,6 @@ from typing import cast
 from typing import Iterator
 from typing import Tuple
 
-from . import exceptions
 from .types import Context as _Context
 
 
@@ -21,15 +20,7 @@ class Store:
     def load(self) -> _Context:
         """Load the context."""
         with self.path.open() as io:
-            try:
-                context = json.load(io)
-            except ValueError as error:
-                raise exceptions.ContextDecodingException(
-                    f"JSON decoding error while loading '{self.path.resolve()}'."
-                    f"  Decoding error details: '{error}'"
-                )
-
-        return cast(_Context, context)
+            return cast(_Context, json.load(io))
 
     def dump(self, context: _Context) -> None:
         """Dump the context."""

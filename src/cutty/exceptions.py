@@ -35,13 +35,6 @@ class InvalidConfiguration(CuttyException):
     """
 
 
-class ContextDecodingException(CuttyException):
-    """Exception for failed JSON decoding.
-
-    Raised when a project's JSON context file can not be decoded.
-    """
-
-
 class OutputDirExistsException(CuttyException):
     """Exception for existing output directory.
 
