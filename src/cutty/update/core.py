@@ -4,7 +4,6 @@ from typing import Optional
 
 from .. import git
 from ..cache import Cache
-from ..config import Config
 from ..context import override_context
 from ..context import Store
 from ..generate import generate_files
@@ -24,10 +23,8 @@ def update(
     interactive: bool = False,
     checkout: Optional[str] = None,
     directory: Optional[Path] = None,
-    config_file: Optional[Path] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    Config.load(config_file)
     previous_context = Store(Path(".cookiecutter.json")).load()
     template = previous_context["_template"]
 
