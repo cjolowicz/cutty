@@ -11,7 +11,6 @@ import poyo.exceptions
 
 from . import exceptions
 from . import locations
-from .types import Context
 
 
 class Abbreviations:
@@ -45,7 +44,6 @@ class Abbreviations:
 class Config:
     """Configuration."""
 
-    default_context: Context = field(default_factory=dict)
     abbreviations: Abbreviations = field(default_factory=Abbreviations)
 
     @classmethod
@@ -71,9 +69,6 @@ class Config:
             )
 
         config = cls()
-
-        if "default_context" in data:
-            config.default_context = data["default_context"]
 
         if "abbreviations" in data:
             config.abbreviations.update(data["abbreviations"])
