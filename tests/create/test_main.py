@@ -1,11 +1,9 @@
 """Test cases for the console module."""
-import shutil
 from pathlib import Path
 
 from click.testing import CliRunner
 
 from cutty import git
-from cutty.cache import Cache
 from cutty.create.console import create
 
 
@@ -103,53 +101,3 @@ def test_checkout(
     )
 
     assert (Path("example") / "README.md").read_text().startswith("## ")
-
-
-def test_replay_dump(
-    runner: CliRunner,
-    user_cache_dir: Path,
-    user_config_file: Path,
-    template: git.Repository,
-) -> None:
-    """It dumps the context."""
-    runner.invoke(
-        create,
-        [str(template.path), f"--config-file={user_config_file}"],
-        input="example",
-        catch_exceptions=False,
-    )
-    with Cache.load(str(template.path)) as cache:
-        assert cache.context.path.exists()
-
-
-def test_replay_load(
-    runner: CliRunner,
-    user_cache_dir: Path,
-    user_config_file: Path,
-    template: git.Repository,
-) -> None:
-    """It loads the context."""
-    project = Path("replay-example")
-
-    runner.invoke(
-        create,
-        [str(template.path), f"--config-file={user_config_file}"],
-        input=project.name,
-        catch_exceptions=False,
-    )
-
-    shutil.rmtree(project)
-
-    runner.invoke(
-        create,
-        [str(template.path), f"--config-file={user_config_file}", "--replay"],
-        catch_exceptions=False,
-    )
-
-    assert project.exists()
-
-
-def test_replay_with_no_input(runner: CliRunner, template: git.Repository) -> None:
-    """It fails when passed --replay and --no-input."""
-    result = runner.invoke(create, [str(template.path), "--replay", "--no-input"])
-    assert result.exit_code == 1 and "replay" in result.output
