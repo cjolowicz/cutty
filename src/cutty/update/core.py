@@ -28,8 +28,7 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     config = Config.load(config_file)
-    store = Store(Path(".cookiecutter.json"))
-    previous_context = store.load() if store.path.exists() else {}
+    previous_context = Store(Path(".cookiecutter.json")).load()
     template = previous_context["_template"]
     template = config.abbreviations.expand(template)
 
