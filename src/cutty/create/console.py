@@ -2,17 +2,13 @@
 import json
 import sys
 from textwrap import dedent
-from typing import Any
-from typing import Iterator
 from typing import Optional
-from typing import Tuple
 
 import click
 
 from . import core
 from .. import exceptions
 from .. import git
-from ..types import Context
 from ..utils import as_optional_path
 
 
@@ -45,33 +41,8 @@ def format_error(error: Exception) -> str:
     return str(error)
 
 
-def validate_extra_context(*args: Any) -> Context:
-    """Validate extra_context command-line argument."""
-    try:  # pragma: no cover
-        _, _, values = args
-    except ValueError:
-        # Typeguard confuses click < 8.0 because click inspects `__code__` to
-        # determine the number of arguments to pass, and Typeguard's wrapper
-        # has an argument count of zero due to the use of `*args`.
-        _, values = args
-
-    def _generate() -> Iterator[Tuple[str, str]]:
-        for value in values:
-            try:
-                key, value = value.split("=", 1)
-            except ValueError:
-                raise click.BadParameter(
-                    "EXTRA_CONTEXT should contain items of the form key=value; "
-                    f"'{value}' doesn't match that form"
-                )
-            yield key, value
-
-    return dict(_generate())
-
-
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("template")
-@click.argument("extra_context", nargs=-1, callback=validate_extra_context)
 @click.option(
     "--no-input",
     is_flag=True,
@@ -126,7 +97,6 @@ def validate_extra_context(*args: Any) -> Context:
 )
 def create(
     template: str,
-    extra_context: Context,
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[str],
@@ -141,7 +111,7 @@ def create(
     try:
         core.create(
             template,
-            extra_context,
+            extra_context={},
             no_input=no_input,
             checkout=checkout,
             directory=as_optional_path(directory),
