@@ -25,19 +25,20 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     previous_template = TemplateConfig.load(".cookiecutter.json")
+    instance = git.Repository()
 
-    with Cache.load(
-        previous_template.location, directory=directory, revision=revision
-    ) as cache:
-        template = Template.load(cache.repository, overrides=previous_template)
-        instance = git.Repository()
-        project_path = instance.path / ".git" / "cutty" / instance.path.name
+    _ensure_branch_exists(instance, "template")
 
-        _ensure_branch_exists(instance, "template")
-
-        with instance.worktree(
-            project_path, "template", checkout=False, force_remove=True
-        ) as project:
+    with instance.worktree(
+        instance.path / ".git" / "cutty" / instance.path.name,
+        "template",
+        checkout=False,
+        force_remove=True,
+    ) as project:
+        with Cache.load(
+            previous_template.location, directory=directory, revision=revision
+        ) as cache:
+            template = Template.load(cache.repository, overrides=previous_template)
             engine = Engine(template, interactive=interactive)
             engine.generate(project.path.parent)
 
