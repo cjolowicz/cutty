@@ -10,11 +10,10 @@ from .template import Template
 class Engine:
     """Engine."""
 
-    def __init__(self, repo_dir: Path, *, location: str) -> None:
+    def __init__(self, template: Template, *, interactive: bool = True) -> None:
         """Initialize."""
-        template = Template.load(repo_dir, location=location)
         self.renderer = Renderer(template)
-        self.survey = Survey(template.variables)
+        self.survey = Survey(template.config.variables, interactive=interactive)
         self.generator = Generator(template=template, renderer=self.renderer)
 
     def generate(self, output_dir: Path) -> None:

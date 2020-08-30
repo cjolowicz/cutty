@@ -17,7 +17,7 @@ class Renderer:
         self.context: Dict[str, Any] = {}
         self.environment = jinja2.Environment(  # noqa: S701
             loader=jinja2.FileSystemLoader(str(template.root)),
-            extensions=template.extensions,
+            extensions=template.config.extensions,
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,
         )
