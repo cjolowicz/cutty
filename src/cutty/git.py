@@ -250,3 +250,7 @@ class Repository:
     def merge(self, ref: str) -> None:
         """Join two development histories together."""
         self.git("merge", ref)
+
+    def cherrypick(self, *commits: str) -> None:
+        """Apply the changes introduced by some existing commits."""
+        self.git("cherry-pick", *commits)
