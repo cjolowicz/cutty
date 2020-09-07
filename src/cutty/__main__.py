@@ -2,7 +2,7 @@
 import click
 
 from .legacy.create.console import create
-from .update.console import update
+from .legacy.update.console import update
 
 
 @click.group()

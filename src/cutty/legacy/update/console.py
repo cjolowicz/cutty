@@ -4,7 +4,7 @@ from typing import Optional
 import click
 
 from . import core
-from ..common.utils import as_optional_path
+from ...common.utils import as_optional_path
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
