@@ -7,7 +7,7 @@ from typing import Optional
 import click
 
 from . import core
-from .. import exceptions
+from ..common import exceptions
 from ..common import git
 from ..utils import as_optional_path
 
