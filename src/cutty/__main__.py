@@ -1,7 +1,7 @@
 """Command-line interface."""
 import click
 
-from .create.console import create
+from .legacy.create.console import create
 from .update.console import update
 
 

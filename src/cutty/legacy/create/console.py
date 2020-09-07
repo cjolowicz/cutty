@@ -7,9 +7,9 @@ from typing import Optional
 import click
 
 from . import core
-from ..common import exceptions
-from ..common import git
-from ..common.utils import as_optional_path
+from ...common import exceptions
+from ...common import git
+from ...common.utils import as_optional_path
 
 
 errors = (
