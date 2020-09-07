@@ -9,7 +9,7 @@ from typing import Optional
 from ..common import exceptions
 from ..common.types import Context
 from ..common.utils import make_executable
-from ..environment import Environment
+from .environment import Environment
 
 
 _HOOKS_DIR = Path("hooks")

@@ -14,7 +14,7 @@ from ..common.compat import contextmanager
 from ..common.types import Context
 from ..common.utils import chdir
 from ..common.utils import rmtree
-from ..environment import Environment
+from .environment import Environment
 from .hooks import run_hook
 
 
