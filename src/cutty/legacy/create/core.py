@@ -5,8 +5,8 @@ from typing import Optional
 from ...common.cache import Cache
 from ...common.config import Config
 from ...generate import generate_files
-from ...prompt import prompt_for_config
 from ..context import Context
+from ..prompt import prompt_for_config
 
 
 def create(

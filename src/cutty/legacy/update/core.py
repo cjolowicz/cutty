@@ -5,9 +5,9 @@ from typing import Optional
 from ...common import git
 from ...common.cache import Cache
 from ...generate import generate_files
-from ...prompt import prompt_for_config
 from ..context import Context
 from ..context import override_context
+from ..prompt import prompt_for_config
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
