@@ -9,7 +9,7 @@ from typing import Optional
 import click
 import jinja2.exceptions
 
-from . import exceptions
+from .common import exceptions
 from .environment import Environment
 from .types import Context
 
