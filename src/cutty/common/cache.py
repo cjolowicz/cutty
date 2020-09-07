@@ -8,8 +8,8 @@ from typing import Iterator
 from typing import Optional
 
 from . import git
+from . import tags
 from .. import locations
-from .. import tags
 from ..compat import contextmanager
 
 
