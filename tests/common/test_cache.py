@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from ..utils import commit
-from cutty import git
+from cutty.common import git
 from cutty.common.cache import Cache
 
 
