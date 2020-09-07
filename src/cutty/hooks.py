@@ -8,8 +8,8 @@ from typing import Optional
 
 from .common import exceptions
 from .common.types import Context
+from .common.utils import make_executable
 from .environment import Environment
-from .utils import make_executable
 
 
 _HOOKS_DIR = Path("hooks")

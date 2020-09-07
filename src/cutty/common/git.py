@@ -13,7 +13,7 @@ from typing import TypeVar
 from ..common.compat import contextmanager
 from ..common.types import CompletedProcess
 from ..common.types import StrPath
-from ..utils import removeprefix
+from ..common.utils import removeprefix
 
 
 class Error(Exception):
