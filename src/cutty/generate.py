@@ -15,7 +15,7 @@ from .common.types import Context
 from .common.utils import chdir
 from .common.utils import rmtree
 from .environment import Environment
-from .hooks import run_hook
+from .legacy.hooks import run_hook
 
 
 def find_template(repo_dir: Path) -> Path:
