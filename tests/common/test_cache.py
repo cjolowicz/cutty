@@ -1,9 +1,9 @@
 """Tests for the cache module."""
 from pathlib import Path
 
-from .utils import commit
+from ..utils import commit
 from cutty import git
-from cutty.cache import Cache
+from cutty.common.cache import Cache
 
 
 def test_repository_clones(user_cache_dir: Path, repository: git.Repository) -> None:

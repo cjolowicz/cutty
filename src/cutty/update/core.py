@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from .. import git
-from ..cache import Cache
+from ..common.cache import Cache
 from ..context import Context
 from ..context import override_context
 from ..generate import generate_files

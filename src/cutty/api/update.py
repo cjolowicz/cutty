@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from .. import git
-from ..cache import Cache
+from ..common.cache import Cache
 from .engine import Engine
 from .template import Config as TemplateConfig
 from .template import Template

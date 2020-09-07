@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ..cache import Cache
+from ..common.cache import Cache
 from ..config import Config
 from ..context import Context
 from ..generate import generate_files

@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import Iterator
 from typing import Optional
 
-from . import git
-from . import locations
-from . import tags
-from .compat import contextmanager
+from .. import git
+from .. import locations
+from .. import tags
+from ..compat import contextmanager
 
 
 def _hash(value: str) -> str:
