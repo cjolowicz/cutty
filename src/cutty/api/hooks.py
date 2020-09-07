@@ -7,7 +7,7 @@ from typing import Iterator
 from typing import Optional
 
 from ..common.compat import contextmanager
-from ..utils import make_executable
+from ..common.utils import make_executable
 from .renderer import Renderer
 from .template import Template
 

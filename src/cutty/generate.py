@@ -12,10 +12,10 @@ from jinja2 import FileSystemLoader
 from .common import exceptions
 from .common.compat import contextmanager
 from .common.types import Context
+from .common.utils import chdir
+from .common.utils import rmtree
 from .environment import Environment
 from .hooks import run_hook
-from .utils import chdir
-from .utils import rmtree
 
 
 def find_template(repo_dir: Path) -> Path:
