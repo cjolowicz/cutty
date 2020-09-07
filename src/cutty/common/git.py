@@ -11,8 +11,8 @@ from typing import Optional
 from typing import TypeVar
 
 from ..common.compat import contextmanager
-from ..types import CompletedProcess
-from ..types import StrPath
+from ..common.types import CompletedProcess
+from ..common.types import StrPath
 from ..utils import removeprefix
 
 

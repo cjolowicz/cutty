@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Optional
 
 from .common import exceptions
+from .common.types import Context
 from .environment import Environment
-from .types import Context
 from .utils import make_executable
 
 
