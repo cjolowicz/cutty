@@ -9,7 +9,7 @@ from typing import Optional
 from packaging.version import InvalidVersion
 from packaging.version import Version
 
-from .common import git
+from . import git
 
 
 @dataclass
