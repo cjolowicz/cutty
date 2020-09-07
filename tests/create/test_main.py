@@ -3,7 +3,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from cutty import git
+from cutty.common import git
 from cutty.create.console import create
 
 

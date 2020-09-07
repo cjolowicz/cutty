@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
-from .. import git
+from ..common import git
 from ..common.cache import Cache
 from ..context import Context
 from ..context import override_context

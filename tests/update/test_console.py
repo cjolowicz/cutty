@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from cutty import git
+from cutty.common import git
 from cutty.create.console import create
 from cutty.update.console import update
 

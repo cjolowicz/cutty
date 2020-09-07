@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from .utils import commit
-from cutty import git
+from ..utils import commit
+from cutty.common import git
 
 
 @pytest.fixture

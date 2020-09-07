@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
-from .. import git
+from ..common import git
 from ..common.cache import Cache
 from .engine import Engine
 from .template import Config as TemplateConfig
