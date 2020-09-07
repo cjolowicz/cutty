@@ -9,8 +9,8 @@ from typing import Optional
 
 import poyo.exceptions
 
-from . import exceptions
-from . import locations
+from .. import exceptions
+from .. import locations
 
 
 class Abbreviations:
