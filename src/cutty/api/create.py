@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..common.cache import Cache
-from ..config import Config
+from ..common.config import Config
 from .engine import Engine
 from .template import Template
 
