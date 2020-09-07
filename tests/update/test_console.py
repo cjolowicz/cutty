@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from cutty.common import git
-from cutty.create.console import create
+from cutty.legacy.create.console import create
 from cutty.update.console import update
 
 
