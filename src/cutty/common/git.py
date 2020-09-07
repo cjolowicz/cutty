@@ -10,7 +10,7 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 
-from ..compat import contextmanager
+from ..common.compat import contextmanager
 from ..types import CompletedProcess
 from ..types import StrPath
 from ..utils import removeprefix
