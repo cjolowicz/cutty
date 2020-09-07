@@ -10,7 +10,7 @@ from binaryornot.check import is_binary
 from jinja2 import FileSystemLoader
 
 from . import exceptions
-from .compat import contextmanager
+from .common.compat import contextmanager
 from .environment import Environment
 from .hooks import run_hook
 from .types import Context

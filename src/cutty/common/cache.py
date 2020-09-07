@@ -10,7 +10,7 @@ from typing import Optional
 from . import git
 from . import tags
 from .. import locations
-from ..compat import contextmanager
+from ..common.compat import contextmanager
 
 
 def _hash(value: str) -> str:
