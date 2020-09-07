@@ -9,9 +9,9 @@ from typing import Optional
 import click
 import jinja2.exceptions
 
-from .common import exceptions
-from .common.types import Context
-from .environment import Environment
+from ..common import exceptions
+from ..common.types import Context
+from ..environment import Environment
 
 
 def read_user_variable(variable: str, default: Any) -> Any:
