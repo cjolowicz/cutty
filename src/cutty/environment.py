@@ -4,7 +4,7 @@ from typing import Any
 import jinja2
 
 from .common import exceptions
-from .types import Context
+from .common.types import Context
 
 
 DEFAULT_EXTENSIONS = [

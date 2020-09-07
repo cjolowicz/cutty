@@ -11,9 +11,9 @@ from jinja2 import FileSystemLoader
 
 from .common import exceptions
 from .common.compat import contextmanager
+from .common.types import Context
 from .environment import Environment
 from .hooks import run_hook
-from .types import Context
 from .utils import chdir
 from .utils import rmtree
 

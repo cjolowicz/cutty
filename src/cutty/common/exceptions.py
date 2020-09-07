@@ -1,7 +1,7 @@
 """All exceptions used in the cutty code base are defined here."""
 import jinja2.exceptions
 
-from ..types import Context
+from ..common.types import Context
 
 
 class CuttyException(Exception):
