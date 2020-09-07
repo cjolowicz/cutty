@@ -9,7 +9,7 @@ from typing import Optional
 
 from . import git
 from . import tags
-from .. import locations
+from ..common import locations
 from ..common.compat import contextmanager
 
 

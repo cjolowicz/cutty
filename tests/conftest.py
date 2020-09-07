@@ -7,8 +7,8 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from click.testing import CliRunner
 
-from cutty import locations
 from cutty.common import git
+from cutty.common import locations
 
 
 @pytest.fixture(scope="session", autouse=True)
