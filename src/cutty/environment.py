@@ -8,9 +8,9 @@ from .types import Context
 
 
 DEFAULT_EXTENSIONS = [
-    "cutty.extensions.JsonifyExtension",
-    "cutty.extensions.RandomStringExtension",
-    "cutty.extensions.SlugifyExtension",
+    "cutty.common.extensions.JsonifyExtension",
+    "cutty.common.extensions.RandomStringExtension",
+    "cutty.common.extensions.SlugifyExtension",
     "jinja2_time.TimeExtension",
 ]
 
