@@ -8,7 +8,7 @@ from typing import Optional
 
 from ..common.compat import contextmanager
 from ..common.utils import make_executable
-from .renderer import Renderer
+from .render import Renderer
 from .template import Template
 
 
