@@ -55,7 +55,7 @@ class Config:
 
             path = locations.config
         elif not path.exists():
-            raise exceptions.ConfigDoesNotExistException(
+            raise exceptions.ConfigurationDoesNotExist(
                 f"Config file {path} does not exist."
             )
 

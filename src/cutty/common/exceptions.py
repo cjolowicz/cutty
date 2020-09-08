@@ -5,7 +5,7 @@ class CuttyException(Exception):
     """Base class for cutty exceptions."""
 
 
-class ConfigDoesNotExistException(CuttyException):
+class ConfigurationDoesNotExist(CuttyException):
     """The configuration file does not exist."""
 
 
