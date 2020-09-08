@@ -10,10 +10,10 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 
-from ..common.compat import contextmanager
-from ..common.types import CompletedProcess
-from ..common.types import StrPath
-from ..common.utils import removeprefix
+from .compat import contextmanager
+from .types import CompletedProcess
+from .types import StrPath
+from .utils import removeprefix
 
 
 class Error(Exception):

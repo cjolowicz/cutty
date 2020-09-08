@@ -8,9 +8,9 @@ from typing import Iterator
 from typing import Optional
 
 from . import git
+from . import locations
 from . import tags
-from ..common import locations
-from ..common.compat import contextmanager
+from .compat import contextmanager
 
 
 def _hash(value: str) -> str:
