@@ -3,7 +3,7 @@ from typing import Any
 
 import jinja2
 
-from ..common import exceptions
+from . import exceptions
 from ..common.types import Context
 
 

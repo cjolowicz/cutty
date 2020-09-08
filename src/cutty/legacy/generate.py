@@ -9,7 +9,7 @@ import jinja2.exceptions
 from binaryornot.check import is_binary
 from jinja2 import FileSystemLoader
 
-from ..common import exceptions
+from . import exceptions
 from ..common.compat import contextmanager
 from ..common.types import Context
 from ..common.utils import chdir
