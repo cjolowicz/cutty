@@ -9,7 +9,7 @@ from typing import Optional
 
 import poyo.exceptions
 
-from ..common import exceptions
+from . import exceptions
 from ..common import locations
 
 
