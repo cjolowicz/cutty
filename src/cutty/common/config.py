@@ -10,7 +10,7 @@ from typing import Optional
 import poyo.exceptions
 
 from . import exceptions
-from ..common import locations
+from . import locations
 
 
 class Abbreviations:
