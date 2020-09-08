@@ -24,8 +24,8 @@ def update(
     directory: Optional[Path] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    previous_template = TemplateConfig.load(".cookiecutter.json")
     instance = git.Repository()
+    previous_template = TemplateConfig.load(instance.path / ".cookiecutter.json")
 
     _ensure_branch_exists(instance, "template")
 
