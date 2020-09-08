@@ -38,7 +38,11 @@ def update(
         with Cache.load(
             previous_template.location, directory=directory, revision=revision
         ) as cache:
-            template = Template.load(cache.repository, overrides=previous_template)
+            template = Template.load(
+                cache.repository,
+                location=previous_template.location,
+                overrides=previous_template,
+            )
             engine = Engine(template, interactive=interactive)
             engine.generate(project.path.parent)
 
