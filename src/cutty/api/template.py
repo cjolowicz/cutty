@@ -93,7 +93,7 @@ class Template:
     ) -> Template:
         """Load the template variables."""
         root = find_template(path)
-        config = Config.load(path / "cookiecutter.json")
+        config = Config.load(path / "cookiecutter.json", location=location)
         if overrides is not None:
             config = config.override(overrides)
 
