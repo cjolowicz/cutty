@@ -50,5 +50,5 @@ def update(
             project.add(all=True)
             project.commit(message=f"Update template to {cache.version}")
 
-            commit = project.rev_parse("HEAD")
+            commit = project.rev_parse("HEAD", verify=False)
             instance.cherrypick(commit)
