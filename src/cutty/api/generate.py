@@ -1,36 +1,12 @@
 """Generate."""
 import fnmatch
 import shutil
-from contextlib import ExitStack
 from pathlib import Path
-from typing import Any
 
+from ..common.utils import RemoveTree
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template
-
-
-class RemoveTree:
-    """Remove a directory tree on exit, unless it already existed."""
-
-    def __init__(self, path: Path) -> None:
-        """Initialize."""
-        self.stack = ExitStack()
-        if not path.exists():
-            self.stack.callback(shutil.rmtree, path)
-
-    def __enter__(self) -> Any:
-        """Enter the context."""
-        self.stack.__enter__()
-        return self
-
-    def __exit__(self, *args: Any) -> None:
-        """Exit the context."""
-        self.stack.__exit__(*args)
-
-    def cancel(self) -> None:
-        """Do not remove the directory tree."""
-        self.stack.pop_all()
 
 
 class Generator:
