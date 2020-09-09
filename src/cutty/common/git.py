@@ -224,12 +224,14 @@ class Repository:
         allow_empty: Optional[bool] = None,
         allow_empty_message: Optional[bool] = None,
         message: Optional[str] = None,
+        verify: Optional[bool] = None,
     ) -> None:
         """Record changes to the repository."""
         options = _format_options(
             allow_empty=allow_empty,
             allow_empty_message=allow_empty_message,
             message=message,
+            verify=verify,
         )
         self.git("commit", *options, "--", *paths)
 
