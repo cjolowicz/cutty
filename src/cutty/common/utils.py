@@ -54,7 +54,7 @@ class RemoveTree:
         """Initialize."""
         self.stack = contextlib.ExitStack()
         if not path.exists():
-            self.stack.callback(shutil.rmtree, path)
+            self.stack.callback(rmtree, path)
 
     def __enter__(self) -> Any:
         """Enter the context."""
