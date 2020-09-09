@@ -10,7 +10,7 @@ from .render import Renderer
 from .template import Template
 
 
-class Cleanup:
+class RemoveTree:
     """Remove a directory tree on exit, unless it already existed."""
 
     def __init__(self, path: Path) -> None:
@@ -45,10 +45,10 @@ class Generator:
     def generate(self, output_dir: Path) -> None:
         """Generate project."""
         target_dir = output_dir / self.renderer.render(self.template.root.name)
-        with Cleanup(target_dir) as cleanup:
+        with RemoveTree(target_dir) as rmtree:
             with self.hooks.run_hooks(cwd=target_dir):
                 self._generate_directory(self.template.root, target_dir)
-            cleanup.cancel()
+            rmtree.cancel()
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
         if self._is_copy_only(source_dir):
