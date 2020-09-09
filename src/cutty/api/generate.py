@@ -3,24 +3,34 @@ import fnmatch
 import shutil
 from contextlib import ExitStack
 from pathlib import Path
+from typing import Any
 
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template
 
 
-class Cleanup(ExitStack):
+class Cleanup:
     """Remove a directory tree on exit, unless it already existed."""
 
     def __init__(self, path: Path) -> None:
         """Initialize."""
-        super().__init__()
+        self.stack = ExitStack()
         if not path.exists():
-            self.callback(shutil.rmtree, path)
+            self.stack.callback(shutil.rmtree, path)
+
+    def __enter__(self) -> Any:
+        """Enter the context."""
+        self.stack.__enter__()
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        """Exit the context."""
+        self.stack.__exit__(*args)
 
     def cancel(self) -> None:
-        """Do not remove the directory tree on exit."""
-        self.pop_all()
+        """Do not remove the directory tree."""
+        self.stack.pop_all()
 
 
 class Generator:
