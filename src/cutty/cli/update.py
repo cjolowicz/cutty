@@ -29,8 +29,18 @@ from ..common.utils import as_optional_path
         "cookiecutter.json file."
     ),
 )
+@click.option(
+    "--config",
+    metavar="FILE",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, allow_dash=True),
+    envvar="CUTTY_CONFIG",
+    help="Configuration file.",
+)
 def update(
-    interactive: bool, revision: Optional[str], template_directory: Optional[str],
+    interactive: bool,
+    revision: Optional[str],
+    template_directory: Optional[str],
+    config: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
     try:
@@ -38,6 +48,7 @@ def update(
             interactive=interactive,
             revision=revision,
             directory=as_optional_path(template_directory),
+            config_file=as_optional_path(config),
         )
     except git.Error as error:
         sys.exit(str(error))
