@@ -24,13 +24,13 @@ poyo = "^0.5.0"
 jinja2-time = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.4.3"
+pytest = "^6.0.1"
 coverage = {extras = ["toml"], version = "^5.2"}
 safety = "^1.9.0"
 mypy = "^0.782"
 typeguard = "^2.9.1"
 xdoctest = "^0.13.0"
-sphinx = "^3.1.2"
+sphinx = "^3.2.0"
 sphinx-autobuild = "^0.7.1"
 pre-commit = "^2.6.0"
 flake8 = "^3.8.3"
@@ -40,9 +40,9 @@ flake8-bugbear = "^20.1.4"
 flake8-docstrings = "^1.5.0"
 flake8-rst-docstrings = "^0.0.13"
 pep8-naming = "^0.11.1"
-darglint = "^1.5.1"
-reorder-python-imports = "^2.3.1"
-pre-commit-hooks = "^3.1.0"
+darglint = "^1.5.2"
+reorder-python-imports = "^2.3.5"
+pre-commit-hooks = "^3.2.0"
 
 [tool.poetry.scripts]
 cutty = "cutty.__main__:main"
