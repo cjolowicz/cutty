@@ -11,6 +11,7 @@ import poyo.exceptions
 
 from . import exceptions
 from . import locations
+from .utils import with_context
 
 
 class Abbreviations:
@@ -40,15 +41,6 @@ class Abbreviations:
         return template
 
 
-def handle_errors(path: Path):
-    """Handle errors."""
-    return (
-        exceptions.ConfigurationDoesNotExist(path).when(FileNotFoundError),
-        exceptions.InvalidConfiguration(path).when(poyo.exceptions.PoyoException),
-        exceptions.ConfigurationError(path).when(Exception),
-    )
-
-
 @dataclass
 class Config:
     """Configuration."""
@@ -64,10 +56,19 @@ class Config:
 
             path = locations.config
 
-        with handle_errors(path):
-            text = path.read_text()
-            data = poyo.parse_string(text)
+        return cls._load(path)
 
+    @with_context(
+        lambda path: (
+            exceptions.ConfigurationDoesNotExist(path).when(FileNotFoundError),
+            exceptions.InvalidConfiguration(path).when(poyo.exceptions.PoyoException),
+            exceptions.ConfigurationError(path).when(Exception),
+        )
+    )
+    @classmethod
+    def _load(cls, path: Path) -> Config:
+        text = path.read_text()
+        data = poyo.parse_string(text)
         config = cls()
 
         if "abbreviations" in data:
