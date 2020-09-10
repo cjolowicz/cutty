@@ -54,12 +54,13 @@ class Config:
                 return cls()
 
             path = locations.config
-        elif not path.exists():
+
+        try:
+            text = path.read_text()
+        except FileNotFoundError:
             raise exceptions.ConfigurationDoesNotExist(
                 f"Config file {path} does not exist."
             )
-
-        text = path.read_text()
 
         try:
             data = poyo.parse_string(text)
