@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import Iterator
 from typing import Mapping
 from typing import Optional
 
@@ -11,6 +12,7 @@ import poyo.exceptions
 
 from . import exceptions
 from . import locations
+from .compat import contextmanager
 
 
 class Abbreviations:
@@ -40,6 +42,25 @@ class Abbreviations:
         return template
 
 
+@contextmanager
+def handle_errors(path: Path) -> Iterator[None]:
+    """Handle errors."""
+    try:
+        yield
+    except FileNotFoundError:
+        raise exceptions.ConfigurationDoesNotExist(
+            f"Cannot load configuration: {path}: File does not exist."
+        )
+    except poyo.exceptions.PoyoException as error:
+        raise exceptions.InvalidConfiguration(
+            f"Configuration file {path} is invalid: {error}"
+        )
+    except Exception as error:
+        raise exceptions.InvalidConfiguration(
+            f"Configuration file {path} cannot be loaded: {error}"
+        )
+
+
 @dataclass
 class Config:
     """Configuration."""
@@ -55,19 +76,9 @@ class Config:
 
             path = locations.config
 
-        try:
+        with handle_errors(path):
             text = path.read_text()
-        except FileNotFoundError:
-            raise exceptions.ConfigurationDoesNotExist(
-                f"Config file {path} does not exist."
-            )
-
-        try:
             data = poyo.parse_string(text)
-        except poyo.exceptions.PoyoException as error:
-            raise exceptions.InvalidConfiguration(
-                f"Unable to parse YAML file {path}. Error: {error}"
-            )
 
         config = cls()
 
