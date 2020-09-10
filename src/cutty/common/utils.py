@@ -5,8 +5,14 @@ import shutil
 import stat
 from pathlib import Path
 from typing import Any
+from typing import Callable
+from typing import cast
+from typing import ContextManager
+from typing import Iterable
 from typing import Iterator
 from typing import Optional
+from typing import TypeVar
+from typing import Union
 
 
 def as_optional_path(argument: Optional[str]) -> Optional[Path]:
@@ -74,3 +80,38 @@ def make_executable(path: Path) -> None:
     """Set the executable bit on a file."""
     status = os.stat(path)
     os.chmod(path, status.st_mode | stat.S_IEXEC)
+
+
+def to_context(
+    contexts: Union[ContextManager[Any], Iterable[ContextManager[Any]]]
+) -> ContextManager[Any]:
+    """Return a single context manager."""
+    if hasattr(contexts, "__enter__"):
+        return cast(ContextManager[Any], contexts)
+
+    stack = contextlib.ExitStack()
+    for context in cast(Iterable[ContextManager[Any]], contexts):
+        stack.enter_context(context)
+    return stack
+
+
+R = TypeVar("R")
+
+
+def with_context(
+    contextfactory: Callable[
+        ..., Union[ContextManager[Any], Iterable[ContextManager[Any]]]
+    ]
+) -> Callable[[Callable[..., R]], Callable[..., R]]:
+    """Invoke a function with a context manager created at call time."""
+
+    def decorator(func: Callable[..., R]) -> Callable[..., R]:
+        def wrapper(*args: Any, **kwargs: Any) -> R:
+            context = contextfactory(*args, **kwargs)
+            context = to_context(context)
+            with context:
+                return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
