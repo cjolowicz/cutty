@@ -1,4 +1,5 @@
 """General-purpose utilities."""
+import collections.abc
 import contextlib
 import os
 import shutil
@@ -118,7 +119,8 @@ def with_context(
     def decorator(func: Callable[..., R]) -> Callable[..., R]:
         def wrapper(*args: Any, **kwargs: Any) -> R:
             context = contextfactory(*args, **kwargs)
-            context = to_context(context)
+            if isinstance(context, collections.abc.Iterable):
+                context = multicontext(context)
             with context:
                 return func(*args, **kwargs)
 
