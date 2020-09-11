@@ -1,6 +1,7 @@
 """General-purpose utilities."""
 import collections.abc
 import contextlib
+import functools
 import os
 import shutil
 import stat
@@ -103,6 +104,7 @@ def with_context(
     """Invoke a function with a context manager created at call time."""
 
     def decorator(func: Callable[..., R]) -> Callable[..., R]:
+        @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> R:
             context = contextfactory(*args, **kwargs)
             if isinstance(context, collections.abc.Iterable):
