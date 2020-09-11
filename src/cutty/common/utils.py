@@ -28,7 +28,7 @@ def removeprefix(string: str, prefix: str) -> str:
     return string[len(prefix) :] if string.startswith(prefix) else string
 
 
-@contextlib.contextmanager
+@contextmanager
 def chdir(path: Path) -> Iterator[None]:
     """Context manager for changing the directory."""
     cwd = Path.cwd()
