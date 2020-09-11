@@ -7,7 +7,6 @@ import stat
 from pathlib import Path
 from typing import Any
 from typing import Callable
-from typing import cast
 from typing import ContextManager
 from typing import Iterable
 from typing import Iterator
@@ -91,19 +90,6 @@ def multicontext(contexts: Iterable[ContextManager[Any]]) -> Iterator[List[Any]]
     """Group multiple context managers in a single context manager."""
     with contextlib.ExitStack() as stack:
         yield [stack.enter_context(context) for context in contexts]
-
-
-def to_context(
-    contexts: Union[ContextManager[Any], Iterable[ContextManager[Any]]]
-) -> ContextManager[Any]:
-    """Return a single context manager."""
-    if hasattr(contexts, "__enter__"):
-        return cast(ContextManager[Any], contexts)
-
-    stack = contextlib.ExitStack()
-    for context in cast(Iterable[ContextManager[Any]], contexts):
-        stack.enter_context(context)
-    return stack
 
 
 R = TypeVar("R")
