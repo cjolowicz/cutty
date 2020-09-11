@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
+from cutty.cli.create import create
+from cutty.cli.update import update
 from cutty.common import git
-from cutty.legacy.create.console import create
-from cutty.legacy.update.console import update
 
 
 def test_help_succeeds(runner: CliRunner) -> None:
