@@ -15,7 +15,7 @@ class CuttyException(Exception):
 
     @contextmanager
     def when(self, *exception_types: Type[Exception]) -> Iterator[None]:
-        """Context manager handling exceptions by raising self."""
+        """Context manager handling exceptions by raising self instead."""
         if not exception_types:
             exception_types = (Exception,)
 
