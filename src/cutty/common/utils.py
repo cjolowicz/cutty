@@ -10,9 +10,12 @@ from typing import cast
 from typing import ContextManager
 from typing import Iterable
 from typing import Iterator
+from typing import List
 from typing import Optional
 from typing import TypeVar
 from typing import Union
+
+from .compat import contextmanager
 
 
 def as_optional_path(argument: Optional[str]) -> Optional[Path]:
@@ -80,6 +83,13 @@ def make_executable(path: Path) -> None:
     """Set the executable bit on a file."""
     status = os.stat(path)
     os.chmod(path, status.st_mode | stat.S_IEXEC)
+
+
+@contextmanager
+def multicontext(contexts: Iterable[ContextManager[Any]]) -> Iterator[List[Any]]:
+    """Group multiple context managers in a single context manager."""
+    with contextlib.ExitStack() as stack:
+        yield [stack.enter_context(context) for context in contexts]
 
 
 def to_context(
