@@ -59,7 +59,7 @@ def test_output_directory_exists(
     assert "already exists" in result.output
 
 
-def test_checkout(
+def test_revision(
     runner: CliRunner, user_cache_dir: Path, template: git.Repository,
 ) -> None:
     """It checks out the specified revision."""
@@ -74,7 +74,7 @@ def test_checkout(
 
     runner.invoke(
         create,
-        [str(template.path), "--checkout=master"],
+        [str(template.path), "--revision=master"],
         input="example",
         catch_exceptions=False,
     )
