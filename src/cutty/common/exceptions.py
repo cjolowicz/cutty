@@ -73,4 +73,4 @@ class PathRenderError(RenderError):
 
 
 class ContentRenderError(RenderError):
-    """Cannot render template contents at {}."""
+    """Cannot render template {}."""
