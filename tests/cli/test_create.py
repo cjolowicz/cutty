@@ -1,4 +1,4 @@
-"""Test cases for the console module."""
+"""Test cases for the create command."""
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -7,7 +7,7 @@ from cutty.cli.create import create
 from cutty.common import git
 
 
-def test_main_succeeds(runner: CliRunner) -> None:
+def test_create_succeeds(runner: CliRunner) -> None:
     """It exits with a status code of zero."""
     result = runner.invoke(create, ["--help"])
     assert result.exit_code == 0
