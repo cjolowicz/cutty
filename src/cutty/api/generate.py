@@ -24,6 +24,9 @@ class Generator:
         with exceptions.PathRenderError(self.template.root):
             target_dir = output_dir / self.renderer.render(self.template.root.name)
 
+        if target_dir.exists():
+            raise exceptions.ProjectDirectoryExists(target_dir)
+
         with RemoveTree(target_dir) as rmtree:
             with self.hooks.run_hooks(cwd=target_dir):
                 self._generate_directory(self.template.root, target_dir)
@@ -34,7 +37,8 @@ class Generator:
             shutil.copytree(source_dir, target_dir)
             return
 
-        target_dir.mkdir(parents=True, exist_ok=True)
+        target_dir.mkdir(parents=True)
+
         for source in source_dir.iterdir():
             with exceptions.PathRenderError(source):
                 target = target_dir / self.renderer.render(source.name)
