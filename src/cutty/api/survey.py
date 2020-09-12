@@ -44,4 +44,4 @@ class Survey:
         if isinstance(variable.value, dict):
             return prompt.ask_json_dict(variable.name, default=value)
 
-        prompt.ask(variable.name, default=value)
+        return prompt.ask(variable.name, default=value)
