@@ -58,3 +58,19 @@ class ConfigurationDoesNotExist(ConfigurationError):
 
 class InvalidConfiguration(ConfigurationError):
     """The configuration file {} is not valid."""
+
+
+class RenderError(CuttyException):
+    """Cannot render template."""
+
+
+class VariableRenderError(RenderError):
+    """Cannot render template variable {}."""
+
+
+class PathRenderError(RenderError):
+    """Cannot render template path {}."""
+
+
+class ContentRenderError(RenderError):
+    """Cannot render template contents at {}."""
