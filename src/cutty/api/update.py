@@ -48,7 +48,7 @@ def update(
             engine.generate(project.path.parent)
 
             project.add(all=True)
-            project.commit(message=f"Update template to {cache.version}")
+            project.commit(message=f"Update template to {cache.version}", verify=False)
 
-            commit = project.rev_parse("HEAD", verify=False)
+            commit = project.rev_parse("HEAD")
             instance.cherrypick(commit)
