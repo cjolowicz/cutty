@@ -1,12 +1,11 @@
 """Command-line interface for creating projects."""
-import sys
 from typing import Optional
 
 import click
 
 from ..api import create as api
-from ..common import git
 from ..common.utils import as_optional_path
+from .errorhandler import errorhandler
 
 
 @click.command()
@@ -53,7 +52,7 @@ def create(
     config: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    try:
+    with errorhandler():
         api.create(
             template,
             interactive=interactive,
@@ -62,5 +61,3 @@ def create(
             output_dir=as_optional_path(directory),
             config_file=as_optional_path(config),
         )
-    except git.Error as error:
-        sys.exit(str(error))
