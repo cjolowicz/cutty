@@ -19,12 +19,12 @@ class Generator:
         self.renderer = renderer
         self.hooks = HookManager(template=template, renderer=renderer)
 
-    def generate(self, output_dir: Path) -> None:
+    def generate(self, output_dir: Path, overwrite: bool = False) -> None:
         """Generate project."""
         with exceptions.PathRenderError(self.template.root):
             target_dir = output_dir / self.renderer.render(self.template.root.name)
 
-        if target_dir.exists():
+        if target_dir.exists() and not overwrite:
             raise exceptions.ProjectDirectoryExists(target_dir)
 
         with RemoveTree(target_dir) as rmtree:
@@ -37,7 +37,7 @@ class Generator:
             shutil.copytree(source_dir, target_dir)
             return
 
-        target_dir.mkdir(parents=True)
+        target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
             with exceptions.PathRenderError(source):
