@@ -1,12 +1,11 @@
 """Command-line interface for updating projects."""
-import sys
 from typing import Optional
 
 import click
 
 from ..api import update as api
-from ..common import git
 from ..common.utils import as_optional_path
+from .errorhandler import errorhandler
 
 
 @click.command()
@@ -43,12 +42,10 @@ def update(
     config: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    try:
+    with errorhandler():
         api.update(
             interactive=interactive,
             revision=revision,
             directory=as_optional_path(template_directory),
             config_file=as_optional_path(config),
         )
-    except git.Error as error:
-        sys.exit(str(error))
