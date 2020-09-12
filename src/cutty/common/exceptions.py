@@ -1,5 +1,7 @@
 """Exceptions."""
+from typing import Any
 from typing import Iterator
+from typing import Optional
 from typing import Type
 
 from .compat import contextmanager
@@ -12,6 +14,21 @@ class CuttyException(Exception):
         """Convert the exception to a string."""
         assert self.__doc__ is not None  # noqa: S101
         return self.__doc__.format(*self.args, cause=self.__cause__)
+
+    def __enter__(self) -> None:
+        """Enter the context."""
+
+    def __exit__(
+        self,
+        exception_type: Optional[Type[BaseException]],
+        exception: Optional[BaseException],
+        traceback: Optional[Any],
+    ) -> None:
+        """Exit the context."""
+        if isinstance(exception, Exception) and not isinstance(
+            exception, CuttyException
+        ):
+            raise self from exception
 
     @contextmanager
     def when(self, *exception_types: Type[Exception]) -> Iterator[None]:
