@@ -62,7 +62,7 @@ class Config:
         lambda path: (
             exceptions.ConfigurationDoesNotExist(path).when(FileNotFoundError),
             exceptions.InvalidConfiguration(path).when(poyo.exceptions.PoyoException),
-            exceptions.ConfigurationError(path).when(Exception),
+            exceptions.ConfigurationError(path),
         )
     )
     @classmethod
