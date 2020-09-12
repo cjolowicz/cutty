@@ -13,7 +13,11 @@ class CuttyException(Exception):
     def __str__(self) -> str:
         """Convert the exception to a string."""
         assert self.__doc__ is not None  # noqa: S101
-        return self.__doc__.format(*self.args, cause=self.__cause__)
+        message = self.__doc__.format(*self.args)
+        if self.__cause__ is not None:
+            message = message.rstrip(".")
+            message = f"{message}: {self.__cause__}"
+        return message
 
     def __enter__(self) -> None:
         """Enter the context."""
