@@ -3,6 +3,7 @@ import fnmatch
 import shutil
 from pathlib import Path
 
+from ..common import exceptions
 from ..common.utils import RemoveTree
 from .hooks import HookManager
 from .render import Renderer
@@ -20,7 +21,9 @@ class Generator:
 
     def generate(self, output_dir: Path) -> None:
         """Generate project."""
-        target_dir = output_dir / self.renderer.render(self.template.root.name)
+        with exceptions.PathRenderError(self.template.root):
+            target_dir = output_dir / self.renderer.render(self.template.root.name)
+
         with RemoveTree(target_dir) as rmtree:
             with self.hooks.run_hooks(cwd=target_dir):
                 self._generate_directory(self.template.root, target_dir)
@@ -33,7 +36,9 @@ class Generator:
 
         target_dir.mkdir(parents=True, exist_ok=True)
         for source in source_dir.iterdir():
-            target = target_dir / self.renderer.render(source.name)
+            with exceptions.PathRenderError(source):
+                target = target_dir / self.renderer.render(source.name)
+
             if source.is_dir():
                 self._generate_directory(source, target)
             else:
@@ -43,7 +48,9 @@ class Generator:
         if self._is_copy_only(source):
             shutil.copyfile(source, target)
         else:
-            text = self.renderer.render_path(source)
+            with exceptions.ContentRenderError(source):
+                text = self.renderer.render_path(source)
+
             target.write_text(text)
 
         shutil.copymode(source, target)

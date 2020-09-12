@@ -3,6 +3,7 @@ from typing import Any
 from typing import List
 
 from . import prompt
+from ..common import exceptions
 from .render import Renderer
 from .template import Variable
 
@@ -27,7 +28,8 @@ class Survey:
         if variable.name.startswith("_"):
             return variable.value
 
-        value = renderer.render(variable.value)
+        with exceptions.VariableRenderError(variable.name):
+            value = renderer.render(variable.value)
 
         if not self.interactive:
             return (
