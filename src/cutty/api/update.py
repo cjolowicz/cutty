@@ -44,7 +44,7 @@ def update(
             template = Template.load(
                 cache.repository, location=location, overrides=previous_template,
             )
-            engine = Engine(template, interactive=interactive)
+            engine = Engine(template, interactive=interactive, overwrite=True)
             engine.generate(project.path.parent)
 
             project.add(all=True)
