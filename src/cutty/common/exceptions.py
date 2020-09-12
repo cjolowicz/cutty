@@ -11,7 +11,7 @@ class CuttyException(Exception):
     def __str__(self) -> str:
         """Convert the exception to a string."""
         assert self.__doc__ is not None  # noqa: S101
-        return self.__doc__.format(*self.args)
+        return self.__doc__.format(*self.args, cause=self.__cause__)
 
     @contextmanager
     def when(self, *exception_types: Type[Exception]) -> Iterator[None]:
