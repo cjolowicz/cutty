@@ -57,5 +57,5 @@ def test_interactive(
     template.commit(message="Add LICENSE")
     template.tag("v1.1.0")
 
-    result = runner.invoke(update, ["--interactive"], input="example",)
+    result = runner.invoke(update, ["--interactive"], input="example")
     assert result.exit_code == 0
