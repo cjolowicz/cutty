@@ -74,3 +74,7 @@ class PathRenderError(RenderError):
 
 class ContentRenderError(RenderError):
     """Cannot render template {}."""
+
+
+class ProjectDirectoryExists(CuttyException):
+    """Project directory {} already exists."""
