@@ -29,34 +29,29 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     return repository
 
 
-class Cache:
-    """Cache for a project template."""
+@contextmanager
+def load(
+    location: str,
+    *,
+    directory: Optional[Path] = None,
+    revision: Optional[str] = None,
+    overrides: Optional[template.Config] = None
+) -> Iterator[Template]:
+    """Load the project template from the cache."""
+    hash = _hash(location)
+    path = locations.cache / "repositories" / hash[:2] / hash
+    repository = _load_repository(location, path / "repo.git")
+    if revision is None:
+        revision = tags.find_latest(repository) or "HEAD"
+    sha1 = repository.rev_parse(revision, verify=True)
+    version = tags.describe(repository, ref=revision)
+    worktree = path / "worktrees" / sha1
 
-    @classmethod
-    @contextmanager
-    def load(
-        cls,
-        location: str,
-        *,
-        directory: Optional[Path] = None,
-        revision: Optional[str] = None,
-        overrides: Optional[template.Config] = None
-    ) -> Iterator[Template]:
-        """Load the project template from the cache."""
-        hash = _hash(location)
-        path = locations.cache / "repositories" / hash[:2] / hash
-        repository = _load_repository(location, path / "repo.git")
-        if revision is None:
-            revision = tags.find_latest(repository) or "HEAD"
-        sha1 = repository.rev_parse(revision, verify=True)
-        version = tags.describe(repository, ref=revision)
-        worktree = path / "worktrees" / sha1
+    with repository.worktree(worktree, sha1, detach=True, force_remove=True):
+        if directory is not None:
+            hash = _hash(str(directory))
+            worktree = worktree / directory
 
-        with repository.worktree(worktree, sha1, detach=True, force_remove=True):
-            if directory is not None:
-                hash = _hash(str(directory))
-                worktree = worktree / directory
-
-            yield Template.load(
-                worktree, location=location, version=version, overrides=overrides
-            )
+        yield Template.load(
+            worktree, location=location, version=version, overrides=overrides
+        )

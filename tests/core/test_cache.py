@@ -2,16 +2,16 @@
 from pathlib import Path
 
 from ..utils import commit
+from cutty.core import cache
 from cutty.core import git
-from cutty.core.cache import Cache
 
 
 def test_repository_clones(user_cache_dir: Path, repository: git.Repository) -> None:
     """It clones the repository if it does not exist."""
     commit(repository)
     location = str(repository.path)
-    with Cache.load(location) as cache:
-        mirror = git.Repository(cache.repository)
+    with cache.load(location) as template:
+        mirror = git.Repository(template.repository)
         origin = mirror.get_remote_url("origin")
         assert origin == location
 
@@ -21,13 +21,13 @@ def test_repository_updates(user_cache_dir: Path, repository: git.Repository) ->
     commit(repository)
     location = str(repository.path)
 
-    with Cache.load(location) as cache:
+    with cache.load(location) as template:
         pass
 
     head = commit(repository)
 
-    with Cache.load(location) as cache:
-        mirror = git.Repository(cache.repository)
+    with cache.load(location) as template:
+        mirror = git.Repository(template.repository)
         assert mirror.rev_parse("HEAD") == head
 
 
@@ -36,8 +36,8 @@ def test_worktree_creates(user_cache_dir: Path, repository: git.Repository) -> N
     head = commit(repository)
     location = str(repository.path)
 
-    with Cache.load(location, revision="HEAD") as cache:
-        mirror = git.Repository(cache.repository)
+    with cache.load(location, revision="HEAD") as template:
+        mirror = git.Repository(template.repository)
         assert mirror.rev_parse("HEAD") == head
 
 
@@ -46,7 +46,7 @@ def test_worktree_removes(user_cache_dir: Path, repository: git.Repository) -> N
     commit(repository)
     location = str(repository.path)
 
-    with Cache.load(location, revision="HEAD") as cache:
+    with cache.load(location, revision="HEAD") as template:
         pass
 
-    assert not cache.repository.exists()
+    assert not template.repository.exists()
