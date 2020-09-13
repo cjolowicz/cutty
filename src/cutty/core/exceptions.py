@@ -61,7 +61,7 @@ class InvalidConfiguration(ConfigurationError):
 
 
 class InvalidAbbreviation(ConfigurationError):
-    """Invalid abbreviation {}: {!r}."""
+    """Invalid abbreviation {!r} in {!r}: {!r}."""
 
 
 class RenderError(CuttyException):
