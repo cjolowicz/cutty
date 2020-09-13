@@ -2,8 +2,8 @@
 from pathlib import Path
 from typing import Optional
 
+from ..core import cache
 from ..core import git
-from ..core.cache import Cache
 from ..core.config import Config
 from ..core.engine import Engine
 from ..core.template import Config as TemplateConfig
@@ -39,7 +39,7 @@ def update(
         checkout=False,
         force_remove=True,
     ) as project:
-        with Cache.load(
+        with cache.load(
             location,
             directory=directory,
             revision=revision,
