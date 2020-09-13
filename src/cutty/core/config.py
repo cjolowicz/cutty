@@ -37,7 +37,7 @@ class Abbreviations:
         prefix, _, rest = template.partition(":")
         abbreviation = self.abbreviations.get(prefix)
         if abbreviation is not None:
-            with exceptions.InvalidAbbreviation(prefix, abbreviation):
+            with exceptions.InvalidAbbreviation(prefix, template, abbreviation):
                 return abbreviation.format(rest)
 
         return template
