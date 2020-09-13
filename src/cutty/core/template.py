@@ -87,11 +87,17 @@ class Template:
     root: Path
     hookdir: Path
     repository: Path
+    version: str
     config: Config
 
     @classmethod
     def load(
-        cls, path: Path, *, location: str, overrides: Optional[Config] = None
+        cls,
+        path: Path,
+        *,
+        version: str,
+        location: str,
+        overrides: Optional[Config] = None
     ) -> Template:
         """Load the template variables."""
         root = find_template(path)
@@ -100,4 +106,6 @@ class Template:
         if overrides is not None:
             config = config.override(overrides)
 
-        return cls(root=root, hookdir=hookdir, repository=path, config=config)
+        return cls(
+            root=root, hookdir=hookdir, repository=path, version=version, config=config
+        )
