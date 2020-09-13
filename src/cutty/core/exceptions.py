@@ -60,6 +60,10 @@ class InvalidConfiguration(ConfigurationError):
     """The configuration file {} is not valid."""
 
 
+class InvalidAbbreviation(ConfigurationError):
+    """Invalid abbreviation {}: {!r}."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 

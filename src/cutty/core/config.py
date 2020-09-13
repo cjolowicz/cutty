@@ -35,8 +35,10 @@ class Abbreviations:
             return self.abbreviations[template]
 
         prefix, _, rest = template.partition(":")
-        if prefix in self.abbreviations:
-            return self.abbreviations[prefix].format(rest)
+        abbreviation = self.abbreviations.get(prefix)
+        if abbreviation is not None:
+            with exceptions.InvalidAbbreviation(prefix, abbreviation):
+                return abbreviation.format(rest)
 
         return template
 
