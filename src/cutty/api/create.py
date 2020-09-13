@@ -22,6 +22,8 @@ def create(
     location = config.abbreviations.expand(location)
 
     with Cache.load(location, directory=directory, revision=revision) as cache:
-        template = Template.load(cache.repository, location=location)
+        template = Template.load(
+            cache.repository, location=location, version=cache.version
+        )
         engine = Engine(template, interactive=interactive)
         engine.generate(output_dir or Path())
