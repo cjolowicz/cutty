@@ -11,9 +11,9 @@ from typing import Optional
 
 
 DEFAULT_EXTENSIONS = [
-    "cutty.common.extensions.JsonifyExtension",
-    "cutty.common.extensions.RandomStringExtension",
-    "cutty.common.extensions.SlugifyExtension",
+    "cutty.core.extensions.JsonifyExtension",
+    "cutty.core.extensions.RandomStringExtension",
+    "cutty.core.extensions.SlugifyExtension",
     "jinja2_time.TimeExtension",
 ]
 

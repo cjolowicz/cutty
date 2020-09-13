@@ -2,8 +2,8 @@
 import sys
 from typing import Iterator
 
-from ..common.compat import contextmanager
-from ..common.exceptions import CuttyException
+from ..core.compat import contextmanager
+from ..core.exceptions import CuttyException
 
 
 @contextmanager

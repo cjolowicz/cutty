@@ -7,7 +7,7 @@ from click.testing import CliRunner
 
 from cutty.cli.create import create
 from cutty.cli.update import update
-from cutty.common import git
+from cutty.core import git
 
 
 def test_help_succeeds(runner: CliRunner) -> None:

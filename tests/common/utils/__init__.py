@@ -1,1 +1,1 @@
-"""Test cases for cutty.common.utils."""
+"""Test cases for cutty.core.utils."""

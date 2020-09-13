@@ -3,8 +3,8 @@ import fnmatch
 import shutil
 from pathlib import Path
 
-from ..common import exceptions
-from ..common.utils import RemoveTree
+from ..core import exceptions
+from ..core.utils import RemoveTree
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template

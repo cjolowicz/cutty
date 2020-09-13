@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Iterator
 from typing import Optional
 
-from ..common import exceptions
-from ..common.compat import contextmanager
-from ..common.utils import make_executable
+from ..core import exceptions
+from ..core.compat import contextmanager
+from ..core.utils import make_executable
 from .render import Renderer
 from .template import Template
 

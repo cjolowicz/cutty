@@ -1,7 +1,7 @@
 """Tests for the tags module."""
 from ..utils import commit
-from cutty.common import git
-from cutty.common import tags
+from cutty.core import git
+from cutty.core import tags
 
 
 def test_no_tags(repository: git.Repository) -> None:

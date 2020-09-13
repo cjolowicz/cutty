@@ -4,7 +4,7 @@ from typing import Optional
 import click
 
 from ..api import create as api
-from ..common.utils import as_optional_path
+from ..core.utils import as_optional_path
 from .errorhandler import errorhandler
 
 

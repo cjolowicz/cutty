@@ -1,5 +1,5 @@
 """Test utilities."""
-from cutty.common import git
+from cutty.core import git
 
 
 def commit(repository: git.Repository) -> str:

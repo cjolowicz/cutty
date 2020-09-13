@@ -2,9 +2,9 @@
 from pathlib import Path
 from typing import Optional
 
-from ..common import git
-from ..common.cache import Cache
-from ..common.config import Config
+from ..core import git
+from ..core.cache import Cache
+from ..core.config import Config
 from .engine import Engine
 from .template import Config as TemplateConfig
 from .template import Template
