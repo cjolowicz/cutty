@@ -48,9 +48,9 @@ def load(
     worktree = path / "worktrees" / sha1
 
     with repository.worktree(worktree, sha1, detach=True, force_remove=True):
-        if directory is not None:
-            worktree = worktree / directory
-
         yield Template.load(
-            worktree, location=location, version=version, overrides=overrides
+            worktree if directory is None else worktree / directory,
+            location=location,
+            version=version,
+            overrides=overrides,
         )
