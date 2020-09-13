@@ -23,7 +23,7 @@ class HookManager:
 
     def __init__(self, *, template: Template, renderer: Renderer) -> None:
         """Initialize."""
-        self.root = template.root / "hooks"
+        self.template = template
         self.renderer = renderer
 
     @contextmanager
@@ -44,8 +44,8 @@ class HookManager:
         """Return the absolute path of the hook script, or None."""
         assert name in HOOKS  # noqa: S101
 
-        if self.root.is_dir():
-            for path in self.root.iterdir():
+        if self.template.hookdir.is_dir():
+            for path in self.template.hookdir.iterdir():
                 if path.stem == name and not path.name.endswith("~"):
                     return path.resolve()
 
