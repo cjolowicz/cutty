@@ -16,7 +16,7 @@ class Renderer:
         self.template = template
         self.context: Dict[str, Any] = {}
         self.environment = jinja2.Environment(  # noqa: S701
-            loader=jinja2.FileSystemLoader(str(template.root)),
+            loader=jinja2.FileSystemLoader(str(template.repository)),
             extensions=template.config.extensions,
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,
@@ -46,7 +46,7 @@ class Renderer:
     def render_path(self, path: Path) -> str:
         """Render a file."""
         if path.is_absolute():
-            path = path.relative_to(self.template.root)
+            path = path.relative_to(self.template.repository)
 
         template = self.environment.get_template(path.as_posix())
         return template.render(cookiecutter=self.context)
