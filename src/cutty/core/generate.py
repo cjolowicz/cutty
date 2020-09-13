@@ -3,11 +3,11 @@ import fnmatch
 import shutil
 from pathlib import Path
 
-from ..core import exceptions
-from ..core.utils import RemoveTree
+from . import exceptions
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template
+from .utils import RemoveTree
 
 
 class Generator:

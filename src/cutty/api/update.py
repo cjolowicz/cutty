@@ -5,9 +5,9 @@ from typing import Optional
 from ..core import git
 from ..core.cache import Cache
 from ..core.config import Config
-from .engine import Engine
-from .template import Config as TemplateConfig
-from .template import Template
+from ..core.engine import Engine
+from ..core.template import Config as TemplateConfig
+from ..core.template import Template
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:

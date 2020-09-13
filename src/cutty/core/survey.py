@@ -2,8 +2,8 @@
 from typing import Any
 from typing import List
 
+from . import exceptions
 from . import prompt
-from ..core import exceptions
 from .render import Renderer
 from .template import Variable
 

@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Iterator
 from typing import Optional
 
-from ..core import exceptions
-from ..core.compat import contextmanager
-from ..core.utils import make_executable
+from . import exceptions
+from .compat import contextmanager
 from .render import Renderer
 from .template import Template
+from .utils import make_executable
 
 
 HOOKS = [
