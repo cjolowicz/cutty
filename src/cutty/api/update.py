@@ -7,7 +7,6 @@ from ..core.cache import Cache
 from ..core.config import Config
 from ..core.engine import Engine
 from ..core.template import Config as TemplateConfig
-from ..core.template import Template
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
@@ -40,18 +39,19 @@ def update(
         checkout=False,
         force_remove=True,
     ) as project:
-        with Cache.load(location, directory=directory, revision=revision) as cache:
-            template = Template.load(
-                cache.repository,
-                location=location,
-                overrides=previous_template,
-                version=cache.version,
-            )
+        with Cache.load(
+            location,
+            directory=directory,
+            revision=revision,
+            overrides=previous_template,
+        ) as template:
             engine = Engine(template, interactive=interactive, overwrite=True)
             engine.generate(project.path.parent)
 
             project.add(all=True)
-            project.commit(message=f"Update template to {cache.version}", verify=False)
+            project.commit(
+                message=f"Update template to {template.version}", verify=False
+            )
 
             commit = project.rev_parse("HEAD")
             instance.cherrypick(commit)

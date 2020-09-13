@@ -5,7 +5,6 @@ from typing import Optional
 from ..core.cache import Cache
 from ..core.config import Config
 from ..core.engine import Engine
-from ..core.template import Template
 
 
 def create(
@@ -21,9 +20,6 @@ def create(
     config = Config.load(config_file)
     location = config.abbreviations.expand(location)
 
-    with Cache.load(location, directory=directory, revision=revision) as cache:
-        template = Template.load(
-            cache.repository, location=location, version=cache.version
-        )
+    with Cache.load(location, directory=directory, revision=revision) as template:
         engine = Engine(template, interactive=interactive)
         engine.generate(output_dir or Path())

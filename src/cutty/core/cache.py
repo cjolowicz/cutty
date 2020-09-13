@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
@@ -10,7 +9,9 @@ from typing import Optional
 from . import git
 from . import locations
 from . import tags
+from . import template
 from .compat import contextmanager
+from .template import Template
 
 
 def _hash(value: str) -> str:
@@ -28,12 +29,8 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     return repository
 
 
-@dataclass
 class Cache:
     """Cache for a project template."""
-
-    repository: Path
-    version: str
 
     @classmethod
     @contextmanager
@@ -43,7 +40,8 @@ class Cache:
         *,
         directory: Optional[Path] = None,
         revision: Optional[str] = None,
-    ) -> Iterator[Cache]:
+        overrides: Optional[template.Config] = None
+    ) -> Iterator[Template]:
         """Load the project template from the cache."""
         hash = _hash(location)
         path = locations.cache / "repositories" / hash[:2] / hash
@@ -59,4 +57,6 @@ class Cache:
                 hash = _hash(str(directory))
                 worktree = worktree / directory
 
-            yield cls(worktree, version)
+            yield Template.load(
+                worktree, location=location, version=version, overrides=overrides
+            )
