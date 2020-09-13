@@ -21,7 +21,9 @@ class Generator:
 
     def generate(self, output_dir: Path, overwrite: bool = False) -> None:
         """Generate project."""
-        with exceptions.PathRenderError(self.template.root):
+        with exceptions.PathRenderError(
+            self.template.root.relative_to(self.template.repository)
+        ):
             target_dir = output_dir / self.renderer.render(self.template.root.name)
 
         if target_dir.exists() and not overwrite:
@@ -40,7 +42,9 @@ class Generator:
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
-            with exceptions.PathRenderError(source):
+            with exceptions.PathRenderError(
+                source.relative_to(self.template.repository)
+            ):
                 target = target_dir / self.renderer.render(source.name)
 
             if source.is_dir():
@@ -52,7 +56,9 @@ class Generator:
         if self._is_copy_only(source):
             shutil.copyfile(source, target)
         else:
-            with exceptions.ContentRenderError(source):
+            with exceptions.ContentRenderError(
+                source.relative_to(self.template.repository)
+            ):
                 text = self.renderer.render_path(source)
 
             target.write_text(text)

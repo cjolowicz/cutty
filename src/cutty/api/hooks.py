@@ -54,7 +54,7 @@ class HookManager:
 
     def render(self, path: Path) -> Path:
         """Render a script."""
-        with exceptions.ContentRenderError(path):
+        with exceptions.ContentRenderError(path.relative_to(self.template.repository)):
             text = self.renderer.render_path(path)
 
         with tempfile.NamedTemporaryFile(
