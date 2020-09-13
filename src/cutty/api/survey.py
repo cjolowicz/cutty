@@ -32,11 +32,7 @@ class Survey:
             value = renderer.render(variable.value)
 
         if not self.interactive:
-            return (
-                variable.value[0]
-                if isinstance(variable.value, list)
-                else variable.value
-            )
+            return value[0] if isinstance(variable.value, list) else value
 
         if isinstance(variable.value, list):
             return prompt.ask_choice(variable.name, values=value)
