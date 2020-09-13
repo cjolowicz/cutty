@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Iterator
 from typing import Optional
 
+from ..common import exceptions
 from ..common.compat import contextmanager
 from ..common.utils import make_executable
 from .render import Renderer
@@ -53,7 +54,8 @@ class HookManager:
 
     def render(self, path: Path) -> Path:
         """Render a script."""
-        text = self.renderer.render_path(path)
+        with exceptions.ContentRenderError(path):
+            text = self.renderer.render_path(path)
 
         with tempfile.NamedTemporaryFile(
             delete=False, mode="w", suffix=path.suffix
