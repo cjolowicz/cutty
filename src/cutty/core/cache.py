@@ -49,7 +49,6 @@ def load(
 
     with repository.worktree(worktree, sha1, detach=True, force_remove=True):
         if directory is not None:
-            hash = _hash(str(directory))
             worktree = worktree / directory
 
         yield Template.load(
