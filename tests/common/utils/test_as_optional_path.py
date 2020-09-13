@@ -1,7 +1,7 @@
-"""Test cases for cutty.common.utils.as_optional_path."""
+"""Test cases for cutty.core.utils.as_optional_path."""
 from pathlib import Path
 
-from cutty.common.utils import as_optional_path
+from cutty.core.utils import as_optional_path
 
 
 def test_none() -> None:

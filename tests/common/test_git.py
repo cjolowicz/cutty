@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from ..utils import commit
-from cutty.common import git
+from cutty.core import git
 
 
 @pytest.fixture

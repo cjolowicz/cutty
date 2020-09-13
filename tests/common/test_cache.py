@@ -2,8 +2,8 @@
 from pathlib import Path
 
 from ..utils import commit
-from cutty.common import git
-from cutty.common.cache import Cache
+from cutty.core import git
+from cutty.core.cache import Cache
 
 
 def test_repository_clones(user_cache_dir: Path, repository: git.Repository) -> None:

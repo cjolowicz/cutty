@@ -4,7 +4,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from cutty.cli.create import create
-from cutty.common import git
+from cutty.core import git
 
 
 def test_create_succeeds(runner: CliRunner) -> None:

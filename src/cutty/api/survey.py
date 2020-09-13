@@ -3,7 +3,7 @@ from typing import Any
 from typing import List
 
 from . import prompt
-from ..common import exceptions
+from ..core import exceptions
 from .render import Renderer
 from .template import Variable
 
