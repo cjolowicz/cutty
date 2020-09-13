@@ -86,6 +86,7 @@ class Template:
 
     root: Path
     hookdir: Path
+    repository: Path
     config: Config
 
     @classmethod
@@ -99,4 +100,4 @@ class Template:
         if overrides is not None:
             config = config.override(overrides)
 
-        return cls(root, hookdir, config)
+        return cls(root=root, hookdir=hookdir, repository=path, config=config)
