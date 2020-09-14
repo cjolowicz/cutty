@@ -64,6 +64,14 @@ class InvalidAbbreviation(ConfigurationError):
     """Invalid abbreviation {!r} in {!r}: {!r}."""
 
 
+class CloneError(CuttyException):
+    """Cannot clone repository from {}."""
+
+
+class UpdateError(CuttyException):
+    """Cannot fetch repository updates from {}."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 

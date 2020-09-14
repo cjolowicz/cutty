@@ -5,6 +5,7 @@ from typing import Iterator
 from typing import Optional
 from typing import Tuple
 
+from . import exceptions
 from . import git
 from . import locations
 from . import tags
@@ -19,11 +20,15 @@ def _hash(value: str) -> str:
 
 def _load_repository(location: str, path: Path) -> git.Repository:
     if not path.exists():
-        return git.Repository.clone(location, destination=path, mirror=True, quiet=True)
+        with exceptions.CloneError(location):
+            return git.Repository.clone(
+                location, destination=path, mirror=True, quiet=True
+            )
 
-    repository = git.Repository(path)
-    repository.update_remote(prune=True)
-    return repository
+    with exceptions.UpdateError(location):
+        repository = git.Repository(path)
+        repository.update_remote(prune=True)
+        return repository
 
 
 def _determine_version(
