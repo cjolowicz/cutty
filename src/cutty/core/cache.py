@@ -1,10 +1,9 @@
 """Application cache."""
-from __future__ import annotations
-
 import hashlib
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
+from typing import Tuple
 
 from . import git
 from . import locations
@@ -27,28 +26,49 @@ def _load_repository(location: str, path: Path) -> git.Repository:
     return repository
 
 
-@contextmanager
-def load(
-    location: str,
-    *,
-    directory: Optional[Path] = None,
-    revision: Optional[str] = None,
-    overrides: Optional[template.Config] = None
-) -> Iterator[Template]:
-    """Load the project template from the cache."""
-    hash = _hash(location)
-    path = locations.cache / "repositories" / hash[:2] / hash
-    repository = _load_repository(location, path / "repo.git")
+def _determine_version(
+    repository: git.Repository, revision: Optional[str]
+) -> Tuple[str, str]:
     if revision is None:
         revision = tags.find_latest(repository) or "HEAD"
     sha1 = repository.rev_parse(revision, verify=True)
     version = tags.describe(repository, ref=revision)
-    worktree = path / "worktrees" / sha1
+    return version, sha1
 
-    with repository.worktree(worktree, sha1, detach=True, force_remove=True):
-        yield Template.load(
-            worktree if directory is None else worktree / directory,
-            location=location,
-            version=version,
-            overrides=overrides,
-        )
+
+class Cache:
+    """Application cache."""
+
+    def __init__(self, path: Path) -> None:
+        """Initialize."""
+        self.path = path
+
+    def _get_template_path(self, location: str) -> Path:
+        hash = _hash(location)
+        return self.path / "repositories" / hash[:2] / hash
+
+    @contextmanager
+    def load(
+        self,
+        location: str,
+        *,
+        directory: Optional[Path] = None,
+        revision: Optional[str] = None,
+        overrides: Optional[template.Config] = None
+    ) -> Iterator[Template]:
+        """Load a project template."""
+        path = self._get_template_path(location)
+        repository = _load_repository(location, path / "repo.git")
+        version, sha1 = _determine_version(repository, revision)
+        worktree = path / "worktrees" / sha1
+
+        with repository.worktree(worktree, sha1, detach=True, force_remove=True):
+            yield Template.load(
+                worktree if directory is None else worktree / directory,
+                location=location,
+                version=version,
+                overrides=overrides,
+            )
+
+
+cache = Cache(locations.cache)

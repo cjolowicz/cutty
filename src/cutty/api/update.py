@@ -2,8 +2,8 @@
 from pathlib import Path
 from typing import Optional
 
-from ..core import cache
 from ..core import git
+from ..core.cache import cache
 from ..core.config import Config
 from ..core.engine import Engine
 from ..core.template import Config as TemplateConfig

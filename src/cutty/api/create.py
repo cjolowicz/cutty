@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ..core import cache
+from ..core.cache import cache
 from ..core.config import Config
 from ..core.engine import Engine
 
