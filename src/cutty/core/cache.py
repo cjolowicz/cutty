@@ -15,9 +15,7 @@ from .template import Template
 
 
 def _hash(value: str) -> str:
-    # Avoid "Filename too long" error with Git for Windows.
-    # https://stackoverflow.com/a/22575737/1355754
-    return hashlib.blake2b(value.encode()).hexdigest()[:64]
+    return hashlib.blake2b(value.encode()).hexdigest()
 
 
 def _load_repository(location: str, path: Path) -> git.Repository:
