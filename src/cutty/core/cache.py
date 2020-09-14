@@ -3,15 +3,14 @@ import hashlib
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
-from typing import Tuple
 
 from . import exceptions
 from . import git
 from . import locations
-from . import tags
 from . import template
 from .compat import contextmanager
 from .template import Template
+from .versions import Version
 
 
 def _hash(value: str) -> str:
@@ -29,16 +28,6 @@ def _load_repository(location: str, path: Path) -> git.Repository:
         repository = git.Repository(path)
         repository.update_remote(prune=True)
         return repository
-
-
-def _determine_version(
-    repository: git.Repository, revision: Optional[str]
-) -> Tuple[str, str]:
-    if revision is None:
-        revision = tags.find_latest(repository) or "HEAD"
-    sha1 = repository.rev_parse(revision, verify=True)
-    version = tags.describe(repository, ref=revision)
-    return version, sha1
 
 
 class Cache:
@@ -64,14 +53,16 @@ class Cache:
         """Load a project template."""
         path = self._get_template_path(location)
         repository = _load_repository(location, path / "repo.git")
-        version, sha1 = _determine_version(repository, revision)
-        worktree = path / "worktrees" / sha1
+        version = Version.get(repository, revision=revision)
+        worktree = path / "worktrees" / version.sha1
 
-        with repository.worktree(worktree, sha1, detach=True, force_remove=True):
+        with repository.worktree(
+            worktree, version.sha1, detach=True, force_remove=True
+        ):
             yield Template.load(
                 worktree if directory is None else worktree / directory,
                 location=location,
-                version=version,
+                version=version.name,
                 overrides=overrides,
             )
 
