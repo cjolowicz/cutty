@@ -8,6 +8,14 @@ import jinja2.ext
 from slugify import slugify
 
 
+DEFAULT_EXTENSIONS = [
+    "cutty.core.extensions.JsonifyExtension",
+    "cutty.core.extensions.RandomStringExtension",
+    "cutty.core.extensions.SlugifyExtension",
+    "jinja2_time.TimeExtension",
+]
+
+
 def jsonify(obj: Any) -> str:
     """Convert a Python object to JSON."""
     return json.dumps(obj, sort_keys=True, indent=4)

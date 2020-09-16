@@ -10,14 +10,7 @@ from typing import List
 from typing import Optional
 
 from . import exceptions
-
-
-DEFAULT_EXTENSIONS = [
-    "cutty.core.extensions.JsonifyExtension",
-    "cutty.core.extensions.RandomStringExtension",
-    "cutty.core.extensions.SlugifyExtension",
-    "jinja2_time.TimeExtension",
-]
+from .extensions import DEFAULT_EXTENSIONS
 
 
 def find_template(path: Path) -> Optional[Path]:
