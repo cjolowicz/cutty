@@ -4,19 +4,20 @@ from typing import Any
 from . import exceptions
 from . import prompt
 from .render import Renderer
+from .template import Template
 from .template import Variable
-from .template import Variables
 
 
 class Survey:
     """Survey."""
 
     def __init__(
-        self, variables: Variables, *, renderer: Renderer, interactive: bool = True
+        self, template: Template, *, renderer: Renderer, interactive: bool = True
     ) -> None:
         """Initialize."""
-        self.variables = list(variables)
-        self.variables.sort(key=lambda variable: isinstance(variable.value, dict))
+        self.variables = sorted(
+            template.variables, key=lambda variable: isinstance(variable.value, dict)
+        )
         self.renderer = renderer
         self.interactive = interactive
 
