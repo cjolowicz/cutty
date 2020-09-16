@@ -14,7 +14,7 @@ class Engine:
         """Initialize."""
         self.renderer = Renderer(template)
         self.survey = Survey(template, renderer=self.renderer, interactive=interactive)
-        self.generator = Generator(template=template, renderer=self.renderer)
+        self.generator = Generator(template, renderer=self.renderer)
 
     def generate(self, output_dir: Path, *, overwrite: bool = False) -> None:
         """Generate the project."""

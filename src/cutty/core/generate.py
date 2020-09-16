@@ -13,7 +13,7 @@ from .utils import RemoveTree
 class Generator:
     """Generator."""
 
-    def __init__(self, *, template: Template, renderer: Renderer) -> None:
+    def __init__(self, template: Template, *, renderer: Renderer) -> None:
         """Initialize."""
         self.template = template
         self.renderer = renderer
