@@ -8,6 +8,7 @@ from typing import Optional
 
 import packaging.version
 
+from . import exceptions
 from . import git
 
 
@@ -66,7 +67,8 @@ class Version:
 
 def find_version(repository: git.Repository, revision: str) -> Version:
     """Return the tag or short SHA-1 for the revision."""
-    sha1 = repository.rev_parse(revision, verify=True)
+    with exceptions.InvalidRevision(revision):
+        sha1 = repository.rev_parse(revision, verify=True)
 
     with contextlib.suppress(git.Error, packaging.version.InvalidVersion):
         tagname = repository.describe(revision, tags=True, exact=True)
