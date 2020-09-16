@@ -10,16 +10,13 @@ from .template import Template
 class Engine:
     """Engine."""
 
-    def __init__(
-        self, template: Template, *, interactive: bool = True, overwrite: bool = False
-    ) -> None:
+    def __init__(self, template: Template, *, interactive: bool = True) -> None:
         """Initialize."""
         self.renderer = Renderer(template)
         self.survey = Survey(template.variables, interactive=interactive)
         self.generator = Generator(template=template, renderer=self.renderer)
-        self.overwrite = overwrite
 
-    def generate(self, output_dir: Path) -> None:
+    def generate(self, output_dir: Path, *, overwrite: bool = False) -> None:
         """Generate the project."""
         self.survey.run(self.renderer)
-        self.generator.generate(output_dir, overwrite=self.overwrite)
+        self.generator.generate(output_dir, overwrite=overwrite)

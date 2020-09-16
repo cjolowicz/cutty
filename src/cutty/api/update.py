@@ -42,8 +42,8 @@ def update(
         with cache.load(location, directory=directory, revision=revision) as template:
             template = template.override(instance.path)
 
-            engine = Engine(template, interactive=interactive, overwrite=True)
-            engine.generate(project.path.parent)
+            engine = Engine(template, interactive=interactive)
+            engine.generate(project.path.parent, overwrite=True)
 
             project.add(all=True)
             project.commit(
