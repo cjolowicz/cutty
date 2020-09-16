@@ -39,9 +39,9 @@ def update(
         checkout=False,
         force_remove=True,
     ) as project:
-        with cache.load(
-            location, directory=directory, revision=revision, instance=instance.path,
-        ) as template:
+        with cache.load(location, directory=directory, revision=revision) as template:
+            template = template.override(instance.path)
+
             engine = Engine(template, interactive=interactive, overwrite=True)
             engine.generate(project.path.parent)
 
