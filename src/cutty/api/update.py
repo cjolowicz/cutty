@@ -7,6 +7,7 @@ from ..core.cache import cache
 from ..core.config import Config
 from ..core.engine import Engine
 from ..core.template import Config as TemplateConfig
+from ..core.template import Template
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
@@ -26,10 +27,11 @@ def update(
 ) -> None:
     """Update a project from a Cookiecutter template."""
     instance = git.Repository()
+    location = Template.load_location(instance.path)
     previous_template = TemplateConfig.load(instance.path / ".cookiecutter.json")
 
     config = Config.load(config_file)
-    location = config.abbreviations.expand(previous_template.location)
+    location = config.abbreviations.expand(location)
 
     _ensure_branch_exists(instance, "template")
 
