@@ -99,12 +99,7 @@ class Template:
 
     @classmethod
     def load(
-        cls,
-        path: Path,
-        *,
-        version: str,
-        location: str,
-        overrides: Optional[Config] = None
+        cls, path: Path, *, version: str, location: str, instance: Optional[Path] = None
     ) -> Template:
         """Load the template variables."""
         root = find_template(path)
@@ -113,8 +108,9 @@ class Template:
 
         hookdir = path / "hooks"
         config = Config.load(path / "cookiecutter.json", location=location)
-        if overrides is not None:
-            config = config.override(overrides)
+        if instance is not None:
+            previous_config = Config.load(instance / ".cookiecutter.json")
+            config = config.override(previous_config)
 
         return cls(
             root=root, hookdir=hookdir, repository=path, version=version, config=config
