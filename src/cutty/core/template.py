@@ -9,6 +9,8 @@ from typing import Any
 from typing import List
 from typing import Optional
 
+from . import exceptions
+
 
 DEFAULT_EXTENSIONS = [
     "cutty.core.extensions.JsonifyExtension",
@@ -18,13 +20,13 @@ DEFAULT_EXTENSIONS = [
 ]
 
 
-def find_template(path: Path) -> Path:
+def find_template(path: Path) -> Optional[Path]:
     """Determine which child directory is the project template."""
     for item in path.iterdir():
         if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
             return item
-    else:
-        raise Exception("template directory not found")
+
+    return None
 
 
 @dataclass(frozen=True)
@@ -101,6 +103,9 @@ class Template:
     ) -> Template:
         """Load the template variables."""
         root = find_template(path)
+        if root is None:
+            raise exceptions.TemplateDirectoryNotFound(location)
+
         hookdir = path / "hooks"
         config = Config.load(path / "cookiecutter.json", location=location)
         if overrides is not None:
