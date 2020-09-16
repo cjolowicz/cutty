@@ -38,12 +38,11 @@ class Config:
         return cast(str, data["_template"])
 
     @classmethod
-    def load(cls, path: Path, *, location: Optional[str] = None) -> Config:
+    def load(cls, path: Path, *, location: str) -> Config:
         """Load the template configuration."""
         with path.open() as io:
             data = json.load(io)
-            location = data.setdefault("_template", location)
-            assert location is not None  # noqa: S101  # TODO: raise
+            data["_template"] = location
 
         variables = [Variable(name, value) for name, value in data.items()]
         extensions = data.get("_extensions", [])
@@ -113,6 +112,8 @@ class Template:
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
-        instance_config = Config.load(instance / ".cookiecutter.json")
+        instance_config = Config.load(
+            instance / ".cookiecutter.json", location=self.config.location
+        )
         config = self.config.override(instance_config)
         return replace(self, config=config)
