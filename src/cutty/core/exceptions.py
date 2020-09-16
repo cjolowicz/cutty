@@ -65,11 +65,11 @@ class InvalidAbbreviation(ConfigurationError):
 
 
 class CloneError(CuttyException):
-    """Cannot clone repository from {}."""
+    """Cannot download template from {}."""
 
 
 class UpdateError(CuttyException):
-    """Cannot fetch repository updates from {}."""
+    """Cannot fetch template updates from {}."""
 
 
 class InvalidRevision(CuttyException):
