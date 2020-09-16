@@ -1,19 +1,19 @@
 """Survey."""
 from typing import Any
-from typing import List
 
 from . import exceptions
 from . import prompt
 from .render import Renderer
 from .template import Variable
+from .template import Variables
 
 
 class Survey:
     """Survey."""
 
-    def __init__(self, variables: List[Variable], *, interactive: bool = True) -> None:
+    def __init__(self, variables: Variables, *, interactive: bool = True) -> None:
         """Initialize."""
-        self.variables = variables
+        self.variables = list(variables)
         self.variables.sort(key=lambda variable: isinstance(variable.value, dict))
         self.interactive = interactive
 

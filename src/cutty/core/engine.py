@@ -15,7 +15,7 @@ class Engine:
     ) -> None:
         """Initialize."""
         self.renderer = Renderer(template)
-        self.survey = Survey(template.config.variables, interactive=interactive)
+        self.survey = Survey(template.variables, interactive=interactive)
         self.generator = Generator(template=template, renderer=self.renderer)
         self.overwrite = overwrite
 
