@@ -6,7 +6,6 @@ from ..core import git
 from ..core.cache import cache
 from ..core.config import Config
 from ..core.engine import Engine
-from ..core.template import Config as TemplateConfig
 from ..core.template import Template
 
 
@@ -28,7 +27,6 @@ def update(
     """Update a project from a Cookiecutter template."""
     instance = git.Repository()
     location = Template.load_location(instance.path)
-    previous_template = TemplateConfig.load(instance.path / ".cookiecutter.json")
 
     config = Config.load(config_file)
     location = config.abbreviations.expand(location)
@@ -42,10 +40,7 @@ def update(
         force_remove=True,
     ) as project:
         with cache.load(
-            location,
-            directory=directory,
-            revision=revision,
-            overrides=previous_template,
+            location, directory=directory, revision=revision, instance=instance.path,
         ) as template:
             engine = Engine(template, interactive=interactive, overwrite=True)
             engine.generate(project.path.parent)
