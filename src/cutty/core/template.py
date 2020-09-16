@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
+from typing import cast
 from typing import List
 from typing import Optional
 
@@ -28,6 +29,13 @@ class Config:
     variables: List[Variable]
     extensions: List[str]
     copy_without_render: List[str]
+
+    @staticmethod
+    def load_location(path: Path) -> str:
+        """Return the location specified in the given JSON file."""
+        with path.open() as io:
+            data = json.load(io)
+        return cast(str, data["_template"])
 
     @classmethod
     def load(cls, path: Path, *, location: Optional[str] = None) -> Config:
@@ -83,6 +91,11 @@ class Template:
     repository: Path
     version: str
     config: Config
+
+    @staticmethod
+    def load_location(instance: Path) -> str:
+        """Return the location specified in the given instance."""
+        return Config.load_location(instance / ".cookiecutter.json")
 
     @classmethod
     def load(
