@@ -10,7 +10,6 @@ from typing import List
 from typing import Optional
 
 from . import exceptions
-from .extensions import DEFAULT_EXTENSIONS
 
 
 def find_template(path: Path) -> Optional[Path]:
@@ -48,7 +47,7 @@ class Config:
             assert location is not None  # noqa: S101  # TODO: raise
 
         variables = [Variable(name, value) for name, value in data.items()]
-        extensions = DEFAULT_EXTENSIONS + data.get("_extensions", [])
+        extensions = data.get("_extensions", [])
         copy_without_render = data.get("_copy_without_render", [])
 
         return cls(location, variables, extensions, copy_without_render)
