@@ -76,6 +76,10 @@ class InvalidRevision(CuttyException):
     """Invalid template revision {!r}."""
 
 
+class TemplateDirectoryNotFound(CuttyException):
+    """Template directory not found in {}."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 
