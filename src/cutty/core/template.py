@@ -43,10 +43,7 @@ class Variables:
 class Config:
     """Template configuration."""
 
-    location: str
     variables: Variables
-    extensions: List[str]
-    copy_without_render: List[str]
 
     @staticmethod
     def load_location(path: Path) -> str:
@@ -63,10 +60,23 @@ class Config:
             data["_template"] = location
 
         variables = Variables(Variable(name, value) for name, value in data.items())
-        extensions = data.get("_extensions", [])
-        copy_without_render = data.get("_copy_without_render", [])
 
-        return cls(location, variables, extensions, copy_without_render)
+        return cls(variables)
+
+    @property
+    def location(self) -> str:
+        """Return the template location."""
+        return self.variables["_template"].value
+
+    @property
+    def extensions(self) -> List[str]:
+        """Return the Jinja extensions."""
+        return self.variables["_extensions"].value
+
+    @property
+    def copy_without_render(self) -> List[str]:
+        """Return patterns for files to be copied without rendering."""
+        return self.variables["_copy_without_render"].value
 
     def override(self, other: Config) -> Config:
         """Override variables from another configuration."""
@@ -85,10 +95,9 @@ class Config:
             # TODO: If variables are missing, we should prompt later.
             return variable
 
-        return replace(
-            self,
-            variables=Variables(_override(variable) for variable in self.variables),
-        )
+        variables = Variables(_override(variable) for variable in self.variables)
+
+        return Config(variables)
 
 
 def find_template(path: Path) -> Optional[Path]:
