@@ -72,6 +72,10 @@ class UpdateError(CuttyException):
     """Cannot fetch repository updates from {}."""
 
 
+class InvalidRevision(CuttyException):
+    """Invalid template revision {!r}."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 
