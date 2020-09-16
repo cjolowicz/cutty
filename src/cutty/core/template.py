@@ -12,15 +12,6 @@ from typing import Optional
 from . import exceptions
 
 
-def find_template(path: Path) -> Optional[Path]:
-    """Determine which child directory is the project template."""
-    for item in path.iterdir():
-        if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
-            return item
-
-    return None
-
-
 @dataclass(frozen=True)
 class Variable:
     """Template variable."""
@@ -72,6 +63,15 @@ class Config:
         return replace(
             self, variables=[_override(variable) for variable in self.variables]
         )
+
+
+def find_template(path: Path) -> Optional[Path]:
+    """Determine which child directory is the project template."""
+    for item in path.iterdir():
+        if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
+            return item
+
+    return None
 
 
 @dataclass(frozen=True)
