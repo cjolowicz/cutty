@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
-from typing import cast
 from typing import Iterable
 from typing import Iterator
 from typing import List
@@ -91,10 +90,8 @@ class Template:
     @staticmethod
     def load_location(instance: Path) -> str:
         """Return the location specified in the given instance."""
-        path = instance / ".cookiecutter.json"
-        with path.open() as io:
-            data = json.load(io)
-        return cast(str, data["_template"])
+        variables = Variables.load(instance / ".cookiecutter.json")
+        return variables["_template"].value
 
     @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
