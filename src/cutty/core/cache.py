@@ -47,7 +47,6 @@ class Cache:
         *,
         directory: Optional[Path] = None,
         revision: Optional[str] = None,
-        instance: Optional[Path] = None
     ) -> Iterator[Template]:
         """Load a project template."""
         path = self._get_template_path(location)
@@ -62,7 +61,6 @@ class Cache:
                 worktree if directory is None else worktree / directory,
                 location=location,
                 version=version.name,
-                instance=instance,
             )
 
 
