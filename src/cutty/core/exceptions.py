@@ -48,19 +48,19 @@ class CuttyException(Exception):
             raise self from exception
 
 
-class ConfigurationError(CuttyException):
-    """Configuration file {} cannot be loaded."""
+class ConfigurationFileError(CuttyException):
+    """Cannot read configuration file {}."""
 
 
-class ConfigurationDoesNotExist(ConfigurationError):
+class ConfigurationDoesNotExist(CuttyException):
     """Configuration file {} not found."""
 
 
-class InvalidConfiguration(ConfigurationError):
+class InvalidConfiguration(CuttyException):
     """The configuration file {} is not valid."""
 
 
-class InvalidAbbreviation(ConfigurationError):
+class InvalidAbbreviation(CuttyException):
     """Invalid abbreviation {!r} in {!r}: {!r}."""
 
 

@@ -11,7 +11,6 @@ import poyo.exceptions
 from . import exceptions
 from . import locations
 from .abbreviations import Abbreviations
-from .utils import with_context
 
 
 @dataclass
@@ -29,19 +28,14 @@ class Config:
 
             path = locations.config
 
-        return cls._load(path)
+        with exceptions.ConfigurationFileError(
+            path
+        ), exceptions.ConfigurationDoesNotExist(path).when(FileNotFoundError):
+            text = path.read_text()
 
-    @with_context(
-        lambda path: (
-            exceptions.ConfigurationDoesNotExist(path).when(FileNotFoundError),
-            exceptions.InvalidConfiguration(path).when(poyo.exceptions.PoyoException),
-            exceptions.ConfigurationError(path),
-        )
-    )
-    @classmethod
-    def _load(cls, path: Path) -> Config:
-        text = path.read_text()
-        data = poyo.parse_string(text)
+        with exceptions.InvalidConfiguration(path):
+            data = poyo.parse_string(text)
+
         config = cls()
 
         if "abbreviations" in data:
