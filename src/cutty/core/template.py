@@ -26,6 +26,15 @@ class Variable:
 class Variables:
     """Collection of template variables."""
 
+    @classmethod
+    def load(cls, path: Path, *, location: str) -> Variables:
+        """Load the template variables from a JSON file."""
+        with path.open() as io:
+            data = json.load(io)
+            data["_template"] = location
+
+        return cls(Variable(name, value) for name, value in data.items())
+
     def __init__(self, variables: Iterable[Variable]) -> None:
         """Initialize."""
         self.variables = {variable.name: variable for variable in variables}
@@ -38,48 +47,8 @@ class Variables:
         """Retrieve a variable by name."""
         return self.variables[name]
 
-
-@dataclass(frozen=True)
-class Config:
-    """Template configuration."""
-
-    variables: Variables
-
-    @staticmethod
-    def load_location(path: Path) -> str:
-        """Return the location specified in the given JSON file."""
-        with path.open() as io:
-            data = json.load(io)
-        return cast(str, data["_template"])
-
-    @classmethod
-    def load(cls, path: Path, *, location: str) -> Config:
-        """Load the template configuration."""
-        with path.open() as io:
-            data = json.load(io)
-            data["_template"] = location
-
-        variables = Variables(Variable(name, value) for name, value in data.items())
-
-        return cls(variables)
-
-    @property
-    def location(self) -> str:
-        """Return the template location."""
-        return self.variables["_template"].value
-
-    @property
-    def extensions(self) -> List[str]:
-        """Return the Jinja extensions."""
-        return self.variables["_extensions"].value
-
-    @property
-    def copy_without_render(self) -> List[str]:
-        """Return patterns for files to be copied without rendering."""
-        return self.variables["_copy_without_render"].value
-
-    def override(self, other: Config) -> Config:
-        """Override variables from another configuration."""
+    def override(self, other: Variables) -> Variables:
+        """Override variables from another collection."""
 
         def _override(variable: Variable) -> Variable:
             if variable.name.startswith("_"):
@@ -95,9 +64,7 @@ class Config:
             # TODO: If variables are missing, we should prompt later.
             return variable
 
-        variables = Variables(_override(variable) for variable in self.variables)
-
-        return Config(variables)
+        return Variables(_override(variable) for variable in self.variables)
 
 
 def find_template(path: Path) -> Optional[Path]:
@@ -117,12 +84,15 @@ class Template:
     hookdir: Path
     repository: Path
     version: str
-    config: Config
+    variables: Variables
 
     @staticmethod
     def load_location(instance: Path) -> str:
         """Return the location specified in the given instance."""
-        return Config.load_location(instance / ".cookiecutter.json")
+        path = instance / ".cookiecutter.json"
+        with path.open() as io:
+            data = json.load(io)
+        return cast(str, data["_template"])
 
     @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
@@ -132,16 +102,35 @@ class Template:
             raise exceptions.TemplateDirectoryNotFound(location)
 
         hookdir = path / "hooks"
-        config = Config.load(path / "cookiecutter.json", location=location)
+        variables = Variables.load(path / "cookiecutter.json", location=location)
 
         return cls(
-            root=root, hookdir=hookdir, repository=path, version=version, config=config
+            root=root,
+            hookdir=hookdir,
+            repository=path,
+            version=version,
+            variables=variables,
         )
+
+    @property
+    def location(self) -> str:
+        """Return the template location."""
+        return self.variables["_template"].value
+
+    @property
+    def extensions(self) -> List[str]:
+        """Return the Jinja extensions."""
+        return self.variables["_extensions"].value
+
+    @property
+    def copy_without_render(self) -> List[str]:
+        """Return patterns for files to be copied without rendering."""
+        return self.variables["_copy_without_render"].value
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
-        instance_config = Config.load(
-            instance / ".cookiecutter.json", location=self.config.location
+        instance_variables = Variables.load(
+            instance / ".cookiecutter.json", location=self.location
         )
-        config = self.config.override(instance_config)
-        return replace(self, config=config)
+        variables = self.variables.override(instance_variables)
+        return replace(self, variables=variables)
