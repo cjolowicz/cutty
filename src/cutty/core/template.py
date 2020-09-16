@@ -27,10 +27,12 @@ class Variables:
     """Collection of template variables."""
 
     @classmethod
-    def load(cls, path: Path, *, location: str) -> Variables:
+    def load(cls, path: Path, *, location: Optional[str]) -> Variables:
         """Load the template variables from a JSON file."""
         with path.open() as io:
             data = json.load(io)
+
+        if location is not None:
             data["_template"] = location
 
         return cls(Variable(name, value) for name, value in data.items())
@@ -129,8 +131,6 @@ class Template:
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
-        instance_variables = Variables.load(
-            instance / ".cookiecutter.json", location=self.location
-        )
+        instance_variables = Variables.load(instance / ".cookiecutter.json")
         variables = self.variables.override(instance_variables)
         return replace(self, variables=variables)
