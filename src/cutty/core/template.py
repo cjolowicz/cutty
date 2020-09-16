@@ -7,6 +7,8 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from typing import cast
+from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Optional
 
@@ -21,12 +23,28 @@ class Variable:
     value: Any
 
 
+class Variables:
+    """Collection of template variables."""
+
+    def __init__(self, variables: Iterable[Variable]) -> None:
+        """Initialize."""
+        self.variables = {variable.name: variable for variable in variables}
+
+    def __iter__(self) -> Iterator[Variable]:
+        """Iterate over the variables in the collection."""
+        return iter(self.variables.values())
+
+    def __getitem__(self, name: str) -> Variable:
+        """Retrieve a variable by name."""
+        return self.variables[name]
+
+
 @dataclass(frozen=True)
 class Config:
     """Template configuration."""
 
     location: str
-    variables: List[Variable]
+    variables: Variables
     extensions: List[str]
     copy_without_render: List[str]
 
@@ -44,7 +62,7 @@ class Config:
             data = json.load(io)
             data["_template"] = location
 
-        variables = [Variable(name, value) for name, value in data.items()]
+        variables = Variables(Variable(name, value) for name, value in data.items())
         extensions = data.get("_extensions", [])
         copy_without_render = data.get("_copy_without_render", [])
 
@@ -68,7 +86,8 @@ class Config:
             return variable
 
         return replace(
-            self, variables=[_override(variable) for variable in self.variables]
+            self,
+            variables=Variables(_override(variable) for variable in self.variables),
         )
 
 
