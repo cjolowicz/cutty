@@ -11,25 +11,28 @@ from .template import Variables
 class Survey:
     """Survey."""
 
-    def __init__(self, variables: Variables, *, interactive: bool = True) -> None:
+    def __init__(
+        self, variables: Variables, *, renderer: Renderer, interactive: bool = True
+    ) -> None:
         """Initialize."""
         self.variables = list(variables)
         self.variables.sort(key=lambda variable: isinstance(variable.value, dict))
+        self.renderer = renderer
         self.interactive = interactive
 
-    def run(self, renderer: Renderer) -> None:
+    def run(self) -> None:
         """Bind variables from user input."""
         for variable in self.variables:
-            value = self.run_one(renderer, variable)
-            renderer.bind(variable.name, value)
+            value = self.run_one(variable)
+            self.renderer.bind(variable.name, value)
 
-    def run_one(self, renderer: Renderer, variable: Variable) -> Any:
+    def run_one(self, variable: Variable) -> Any:
         """Return user input for a variable."""
         if variable.name.startswith("_"):
             return variable.value
 
         with exceptions.VariableRenderError(variable.name):
-            value = renderer.render(variable.value)
+            value = self.renderer.render(variable.value)
 
         if not self.interactive:
             return value[0] if isinstance(variable.value, list) else value
