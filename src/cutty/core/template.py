@@ -12,6 +12,7 @@ from typing import List
 from typing import Optional
 
 from . import exceptions
+from .utils import with_context
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,17 @@ class Variables:
     """Collection of template variables."""
 
     @classmethod
+    @with_context(
+        lambda cls, path, **kwargs: (
+            exceptions.TemplateConfigurationFileError(path.name),
+            exceptions.TemplateConfigurationDoesNotExist(path.name).when(
+                FileNotFoundError
+            ),
+            exceptions.InvalidTemplateConfiguration(path.name).when(
+                json.decoder.JSONDecodeError
+            ),
+        )
+    )
     def load(cls, path: Path, *, location: Optional[str]) -> Variables:
         """Load the template variables from a JSON file."""
         with path.open() as io:

@@ -80,6 +80,18 @@ class TemplateDirectoryNotFound(CuttyException):
     """Template directory not found in {}."""
 
 
+class TemplateConfigurationFileError(CuttyException):
+    """Cannot read template configuration file {}."""
+
+
+class TemplateConfigurationDoesNotExist(CuttyException):
+    """Template configuration file {} not found."""
+
+
+class InvalidTemplateConfiguration(CuttyException):
+    """The template configuration file {} is not valid."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 
