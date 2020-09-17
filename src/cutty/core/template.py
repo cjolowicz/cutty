@@ -67,7 +67,7 @@ class Variables:
             if variable.name.startswith("_"):
                 return variable
 
-            for other_variable in other.variables:
+            for other_variable in other:
                 if variable.name == other_variable.name and (
                     not isinstance(variable.value, list)
                     or other_variable.value in variable.value
@@ -77,7 +77,7 @@ class Variables:
             # TODO: If variables are missing, we should prompt later.
             return variable
 
-        return Variables(_override(variable) for variable in self.variables)
+        return Variables(_override(variable) for variable in self)
 
 
 def find_template(path: Path) -> Optional[Path]:
