@@ -3,9 +3,11 @@ import json
 import string
 from secrets import choice
 from typing import Any
+from typing import cast
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Type
 
 import jinja2.ext
 import jinja2_time
@@ -63,18 +65,18 @@ DEFAULT_EXTENSIONS = [
 ]
 
 
-def load_extension(import_path: str) -> jinja2.ext.Extension:
+def load_extension(import_path: str) -> Type[jinja2.ext.Extension]:
     """Import a Jinja extension from the specified path."""
     with exceptions.TemplateExtensionNotFound(import_path):
         extension = import_object(import_path)
 
-    if not isinstance(extension, jinja2.ext.Extension):
+    if not issubclass(extension, jinja2.ext.Extension):
         raise exceptions.TemplateExtensionTypeError(import_path, type(extension))
 
-    return extension
+    return cast(Type[jinja2.ext.Extension], extension)
 
 
-def load(*, extra: Optional[Iterable[str]] = None) -> List[jinja2.ext.Extension]:
+def load(*, extra: Optional[Iterable[str]] = None) -> List[Type[jinja2.ext.Extension]]:
     """Return the default Jinja extensions, plus any additional ones specified."""
     extensions = DEFAULT_EXTENSIONS[:]
 
