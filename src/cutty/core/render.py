@@ -11,9 +11,10 @@ from .template import Template
 
 def create_environment(template: Template) -> jinja2.Environment:
     """Create the Jinja environment."""
+    extensions_ = extensions.load(extra=template.extensions)
     return jinja2.Environment(  # noqa: S701
         loader=jinja2.FileSystemLoader(str(template.repository)),
-        extensions=extensions.load(extra=template.extensions),
+        extensions=extensions_,
         keep_trailing_newline=True,
         undefined=jinja2.StrictUndefined,
     )
