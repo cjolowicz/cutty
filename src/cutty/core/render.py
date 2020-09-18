@@ -5,8 +5,20 @@ from typing import Dict
 
 import jinja2
 
+from . import exceptions
 from .extensions import DEFAULT_EXTENSIONS
 from .template import Template
+
+
+def create_environment(template: Template) -> jinja2.Environment:
+    """Create the Jinja environment."""
+    with exceptions.TemplateExtensionNotFound().when(ImportError, AttributeError):
+        return jinja2.Environment(  # noqa: S701
+            loader=jinja2.FileSystemLoader(str(template.repository)),
+            extensions=DEFAULT_EXTENSIONS + template.extensions,
+            keep_trailing_newline=True,
+            undefined=jinja2.StrictUndefined,
+        )
 
 
 class Renderer:
@@ -16,12 +28,7 @@ class Renderer:
         """Initialize."""
         self.template = template
         self.context: Dict[str, Any] = {}
-        self.environment = jinja2.Environment(  # noqa: S701
-            loader=jinja2.FileSystemLoader(str(template.repository)),
-            extensions=DEFAULT_EXTENSIONS + template.extensions,
-            keep_trailing_newline=True,
-            undefined=jinja2.StrictUndefined,
-        )
+        self.environment = create_environment(template)
 
     def bind(self, name: str, value: Any) -> None:
         """Assign a value to a template variable."""
