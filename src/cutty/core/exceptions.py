@@ -101,7 +101,7 @@ class MissingTemplateVariable(CuttyException):
 
 
 class InvalidTemplateVariable(CuttyException):
-    """Invalid template variable {} in {}: expected {}, but was {!r}."""
+    """Invalid template variable {} in {}: expected {}, but was {}."""
 
 
 class TemplateExtensionNotFound(CuttyException):

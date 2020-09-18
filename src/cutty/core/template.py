@@ -30,7 +30,7 @@ def as_string_list(variable: Variable) -> List[str]:
         and all(isinstance(item, str) for item in variable.value)
     ):
         raise exceptions.InvalidTemplateVariable(
-            variable.name, "cookiecutter.json", "List[str]", variable.value
+            variable.name, "cookiecutter.json", "List[str]", repr(variable.value)
         )
 
     return variable.value
@@ -75,7 +75,7 @@ class Template:
 
         if not isinstance(location, str):
             raise exceptions.InvalidTemplateVariable(
-                "_template", path, "str", type(location).__name__
+                "_template", path, "str", repr(location)
             )
 
         return location
