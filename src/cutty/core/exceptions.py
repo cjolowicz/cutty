@@ -104,6 +104,10 @@ class InvalidTemplateVariable(CuttyException):
     """Invalid template variable {} in {}: expected {}, but was {!r}."""
 
 
+class TemplateExtensionNotFound(CuttyException):
+    """Template extension not found."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 
