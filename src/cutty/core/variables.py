@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Iterable
 from typing import Iterator
+from typing import Mapping
 
 
 @dataclass(frozen=True)
@@ -18,6 +19,11 @@ class Variable:
 
 class Variables:
     """Collection of template variables."""
+
+    @classmethod
+    def fromdict(cls, data: Mapping[str, Any]) -> Variables:
+        """Create variables from a dictionary or another mapping."""
+        return cls(Variable(name, value) for name, value in data.items())
 
     def __init__(self, variables: Iterable[Variable]) -> None:
         """Initialize."""
