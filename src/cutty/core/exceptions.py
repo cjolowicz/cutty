@@ -92,6 +92,18 @@ class InvalidTemplateConfiguration(CuttyException):
     """The template configuration file {} is not valid."""
 
 
+class TemplateConfigurationTypeError(CuttyException):
+    """The template configuration file {} is not valid: expected {}, but was {}."""
+
+
+class MissingTemplateVariable(CuttyException):
+    """Missing template variable {} in {}."""
+
+
+class InvalidTemplateVariable(CuttyException):
+    """Invalid template variable {} in {}: expected {}, but was {!r}."""
+
+
 class RenderError(CuttyException):
     """Cannot render template."""
 
