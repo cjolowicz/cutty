@@ -2,6 +2,7 @@
 import collections.abc
 import contextlib
 import functools
+import importlib
 import os
 import shutil
 import stat
@@ -115,3 +116,27 @@ def with_context(
         return wrapper
 
     return decorator
+
+
+def import_object(import_path: str) -> Any:
+    """Import the object at the given import path.
+
+    Import paths consist of the dotted module name, optionally followed by a
+    colon or dot, and the module attribute at which the object is located.
+
+    For example:
+
+    - ``json``
+    - ``os.path``
+    - ``xml.sax.saxutils:escape``
+    - ``xml.sax.saxutils.escape``
+
+    This function mirrors the implementation of ``jinja2.utils.import_string``.
+    """
+    module_name, colon, attribute = import_path.rpartition(":")
+
+    if not colon:
+        module_name, _, attribute = import_path.rpartition(".")
+
+    module = importlib.import_module(module_name)
+    return getattr(module, attribute) if attribute else module
