@@ -3,17 +3,16 @@ import json
 import string
 from secrets import choice
 from typing import Any
+from typing import Iterable
+from typing import List
+from typing import Optional
 
 import jinja2.ext
+import jinja2_time
 from slugify import slugify
 
-
-DEFAULT_EXTENSIONS = [
-    "cutty.core.extensions.JsonifyExtension",
-    "cutty.core.extensions.RandomStringExtension",
-    "cutty.core.extensions.SlugifyExtension",
-    "jinja2_time.TimeExtension",
-]
+from . import exceptions
+from .utils import import_object
 
 
 def jsonify(obj: Any) -> str:
@@ -54,3 +53,32 @@ class SlugifyExtension(jinja2.ext.Extension):
         """Initialize."""
         super().__init__(environment)
         environment.filters["slugify"] = slugify
+
+
+DEFAULT_EXTENSIONS = [
+    JsonifyExtension,
+    RandomStringExtension,
+    SlugifyExtension,
+    jinja2_time.TimeExtension,
+]
+
+
+def load_extension(import_path: str) -> jinja2.ext.Extension:
+    """Import a Jinja extension from the specified path."""
+    with exceptions.TemplateExtensionNotFound(import_path):
+        extension = import_object(import_path)
+
+    if not isinstance(extension, jinja2.ext.Extension):
+        raise exceptions.TemplateExtensionTypeError(import_path, type(extension))
+
+    return extension
+
+
+def load(*, extra: Optional[Iterable[str]] = None) -> List[jinja2.ext.Extension]:
+    """Return the default Jinja extensions, plus any additional ones specified."""
+    extensions = DEFAULT_EXTENSIONS[:]
+
+    if extra is not None:
+        extensions.extend(load_extension(path) for path in extra)
+
+    return extensions

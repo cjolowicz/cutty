@@ -105,7 +105,11 @@ class InvalidTemplateVariable(CuttyException):
 
 
 class TemplateExtensionNotFound(CuttyException):
-    """Template extension not found."""
+    """Template extension {} not found."""
+
+
+class TemplateExtensionTypeError(CuttyException):
+    """Template extension {} is not an instance of jinja2.ext.Extension: {}."""
 
 
 class RenderError(CuttyException):
