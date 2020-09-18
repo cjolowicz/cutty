@@ -47,22 +47,6 @@ class Template:
     variables: Variables
 
     @classmethod
-    def load_location(cls, instance: Path) -> str:
-        """Return the location specified in the given instance."""
-        path = instance / ".cookiecutter.json"
-        variables = cls.load_variables(path)
-
-        with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
-            location = variables["_template"].value
-
-        if not isinstance(location, str):
-            raise exceptions.InvalidTemplateVariable(
-                "_template", path, "str", type(location).__name__
-            )
-
-        return location
-
-    @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
         """Load the template variables."""
         root = find_template(path)
@@ -79,6 +63,22 @@ class Template:
             version=version,
             variables=variables,
         )
+
+    @classmethod
+    def load_location(cls, instance: Path) -> str:
+        """Return the location specified in the given instance."""
+        path = instance / ".cookiecutter.json"
+        variables = cls.load_variables(path)
+
+        with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
+            location = variables["_template"].value
+
+        if not isinstance(location, str):
+            raise exceptions.InvalidTemplateVariable(
+                "_template", path, "str", type(location).__name__
+            )
+
+        return location
 
     @classmethod
     @with_context(
