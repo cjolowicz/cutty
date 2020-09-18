@@ -39,7 +39,7 @@ class Variables:
             ),
         )
     )
-    def load(cls, path: Path, *, location: Optional[str]) -> Variables:
+    def load(cls, path: Path, *, location: Optional[str] = None) -> Variables:
         """Load the template variables from a JSON file."""
         with path.open() as io:
             data = json.load(io)
