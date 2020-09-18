@@ -105,7 +105,15 @@ class Template:
         if location is not None:
             data["_template"] = location
 
-        return Variables.fromdict(data)
+        variables = Variables.fromdict(data)
+
+        for variable in variables:
+            if isinstance(variable.value, list) and not variable.value:
+                raise exceptions.InvalidTemplateVariable(
+                    variable.name, path.name, "non-empty list", repr(variable.value)
+                )
+
+        return variables
 
     @property
     def extensions(self) -> List[str]:
