@@ -5,20 +5,18 @@ from typing import Dict
 
 import jinja2
 
-from . import exceptions
-from .extensions import DEFAULT_EXTENSIONS
+from . import extensions
 from .template import Template
 
 
 def create_environment(template: Template) -> jinja2.Environment:
     """Create the Jinja environment."""
-    with exceptions.TemplateExtensionNotFound().when(ImportError, AttributeError):
-        return jinja2.Environment(  # noqa: S701
-            loader=jinja2.FileSystemLoader(str(template.repository)),
-            extensions=DEFAULT_EXTENSIONS + template.extensions,
-            keep_trailing_newline=True,
-            undefined=jinja2.StrictUndefined,
-        )
+    return jinja2.Environment(  # noqa: S701
+        loader=jinja2.FileSystemLoader(str(template.repository)),
+        extensions=extensions.load(extra=template.extensions),
+        keep_trailing_newline=True,
+        undefined=jinja2.StrictUndefined,
+    )
 
 
 class Renderer:
