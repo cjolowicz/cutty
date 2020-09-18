@@ -105,7 +105,7 @@ class Template:
         if location is not None:
             data["_template"] = location
 
-        return Variables(Variable(name, value) for name, value in data.items())
+        return Variables.fromdict(data)
 
     @property
     def extensions(self) -> List[str]:
