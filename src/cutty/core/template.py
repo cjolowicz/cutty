@@ -1,6 +1,7 @@
 """Template."""
 from __future__ import annotations
 
+import contextlib
 import json
 from dataclasses import dataclass
 from dataclasses import replace
@@ -43,6 +44,11 @@ class Variables:
         with path.open() as io:
             data = json.load(io)
 
+        if not isinstance(data, dict):
+            raise exceptions.TemplateConfigurationTypeError(
+                path.name, "dict", type(data)
+            )
+
         if location is not None:
             data["_template"] = location
 
@@ -59,6 +65,12 @@ class Variables:
     def __getitem__(self, name: str) -> Variable:
         """Retrieve a variable by name."""
         return self.variables[name]
+
+    def get(self, name: str, *, default: Any = None) -> Variable:
+        """Return the variable named `name`, or the provided default."""
+        with contextlib.suppress(KeyError):
+            return self.variables[name]
+        return Variable(name, default)
 
     def override(self, other: Variables) -> Variables:
         """Override variables from another collection."""
@@ -78,6 +90,19 @@ class Variables:
             return variable
 
         return Variables(_override(variable) for variable in self)
+
+
+def as_string_list(variable: Variable) -> List[str]:
+    """Check that the value is a list of strings, and return it."""
+    if not (
+        isinstance(variable.value, list)
+        and all(isinstance(item, str) for item in variable.value)
+    ):
+        raise exceptions.InvalidTemplateVariable(
+            variable.name, "cookiecutter.json", "List[str]", variable.value
+        )
+
+    return variable.value
 
 
 def find_template(path: Path) -> Optional[Path]:
@@ -102,8 +127,18 @@ class Template:
     @staticmethod
     def load_location(instance: Path) -> str:
         """Return the location specified in the given instance."""
-        variables = Variables.load(instance / ".cookiecutter.json")
-        return variables["_template"].value
+        path = instance / ".cookiecutter.json"
+        variables = Variables.load(path)
+
+        with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
+            location = variables["_template"].value
+
+        if not isinstance(location, str):
+            raise exceptions.InvalidTemplateVariable(
+                "_template", path, "str", type(location).__name__
+            )
+
+        return location
 
     @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
@@ -124,19 +159,16 @@ class Template:
         )
 
     @property
-    def location(self) -> str:
-        """Return the template location."""
-        return self.variables["_template"].value
-
-    @property
     def extensions(self) -> List[str]:
         """Return the Jinja extensions."""
-        return self.variables["_extensions"].value
+        variable = self.variables.get("_extensions", default=[])
+        return as_string_list(variable)
 
     @property
     def copy_without_render(self) -> List[str]:
         """Return patterns for files to be copied without rendering."""
-        return self.variables["_copy_without_render"].value
+        variable = self.variables.get("_copy_without_render", default=[])
+        return as_string_list(variable)
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
