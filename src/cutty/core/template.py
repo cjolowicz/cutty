@@ -1,6 +1,7 @@
 """Template."""
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
@@ -8,6 +9,7 @@ from typing import List
 from typing import Optional
 
 from . import exceptions
+from .utils import with_context
 from .variables import Variable
 from .variables import Variables
 
@@ -44,11 +46,11 @@ class Template:
     version: str
     variables: Variables
 
-    @staticmethod
-    def load_location(instance: Path) -> str:
+    @classmethod
+    def load_location(cls, instance: Path) -> str:
         """Return the location specified in the given instance."""
         path = instance / ".cookiecutter.json"
-        variables = Variables.load(path)
+        variables = cls.load_variables(path)
 
         with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
             location = variables["_template"].value
@@ -68,7 +70,7 @@ class Template:
             raise exceptions.TemplateDirectoryNotFound(location)
 
         hookdir = path / "hooks"
-        variables = Variables.load(path / "cookiecutter.json", location=location)
+        variables = cls.load_variables(path / "cookiecutter.json", location=location)
 
         return cls(
             root=root,
@@ -77,6 +79,33 @@ class Template:
             version=version,
             variables=variables,
         )
+
+    @classmethod
+    @with_context(
+        lambda cls, path, **kwargs: (
+            exceptions.TemplateConfigurationFileError(path.name),
+            exceptions.TemplateConfigurationDoesNotExist(path.name).when(
+                FileNotFoundError
+            ),
+            exceptions.InvalidTemplateConfiguration(path.name).when(
+                json.decoder.JSONDecodeError
+            ),
+        )
+    )
+    def load_variables(cls, path: Path, *, location: Optional[str] = None) -> Variables:
+        """Load the template variables from a JSON file."""
+        with path.open() as io:
+            data = json.load(io)
+
+        if not isinstance(data, dict):
+            raise exceptions.TemplateConfigurationTypeError(
+                path.name, "dict", type(data)
+            )
+
+        if location is not None:
+            data["_template"] = location
+
+        return Variables(Variable(name, value) for name, value in data.items())
 
     @property
     def extensions(self) -> List[str]:
@@ -92,6 +121,6 @@ class Template:
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
-        instance_variables = Variables.load(instance / ".cookiecutter.json")
+        instance_variables = self.load_variables(instance / ".cookiecutter.json")
         variables = self.variables.override(instance_variables)
         return replace(self, variables=variables)
