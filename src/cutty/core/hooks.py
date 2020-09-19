@@ -13,12 +13,6 @@ from .template import Template
 from .utils import make_executable
 
 
-HOOKS = [
-    "pre_gen_project",
-    "post_gen_project",
-]
-
-
 class Hook:
     """Hook."""
 
@@ -82,8 +76,6 @@ class HookManager:
 
     def find(self, name: str) -> Optional[Hook]:
         """Return the hook if found, or None."""
-        assert name in HOOKS  # noqa: S101
-
         if self.template.hookdir.is_dir():
             for path in self.template.hookdir.iterdir():
                 if path.stem == name and not path.name.endswith("~"):
