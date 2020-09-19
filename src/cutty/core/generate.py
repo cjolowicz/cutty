@@ -8,7 +8,7 @@ from . import exceptions
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template
-from .utils import OnRaise
+from .utils import on_raise
 from .utils import rmtree
 
 
@@ -32,7 +32,7 @@ class Generator:
             raise exceptions.ProjectDirectoryExists(target_dir)
 
         cleanup = (
-            OnRaise(rmtree, target_dir)
+            on_raise(rmtree, target_dir)
             if not target_dir.exists()
             else contextlib.nullcontext()
         )

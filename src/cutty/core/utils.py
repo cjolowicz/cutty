@@ -72,6 +72,9 @@ class OnRaise(contextlib.AbstractContextManager):
             callback(*args, **kwargs)
 
 
+on_raise = OnRaise
+
+
 def make_executable(path: Path) -> None:
     """Set the executable bit on a file."""
     status = os.stat(path)
