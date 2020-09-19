@@ -18,8 +18,7 @@ Error = TypeVar(
     "Error",
     exceptions.ContentRenderError,
     exceptions.PathRenderError,
-    exceptions.DirectoryGenerationFailed,
-    exceptions.FileGenerationFailed,
+    exceptions.ProjectGenerationFailed,
 )
 
 
@@ -50,18 +49,26 @@ class Generator:
             else contextlib.nullcontext()
         )
 
-        with cleanup:
-            self.hooks.pre_generate(cwd=target_dir)
-            self._generate_directory(self.template.root, target_dir)
-            self.hooks.post_generate(cwd=target_dir)
+        with exceptions.ProjectGenerationFailed():
+            with cleanup:
+                self.hooks.pre_generate(cwd=target_dir)
+                self._generate_directory(self.template.root, target_dir)
+                self.hooks.post_generate(cwd=target_dir)
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
-        with self.error(exceptions.DirectoryGenerationFailed, source_dir):
-            if self._is_copy_only(source_dir):
-                shutil.copytree(source_dir, target_dir)
-                return
+        if self._is_copy_only(source_dir):
+            self._copy_directory(source_dir, target_dir)
+        else:
+            self._render_directory(source_dir, target_dir)
 
-            target_dir.mkdir(parents=True, exist_ok=True)
+    def _generate_file(self, source: Path, target: Path) -> None:
+        if self._is_copy_only(source):
+            self._copy_file(source, target)
+        else:
+            self._render_file(source, target)
+
+    def _render_directory(self, source_dir: Path, target_dir: Path) -> None:
+        target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
             with self.error(exceptions.PathRenderError, source):
@@ -72,20 +79,22 @@ class Generator:
             else:
                 self._generate_file(source, target)
 
-    def _generate_file(self, source: Path, target: Path) -> None:
-        with self.error(exceptions.FileGenerationFailed, source):
-            if self._is_copy_only(source):
-                shutil.copyfile(source, target)
-            else:
-                with self.error(exceptions.ContentRenderError, source):
-                    text = self.renderer.render_path(source)
+    def _render_file(self, source: Path, target: Path) -> None:
+        with self.error(exceptions.ContentRenderError, source):
+            text = self.renderer.render_path(source)
 
-                target.write_text(text)
-
-            shutil.copymode(source, target)
+        target.write_text(text)
+        shutil.copymode(source, target)
 
     def _is_copy_only(self, path: Path) -> bool:
         return any(
             fnmatch.fnmatch(str(path), pattern)
             for pattern in self.template.copy_without_render
         )
+
+    def _copy_directory(self, source: Path, target: Path) -> None:
+        shutil.copytree(source, target)
+
+    def _copy_file(self, source: Path, target: Path) -> None:
+        shutil.copyfile(source, target)
+        shutil.copymode(source, target)
