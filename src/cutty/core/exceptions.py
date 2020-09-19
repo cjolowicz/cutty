@@ -130,3 +130,7 @@ class ContentRenderError(RenderError):
 
 class ProjectDirectoryExists(CuttyException):
     """Project directory {} already exists."""
+
+
+class HookFailed(CuttyException):
+    """Hook script {} failed."""
