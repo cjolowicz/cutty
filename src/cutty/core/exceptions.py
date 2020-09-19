@@ -134,3 +134,11 @@ class ProjectDirectoryExists(CuttyException):
 
 class HookFailed(CuttyException):
     """Hook script {} failed."""
+
+
+class DirectoryGenerationFailed(CuttyException):
+    """Cannot generate directory {}."""
+
+
+class FileGenerationFailed(CuttyException):
+    """Cannot generate file {}."""

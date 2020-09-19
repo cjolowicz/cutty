@@ -43,11 +43,14 @@ class Generator:
             self.hooks.post_generate(cwd=target_dir)
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
-        if self._is_copy_only(source_dir):
-            shutil.copytree(source_dir, target_dir)
-            return
+        with exceptions.DirectoryGenerationFailed(
+            source_dir.relative_to(self.template.repository)
+        ):
+            if self._is_copy_only(source_dir):
+                shutil.copytree(source_dir, target_dir)
+                return
 
-        target_dir.mkdir(parents=True, exist_ok=True)
+            target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
             with exceptions.PathRenderError(
@@ -61,17 +64,20 @@ class Generator:
                 self._generate_file(source, target)
 
     def _generate_file(self, source: Path, target: Path) -> None:
-        if self._is_copy_only(source):
-            shutil.copyfile(source, target)
-        else:
-            with exceptions.ContentRenderError(
-                source.relative_to(self.template.repository)
-            ):
-                text = self.renderer.render_path(source)
+        with exceptions.FileGenerationFailed(
+            source.relative_to(self.template.repository)
+        ):
+            if self._is_copy_only(source):
+                shutil.copyfile(source, target)
+            else:
+                with exceptions.ContentRenderError(
+                    source.relative_to(self.template.repository)
+                ):
+                    text = self.renderer.render_path(source)
 
-            target.write_text(text)
+                target.write_text(text)
 
-        shutil.copymode(source, target)
+            shutil.copymode(source, target)
 
     def _is_copy_only(self, path: Path) -> bool:
         return any(
