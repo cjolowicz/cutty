@@ -18,6 +18,7 @@ from typing import TypeVar
 from typing import Union
 
 from .compat import contextmanager
+from .types import AbstractContextManager
 
 
 def as_optional_path(argument: Optional[str]) -> Optional[Path]:
@@ -58,7 +59,7 @@ def rmtree(path: Path) -> None:
     shutil.rmtree(path, onerror=_onerror)
 
 
-class OnRaise(contextlib.AbstractContextManager):
+class OnRaise(AbstractContextManager):
     """Invoke a callback when leaving the context due to an exception."""
 
     def __init__(self, callback: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
