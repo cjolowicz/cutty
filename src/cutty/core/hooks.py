@@ -54,7 +54,8 @@ class Hook:
         command = [Path(sys.executable), path] if path.suffix == ".py" else [path]
         shell = sys.platform == "win32"
 
-        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
+        with exceptions.HookFailed(self.path.relative_to(self.template.repository)):
+            subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
 
 
 class HookManager:
