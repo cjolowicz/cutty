@@ -58,27 +58,18 @@ def rmtree(path: Path) -> None:
     shutil.rmtree(path, onerror=_onerror)
 
 
-class RemoveTree:
-    """Remove a directory tree on exit, unless it already existed."""
+class OnRaise(contextlib.AbstractContextManager):
+    """Invoke a callback when leaving the context due to an exception."""
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, callback: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
         """Initialize."""
-        self.stack = contextlib.ExitStack()
-        if not path.exists():
-            self.stack.callback(rmtree, path)
+        self._args = (callback, args, kwargs)
 
-    def __enter__(self) -> Any:
-        """Enter the context."""
-        self.stack.__enter__()
-        return self
-
-    def __exit__(self, *args: Any) -> None:
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         """Exit the context."""
-        self.stack.__exit__(*args)
-
-    def cancel(self) -> None:
-        """Do not remove the directory tree."""
-        self.stack.pop_all()
+        if exc_type is not None:
+            (callback, args, kwargs) = self._args
+            callback(*args, **kwargs)
 
 
 def make_executable(path: Path) -> None:
