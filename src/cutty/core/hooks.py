@@ -19,6 +19,44 @@ HOOKS = [
 ]
 
 
+class Hook:
+    """Hook."""
+
+    def __init__(self, path: Path, *, template: Template, renderer: Renderer) -> None:
+        """Initialize."""
+        self.path = path
+        self.template = template
+        self.renderer = renderer
+
+    def run(self, *, cwd: Path) -> None:
+        """Execute the hook from the specified directory."""
+        with self.render() as script:
+            self.execute(script, cwd=cwd)
+
+    @contextmanager
+    def render(self) -> Iterator[Path]:
+        """Render the hook."""
+        with exceptions.ContentRenderError(
+            self.path.relative_to(self.template.repository)
+        ):
+            text = self.renderer.render_path(self.path)
+
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / self.path.name
+            script.write_text(text)
+
+            make_executable(script)
+
+            yield script
+
+    def execute(self, path: Path, cwd: Path) -> None:
+        """Execute a script from a working directory."""
+        command = [Path(sys.executable), path] if path.suffix == ".py" else [path]
+        shell = sys.platform == "win32"
+
+        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
+
+
 class HookManager:
     """Hook manager."""
 
@@ -36,41 +74,17 @@ class HookManager:
 
     def run(self, hook_name: str, *, cwd: Path) -> None:
         """Try to find and execute a hook from the specified directory."""
-        script = self.find(hook_name)
-        if script is not None:
-            script = self.render(script)
-            self.execute(script, cwd=cwd)
+        hook = self.find(hook_name)
+        if hook is not None:
+            hook.run(cwd=cwd)
 
-    def find(self, name: str) -> Optional[Path]:
-        """Return the absolute path of the hook script, or None."""
+    def find(self, name: str) -> Optional[Hook]:
+        """Return the hook if found, or None."""
         assert name in HOOKS  # noqa: S101
 
         if self.template.hookdir.is_dir():
             for path in self.template.hookdir.iterdir():
                 if path.stem == name and not path.name.endswith("~"):
-                    return path.resolve()
+                    return Hook(path, template=self.template, renderer=self.renderer)
 
         return None
-
-    def render(self, path: Path) -> Path:
-        """Render a script."""
-        with exceptions.ContentRenderError(path.relative_to(self.template.repository)):
-            text = self.renderer.render_path(path)
-
-        with tempfile.NamedTemporaryFile(
-            delete=False, mode="w", suffix=path.suffix
-        ) as temporary:
-            temporary.write(text)
-
-        path = Path(temporary.name)
-
-        make_executable(path)
-
-        return path
-
-    def execute(self, path: Path, cwd: Path) -> None:
-        """Execute a script from a working directory."""
-        command = [Path(sys.executable), path] if path.suffix == ".py" else [path]
-        shell = sys.platform == "win32"
-
-        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
