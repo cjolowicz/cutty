@@ -13,6 +13,18 @@ from .template import Template
 from .utils import make_executable
 
 
+@contextmanager
+def create_temporary_script(filename: str, text: str) -> Iterator[Path]:
+    """Create script with given filename and contents, using a temporary directory."""
+    with tempfile.TemporaryDirectory() as directory:
+        script = Path(directory) / filename
+        script.write_text(text)
+
+        make_executable(script)
+
+        yield script
+
+
 class Hook:
     """Hook."""
 
@@ -24,24 +36,13 @@ class Hook:
 
     def run(self, *, cwd: Path) -> None:
         """Execute the hook from the specified directory."""
-        with self.render() as script:
-            self.execute(script, cwd=cwd)
-
-    @contextmanager
-    def render(self) -> Iterator[Path]:
-        """Render the hook."""
         with exceptions.ContentRenderError(
             self.path.relative_to(self.template.repository)
         ):
             text = self.renderer.render_path(self.path)
 
-        with tempfile.TemporaryDirectory() as directory:
-            script = Path(directory) / self.path.name
-            script.write_text(text)
-
-            make_executable(script)
-
-            yield script
+        with create_temporary_script(self.path.name, text) as script:
+            self.execute(script, cwd=cwd)
 
     def execute(self, path: Path, cwd: Path) -> None:
         """Execute a script from a working directory."""
