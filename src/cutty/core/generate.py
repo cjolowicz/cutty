@@ -22,6 +22,15 @@ Error = TypeVar(
 )
 
 
+def _copy_directory(source: Path, target: Path) -> None:
+    shutil.copytree(source, target)
+
+
+def _copy_file(source: Path, target: Path) -> None:
+    shutil.copyfile(source, target)
+    shutil.copymode(source, target)
+
+
 class Generator:
     """Generator."""
 
@@ -57,13 +66,13 @@ class Generator:
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
         if self._is_copy_only(source_dir):
-            self._copy_directory(source_dir, target_dir)
+            _copy_directory(source_dir, target_dir)
         else:
             self._render_directory(source_dir, target_dir)
 
     def _generate_file(self, source: Path, target: Path) -> None:
         if self._is_copy_only(source):
-            self._copy_file(source, target)
+            _copy_file(source, target)
         else:
             self._render_file(source, target)
 
@@ -91,10 +100,3 @@ class Generator:
             fnmatch.fnmatch(str(path), pattern)
             for pattern in self.template.copy_without_render
         )
-
-    def _copy_directory(self, source: Path, target: Path) -> None:
-        shutil.copytree(source, target)
-
-    def _copy_file(self, source: Path, target: Path) -> None:
-        shutil.copyfile(source, target)
-        shutil.copymode(source, target)
