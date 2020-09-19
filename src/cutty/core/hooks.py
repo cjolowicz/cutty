@@ -41,16 +41,16 @@ class Hook:
         ):
             text = self.renderer.render_path(self.path)
 
-        with create_temporary_script(self.path.name, text) as script:
-            self.execute(script, cwd=cwd)
+        with exceptions.HookFailed(self.path.relative_to(self.template.repository)):
+            with create_temporary_script(self.path.name, text) as script:
+                self.execute(script, cwd=cwd)
 
     def execute(self, path: Path, cwd: Path) -> None:
         """Execute a script from a working directory."""
         command = [Path(sys.executable), path] if path.suffix == ".py" else [path]
         shell = sys.platform == "win32"
 
-        with exceptions.HookFailed(self.path.relative_to(self.template.repository)):
-            subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
+        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
 
 
 class HookManager:
