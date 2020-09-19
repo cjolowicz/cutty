@@ -66,11 +66,12 @@ class HookManager:
         self.template = template
         self.renderer = renderer
 
-    @contextmanager
-    def run_hooks(self, *, cwd: Path) -> Iterator[None]:
-        """Context manager to run pre- and post-generation hooks."""
+    def pre_generate(self, *, cwd: Path) -> None:
+        """Run pre-generate hook."""
         self.run("pre_gen_project", cwd=cwd)
-        yield
+
+    def post_generate(self, *, cwd: Path) -> None:
+        """Run post-generate hook."""
         self.run("post_gen_project", cwd=cwd)
 
     def run(self, hook_name: str, *, cwd: Path) -> None:

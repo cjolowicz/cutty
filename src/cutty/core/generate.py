@@ -38,8 +38,9 @@ class Generator:
         )
 
         with cleanup:
-            with self.hooks.run_hooks(cwd=target_dir):
-                self._generate_directory(self.template.root, target_dir)
+            self.hooks.pre_generate(cwd=target_dir)
+            self._generate_directory(self.template.root, target_dir)
+            self.hooks.post_generate(cwd=target_dir)
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
         if self._is_copy_only(source_dir):
