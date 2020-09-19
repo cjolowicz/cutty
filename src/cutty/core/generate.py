@@ -1,4 +1,5 @@
 """Generate."""
+import contextlib
 import fnmatch
 import shutil
 from pathlib import Path
@@ -7,7 +8,8 @@ from . import exceptions
 from .hooks import HookManager
 from .render import Renderer
 from .template import Template
-from .utils import RemoveTree
+from .utils import OnRaise
+from .utils import rmtree
 
 
 class Generator:
@@ -29,10 +31,15 @@ class Generator:
         if target_dir.exists() and not overwrite:
             raise exceptions.ProjectDirectoryExists(target_dir)
 
-        with RemoveTree(target_dir) as rmtree:
+        cleanup = (
+            OnRaise(rmtree, target_dir)
+            if not target_dir.exists()
+            else contextlib.nullcontext()
+        )
+
+        with cleanup:
             with self.hooks.run_hooks(cwd=target_dir):
                 self._generate_directory(self.template.root, target_dir)
-            rmtree.cancel()
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
         if self._is_copy_only(source_dir):
