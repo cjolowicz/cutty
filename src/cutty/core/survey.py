@@ -5,7 +5,7 @@ from . import exceptions
 from . import prompt
 from .render import Renderer
 from .template import Template
-from .template import Variable
+from .variables import Variable
 
 
 class Survey:
