@@ -6,7 +6,10 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Iterable
 from typing import Iterator
+from typing import List
 from typing import Mapping
+
+from . import exceptions
 
 
 @dataclass(frozen=True)
@@ -15,6 +18,19 @@ class Variable:
 
     name: str
     value: Any
+
+
+def as_string_list(variable: Variable) -> List[str]:
+    """Check that the value is a list of strings, and return it."""
+    if not (
+        isinstance(variable.value, list)
+        and all(isinstance(item, str) for item in variable.value)
+    ):
+        raise exceptions.InvalidTemplateVariable(
+            variable.name, "cookiecutter.json", "List[str]", repr(variable.value)
+        )
+
+    return variable.value
 
 
 class Variables:
@@ -42,6 +58,18 @@ class Variables:
         with contextlib.suppress(KeyError):
             return self.variables[name]
         return Variable(name, default)
+
+    @property
+    def extensions(self) -> List[str]:
+        """Return the Jinja extensions."""
+        variable = self.get("_extensions", default=[])
+        return as_string_list(variable)
+
+    @property
+    def copy_without_render(self) -> List[str]:
+        """Return patterns for files to be copied without rendering."""
+        variable = self.get("_copy_without_render", default=[])
+        return as_string_list(variable)
 
     def override(self, other: Variables) -> Variables:
         """Override variables from another collection."""
