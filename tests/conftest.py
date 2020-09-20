@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from cutty.core import git
 from cutty.core import locations
+from cutty.core.cache import Cache
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -39,6 +40,13 @@ def user_cache_dir(monkeypatch: MonkeyPatch, tmp_path: Path) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr("appdirs.user_cache_dir", lambda *args, **kwargs: path)
     return path
+
+
+@pytest.fixture
+def cache(tmp_path: Path) -> Cache:
+    """Return a temporary application cache."""
+    path = tmp_path / ".cache" / locations.cache.name
+    return Cache(path)
 
 
 @pytest.fixture
