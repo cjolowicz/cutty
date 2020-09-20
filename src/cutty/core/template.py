@@ -5,12 +5,10 @@ import json
 from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
-from typing import List
 from typing import Optional
 
 from . import exceptions
 from .utils import with_context
-from .variables import Variable
 from .variables import Variables
 
 
@@ -21,19 +19,6 @@ def find_template(path: Path) -> Optional[Path]:
             return item
 
     return None
-
-
-def as_string_list(variable: Variable) -> List[str]:
-    """Check that the value is a list of strings, and return it."""
-    if not (
-        isinstance(variable.value, list)
-        and all(isinstance(item, str) for item in variable.value)
-    ):
-        raise exceptions.InvalidTemplateVariable(
-            variable.name, "cookiecutter.json", "List[str]", repr(variable.value)
-        )
-
-    return variable.value
 
 
 @dataclass(frozen=True)
@@ -114,18 +99,6 @@ class Template:
                 )
 
         return variables
-
-    @property
-    def extensions(self) -> List[str]:
-        """Return the Jinja extensions."""
-        variable = self.variables.get("_extensions", default=[])
-        return as_string_list(variable)
-
-    @property
-    def copy_without_render(self) -> List[str]:
-        """Return patterns for files to be copied without rendering."""
-        variable = self.variables.get("_copy_without_render", default=[])
-        return as_string_list(variable)
 
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""

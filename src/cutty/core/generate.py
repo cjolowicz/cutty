@@ -98,5 +98,5 @@ class Generator:
     def _is_copy_only(self, path: Path) -> bool:
         return any(
             fnmatch.fnmatch(str(path), pattern)
-            for pattern in self.template.copy_without_render
+            for pattern in self.template.variables.copy_without_render
         )
