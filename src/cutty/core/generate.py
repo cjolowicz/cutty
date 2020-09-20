@@ -46,7 +46,7 @@ class Generator:
 
     def generate(self, output_dir: Path, overwrite: bool = False) -> None:
         """Generate project."""
-        with self.error(exceptions.PathRenderError, self.template):
+        with self.error(exceptions.PathRenderError, self.template.root):
             target_dir = output_dir / self.renderer.render(self.template.root.name)
 
         if target_dir.exists() and not overwrite:
