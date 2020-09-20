@@ -36,8 +36,6 @@ def update(
             checkout=False,
             force_remove=True,
         ) as project:
-            template = template.override(instance.path)
-
             application.generate_project(
                 template,
                 output_dir=project.path.parent,

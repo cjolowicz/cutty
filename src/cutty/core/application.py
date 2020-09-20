@@ -37,7 +37,8 @@ class Application:
 
         return cls(config=config, cache=cache)
 
-    def _load_template(
+    @contextmanager
+    def load_template(
         self,
         location: str,
         *,
@@ -51,8 +52,6 @@ class Application:
         ) as template:
             yield template
 
-    load_template = contextmanager(_load_template)
-
     @contextmanager
     def load_template_from_instance(
         self,
@@ -63,7 +62,10 @@ class Application:
     ) -> Iterator[Template]:
         """Load a template."""
         location = Template.load_location(instance)
-        yield from self._load_template(location, directory=directory, revision=revision)
+        with self.load_template(
+            location, directory=directory, revision=revision
+        ) as template:
+            yield template.override(instance)
 
     def generate_project(
         self,
