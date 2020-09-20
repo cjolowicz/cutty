@@ -22,9 +22,14 @@ class Application:
     config: Config
 
     @classmethod
-    def create(cls, *, config_file: Optional[Path] = None) -> Application:
+    def create(
+        cls, *, config_file: Optional[Path] = None, cache_dir: Optional[Path] = None
+    ) -> Application:
         """Create an application."""
-        cache = Cache(locations.cache)
+        if cache_dir is None:
+            cache_dir = locations.cache
+
+        cache = Cache(cache_dir)
         config = Config.load(config_file)
         return cls(cache=cache, config=config)
 
