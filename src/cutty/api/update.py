@@ -3,10 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..core import git
-from ..core.cache import cache
-from ..core.config import Config
-from ..core.engine import Engine
-from ..core.template import Template
+from ..core.application import Application
 
 
 def _ensure_branch_exists(repository: git.Repository, branch: str) -> None:
@@ -25,25 +22,28 @@ def update(
     config_file: Optional[Path] = None,
 ) -> None:
     """Update a project from a Cookiecutter template."""
+    application = Application.create(config_file=config_file)
     instance = git.Repository()
-    location = Template.load_location(instance.path)
 
-    config = Config.load(config_file)
-    location = config.abbreviations.expand(location)
+    with application.load_template_from_instance(
+        instance.path, directory=directory, revision=revision
+    ) as template:
+        _ensure_branch_exists(instance, "template")
 
-    _ensure_branch_exists(instance, "template")
-
-    with instance.worktree(
-        instance.path / ".git" / "cutty" / instance.path.name,
-        "template",
-        checkout=False,
-        force_remove=True,
-    ) as project:
-        with cache.load(location, directory=directory, revision=revision) as template:
+        with instance.worktree(
+            instance.path / ".git" / "cutty" / instance.path.name,
+            "template",
+            checkout=False,
+            force_remove=True,
+        ) as project:
             template = template.override(instance.path)
 
-            engine = Engine(template, interactive=interactive)
-            engine.generate(project.path.parent, overwrite=True)
+            application.generate_project(
+                template,
+                output_dir=project.path.parent,
+                interactive=interactive,
+                overwrite=True,
+            )
 
             project.add(all=True)
             project.commit(
