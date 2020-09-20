@@ -56,14 +56,7 @@ class Template:
         variables = cls.load_variables(path)
 
         with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
-            location = variables["_template"].value
-
-        if not isinstance(location, str):
-            raise exceptions.InvalidTemplateVariable(
-                "_template", path, "str", repr(location)
-            )
-
-        return location
+            return variables.location
 
     @classmethod
     @with_context(
