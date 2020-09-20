@@ -36,10 +36,6 @@ class Cache:
         """Initialize."""
         self.path = path
 
-    def _get_template_path(self, location: str) -> Path:
-        hash = _hash(location)
-        return self.path / "repositories" / hash[:2] / hash
-
     @contextmanager
     def load(
         self,
@@ -49,7 +45,8 @@ class Cache:
         revision: Optional[str] = None,
     ) -> Iterator[Template]:
         """Load a project template."""
-        path = self._get_template_path(location)
+        hash = _hash(location)
+        path = self.path / "repositories" / hash[:2] / hash
         repository = _load_repository(location, path / "repo.git")
         version = Version.get(repository, revision=revision)
         worktree = path / "worktrees" / version.sha1
