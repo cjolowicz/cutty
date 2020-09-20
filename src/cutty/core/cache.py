@@ -6,7 +6,6 @@ from typing import Optional
 
 from . import exceptions
 from . import git
-from . import locations
 from .compat import contextmanager
 from .template import Template
 from .versions import Version
@@ -59,6 +58,3 @@ class Cache:
                 location=location,
                 version=version.name,
             )
-
-
-cache = Cache(locations.cache)
