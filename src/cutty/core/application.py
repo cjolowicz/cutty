@@ -18,8 +18,8 @@ from .template import Template
 class Application:
     """Application."""
 
-    cache: Cache
     config: Config
+    cache: Cache
 
     @classmethod
     def create(
@@ -29,9 +29,9 @@ class Application:
         if cache_dir is None:
             cache_dir = locations.cache
 
-        cache = Cache(cache_dir)
         config = Config.load(config_file)
-        return cls(cache=cache, config=config)
+        cache = Cache(cache_dir)
+        return cls(config=config, cache=cache)
 
     @contextmanager
     def load_template(
