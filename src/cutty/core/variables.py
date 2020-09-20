@@ -19,28 +19,26 @@ class Variable:
     name: str
     value: Any
 
+    def as_string(self) -> str:
+        """Check that the value is a string, and return it."""
+        if not (isinstance(self.value, str)):
+            raise exceptions.InvalidTemplateVariable(
+                self.name, "cookiecutter.json", "str", repr(self.value)
+            )
 
-def as_string(variable: Variable) -> str:
-    """Check that the value is a string, and return it."""
-    if not (isinstance(variable.value, str)):
-        raise exceptions.InvalidTemplateVariable(
-            variable.name, "cookiecutter.json", "str", repr(variable.value)
-        )
+        return self.value
 
-    return variable.value
+    def as_string_list(self) -> List[str]:
+        """Check that the value is a list of strings, and return it."""
+        if not (
+            isinstance(self.value, list)
+            and all(isinstance(item, str) for item in self.value)
+        ):
+            raise exceptions.InvalidTemplateVariable(
+                self.name, "cookiecutter.json", "List[str]", repr(self.value)
+            )
 
-
-def as_string_list(variable: Variable) -> List[str]:
-    """Check that the value is a list of strings, and return it."""
-    if not (
-        isinstance(variable.value, list)
-        and all(isinstance(item, str) for item in variable.value)
-    ):
-        raise exceptions.InvalidTemplateVariable(
-            variable.name, "cookiecutter.json", "List[str]", repr(variable.value)
-        )
-
-    return variable.value
+        return self.value
 
 
 class Variables:
@@ -73,19 +71,19 @@ class Variables:
     def location(self) -> str:
         """Return the template location."""
         variable = self.variables["_template"]
-        return as_string(variable)
+        return variable.as_string()
 
     @property
     def extensions(self) -> List[str]:
         """Return the Jinja extensions."""
         variable = self.get("_extensions", default=[])
-        return as_string_list(variable)
+        return variable.as_string_list()
 
     @property
     def copy_without_render(self) -> List[str]:
         """Return patterns for files to be copied without rendering."""
         variable = self.get("_copy_without_render", default=[])
-        return as_string_list(variable)
+        return variable.as_string_list()
 
     def override(self, other: Variables) -> Variables:
         """Override variables from another collection."""
