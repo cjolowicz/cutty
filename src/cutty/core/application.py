@@ -29,8 +29,12 @@ class Application:
         if cache_dir is None:
             cache_dir = locations.cache
 
+        if config_file is None:
+            config_file = locations.config
+
         config = Config.load(config_file)
         cache = Cache(cache_dir)
+
         return cls(config=config, cache=cache)
 
     @contextmanager
