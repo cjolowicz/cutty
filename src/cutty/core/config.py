@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 
-import poyo.exceptions
+import poyo
 
 from . import exceptions
 from . import locations
