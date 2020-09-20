@@ -4,7 +4,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
-from typing import Optional
 
 import poyo.exceptions
 
@@ -20,13 +19,10 @@ class Config:
     abbreviations: Abbreviations = field(default_factory=Abbreviations)
 
     @classmethod
-    def load(cls, path: Optional[Path] = None) -> Config:
+    def load(cls, path: Path) -> Config:
         """Return the user configuration."""
-        if path is None:
-            if not locations.config.exists():
-                return cls()
-
-            path = locations.config
+        if path == locations.config and not path.exists():
+            return cls()
 
         with exceptions.ConfigurationFileError(
             path
