@@ -14,5 +14,5 @@ def contextmanager(
 ) -> Callable[..., ContextManager[T]]:
     """Fix annotations of functions decorated by contextlib.contextmanager."""
     result = contextlib.contextmanager(func)
-    result.__annotations__["return"] = ContextManager[T]
+    result.__annotations__ = {**func.__annotations__, "return": ContextManager[T]}
     return result
