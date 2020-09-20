@@ -20,6 +20,16 @@ class Variable:
     value: Any
 
 
+def as_string(variable: Variable) -> str:
+    """Check that the value is a string, and return it."""
+    if not (isinstance(variable.value, str)):
+        raise exceptions.InvalidTemplateVariable(
+            variable.name, "cookiecutter.json", "str", repr(variable.value)
+        )
+
+    return variable.value
+
+
 def as_string_list(variable: Variable) -> List[str]:
     """Check that the value is a list of strings, and return it."""
     if not (
@@ -58,6 +68,12 @@ class Variables:
         with contextlib.suppress(KeyError):
             return self.variables[name]
         return Variable(name, default)
+
+    @property
+    def location(self) -> str:
+        """Return the template location."""
+        variable = self.variables["_template"]
+        return as_string(variable)
 
     @property
     def extensions(self) -> List[str]:
