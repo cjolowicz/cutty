@@ -2,9 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ..core.cache import cache
-from ..core.config import Config
-from ..core.engine import Engine
+from ..core.application import Application
 
 
 def create(
@@ -17,9 +15,11 @@ def create(
     config_file: Optional[Path] = None,
 ) -> None:
     """Create a project from a Cookiecutter template."""
-    config = Config.load(config_file)
-    location = config.abbreviations.expand(location)
+    application = Application.create(config_file=config_file)
 
-    with cache.load(location, directory=directory, revision=revision) as template:
-        engine = Engine(template, interactive=interactive)
-        engine.generate(output_dir or Path())
+    with application.load_template(
+        location, directory=directory, revision=revision
+    ) as template:
+        application.generate_project(
+            template, output_dir=output_dir, interactive=interactive
+        )
