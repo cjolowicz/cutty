@@ -44,7 +44,7 @@ class Project:
             worktree.commit(message=f"Update {name} to {version}", verify=False)
 
         self.repository.cherrypick(branch, commit=False)
-        self.repository.commit()  # Run pre-commit hook
+        self.repository.commit(edit=False)  # Run pre-commit hook
 
     def _ensure_branch_exists(self, branch: str) -> None:
         try:
