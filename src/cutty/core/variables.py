@@ -25,7 +25,7 @@ class Variable:
 
     def as_string(self) -> str:
         """Check that the value is a string, and return it."""
-        if not (isinstance(self.value, str)):
+        if not isinstance(self.value, str):
             raise exceptions.InvalidTemplateVariable(
                 self.name, "cookiecutter.json", "str", repr(self.value)
             )
