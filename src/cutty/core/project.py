@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Iterator
 
 from . import git
+from . import locations
 from .compat import contextmanager
 from .variables import Variables
 
@@ -28,11 +29,12 @@ class Project:
     @contextmanager
     def update(self, *, name: str, version: str) -> Iterator[Path]:
         """Update the project."""
-        self._ensure_branch_exists(name)
+        branch = f"{locations.name}/{name}"
+        self._ensure_branch_exists(branch)
 
         with self.repository.worktree(
-            self.repository.path / ".git" / "cutty" / self.repository.path.name,
-            name,
+            self.repository.path / ".git" / locations.name / self.repository.path.name,
+            branch,
             checkout=False,
             force_remove=True,
         ) as worktree:
