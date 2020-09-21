@@ -31,18 +31,6 @@ def removeprefix(string: str, prefix: str) -> str:
     return string[len(prefix) :] if string.startswith(prefix) else string
 
 
-@contextmanager
-def chdir(path: Path) -> Iterator[None]:
-    """Context manager for changing the directory."""
-    cwd = Path.cwd()
-    os.chdir(path)
-
-    try:
-        yield
-    finally:
-        os.chdir(cwd)
-
-
 def rmtree(path: Path) -> None:
     """Remove a directory tree.
 
