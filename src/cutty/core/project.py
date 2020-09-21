@@ -26,8 +26,8 @@ class Project:
         return cls(repository, variables)
 
     @contextmanager
-    def worktree(self, *, commit_message: str) -> Iterator[Path]:
-        """Create an empty worktree for a commit."""
+    def update(self, *, version: str) -> Iterator[Path]:
+        """Update the project."""
         self._ensure_branch_exists("template")
 
         with self.repository.worktree(
@@ -39,7 +39,7 @@ class Project:
             yield worktree.path
 
             worktree.add(all=True)
-            worktree.commit(message=commit_message, verify=False)
+            worktree.commit(message=f"Update template to {version}", verify=False)
 
             commit = worktree.rev_parse("HEAD")
 
