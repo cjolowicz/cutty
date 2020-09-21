@@ -11,6 +11,7 @@ from .cache import Cache
 from .compat import contextmanager
 from .config import Config
 from .engine import Engine
+from .project import Project
 from .template import Template
 
 
@@ -53,19 +54,18 @@ class Application:
             yield template
 
     @contextmanager
-    def load_template_from_instance(
+    def load_template_for_project(
         self,
-        instance: Path,
+        project: Project,
         *,
         directory: Optional[Path] = None,
         revision: Optional[str] = None
     ) -> Iterator[Template]:
         """Load a template."""
-        location = Template.load_location(instance)
         with self.load_template(
-            location, directory=directory, revision=revision
+            project.variables.location, directory=directory, revision=revision
         ) as template:
-            yield template.override(instance)
+            yield template.override(project.repository.path)
 
     def generate_project(
         self,
