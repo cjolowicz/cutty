@@ -50,15 +50,6 @@ class Template:
         )
 
     @classmethod
-    def load_location(cls, instance: Path) -> str:
-        """Return the location specified in the given instance."""
-        path = instance / ".cookiecutter.json"
-        variables = cls.load_variables(path)
-
-        with exceptions.MissingTemplateVariable("_template", path).when(KeyError):
-            return variables.location
-
-    @classmethod
     @with_context(
         lambda cls, path, **kwargs: (
             exceptions.TemplateConfigurationFileError(path.name),
