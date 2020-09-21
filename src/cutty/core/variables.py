@@ -2,14 +2,18 @@
 from __future__ import annotations
 
 import contextlib
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from typing import Iterable
 from typing import Iterator
 from typing import List
 from typing import Mapping
+from typing import Optional
 
 from . import exceptions
+from .utils import with_context
 
 
 @dataclass(frozen=True)
@@ -43,6 +47,41 @@ class Variable:
 
 class Variables:
     """Collection of template variables."""
+
+    @classmethod
+    @with_context(
+        lambda cls, path, **kwargs: (
+            exceptions.TemplateConfigurationFileError(path.name),
+            exceptions.TemplateConfigurationDoesNotExist(path.name).when(
+                FileNotFoundError
+            ),
+            exceptions.InvalidTemplateConfiguration(path.name).when(
+                json.decoder.JSONDecodeError
+            ),
+        )
+    )
+    def load(cls, path: Path, *, location: Optional[str] = None) -> Variables:
+        """Load the template variables from a JSON file."""
+        with path.open() as io:
+            data = json.load(io)
+
+        if not isinstance(data, dict):
+            raise exceptions.TemplateConfigurationTypeError(
+                path.name, "dict", type(data)
+            )
+
+        if location is not None:
+            data["_template"] = location
+
+        variables = cls.fromdict(data)
+
+        for variable in variables:
+            if isinstance(variable.value, list) and not variable.value:
+                raise exceptions.InvalidTemplateVariable(
+                    variable.name, path.name, "non-empty list", repr(variable.value)
+                )
+
+        return variables
 
     @classmethod
     def fromdict(cls, data: Mapping[str, Any]) -> Variables:
