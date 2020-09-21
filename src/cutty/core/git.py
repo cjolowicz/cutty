@@ -223,6 +223,7 @@ class Repository:
         *paths: StrPath,
         allow_empty: Optional[bool] = None,
         allow_empty_message: Optional[bool] = None,
+        edit: Optional[bool] = None,
         message: Optional[str] = None,
         verify: Optional[bool] = None,
     ) -> None:
@@ -230,6 +231,7 @@ class Repository:
         options = _format_options(
             allow_empty=allow_empty,
             allow_empty_message=allow_empty_message,
+            edit=edit,
             message=message,
             verify=verify,
         )
