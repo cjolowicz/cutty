@@ -1,14 +1,12 @@
 """Template."""
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
 from . import exceptions
-from .utils import with_context
 from .variables import Variables
 
 
@@ -39,7 +37,7 @@ class Template:
             raise exceptions.TemplateDirectoryNotFound(location)
 
         hookdir = path / "hooks"
-        variables = cls.load_variables(path / "cookiecutter.json", location=location)
+        variables = Variables.load(path / "cookiecutter.json", location=location)
 
         return cls(
             root=root,
@@ -49,43 +47,8 @@ class Template:
             variables=variables,
         )
 
-    @classmethod
-    @with_context(
-        lambda cls, path, **kwargs: (
-            exceptions.TemplateConfigurationFileError(path.name),
-            exceptions.TemplateConfigurationDoesNotExist(path.name).when(
-                FileNotFoundError
-            ),
-            exceptions.InvalidTemplateConfiguration(path.name).when(
-                json.decoder.JSONDecodeError
-            ),
-        )
-    )
-    def load_variables(cls, path: Path, *, location: Optional[str] = None) -> Variables:
-        """Load the template variables from a JSON file."""
-        with path.open() as io:
-            data = json.load(io)
-
-        if not isinstance(data, dict):
-            raise exceptions.TemplateConfigurationTypeError(
-                path.name, "dict", type(data)
-            )
-
-        if location is not None:
-            data["_template"] = location
-
-        variables = Variables.fromdict(data)
-
-        for variable in variables:
-            if isinstance(variable.value, list) and not variable.value:
-                raise exceptions.InvalidTemplateVariable(
-                    variable.name, path.name, "non-empty list", repr(variable.value)
-                )
-
-        return variables
-
     def override(self, instance: Path) -> Template:
         """Override template configuration from an existing instance."""
-        instance_variables = self.load_variables(instance / ".cookiecutter.json")
+        instance_variables = Variables.load(instance / ".cookiecutter.json")
         variables = self.variables.override(instance_variables)
         return replace(self, variables=variables)
