@@ -17,8 +17,8 @@ def update(
     application = Application.create(config_file=config_file)
     project = Project.load(Path.cwd())
 
-    with application.load_template_from_instance(
-        project.repository.path, directory=directory, revision=revision
+    with application.load_template_for_project(
+        project, directory=directory, revision=revision
     ) as template:
         with project.worktree(
             commit_message=f"Update template to {template.version}"
