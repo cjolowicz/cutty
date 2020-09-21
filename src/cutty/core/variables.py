@@ -109,7 +109,8 @@ class Variables:
     @property
     def location(self) -> str:
         """Return the template location."""
-        variable = self.variables["_template"]
+        with exceptions.MissingTemplateVariable("_template", ".cookiecutter.json"):
+            variable = self.variables["_template"]
         return variable.as_string()
 
     @property
