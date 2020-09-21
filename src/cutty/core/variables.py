@@ -21,12 +21,13 @@ class Variable:
 
     name: str
     value: Any
+    path: Path
 
     def as_string(self) -> str:
         """Check that the value is a string, and return it."""
         if not isinstance(self.value, str):
             raise exceptions.InvalidTemplateVariable(
-                self.name, "cookiecutter.json", "str", repr(self.value)
+                self.name, self.path.name, "str", repr(self.value)
             )
 
         return self.value
@@ -38,7 +39,7 @@ class Variable:
             and all(isinstance(item, str) for item in self.value)
         ):
             raise exceptions.InvalidTemplateVariable(
-                self.name, "cookiecutter.json", "List[str]", repr(self.value)
+                self.name, self.path.name, "List[str]", repr(self.value)
             )
 
         return self.value
@@ -72,7 +73,7 @@ class Variables:
         if location is not None:
             data["_template"] = location
 
-        variables = [Variable(name, value) for name, value in data.items()]
+        variables = [Variable(name, value, path) for name, value in data.items()]
 
         for variable in variables:
             if isinstance(variable.value, list) and not variable.value:
@@ -99,12 +100,12 @@ class Variables:
         """Return the variable named `name`, or the provided default."""
         with contextlib.suppress(KeyError):
             return self.variables[name]
-        return Variable(name, default)
+        return Variable(name, default, self.path)
 
     @property
     def location(self) -> str:
         """Return the template location."""
-        with exceptions.MissingTemplateVariable("_template", ".cookiecutter.json"):
+        with exceptions.MissingTemplateVariable("_template", self.path.name):
             variable = self.variables["_template"]
         return variable.as_string()
 
