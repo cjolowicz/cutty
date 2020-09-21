@@ -26,20 +26,20 @@ class Project:
         return cls(repository, variables)
 
     @contextmanager
-    def update(self, *, version: str) -> Iterator[Path]:
+    def update(self, *, name: str, version: str) -> Iterator[Path]:
         """Update the project."""
-        self._ensure_branch_exists("template")
+        self._ensure_branch_exists(name)
 
         with self.repository.worktree(
             self.repository.path / ".git" / "cutty" / self.repository.path.name,
-            "template",
+            name,
             checkout=False,
             force_remove=True,
         ) as worktree:
             yield worktree.path
 
             worktree.add(all=True)
-            worktree.commit(message=f"Update template to {version}", verify=False)
+            worktree.commit(message=f"Update {name} to {version}", verify=False)
 
             commit = worktree.rev_parse("HEAD")
 

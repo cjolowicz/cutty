@@ -20,7 +20,7 @@ def update(
     with application.load_template_for_project(
         project, directory=directory, revision=revision
     ) as template:
-        with project.update(version=template.version) as worktree:
+        with project.update(name="template", version=template.version) as worktree:
             application.generate_project(
                 template,
                 output_dir=worktree.parent,
