@@ -7,6 +7,7 @@ from typing import Iterator
 
 from . import git
 from .compat import contextmanager
+from .variables import Variables
 
 
 @dataclass
@@ -14,11 +15,15 @@ class Project:
     """Project."""
 
     repository: git.Repository
+    variables: Variables
 
     @classmethod
     def load(cls, path: Path) -> Project:
         """Load the project."""
-        return cls(git.Repository(path))
+        repository = git.Repository(path)
+        variables = Variables.load(path / ".cookiecutter.json")
+
+        return cls(repository, variables)
 
     @contextmanager
     def worktree(self, *, commit_message: str) -> Iterator[Path]:
