@@ -17,12 +17,12 @@ class Project:
 
     @classmethod
     def load(cls, path: Path) -> Project:
-        """Load."""
+        """Load the project."""
         return cls(git.Repository(path))
 
     @contextmanager
     def worktree(self, *, commit_message: str) -> Iterator[Path]:
-        """Create worktree."""
+        """Create an empty worktree for a commit."""
         self._ensure_branch_exists("template")
 
         with self.repository.worktree(
