@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
@@ -46,9 +45,3 @@ class Template:
             version=version,
             variables=variables,
         )
-
-    def override(self, instance: Path) -> Template:
-        """Override template configuration from an existing instance."""
-        instance_variables = Variables.load(instance / ".cookiecutter.json")
-        variables = self.variables.override(instance_variables)
-        return replace(self, variables=variables)
