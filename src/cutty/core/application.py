@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import replace
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
@@ -65,7 +66,8 @@ class Application:
         with self.load_template(
             project.variables.location, directory=directory, revision=revision
         ) as template:
-            yield template.override(project.repository.path)
+            variables = template.variables.override(project.variables)
+            yield replace(template, variables=variables)
 
     def generate_project(
         self,
