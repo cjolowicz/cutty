@@ -9,7 +9,6 @@ from typing import Any
 from typing import Iterable
 from typing import Iterator
 from typing import List
-from typing import Mapping
 from typing import Optional
 
 from . import exceptions
@@ -73,7 +72,7 @@ class Variables:
         if location is not None:
             data["_template"] = location
 
-        variables = cls.fromdict(data)
+        variables = [Variable(name, value) for name, value in data.items()]
 
         for variable in variables:
             if isinstance(variable.value, list) and not variable.value:
@@ -81,16 +80,12 @@ class Variables:
                     variable.name, path.name, "non-empty list", repr(variable.value)
                 )
 
-        return variables
+        return cls(variables, path=path)
 
-    @classmethod
-    def fromdict(cls, data: Mapping[str, Any]) -> Variables:
-        """Create variables from a dictionary or another mapping."""
-        return cls(Variable(name, value) for name, value in data.items())
-
-    def __init__(self, variables: Iterable[Variable]) -> None:
+    def __init__(self, variables: Iterable[Variable], *, path: Path) -> None:
         """Initialize."""
         self.variables = {variable.name: variable for variable in variables}
+        self.path = path
 
     def __iter__(self) -> Iterator[Variable]:
         """Iterate over the variables in the collection."""
@@ -142,4 +137,4 @@ class Variables:
             # TODO: If variables are missing, we should prompt later.
             return variable
 
-        return Variables(_override(variable) for variable in self)
+        return Variables([_override(variable) for variable in self], path=self.path)
