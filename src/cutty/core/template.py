@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
 
 from . import exceptions
 from .variables import Variables
@@ -18,6 +19,12 @@ def find_template(path: Path) -> Optional[Path]:
     return None
 
 
+def get_name_from_location(location: str) -> str:
+    """Return the template name given its location."""
+    url = urlparse(location)
+    return Path(url.path).stem
+
+
 @dataclass(frozen=True)
 class Template:
     """Template."""
@@ -25,12 +32,14 @@ class Template:
     root: Path
     hookdir: Path
     repository: Path
+    name: str
     version: str
     variables: Variables
 
     @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
         """Load the template variables."""
+        name = get_name_from_location(location)
         root = find_template(path)
         if root is None:
             raise exceptions.TemplateDirectoryNotFound(location)
@@ -42,6 +51,7 @@ class Template:
             root=root,
             hookdir=hookdir,
             repository=path,
+            name=name,
             version=version,
             variables=variables,
         )
