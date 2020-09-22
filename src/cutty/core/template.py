@@ -13,7 +13,12 @@ from .variables import Variables
 def find_template(path: Path) -> Optional[Path]:
     """Determine which child directory is the project template."""
     for item in path.iterdir():
-        if "cookiecutter" in item.name and "{{" in item.name and "}}" in item.name:
+        if (
+            item.is_dir()
+            and "cookiecutter" in item.name
+            and "{{" in item.name
+            and "}}" in item.name
+        ):
             return item
 
     return None

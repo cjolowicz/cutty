@@ -1,7 +1,7 @@
 """Generate."""
 import contextlib
 import fnmatch
-import os
+import os.path
 import shutil
 from pathlib import Path
 
@@ -16,46 +16,67 @@ from .utils import rmtree
 class Generator:
     """Generator."""
 
-    def __init__(self, template: Template, *, renderer: Renderer) -> None:
+    def __init__(
+        self, template: Template, *, renderer: Renderer, overwrite: bool = False
+    ) -> None:
         """Initialize."""
         self.template = template
         self.renderer = renderer
+        self.overwrite = overwrite
         self.hooks = HookManager(template=template, renderer=renderer)
 
-    def generate(self, output_dir: Path, overwrite: bool = False) -> None:
+    def generate(self, output_dir: Path) -> None:
         """Generate project."""
+        assert self.template.root.is_dir()  # noqa: S101
+
         with exceptions.PathRenderError(self.template.root):
-            target_dir = output_dir / self.renderer.render(self.template.root.name)
+            target = output_dir / self.renderer.render(self.template.root.name)
 
-        if target_dir.exists() and not overwrite:
-            raise exceptions.ProjectDirectoryExists(target_dir)
+        if os.path.lexists(target):
+            if not self.overwrite:
+                raise exceptions.ProjectDirectoryExists(target)
 
-        cleanup = (
-            on_raise(rmtree, target_dir)
-            if not target_dir.exists()
-            else contextlib.nullcontext()
-        )
+            cleanup = contextlib.nullcontext()
+        else:
+            cleanup = on_raise(rmtree, target)
 
-        with exceptions.ProjectGenerationFailed():
-            with cleanup:
-                self.hooks.pre_generate(cwd=target_dir)
-                self._render_directory(self.template.root, target_dir)
-                self.hooks.post_generate(cwd=target_dir)
+        with cleanup:
+            with exceptions.ProjectGenerationFailed():
+                self._render(self.template.root, output_dir)
 
-    def _render_directory(self, source_dir: Path, target_dir: Path) -> None:
-        target_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copymode(source_dir, target_dir)
+    def _render(self, source: Path, output_dir: Path) -> None:
+        with exceptions.PathRenderError(source):
+            target = output_dir / self.renderer.render(source.name)
 
-        for source in source_dir.iterdir():
-            with exceptions.PathRenderError(source):
-                target = target_dir / self.renderer.render(source.name)
+        # If the target exists at this point, we are in overwrite mode. Remove
+        # existing files and symlinks, but do not recursively remove directory
+        # trees. Unlinking is required to replace symlinks, and to replace
+        # regular files by symlinks or directories. For safety, a directory
+        # tree is never replaced by a symlink or regular file. Furthermore,
+        # generating a project _across_ a symlink is not supported.
+        if target.is_symlink() or target.exists() and not target.is_dir():
+            target.unlink()
 
-            if source.is_symlink():
-                self._render_symlink(source, target)
-            elif source.is_dir():
-                self._render_directory(source, target)
-            else:
-                self._render_file(source, target)
+        if source.is_symlink():
+            self._render_symlink(source, target)
+        elif source.is_dir():
+            self._render_directory(source, target)
+        else:
+            self._render_file(source, target)
+
+    def _render_directory(self, source: Path, target: Path) -> None:
+        target.mkdir(parents=True, exist_ok=True)
+        shutil.copymode(source, target)
+
+        root = source == self.template.root
+        if root:
+            self.hooks.pre_generate(cwd=target)
+
+        for entry in source.iterdir():
+            self._render(entry, target)
+
+        if root:
+            self.hooks.post_generate(cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
