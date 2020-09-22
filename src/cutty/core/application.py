@@ -81,5 +81,5 @@ class Application:
         if output_dir is None:
             output_dir = Path.cwd()
 
-        engine = Engine(template, interactive=interactive)
-        engine.generate(output_dir, overwrite=overwrite)
+        engine = Engine(template, interactive=interactive, overwrite=overwrite)
+        engine.generate(output_dir)
