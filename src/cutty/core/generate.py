@@ -44,6 +44,7 @@ class Generator:
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
         target_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copymode(source_dir, target_dir)
 
         for source in source_dir.iterdir():
             with exceptions.PathRenderError(source):
