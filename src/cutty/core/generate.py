@@ -3,8 +3,6 @@ import contextlib
 import fnmatch
 import shutil
 from pathlib import Path
-from typing import Type
-from typing import TypeVar
 
 from . import exceptions
 from .hooks import HookManager
@@ -12,14 +10,6 @@ from .render import Renderer
 from .template import Template
 from .utils import on_raise
 from .utils import rmtree
-
-
-Error = TypeVar(
-    "Error",
-    exceptions.ContentRenderError,
-    exceptions.PathRenderError,
-    exceptions.ProjectGenerationFailed,
-)
 
 
 def _copy_directory(source: Path, target: Path) -> None:
@@ -40,13 +30,9 @@ class Generator:
         self.renderer = renderer
         self.hooks = HookManager(template=template, renderer=renderer)
 
-    def error(self, errortype: Type[Error], path: Path) -> Error:
-        """Instantiate the exception type with a relative path, for readability."""
-        return errortype(path.relative_to(self.template.repository))
-
     def generate(self, output_dir: Path, overwrite: bool = False) -> None:
         """Generate project."""
-        with self.error(exceptions.PathRenderError, self.template.root):
+        with exceptions.PathRenderError(self.template.root):
             target_dir = output_dir / self.renderer.render(self.template.root.name)
 
         if target_dir.exists() and not overwrite:
@@ -80,7 +66,7 @@ class Generator:
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
-            with self.error(exceptions.PathRenderError, source):
+            with exceptions.PathRenderError(source):
                 target = target_dir / self.renderer.render(source.name)
 
             if source.is_dir():
@@ -89,7 +75,7 @@ class Generator:
                 self._generate_file(source, target)
 
     def _render_file(self, source: Path, target: Path) -> None:
-        with self.error(exceptions.ContentRenderError, source):
+        with exceptions.ContentRenderError(source):
             text = self.renderer.render_path(source)
 
         target.write_text(text)
