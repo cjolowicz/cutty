@@ -96,6 +96,7 @@ class Generator:
         shutil.copymode(source, target)
 
     def _is_copy_only(self, path: Path) -> bool:
+        path = path.relative_to(self.template.root)
         return any(
             fnmatch.fnmatch(str(path), pattern)
             for pattern in self.template.variables.copy_without_render
