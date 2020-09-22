@@ -39,10 +39,10 @@ class Generator:
         with exceptions.ProjectGenerationFailed():
             with cleanup:
                 self.hooks.pre_generate(cwd=target_dir)
-                self._generate_directory(self.template.root, target_dir)
+                self._render_directory(self.template.root, target_dir)
                 self.hooks.post_generate(cwd=target_dir)
 
-    def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
+    def _render_directory(self, source_dir: Path, target_dir: Path) -> None:
         target_dir.mkdir(parents=True, exist_ok=True)
         shutil.copymode(source_dir, target_dir)
 
@@ -51,13 +51,13 @@ class Generator:
                 target = target_dir / self.renderer.render(source.name)
 
             if source.is_symlink():
-                self._generate_symlink(source, target)
+                self._render_symlink(source, target)
             elif source.is_dir():
-                self._generate_directory(source, target)
+                self._render_directory(source, target)
             else:
-                self._generate_file(source, target)
+                self._render_file(source, target)
 
-    def _generate_symlink(self, source: Path, target: Path) -> None:
+    def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
         with exceptions.SymlinkRenderError(source, source_target):
             target_target = (
@@ -69,7 +69,7 @@ class Generator:
         target.symlink_to(target_target)
         shutil.copymode(source, target, follow_symlinks=False)
 
-    def _generate_file(self, source: Path, target: Path) -> None:
+    def _render_file(self, source: Path, target: Path) -> None:
         with exceptions.ContentRenderError(source):
             text = (
                 self.renderer.render_path(source)
