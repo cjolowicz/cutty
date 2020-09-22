@@ -1,6 +1,7 @@
 """Generate."""
 import contextlib
 import fnmatch
+import os
 import shutil
 from pathlib import Path
 
@@ -48,10 +49,24 @@ class Generator:
             with exceptions.PathRenderError(source):
                 target = target_dir / self.renderer.render(source.name)
 
-            if source.is_dir():
+            if source.is_symlink():
+                self._generate_symlink(source, target)
+            elif source.is_dir():
                 self._generate_directory(source, target)
             else:
                 self._generate_file(source, target)
+
+    def _generate_symlink(self, source: Path, target: Path) -> None:
+        source_target = os.readlink(source)
+        with exceptions.SymlinkRenderError(source, source_target):
+            target_target = (
+                self.renderer.render(source_target)
+                if not self._is_copy_only(source)
+                else source_target
+            )
+
+        target.symlink_to(target_target)
+        shutil.copymode(source, target, follow_symlinks=False)
 
     def _generate_file(self, source: Path, target: Path) -> None:
         with exceptions.ContentRenderError(source):

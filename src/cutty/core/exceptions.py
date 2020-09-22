@@ -128,6 +128,10 @@ class ContentRenderError(RenderError):
     """Cannot render template {}."""
 
 
+class SymlinkRenderError(RenderError):
+    """Cannot render symlink {}: {}."""
+
+
 class ProjectDirectoryExists(CuttyException):
     """Project directory {} already exists."""
 
