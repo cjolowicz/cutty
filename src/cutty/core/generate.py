@@ -12,15 +12,6 @@ from .utils import on_raise
 from .utils import rmtree
 
 
-def _copy_directory(source: Path, target: Path) -> None:
-    shutil.copytree(source, target)
-
-
-def _copy_file(source: Path, target: Path) -> None:
-    shutil.copyfile(source, target)
-    shutil.copymode(source, target)
-
-
 class Generator:
     """Generator."""
 
@@ -51,18 +42,6 @@ class Generator:
                 self.hooks.post_generate(cwd=target_dir)
 
     def _generate_directory(self, source_dir: Path, target_dir: Path) -> None:
-        if self._is_copy_only(source_dir):
-            _copy_directory(source_dir, target_dir)
-        else:
-            self._render_directory(source_dir, target_dir)
-
-    def _generate_file(self, source: Path, target: Path) -> None:
-        if self._is_copy_only(source):
-            _copy_file(source, target)
-        else:
-            self._render_file(source, target)
-
-    def _render_directory(self, source_dir: Path, target_dir: Path) -> None:
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for source in source_dir.iterdir():
@@ -74,9 +53,13 @@ class Generator:
             else:
                 self._generate_file(source, target)
 
-    def _render_file(self, source: Path, target: Path) -> None:
+    def _generate_file(self, source: Path, target: Path) -> None:
         with exceptions.ContentRenderError(source):
-            text = self.renderer.render_path(source)
+            text = (
+                self.renderer.render_path(source)
+                if not self._is_copy_only(source)
+                else source.read_text()
+            )
 
         target.write_text(text)
         shutil.copymode(source, target)
@@ -84,6 +67,7 @@ class Generator:
     def _is_copy_only(self, path: Path) -> bool:
         path = path.relative_to(self.template.root)
         return any(
-            fnmatch.fnmatch(str(path), pattern)
+            fnmatch.fnmatch(str(item), pattern)
+            for item in [path, *path.parents]
             for pattern in self.template.variables.copy_without_render
         )
