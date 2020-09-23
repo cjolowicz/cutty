@@ -76,10 +76,12 @@ class Application:
         output_dir: Optional[Path] = None,
         interactive: bool = False,
         overwrite: bool = False
-    ) -> Path:
+    ) -> Project:
         """Generate a project from a template."""
         if output_dir is None:
             output_dir = Path.cwd()
 
         engine = Engine(template, interactive=interactive, overwrite=overwrite)
-        return engine.generate(output_dir)
+        path = engine.generate(output_dir)
+
+        return Project.create(path, name=template.name, version=template.version)
