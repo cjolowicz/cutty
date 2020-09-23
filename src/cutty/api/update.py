@@ -17,13 +17,6 @@ def update(
     application = Application.create(config_file=config_file)
     project = Project.load(Path.cwd())
 
-    with application.load_template_for_project(
-        project, directory=directory, revision=revision
-    ) as template:
-        with project.update(name=template.name, version=template.version) as worktree:
-            application.generate_project(
-                template,
-                output_dir=worktree.parent,
-                interactive=interactive,
-                overwrite=True,
-            )
+    application.update_project(
+        project, directory=directory, revision=revision, interactive=interactive,
+    )
