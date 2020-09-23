@@ -25,7 +25,7 @@ class Generator:
         self.overwrite = overwrite
         self.hooks = HookManager(template=template, renderer=renderer)
 
-    def generate(self, output_dir: Path) -> None:
+    def generate(self, output_dir: Path) -> Path:
         """Generate project."""
         assert self.template.root.is_dir()  # noqa: S101
 
@@ -46,6 +46,8 @@ class Generator:
         with cleanup:
             with exceptions.ProjectGenerationFailed():
                 self._render_directory(self.template.root, target, root=True)
+
+        return target
 
     def _render(self, source: Path, output_dir: Path) -> None:
         with exceptions.PathRenderError(source):
