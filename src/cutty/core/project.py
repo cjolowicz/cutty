@@ -26,6 +26,18 @@ class Project:
 
         return cls(repository, variables)
 
+    @classmethod
+    def create(cls, path: Path, *, name: str, version: str) -> Project:
+        """Create the project."""
+        repository = git.Repository.init(path)
+        branch = f"{locations.name}/{name}"
+
+        repository.add(all=True)
+        repository.commit(message=f"Generate project from {name} {version}")
+        repository.branch(branch)
+
+        return cls.load(path)
+
     @contextmanager
     def update(self, *, name: str, version: str) -> Iterator[Path]:
         """Update the project."""
