@@ -42,9 +42,9 @@ class Generator:
 
         with cleanup:
             with exceptions.ProjectGenerationFailed():
-                self._render(self.template.root, output_dir)
+                self._render(self.template.root, output_dir, root=True)
 
-    def _render(self, source: Path, output_dir: Path) -> None:
+    def _render(self, source: Path, output_dir: Path, *, root: bool = False) -> None:
         with exceptions.PathRenderError(source):
             target = output_dir / self.renderer.render(source.name)
 
@@ -60,15 +60,14 @@ class Generator:
         if source.is_symlink():
             self._render_symlink(source, target)
         elif source.is_dir():
-            self._render_directory(source, target)
+            self._render_directory(source, target, root=root)
         else:
             self._render_file(source, target)
 
-    def _render_directory(self, source: Path, target: Path) -> None:
+    def _render_directory(self, source: Path, target: Path, *, root: bool) -> None:
         target.mkdir(parents=True, exist_ok=True)
         shutil.copymode(source, target)
 
-        root = source == self.template.root
         if root:
             self.hooks.pre_generate(cwd=target)
 
