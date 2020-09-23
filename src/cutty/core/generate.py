@@ -67,7 +67,9 @@ class Generator:
         else:
             self._render_file(source, target)
 
-    def _render_directory(self, source: Path, target: Path, *, root: bool) -> None:
+    def _render_directory(
+        self, source: Path, target: Path, *, root: bool = False
+    ) -> None:
         target.mkdir(parents=True, exist_ok=True)
         shutil.copymode(source, target)
 
