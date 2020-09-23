@@ -83,11 +83,7 @@ class Generator:
     def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
         with exceptions.SymlinkRenderError(source, source_target):
-            target_target = (
-                self.renderer.render(source_target)
-                if not self._is_copy_only(source)
-                else source_target
-            )
+            target_target = self.renderer.render(source_target)
 
         target.symlink_to(target_target)
         shutil.copymode(source, target, follow_symlinks=False)
