@@ -85,3 +85,25 @@ class Application:
         path = engine.generate(output_dir)
 
         return Project.create(path, name=template.name, version=template.version)
+
+    def update_project(
+        self,
+        project: Project,
+        *,
+        interactive: bool = False,
+        directory: Optional[Path] = None,
+        revision: Optional[str] = None
+    ):
+        """Update a project with changes from its template."""
+        with self.load_template_for_project(
+            project, directory=directory, revision=revision
+        ) as template:
+            with project.update(
+                name=template.name, version=template.version
+            ) as worktree:
+                self.generate_project(
+                    template,
+                    output_dir=worktree.parent,
+                    interactive=interactive,
+                    overwrite=True,
+                )
