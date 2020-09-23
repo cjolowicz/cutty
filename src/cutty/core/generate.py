@@ -103,10 +103,10 @@ class Generator:
         target.write_text(text)
         shutil.copymode(source, target)
 
-    def _is_copy_only(self, path: Path) -> bool:
-        path = path.relative_to(self.template.root)
+    def _is_copy_only(self, source: Path) -> bool:
+        source = source.relative_to(self.template.root)
         return any(
-            fnmatch.fnmatch(str(item), pattern)
-            for item in [path, *path.parents]
+            fnmatch.fnmatch(str(path), pattern)
+            for path in [source, *source.parents]
             for pattern in self.template.variables.copy_without_render
         )
