@@ -57,7 +57,7 @@ class Generator:
         # regular files by symlinks or directories. For safety, a directory
         # tree is never replaced by a symlink or regular file. Furthermore,
         # generating a project _across_ a symlink is not supported.
-        if target.is_symlink() or target.exists() and not target.is_dir():
+        if target.exists() and not target.is_dir() or target.is_symlink():
             target.unlink()
 
         if source.is_symlink():
