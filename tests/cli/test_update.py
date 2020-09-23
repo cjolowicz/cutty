@@ -25,10 +25,7 @@ def instance(
         create, [str(template.path)], input="example",
     )
 
-    instance = git.Repository.init(Path("example"))
-    instance.add(all=True)
-    instance.commit(message="Initial")
-    instance.branch(f"cutty/{template.path.name}")
+    instance = git.Repository(Path("example"))
 
     os.chdir(instance.path)
 
