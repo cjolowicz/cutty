@@ -33,7 +33,7 @@ class Survey:
             return variable.value
 
         with exceptions.VariableRenderError(variable.name):
-            value = self.renderer.render(variable.value)
+            value = self.renderer.render_json(variable.value)
 
         if not self.interactive:
             return value[0] if isinstance(variable.value, list) else value

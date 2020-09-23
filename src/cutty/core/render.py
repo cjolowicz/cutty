@@ -33,17 +33,24 @@ class Renderer:
         """Assign a value to a template variable."""
         self.context[name] = value
 
-    def render(self, value: Any) -> Any:
+    def render(self, value: str) -> str:
+        """Render a string."""
+        template = self.environment.from_string(value)
+        return template.render(cookiecutter=self.context)
+
+    def render_json(self, value: Any) -> Any:
         """Render a JSON value."""
         if isinstance(value, dict):
-            return {self.render(key): self.render(val) for key, val in value.items()}
+            return {
+                self.render_json(key): self.render_json(val)
+                for key, val in value.items()
+            }
 
         if isinstance(value, list):
-            return [self.render(item) for item in value]
+            return [self.render_json(item) for item in value]
 
         if isinstance(value, str):
-            template = self.environment.from_string(value)
-            return template.render(cookiecutter=self.context)
+            return self.render(value)
 
         if value is None:
             return None
