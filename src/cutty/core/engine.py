@@ -20,7 +20,7 @@ class Engine:
             template, renderer=self.renderer, overwrite=overwrite
         )
 
-    def generate(self, output_dir: Path) -> None:
+    def generate(self, output_dir: Path) -> Path:
         """Generate the project."""
         self.survey.run()
-        self.generator.generate(output_dir)
+        return self.generator.generate(output_dir)
