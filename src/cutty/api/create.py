@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..core.application import Application
+from ..core.project import Project
 
 
 def create(
@@ -20,6 +21,8 @@ def create(
     with application.load_template(
         location, directory=directory, revision=revision
     ) as template:
-        application.generate_project(
+        path = application.generate_project(
             template, output_dir=output_dir, interactive=interactive
         )
+
+        Project.create(path, name=template.name, version=template.version)
