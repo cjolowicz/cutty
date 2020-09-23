@@ -36,15 +36,18 @@ class Generator:
             if not self.overwrite:
                 raise exceptions.ProjectDirectoryExists(target)
 
+            if not target.is_dir() or target.is_symlink():
+                target.unlink()
+
             cleanup = contextlib.nullcontext()
         else:
             cleanup = on_raise(rmtree, target)
 
         with cleanup:
             with exceptions.ProjectGenerationFailed():
-                self._render(self.template.root, output_dir, root=True)
+                self._render_directory(self.template.root, target, root=True)
 
-    def _render(self, source: Path, output_dir: Path, *, root: bool = False) -> None:
+    def _render(self, source: Path, output_dir: Path) -> None:
         with exceptions.PathRenderError(source):
             target = output_dir / self.renderer.render(source.name)
 
@@ -60,7 +63,7 @@ class Generator:
         if source.is_symlink():
             self._render_symlink(source, target)
         elif source.is_dir():
-            self._render_directory(source, target, root=root)
+            self._render_directory(source, target)
         else:
             self._render_file(source, target)
 
