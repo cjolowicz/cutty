@@ -1,4 +1,6 @@
 """Hooks."""
+from __future__ import annotations
+
 import subprocess  # noqa: S404
 import sys
 import tempfile
@@ -55,32 +57,45 @@ class Hook:
 
 
 class Hooks:
-    """Hook manager."""
+    """Hooks."""
 
-    def __init__(self, *, template: Template, renderer: Renderer) -> None:
+    @classmethod
+    def load(cls, *, template: Template, renderer: Renderer) -> Hooks:
+        """Load the hooks."""
+        return Hooks(
+            pre_gen_project=cls.find(
+                "pre_gen_project", template=template, renderer=renderer
+            ),
+            post_gen_project=cls.find(
+                "post_gen_project", template=template, renderer=renderer
+            ),
+        )
+
+    def __init__(
+        self, *, pre_gen_project: Optional[Hook], post_gen_project: Optional[Hook]
+    ) -> None:
         """Initialize."""
-        self.template = template
-        self.renderer = renderer
+        self.pre_gen_project = pre_gen_project
+        self.post_gen_project = post_gen_project
 
     def pre_generate(self, *, cwd: Path) -> None:
         """Run pre-generate hook."""
-        self.run("pre_gen_project", cwd=cwd)
+        if self.pre_gen_project is not None:
+            self.pre_gen_project.run(cwd=cwd)
 
     def post_generate(self, *, cwd: Path) -> None:
         """Run post-generate hook."""
-        self.run("post_gen_project", cwd=cwd)
+        if self.post_gen_project is not None:
+            self.post_gen_project.run(cwd=cwd)
 
-    def run(self, hook_name: str, *, cwd: Path) -> None:
-        """Try to find and execute a hook from the specified directory."""
-        hook = self.find(hook_name)
-        if hook is not None:
-            hook.run(cwd=cwd)
-
-    def find(self, name: str) -> Optional[Hook]:
+    @classmethod
+    def find(
+        cls, name: str, *, template: Template, renderer: Renderer
+    ) -> Optional[Hook]:
         """Return the hook if found, or None."""
-        if self.template.hookdir.is_dir():
-            for path in self.template.hookdir.iterdir():
+        if template.hookdir.is_dir():
+            for path in template.hookdir.iterdir():
                 if path.stem == name and not path.name.endswith("~"):
-                    return Hook(path, template=self.template, renderer=self.renderer)
+                    return Hook(path, template=template, renderer=renderer)
 
         return None
