@@ -1,10 +1,12 @@
 """Git interface."""
 from __future__ import annotations
 
+import functools
 import shutil
 import subprocess  # noqa: S404
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 from typing import Callable
 from typing import Iterator
 from typing import List
@@ -12,6 +14,8 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 from urllib.parse import urlparse
+
+import packaging.version
 
 from .compat import cached_property
 from .compat import contextmanager
@@ -74,6 +78,10 @@ class Git:
         output = self.run("--version").stdout.strip()
         return removeprefix(output, "git version ")
 
+    def check_version(self, required: str) -> bool:
+        """Return True if the local Git has at least the required version."""
+        return packaging.version.parse(required) < packaging.version.parse(self.version)
+
     def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
         try:
@@ -109,14 +117,20 @@ def _format_options(**kwargs: Optional[T]) -> List[str]:
     ]
 
 
-F = TypeVar("F")
-
-
-def requires(version: str) -> Callable[[F], F]:
+def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Document the minimum Git version."""
 
-    def decorator(f: F) -> F:
-        return f
+    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
+        @functools.wraps
+        def wrapper(repository: Repository, *args: Any, **kwargs: Any) -> Any:
+            if not repository._git.check_version(version):
+                raise Exception(
+                    f"{f.__func__.__name__} requires git version {version},"
+                    f" you have {repository._git.version}"
+                )
+            return f(repository, *args, **kwargs)
+
+        return wrapper
 
     return decorator
 
@@ -129,7 +143,7 @@ class Repository:
         self.path = path or Path.cwd()
         self._git = Git.find()
 
-    @requires("1.5.6")
+    # @requires("1.5.6")
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
@@ -137,7 +151,7 @@ class Repository:
         self.git("init")
         return self
 
-    @requires("1.6.0")  # --mirror
+    # @requires("1.6.0")  # --mirror
     @classmethod
     def clone(
         cls,
