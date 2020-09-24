@@ -1,9 +1,11 @@
 """Hooks."""
 from __future__ import annotations
 
+import dataclasses
 import subprocess  # noqa: S404
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
@@ -51,16 +53,17 @@ class Hook:
                 execute_script(script, cwd=cwd)
 
 
+@dataclass
 class Hooks:
     """Hooks."""
+
+    pre_gen_project: Optional[Hook]
+    post_gen_project: Optional[Hook]
 
     @classmethod
     def load(cls, path: Path) -> Hooks:
         """Load the hooks."""
-        return Hooks(
-            pre_gen_project=cls.find(path, "pre_gen_project"),
-            post_gen_project=cls.find(path, "post_gen_project"),
-        )
+        return Hooks(*[cls.find(path, field.name) for field in dataclasses.fields(cls)])
 
     @classmethod
     def find(cls, hookdir: Path, name: str) -> Optional[Hook]:
@@ -71,13 +74,6 @@ class Hooks:
                     return Hook(path)
 
         return None
-
-    def __init__(
-        self, *, pre_gen_project: Optional[Hook], post_gen_project: Optional[Hook]
-    ) -> None:
-        """Initialize."""
-        self.pre_gen_project = pre_gen_project
-        self.post_gen_project = post_gen_project
 
     def pre_generate(self, *, renderer: Renderer, cwd: Path) -> None:
         """Run pre-generate hook."""
