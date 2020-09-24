@@ -74,13 +74,13 @@ class Generator:
         shutil.copymode(source, target)
 
         if root:
-            self.template.hooks.pre_generate(renderer=self.renderer, cwd=target)
+            self.template.hooks.run_pre_gen_project(renderer=self.renderer, cwd=target)
 
         for entry in source.iterdir():
             self._render(entry, target)
 
         if root:
-            self.template.hooks.post_generate(renderer=self.renderer, cwd=target)
+            self.template.hooks.run_post_gen_project(renderer=self.renderer, cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
