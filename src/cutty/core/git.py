@@ -67,16 +67,19 @@ class Git:
             raise Exception("git not found")
         return cls(Path(path))
 
-    def run(self, *args: StrPath, **kwargs: Any) -> CompletedProcess:
+    def run(
+        self, *args: StrPath, cwd: Optional[Path] = None, stdout: Any = None
+    ) -> CompletedProcess:
         """Invoke git."""
         try:
             return subprocess.run(  # noqa: S603
                 [str(self.path), *args],
                 check=True,
+                stdout=stdout,
                 stderr=subprocess.PIPE,
                 text=True,
                 env=env or None,
-                **kwargs,
+                cwd=cwd,
             )
         except subprocess.CalledProcessError as error:
             raise Error.from_subprocess(error) from None
@@ -152,9 +155,9 @@ class Repository:
 
         return Repository(destination, git=git)
 
-    def git(self, *args: StrPath, **kwargs: Any) -> CompletedProcess:
+    def git(self, *args: StrPath, stdout: Any = None) -> CompletedProcess:
         """Invoke git."""
-        return self._git.run(*args, cwd=self.path, **kwargs)
+        return self._git.run(*args, cwd=self.path, stdout=stdout)
 
     @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
