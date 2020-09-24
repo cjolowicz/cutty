@@ -11,7 +11,6 @@ from typing import Optional
 from . import exceptions
 from .compat import contextmanager
 from .render import Renderer
-from .template import Template
 from .utils import make_executable
 
 
@@ -57,25 +56,19 @@ class Hooks:
     """Hooks."""
 
     @classmethod
-    def load(cls, *, template: Template, renderer: Renderer) -> Hooks:
+    def load(cls, path: Path, *, renderer: Renderer) -> Hooks:
         """Load the hooks."""
         return Hooks(
-            pre_gen_project=cls.find(
-                "pre_gen_project", template=template, renderer=renderer
-            ),
-            post_gen_project=cls.find(
-                "post_gen_project", template=template, renderer=renderer
-            ),
+            pre_gen_project=cls.find(path, "pre_gen_project", renderer=renderer),
+            post_gen_project=cls.find(path, "post_gen_project", renderer=renderer),
         )
 
     @classmethod
-    def find(
-        cls, name: str, *, template: Template, renderer: Renderer
-    ) -> Optional[Hook]:
+    def find(cls, hookdir: Path, name: str, *, renderer: Renderer) -> Optional[Hook]:
         """Return the hook if found, or None."""
-        if template.hookdir.is_dir():
-            for path in template.hookdir.iterdir():
-                if path.stem == name and not path.name.endswith("~"):
+        if hookdir.is_dir():
+            for path in hookdir.iterdir():
+                if path.is_file() and path.stem == name and not path.name.endswith("~"):
                     return Hook(path, renderer=renderer)
 
         return None

@@ -23,7 +23,7 @@ class Generator:
         self.template = template
         self.renderer = renderer
         self.overwrite = overwrite
-        self.hooks = Hooks.load(template=template, renderer=renderer)
+        self.hooks = Hooks.load(template.hookdir, renderer=renderer)
 
     def generate(self, output_dir: Path) -> Path:
         """Generate project."""
