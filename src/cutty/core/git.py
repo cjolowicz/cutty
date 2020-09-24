@@ -202,10 +202,14 @@ class Repository:
         return process.stdout.split()
 
     def describe(
-        self, ref: str, *, tags: Optional[bool] = None, exact: Optional[bool] = None,
+        self,
+        ref: str,
+        *,
+        tags: Optional[bool] = None,
+        exact_match: Optional[bool] = None,
     ) -> str:
         """Give an object a human readable name based on an available ref."""
-        options = _format_options(tags=tags, exact=exact)
+        options = _format_options(tags=tags, exact_match=exact_match)
         process = self.git("describe", *options, ref, stdout=subprocess.PIPE)
         return process.stdout.strip()
 
