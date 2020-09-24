@@ -79,6 +79,14 @@ version = "2.8.0"
 pytz = ">=2015.7"
 
 [[package]]
+category = "main"
+description = "cached_property() - computed once per instance, cached as attribute"
+name = "backports.cached-property"
+optional = false
+python-versions = ">=3.6.0"
+version = "1.0.0.post2"
+
+[[package]]
 category = "dev"
 description = "Security oriented static analyser for python code."
 name = "bandit"
@@ -1090,8 +1098,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "053147486e6286d6f27f2f843c7a70abf09f6a3192ebeb1dc82d68e4e50288bb"
-lock-version = "1.0"
+content-hash = "c71e74d19366a6b9bcbce63ca300fe96351a069dc59975c387912703d65aabd5"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1126,6 +1133,10 @@ attrs = [
 babel = [
     {file = "Babel-2.8.0-py2.py3-none-any.whl", hash = "sha256:d670ea0b10f8b723672d3a6abeb87b565b244da220d76b4dba1b66269ec152d4"},
     {file = "Babel-2.8.0.tar.gz", hash = "sha256:1aac2ae2d0d8ea368fa90906567f5c08463d98ade155c0c4bfedd6a0f7160e38"},
+]
+"backports.cached-property" = [
+    {file = "backports.cached-property-1.0.0.post2.tar.gz", hash = "sha256:74d525451ff39a069701ed81247e708498a387eeb35043070d008e1c25ed1b0c"},
+    {file = "backports.cached_property-1.0.0.post2-py3-none-any.whl", hash = "sha256:268eb9a5c6bb74d567038d574d7c2abfdadb481522ed8c5f230c13a898472673"},
 ]
 bandit = [
     {file = "bandit-1.6.2-py2.py3-none-any.whl", hash = "sha256:336620e220cf2d3115877685e264477ff9d9abaeb0afe3dc7264f55fa17a3952"},
