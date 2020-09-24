@@ -67,14 +67,12 @@ class Git:
             raise Exception("git not found")
         return cls(Path(path))
 
-    def run(
-        self, *args: StrPath, check: bool = True, **kwargs: Any
-    ) -> CompletedProcess:
+    def run(self, *args: StrPath, **kwargs: Any) -> CompletedProcess:
         """Invoke git."""
         try:
             return subprocess.run(  # noqa: S603
                 [str(self.path), *args],
-                check=check,
+                check=True,
                 stderr=subprocess.PIPE,
                 text=True,
                 env=env or None,
