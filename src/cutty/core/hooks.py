@@ -37,15 +37,14 @@ def execute_script(script: Path, *, cwd: Path) -> None:
 class Hook:
     """Hook."""
 
-    def __init__(self, path: Path, *, renderer: Renderer) -> None:
+    def __init__(self, path: Path) -> None:
         """Initialize."""
         self.path = path
-        self.renderer = renderer
 
-    def run(self, *, cwd: Path) -> None:
+    def run(self, *, renderer: Renderer, cwd: Path) -> None:
         """Execute the hook from the specified directory."""
         with exceptions.ContentRenderError(self.path):
-            text = self.renderer.render_path(self.path)
+            text = renderer.render_path(self.path)
 
         with exceptions.HookFailed(self.path):
             with create_temporary_script(self.path.name, text) as script:
@@ -56,20 +55,20 @@ class Hooks:
     """Hooks."""
 
     @classmethod
-    def load(cls, path: Path, *, renderer: Renderer) -> Hooks:
+    def load(cls, path: Path) -> Hooks:
         """Load the hooks."""
         return Hooks(
-            pre_gen_project=cls.find(path, "pre_gen_project", renderer=renderer),
-            post_gen_project=cls.find(path, "post_gen_project", renderer=renderer),
+            pre_gen_project=cls.find(path, "pre_gen_project"),
+            post_gen_project=cls.find(path, "post_gen_project"),
         )
 
     @classmethod
-    def find(cls, hookdir: Path, name: str, *, renderer: Renderer) -> Optional[Hook]:
+    def find(cls, hookdir: Path, name: str) -> Optional[Hook]:
         """Return the hook if found, or None."""
         if hookdir.is_dir():
             for path in hookdir.iterdir():
                 if path.is_file() and path.stem == name and not path.name.endswith("~"):
-                    return Hook(path, renderer=renderer)
+                    return Hook(path)
 
         return None
 
@@ -80,12 +79,12 @@ class Hooks:
         self.pre_gen_project = pre_gen_project
         self.post_gen_project = post_gen_project
 
-    def pre_generate(self, *, cwd: Path) -> None:
+    def pre_generate(self, *, renderer: Renderer, cwd: Path) -> None:
         """Run pre-generate hook."""
         if self.pre_gen_project is not None:
-            self.pre_gen_project.run(cwd=cwd)
+            self.pre_gen_project.run(renderer=renderer, cwd=cwd)
 
-    def post_generate(self, *, cwd: Path) -> None:
+    def post_generate(self, *, renderer: Renderer, cwd: Path) -> None:
         """Run post-generate hook."""
         if self.post_gen_project is not None:
-            self.post_gen_project.run(cwd=cwd)
+            self.post_gen_project.run(renderer=renderer, cwd=cwd)

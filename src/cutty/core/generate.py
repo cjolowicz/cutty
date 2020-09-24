@@ -23,7 +23,7 @@ class Generator:
         self.template = template
         self.renderer = renderer
         self.overwrite = overwrite
-        self.hooks = Hooks.load(template.hookdir, renderer=renderer)
+        self.hooks = Hooks.load(template.hookdir)
 
     def generate(self, output_dir: Path) -> Path:
         """Generate project."""
@@ -76,13 +76,13 @@ class Generator:
         shutil.copymode(source, target)
 
         if root:
-            self.hooks.pre_generate(cwd=target)
+            self.hooks.pre_generate(renderer=self.renderer, cwd=target)
 
         for entry in source.iterdir():
             self._render(entry, target)
 
         if root:
-            self.hooks.post_generate(cwd=target)
+            self.hooks.post_generate(renderer=self.renderer, cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
