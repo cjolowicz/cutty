@@ -1,7 +1,9 @@
 """Git interface."""
 from __future__ import annotations
 
+import shutil
 import subprocess  # noqa: S404
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from typing import Callable
@@ -51,19 +53,40 @@ class Error(Exception):
 env: MutableMapping[str, str] = {}
 
 
-def git(*args: StrPath, check: bool = True, **kwargs: Any) -> CompletedProcess:
+@dataclass
+class Git:
+    """Git program."""
+
+    path: Path
+
+    @classmethod
+    def find(cls) -> Git:
+        """Find the Git program."""
+        path = shutil.which("git")
+        if path is None:
+            raise Exception("git not found")
+        return cls(Path(path))
+
+    def run(
+        self, *args: StrPath, check: bool = True, **kwargs: Any
+    ) -> CompletedProcess:
+        """Invoke git."""
+        try:
+            return subprocess.run(  # noqa: S603,S607
+                [str(self.path), *args],
+                check=check,
+                stderr=subprocess.PIPE,
+                text=True,
+                env=env or None,
+                **kwargs,
+            )
+        except subprocess.CalledProcessError as error:
+            raise Error.from_subprocess(error) from None
+
+
+def git(*args: Any, **kwargs: Any) -> CompletedProcess:
     """Invoke git."""
-    try:
-        return subprocess.run(  # noqa: S603,S607
-            ["git", *args],
-            check=check,
-            stderr=subprocess.PIPE,
-            text=True,
-            env=env or None,
-            **kwargs,
-        )
-    except subprocess.CalledProcessError as error:
-        raise Error.from_subprocess(error) from None
+    return Git.find().run(*args, **kwargs)
 
 
 T = TypeVar("T")
