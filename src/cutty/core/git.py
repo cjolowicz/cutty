@@ -142,19 +142,19 @@ class Repository:
     def clone(
         cls,
         location: str,
+        path: Optional[Path] = None,
         *,
-        destination: Optional[Path] = None,
         quiet: Optional[bool] = None,
         mirror: Optional[bool] = None,
     ) -> Repository:
         """Clone a repository."""
         options = _format_options(quiet=quiet, mirror=mirror)
 
-        if destination is None:
-            destination = Path(cls.name_from_location(location, bare=mirror))
+        if path is None:
+            path = Path(cls.name_from_location(location, bare=mirror))
 
-        self = cls(destination)
-        self.git("clone", *options, location, str(destination))
+        self = cls(path)
+        self.git("clone", *options, location, str(path))
         return self
 
     @classmethod
