@@ -124,12 +124,10 @@ def requires(version: str) -> Callable[[F], F]:
 class Repository:
     """Git repository."""
 
-    def __init__(
-        self, path: Optional[Path] = None, *, git: Optional[Git] = None
-    ) -> None:
+    def __init__(self, path: Optional[Path] = None) -> None:
         """Initialize."""
         self.path = path or Path.cwd()
-        self._git = git or Git.find()
+        self._git = Git.find()
 
     @requires("1.5.6")
     @classmethod
