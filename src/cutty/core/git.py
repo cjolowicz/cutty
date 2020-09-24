@@ -84,11 +84,6 @@ class Git:
             raise Error.from_subprocess(error) from None
 
 
-def git(*args: Any, **kwargs: Any) -> CompletedProcess:
-    """Invoke git."""
-    return Git.find().run(*args, **kwargs)
-
-
 T = TypeVar("T")
 
 
