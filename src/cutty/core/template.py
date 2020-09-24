@@ -14,18 +14,18 @@ from .variables import Variables
 class Template:
     """Template."""
 
-    hooks: Hooks
     repository: Path
     version: str
     variables: Variables
+    hooks: Hooks
 
     @classmethod
     def load(cls, path: Path, *, version: str, location: str) -> Template:
         """Load the template variables."""
-        hooks = Hooks.load(path / "hooks")
         variables = Variables.load(path / "cookiecutter.json", location=location)
+        hooks = Hooks.load(path / "hooks")
 
-        return cls(hooks=hooks, repository=path, version=version, variables=variables)
+        return cls(repository=path, version=version, variables=variables, hooks=hooks)
 
     @cached_property
     def root(self) -> Path:
