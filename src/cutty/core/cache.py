@@ -16,6 +16,8 @@ def _hash(value: str) -> str:
 
 
 def _load_repository(location: str, path: Path) -> git.Repository:
+    path /= git.Repository.name_from_location(location, bare=True)
+
     if not path.exists():
         with exceptions.CloneError(location):
             return git.Repository.clone(
@@ -46,7 +48,7 @@ class Cache:
         """Load a project template."""
         hash = _hash(location)
         path = self.path / "repositories" / hash[:2] / hash
-        repository = _load_repository(location, path / "repo.git")
+        repository = _load_repository(location, path)
         version = Version.get(repository, revision=revision)
         worktree = path / "worktrees" / version.sha1
 
