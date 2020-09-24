@@ -5,7 +5,6 @@ import shutil
 import subprocess  # noqa: S404
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 from typing import Callable
 from typing import Iterator
 from typing import List
@@ -67,15 +66,13 @@ class Git:
             raise Exception("git not found")
         return cls(Path(path))
 
-    def run(
-        self, *args: StrPath, cwd: Optional[Path] = None, stdout: Any = None
-    ) -> CompletedProcess:
+    def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
         try:
             return subprocess.run(  # noqa: S603
                 [str(self.path), *args],
                 check=True,
-                stdout=stdout,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
                 env=env or None,
@@ -155,20 +152,20 @@ class Repository:
 
         return Repository(destination, git=git)
 
-    def git(self, *args: StrPath, stdout: Any = None) -> CompletedProcess:
+    def git(self, *args: StrPath) -> CompletedProcess:
         """Invoke git."""
-        return self._git.run(*args, cwd=self.path, stdout=stdout)
+        return self._git.run(*args, cwd=self.path)
 
     @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
         """Fetch updates for remotes in the repository."""
         options = _format_options(prune=prune)
-        self.git("remote", "update", *options, stdout=subprocess.PIPE)
+        self.git("remote", "update", *options)
 
     @requires("2.7.0")
     def get_remote_url(self, remote: str) -> str:
         """Retrieve the URL for a remote."""
-        process = self.git("remote", "get-url", remote, stdout=subprocess.PIPE)
+        process = self.git("remote", "get-url", remote)
         return process.stdout.strip()
 
     @requires("1.6.1")  # --format ":short"
@@ -232,7 +229,7 @@ class Repository:
     ) -> str:
         """Return the SHA1 hash for the given revision."""
         options = _format_options(quiet=quiet, short=short, verify=verify)
-        process = self.git("rev-parse", *options, rev, stdout=subprocess.PIPE)
+        process = self.git("rev-parse", *options, rev)
         return process.stdout.strip()
 
     @requires("1.7.5")  # --max-parents
@@ -244,7 +241,7 @@ class Repository:
     ) -> List[str]:
         """Lists commit objects in reverse chronological order."""
         options = _format_options(max_count=max_count, max_parents=max_parents)
-        process = self.git("rev-list", *options, *commits, stdout=subprocess.PIPE)
+        process = self.git("rev-list", *options, *commits)
         return process.stdout.split()
 
     @requires("1.5.5")  # --exact-match
@@ -257,7 +254,7 @@ class Repository:
     ) -> str:
         """Give an object a human readable name based on an available ref."""
         options = _format_options(tags=tags, exact_match=exact_match)
-        process = self.git("describe", *options, ref, stdout=subprocess.PIPE)
+        process = self.git("describe", *options, ref)
         return process.stdout.strip()
 
     @requires("0.99.7")
