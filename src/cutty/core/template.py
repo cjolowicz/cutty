@@ -7,6 +7,7 @@ from typing import Optional
 from urllib.parse import urlparse
 
 from . import exceptions
+from .hooks import Hooks
 from .variables import Variables
 
 
@@ -35,7 +36,7 @@ class Template:
     """Template."""
 
     root: Path
-    hookdir: Path
+    hooks: Hooks
     repository: Path
     name: str
     version: str
@@ -49,12 +50,12 @@ class Template:
         if root is None:
             raise exceptions.TemplateDirectoryNotFound(location)
 
-        hookdir = path / "hooks"
+        hooks = Hooks.load(path / "hooks")
         variables = Variables.load(path / "cookiecutter.json", location=location)
 
         return cls(
             root=root,
-            hookdir=hookdir,
+            hooks=hooks,
             repository=path,
             name=name,
             version=version,

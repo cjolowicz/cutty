@@ -6,7 +6,6 @@ import shutil
 from pathlib import Path
 
 from . import exceptions
-from .hooks import Hooks
 from .render import Renderer
 from .template import Template
 from .utils import on_raise
@@ -23,7 +22,6 @@ class Generator:
         self.template = template
         self.renderer = renderer
         self.overwrite = overwrite
-        self.hooks = Hooks.load(template.hookdir)
 
     def generate(self, output_dir: Path) -> Path:
         """Generate project."""
@@ -76,13 +74,13 @@ class Generator:
         shutil.copymode(source, target)
 
         if root:
-            self.hooks.pre_generate(renderer=self.renderer, cwd=target)
+            self.template.hooks.pre_generate(renderer=self.renderer, cwd=target)
 
         for entry in source.iterdir():
             self._render(entry, target)
 
         if root:
-            self.hooks.post_generate(renderer=self.renderer, cwd=target)
+            self.template.hooks.post_generate(renderer=self.renderer, cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
         source_target = os.readlink(source)
