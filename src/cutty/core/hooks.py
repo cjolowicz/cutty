@@ -36,12 +36,11 @@ def execute_script(script: Path, *, cwd: Path) -> None:
     subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
 
 
+@dataclass
 class Hook:
     """Hook."""
 
-    def __init__(self, path: Path) -> None:
-        """Initialize."""
-        self.path = path
+    path: Path
 
     def run(self, *, renderer: Renderer, cwd: Path) -> None:
         """Execute the hook from the specified directory."""
