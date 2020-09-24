@@ -9,11 +9,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
+from typing import TYPE_CHECKING
 
 from . import exceptions
 from .compat import contextmanager
-from .render import Renderer
 from .utils import make_executable
+
+if TYPE_CHECKING:
+    from .render import Renderer
 
 
 @contextmanager
