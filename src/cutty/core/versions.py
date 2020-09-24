@@ -71,7 +71,7 @@ def find_version(repository: git.Repository, revision: str) -> Version:
         sha1 = repository.rev_parse(revision, verify=True)
 
     with contextlib.suppress(git.Error, packaging.version.InvalidVersion):
-        tagname = repository.describe(revision, tags=True, exact=True)
+        tagname = repository.describe(revision, tags=True, exact_match=True)
         tag = Tag.create(tagname)
         return Version(tag.name, sha1)
 
