@@ -12,6 +12,7 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 
+from .compat import cached_property
 from .compat import contextmanager
 from .types import CompletedProcess
 from .types import StrPath
@@ -66,7 +67,7 @@ class Git:
             raise Exception("git not found")
         return cls(Path(path))
 
-    @property
+    @cached_property
     def version(self) -> str:
         """Return the git version."""
         output = self.run("--version").stdout.strip()
