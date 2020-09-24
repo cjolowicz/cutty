@@ -72,7 +72,7 @@ class Git:
     ) -> CompletedProcess:
         """Invoke git."""
         try:
-            return subprocess.run(  # noqa: S603,S607
+            return subprocess.run(  # noqa: S603
                 [str(self.path), *args],
                 check=check,
                 stderr=subprocess.PIPE,
