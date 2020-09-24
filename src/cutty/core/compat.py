@@ -5,6 +5,8 @@ from typing import ContextManager
 from typing import Iterator
 from typing import TypeVar
 
+from backports import cached_property as cached_property  # noqa: F401
+
 
 T = TypeVar("T")
 
