@@ -11,6 +11,7 @@ from typing import List
 from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
+from urllib.parse import urlparse
 
 from .compat import cached_property
 from .compat import contextmanager
@@ -153,11 +154,18 @@ class Repository:
         options = _format_options(quiet=quiet, mirror=mirror)
 
         if destination is None:
-            git.run("clone", *options, location)
-        else:
-            git.run("clone", *options, location, str(destination))
+            destination = Path(cls.name_from_location(location, bare=mirror))
+
+        git.run("clone", *options, location, str(destination))
 
         return Repository(destination, git=git)
+
+    @classmethod
+    def name_from_location(cls, location: str, *, bare: bool = False) -> str:
+        """Return the directory name given the location."""
+        url = urlparse(location)
+        name = Path(url.path).stem
+        return name if not bare else f"{name}.git"
 
     def git(self, *args: StrPath) -> CompletedProcess:
         """Invoke git."""
