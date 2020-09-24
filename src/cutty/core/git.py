@@ -66,6 +66,12 @@ class Git:
             raise Exception("git not found")
         return cls(Path(path))
 
+    @property
+    def version(self) -> str:
+        """Return the git version."""
+        output = self.run("--version").stdout.strip()
+        return removeprefix(output, "git version ")
+
     def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
         try:
