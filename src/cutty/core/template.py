@@ -31,7 +31,6 @@ class Template:
     root: Path
     hooks: Hooks
     repository: Path
-    name: str
     version: str
     variables: Variables
 
@@ -49,7 +48,11 @@ class Template:
             root=root,
             hooks=hooks,
             repository=path,
-            name=path.name,
             version=version,
             variables=variables,
         )
+
+    @property
+    def name(self) -> str:
+        """Return the template name."""
+        return self.repository.stem
