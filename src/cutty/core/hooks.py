@@ -71,6 +71,18 @@ class Hooks:
             ),
         )
 
+    @classmethod
+    def find(
+        cls, name: str, *, template: Template, renderer: Renderer
+    ) -> Optional[Hook]:
+        """Return the hook if found, or None."""
+        if template.hookdir.is_dir():
+            for path in template.hookdir.iterdir():
+                if path.stem == name and not path.name.endswith("~"):
+                    return Hook(path, template=template, renderer=renderer)
+
+        return None
+
     def __init__(
         self, *, pre_gen_project: Optional[Hook], post_gen_project: Optional[Hook]
     ) -> None:
@@ -87,15 +99,3 @@ class Hooks:
         """Run post-generate hook."""
         if self.post_gen_project is not None:
             self.post_gen_project.run(cwd=cwd)
-
-    @classmethod
-    def find(
-        cls, name: str, *, template: Template, renderer: Renderer
-    ) -> Optional[Hook]:
-        """Return the hook if found, or None."""
-        if template.hookdir.is_dir():
-            for path in template.hookdir.iterdir():
-                if path.stem == name and not path.name.endswith("~"):
-                    return Hook(path, template=template, renderer=renderer)
-
-        return None
