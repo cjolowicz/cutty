@@ -20,9 +20,7 @@ def _load_repository(location: str, path: Path) -> git.Repository:
 
     if not path.exists():
         with exceptions.CloneError(location):
-            return git.Repository.clone(
-                location, destination=path, mirror=True, quiet=True
-            )
+            return git.Repository.clone(location, path, mirror=True, quiet=True)
 
     with exceptions.UpdateError(location):
         repository = git.Repository(path)
