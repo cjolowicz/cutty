@@ -38,10 +38,9 @@ def execute_script(script: Path, *, cwd: Path) -> None:
 class Hook:
     """Hook."""
 
-    def __init__(self, path: Path, *, template: Template, renderer: Renderer) -> None:
+    def __init__(self, path: Path, *, renderer: Renderer) -> None:
         """Initialize."""
         self.path = path
-        self.template = template
         self.renderer = renderer
 
     def run(self, *, cwd: Path) -> None:
@@ -77,7 +76,7 @@ class Hooks:
         if template.hookdir.is_dir():
             for path in template.hookdir.iterdir():
                 if path.stem == name and not path.name.endswith("~"):
-                    return Hook(path, template=template, renderer=renderer)
+                    return Hook(path, renderer=renderer)
 
         return None
 
