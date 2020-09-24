@@ -74,12 +74,12 @@ class Hooks:
 
         return None
 
-    def pre_generate(self, *, renderer: Renderer, cwd: Path) -> None:
-        """Run pre-generate hook."""
+    def run_pre_gen_project(self, *, renderer: Renderer, cwd: Path) -> None:
+        """Run pre_gen_project hook."""
         if self.pre_gen_project is not None:
             self.pre_gen_project.run(renderer=renderer, cwd=cwd)
 
-    def post_generate(self, *, renderer: Renderer, cwd: Path) -> None:
-        """Run post-generate hook."""
+    def run_post_gen_project(self, *, renderer: Renderer, cwd: Path) -> None:
+        """Run post_gen_project hook."""
         if self.post_gen_project is not None:
             self.post_gen_project.run(renderer=renderer, cwd=cwd)
