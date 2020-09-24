@@ -70,7 +70,7 @@ class Git:
         """Invoke git."""
         try:
             return subprocess.run(  # noqa: S603
-                [str(self.path), *args],
+                [self.path, *args],
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
