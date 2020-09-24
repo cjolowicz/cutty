@@ -135,9 +135,9 @@ class Repository:
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
-        git = Git.find()
-        git.run("init", cwd=path)
-        return cls(path, git=git)
+        self = cls(path)
+        self.git("init")
+        return self
 
     @requires("1.6.0")  # --mirror
     @classmethod
@@ -150,15 +150,14 @@ class Repository:
         mirror: Optional[bool] = None,
     ) -> Repository:
         """Clone a repository."""
-        git = Git.find()
         options = _format_options(quiet=quiet, mirror=mirror)
 
         if destination is None:
             destination = Path(cls.name_from_location(location, bare=mirror))
 
-        git.run("clone", *options, location, str(destination))
-
-        return Repository(destination, git=git)
+        self = cls(destination)
+        self.git("clone", *options, location, str(destination))
+        return self
 
     @classmethod
     def name_from_location(cls, location: str, *, bare: bool = False) -> str:
