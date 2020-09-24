@@ -54,7 +54,7 @@ class Hook:
                 execute_script(script, cwd=cwd)
 
 
-class HookManager:
+class Hooks:
     """Hook manager."""
 
     def __init__(self, *, template: Template, renderer: Renderer) -> None:

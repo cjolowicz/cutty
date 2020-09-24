@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 from . import exceptions
-from .hooks import HookManager
+from .hooks import Hooks
 from .render import Renderer
 from .template import Template
 from .utils import on_raise
@@ -23,7 +23,7 @@ class Generator:
         self.template = template
         self.renderer = renderer
         self.overwrite = overwrite
-        self.hooks = HookManager(template=template, renderer=renderer)
+        self.hooks = Hooks(template=template, renderer=renderer)
 
     def generate(self, output_dir: Path) -> Path:
         """Generate project."""
