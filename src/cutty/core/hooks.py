@@ -46,12 +46,10 @@ class Hook:
 
     def run(self, *, cwd: Path) -> None:
         """Execute the hook from the specified directory."""
-        with exceptions.ContentRenderError(
-            self.path.relative_to(self.template.repository)
-        ):
+        with exceptions.ContentRenderError(self.path):
             text = self.renderer.render_path(self.path)
 
-        with exceptions.HookFailed(self.path.relative_to(self.template.repository)):
+        with exceptions.HookFailed(self.path):
             with create_temporary_script(self.path.name, text) as script:
                 execute_script(script, cwd=cwd)
 
