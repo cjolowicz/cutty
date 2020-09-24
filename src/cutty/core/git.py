@@ -154,7 +154,7 @@ class Repository:
             path = Path(cls.name_from_location(location, bare=mirror))
 
         self = cls(path)
-        self.git("clone", *options, location, str(path))
+        self._git.run("clone", *options, location, str(path))
         return self
 
     @classmethod
