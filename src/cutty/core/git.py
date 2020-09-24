@@ -4,6 +4,7 @@ from __future__ import annotations
 import subprocess  # noqa: S404
 from pathlib import Path
 from typing import Any
+from typing import Callable
 from typing import Iterator
 from typing import List
 from typing import MutableMapping
@@ -84,6 +85,18 @@ def _format_options(**kwargs: Optional[T]) -> List[str]:
     ]
 
 
+F = TypeVar("F")
+
+
+def requires(version: str) -> Callable[[F], F]:
+    """Document the minimum Git version."""
+
+    def decorator(f: F) -> F:
+        return f
+
+    return decorator
+
+
 class Repository:
     """Git repository."""
 
@@ -91,12 +104,14 @@ class Repository:
         """Initialize."""
         self.path = path or Path.cwd()
 
+    @requires("1.5.6")
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
         git("init", cwd=path)
         return cls(path)
 
+    @requires("1.6.0")  # --mirror
     @classmethod
     def clone(
         cls,
@@ -120,16 +135,19 @@ class Repository:
         """Invoke git."""
         return git(*args, cwd=self.path, **kwargs)
 
+    @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
         """Fetch updates for remotes in the repository."""
         options = _format_options(prune=prune)
         self.git("remote", "update", *options, stdout=subprocess.PIPE)
 
+    @requires("2.7.0")
     def get_remote_url(self, remote: str) -> str:
         """Retrieve the URL for a remote."""
         process = self.git("remote", "get-url", remote, stdout=subprocess.PIPE)
         return process.stdout.strip()
 
+    @requires("1.6.1")  # --format ":short"
     def tags(self) -> List[str]:
         """Return the tags."""
         process = self.git(
@@ -140,6 +158,7 @@ class Repository:
         )
         return process.stdout.split()
 
+    @requires("2.9.0")  # --checkout
     def add_worktree(
         self,
         path: Path,
@@ -154,6 +173,7 @@ class Repository:
 
         return Repository(path)
 
+    @requires("2.17.0")
     def remove_worktree(self, path: Path, *, force: Optional[bool] = None) -> None:
         """Remove a worktree."""
         options = _format_options(force=force)
@@ -177,6 +197,7 @@ class Repository:
         finally:
             self.remove_worktree(path, force=force_remove)
 
+    @requires("1.2.0")  # --short
     def rev_parse(
         self,
         rev: str,
@@ -190,6 +211,7 @@ class Repository:
         process = self.git("rev-parse", *options, rev, stdout=subprocess.PIPE)
         return process.stdout.strip()
 
+    @requires("1.7.5")  # --max-parents
     def rev_list(
         self,
         *commits: str,
@@ -201,6 +223,7 @@ class Repository:
         process = self.git("rev-list", *options, *commits, stdout=subprocess.PIPE)
         return process.stdout.split()
 
+    @requires("1.5.5")  # --exact-match
     def describe(
         self,
         ref: str,
@@ -213,15 +236,18 @@ class Repository:
         process = self.git("describe", *options, ref, stdout=subprocess.PIPE)
         return process.stdout.strip()
 
+    @requires("0.99.7")
     def add(self, *paths: StrPath, all: Optional[bool] = None) -> None:
         """Add file contents to the index."""
         options = _format_options(all=all)
         self.git("add", *options, "--", *paths)
 
+    @requires("1.3.0")
     def rm(self, *paths: StrPath) -> None:
         """Remove files from the working tree and from the index."""
         self.git("rm", *paths)
 
+    @requires("1.7.2")  # --allow-empty-message
     def commit(
         self,
         *paths: StrPath,
@@ -241,6 +267,7 @@ class Repository:
         )
         self.git("commit", *options, "--", *paths)
 
+    @requires("0.99.1")
     def branch(self, name: str, ref: Optional[str] = None) -> None:
         """Create a branch."""
         if ref is not None:
@@ -248,6 +275,7 @@ class Repository:
         else:
             self.git("branch", name)
 
+    @requires("0.99")
     def tag(self, name: str, ref: Optional[str] = None) -> None:
         """Create a tag."""
         if ref is not None:
@@ -255,10 +283,12 @@ class Repository:
         else:
             self.git("tag", name)
 
+    @requires("0.99.7")
     def merge(self, ref: str) -> None:
         """Join two development histories together."""
         self.git("merge", ref)
 
+    @requires("0.99.6")
     def cherrypick(self, *commits: str, commit: Optional[bool] = None) -> None:
         """Apply the changes introduced by some existing commits."""
         options = _format_options(commit=commit)
