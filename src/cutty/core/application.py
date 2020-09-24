@@ -93,7 +93,7 @@ class Application:
         interactive: bool = False,
         directory: Optional[Path] = None,
         revision: Optional[str] = None
-    ):
+    ) -> None:
         """Update a project with changes from its template."""
         with self.load_template_for_project(
             project, directory=directory, revision=revision
