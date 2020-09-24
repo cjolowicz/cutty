@@ -123,16 +123,20 @@ def requires(version: str) -> Callable[[F], F]:
 class Repository:
     """Git repository."""
 
-    def __init__(self, path: Optional[Path] = None) -> None:
+    def __init__(
+        self, path: Optional[Path] = None, *, git: Optional[Git] = None
+    ) -> None:
         """Initialize."""
         self.path = path or Path.cwd()
+        self._git = git or Git.find()
 
     @requires("1.5.6")
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
-        git("init", cwd=path)
-        return cls(path)
+        git = Git.find()
+        git.run("init", cwd=path)
+        return cls(path, git=git)
 
     @requires("1.6.0")  # --mirror
     @classmethod
@@ -145,18 +149,19 @@ class Repository:
         mirror: Optional[bool] = None,
     ) -> Repository:
         """Clone a repository."""
+        git = Git.find()
         options = _format_options(quiet=quiet, mirror=mirror)
 
         if destination is None:
-            git("clone", *options, location)
+            git.run("clone", *options, location)
         else:
-            git("clone", *options, location, str(destination))
+            git.run("clone", *options, location, str(destination))
 
-        return Repository(destination)
+        return Repository(destination, git=git)
 
     def git(self, *args: StrPath, **kwargs: Any) -> CompletedProcess:
         """Invoke git."""
-        return git(*args, cwd=self.path, **kwargs)
+        return self._git.run(*args, cwd=self.path, **kwargs)
 
     @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
