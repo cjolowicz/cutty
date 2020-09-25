@@ -39,7 +39,7 @@ class Generator:
                 raise exceptions.ProjectDirectoryExists(target)
 
             if not target.is_dir() or target.is_symlink():
-                logger.debug(f"{target}: unlink")
+                logger.debug(f"Remove {target}")
                 target.unlink()
 
             cleanup = contextlib.nullcontext()
@@ -75,7 +75,8 @@ class Generator:
     def _render_directory(
         self, source: Path, target: Path, *, root: bool = False
     ) -> None:
-        logger.debug(f"{target}: mkdir")
+        logger.debug(f"Generate {target}")
+
         target.mkdir(parents=True, exist_ok=True)
         shutil.copymode(source, target)
 
@@ -89,7 +90,8 @@ class Generator:
             self.template.hooks.run_post_gen_project(renderer=self.renderer, cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
-        logger.debug(f"{target}: symlink")
+        logger.debug(f"Generate {target}")
+
         source_target = os.readlink(source)
         with exceptions.SymlinkRenderError(source, source_target):
             target_target = self.renderer.render(source_target)
@@ -98,7 +100,8 @@ class Generator:
         shutil.copymode(source, target, follow_symlinks=False)
 
     def _render_file(self, source: Path, target: Path) -> None:
-        logger.debug(f"{target}: file")
+        logger.debug(f"Generate {target}")
+
         with exceptions.ContentRenderError(source):
             text = (
                 self.renderer.render_path(source)
