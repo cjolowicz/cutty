@@ -183,12 +183,7 @@ class Repository:
     @requires("1.6.1")  # --format ":short"
     def tags(self) -> List[str]:
         """Return the tags."""
-        process = self.git(
-            "for-each-ref",
-            "--format=%(refname:short)",
-            "refs/tags",
-            stdout=subprocess.PIPE,
-        )
+        process = self.git("for-each-ref", "--format=%(refname:short)", "refs/tags")
         return process.stdout.split()
 
     @requires("2.9.0")  # --checkout
