@@ -101,9 +101,5 @@ class Application:
             with project.update(
                 name=template.name, version=template.version
             ) as worktree:
-                self.generate_project(
-                    template,
-                    output_dir=worktree.parent,
-                    interactive=interactive,
-                    overwrite=True,
-                )
+                engine = Engine(template, interactive=interactive, overwrite=True)
+                engine.generate(worktree.parent)
