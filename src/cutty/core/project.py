@@ -45,7 +45,7 @@ class Project:
         self._ensure_branch_exists(branch)
 
         with self.repository.worktree(
-            self.repository.path / ".git" / locations.name / name,
+            self.repository.path / ".git" / locations.name / self.repository.path.name,
             branch,
             checkout=False,
             force_remove=True,
