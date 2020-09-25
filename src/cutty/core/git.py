@@ -242,13 +242,14 @@ class Repository:
     @requires("1.7.5")  # --max-parents
     def rev_list(
         self,
+        commit: str,
         *commits: str,
         max_count: Optional[int] = None,
         max_parents: Optional[int] = None,
     ) -> List[str]:
         """Lists commit objects in reverse chronological order."""
         options = _format_options(max_count=max_count, max_parents=max_parents)
-        process = self.git("rev-list", *options, *commits)
+        process = self.git("rev-list", *options, commit, *commits)
         return process.stdout.split()
 
     @requires("1.5.5")  # --exact-match
