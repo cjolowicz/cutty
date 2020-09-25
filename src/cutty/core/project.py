@@ -62,5 +62,5 @@ class Project:
         try:
             self.repository.rev_parse(branch, verify=True, quiet=True)
         except git.Error:
-            (firstref,) = self.repository.rev_list(max_count=1, max_parents=0)
+            (firstref,) = self.repository.rev_list("HEAD", max_count=1, max_parents=0)
             self.repository.branch(branch, firstref)
