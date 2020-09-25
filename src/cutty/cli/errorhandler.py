@@ -2,6 +2,8 @@
 import sys
 from typing import Iterator
 
+from rich.console import Console
+
 from ..core.compat import contextmanager
 from ..core.exceptions import CuttyException
 
@@ -13,3 +15,5 @@ def errorhandler() -> Iterator[None]:
         yield
     except CuttyException as error:
         sys.exit(str(error))
+    except Exception:
+        Console().print_exception()
