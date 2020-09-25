@@ -3,6 +3,7 @@ from typing import Optional
 
 import click
 
+from . import logging
 from ..api import update as api
 from ..core.utils import as_optional_path
 from .errorhandler import errorhandler
@@ -42,6 +43,8 @@ def update(
     config: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
+    logging.configure()
+
     with errorhandler():
         api.update(
             interactive=interactive,
