@@ -3,6 +3,7 @@ from typing import Optional
 
 import click
 
+from . import logging
 from ..api import create as api
 from ..core.utils import as_optional_path
 from .errorhandler import errorhandler
@@ -52,6 +53,8 @@ def create(
     config: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
+    logging.configure()
+
     with errorhandler():
         api.create(
             template,
