@@ -56,5 +56,6 @@ class Cache:
             yield Template.load(
                 worktree if directory is None else worktree / directory,
                 location=location,
+                name=repository.path.stem,
                 version=version.name,
             )

@@ -15,17 +15,24 @@ class Template:
     """Template."""
 
     repository: Path
+    name: str
     version: str
     variables: Variables
     hooks: Hooks
 
     @classmethod
-    def load(cls, path: Path, *, version: str, location: str) -> Template:
+    def load(cls, path: Path, *, name: str, version: str, location: str) -> Template:
         """Load the template variables."""
         variables = Variables.load(path / "cookiecutter.json", location=location)
         hooks = Hooks.load(path / "hooks")
 
-        return cls(repository=path, version=version, variables=variables, hooks=hooks)
+        return cls(
+            repository=path,
+            name=name,
+            version=version,
+            variables=variables,
+            hooks=hooks,
+        )
 
     @cached_property
     def root(self) -> Path:
@@ -40,8 +47,3 @@ class Template:
                 return path
 
         raise exceptions.TemplateDirectoryNotFound(self.variables.location)
-
-    @property
-    def name(self) -> str:
-        """Return the template name."""
-        return self.repository.stem
