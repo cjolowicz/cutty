@@ -87,7 +87,7 @@ class Git:
                 cwd=cwd,
             )
         except subprocess.CalledProcessError as error:
-            raise Error.from_subprocess(error) from None
+            raise Error.from_subprocess(error) from error
 
 
 T = TypeVar("T")
