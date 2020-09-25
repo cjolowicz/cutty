@@ -1,6 +1,7 @@
 """Generate."""
 import contextlib
 import fnmatch
+import logging
 import os.path
 import shutil
 from pathlib import Path
@@ -10,6 +11,9 @@ from .render import Renderer
 from .template import Template
 from .utils import on_raise
 from .utils import rmtree
+
+
+logger = logging.getLogger(__name__)
 
 
 class Generator:
@@ -35,6 +39,7 @@ class Generator:
                 raise exceptions.ProjectDirectoryExists(target)
 
             if not target.is_dir() or target.is_symlink():
+                logger.debug(f"{target}: unlink")
                 target.unlink()
 
             cleanup = contextlib.nullcontext()
@@ -70,6 +75,7 @@ class Generator:
     def _render_directory(
         self, source: Path, target: Path, *, root: bool = False
     ) -> None:
+        logger.debug(f"{target}: mkdir")
         target.mkdir(parents=True, exist_ok=True)
         shutil.copymode(source, target)
 
@@ -83,6 +89,7 @@ class Generator:
             self.template.hooks.run_post_gen_project(renderer=self.renderer, cwd=target)
 
     def _render_symlink(self, source: Path, target: Path) -> None:
+        logger.debug(f"{target}: symlink")
         source_target = os.readlink(source)
         with exceptions.SymlinkRenderError(source, source_target):
             target_target = self.renderer.render(source_target)
@@ -91,6 +98,7 @@ class Generator:
         shutil.copymode(source, target, follow_symlinks=False)
 
     def _render_file(self, source: Path, target: Path) -> None:
+        logger.debug(f"{target}: file")
         with exceptions.ContentRenderError(source):
             text = (
                 self.renderer.render_path(source)
