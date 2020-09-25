@@ -1,5 +1,6 @@
 """Application cache."""
 import hashlib
+import logging
 from pathlib import Path
 from typing import Iterator
 from typing import Optional
@@ -11,6 +12,9 @@ from .template import Template
 from .versions import Version
 
 
+logger = logging.getLogger(__name__)
+
+
 def _hash(value: str) -> str:
     return hashlib.blake2b(value.encode()).hexdigest()
 
@@ -20,9 +24,13 @@ def _load_repository(location: str, path: Path) -> git.Repository:
 
     if not path.exists():
         with exceptions.CloneError(location):
+            logger.debug(f"Clone {location} to {path}")
+
             return git.Repository.clone(location, path, mirror=True, quiet=True)
 
     with exceptions.UpdateError(location):
+        logger.debug(f"Fetch {location} to {path}")
+
         repository = git.Repository(path)
         repository.update_remote(prune=True)
         return repository
@@ -49,6 +57,8 @@ class Cache:
         repository = _load_repository(location, path)
         version = Version.get(repository, revision=revision)
         worktree = path / "worktrees" / version.sha1
+
+        logger.debug(f"Version {version.name} ({version.sha1})")
 
         with repository.worktree(
             worktree, version.sha1, detach=True, force_remove=True
