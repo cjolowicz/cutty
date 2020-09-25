@@ -1,6 +1,7 @@
 """Project."""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
@@ -9,6 +10,9 @@ from . import git
 from . import locations
 from .compat import contextmanager
 from .variables import Variables
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,6 +56,7 @@ class Project:
         ) as worktree:
             yield worktree.path
 
+            logger.debug(f"Worktree {worktree.path}")
             worktree.add(all=True)
             worktree.commit(message=f"Update {name} to {version}", verify=False)
 
