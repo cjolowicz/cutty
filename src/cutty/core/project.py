@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 
+from . import exceptions
 from . import git
 from . import locations
 from .compat import contextmanager
@@ -57,11 +58,13 @@ class Project:
             yield worktree.path
 
             logger.debug(f"Worktree {worktree.path}")
+
             worktree.add(all=True)
             worktree.commit(message=f"Update {name} to {version}", verify=False)
 
-        self.repository.cherrypick(branch, commit=False)
-        self.repository.commit(edit=False)  # Run pre-commit hook
+        with exceptions.ProjectUpdateFailed():
+            self.repository.cherrypick(branch, commit=False)
+            self.repository.commit(edit=False)  # Run pre-commit hook
 
     def _ensure_branch_exists(self, branch: str) -> None:
         try:

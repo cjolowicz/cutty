@@ -142,3 +142,7 @@ class HookFailed(CuttyException):
 
 class ProjectGenerationFailed(CuttyException):
     """Project generation failed."""
+
+
+class ProjectUpdateFailed(CuttyException):
+    """Project update failed."""
