@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import functools
+import inspect
 import shutil
 import subprocess  # noqa: S404
 from dataclasses import dataclass
@@ -138,8 +139,9 @@ def requires(version: str) -> Callable[[Callable[..., R]], Callable[..., R]]:
         @functools.wraps(f)
         def wrapper(*args: Any, **kwargs: Any) -> R:
             if not _global.git.check_version(version):
+                func_name = dict(inspect.getmembers(f)).get("__name__")
                 raise exceptions.GitVersionRequired(
-                    f.__func__.__name__, version, _global.git.version
+                    func_name, version, _global.git.version
                 )
             return f(*args, **kwargs)
 
