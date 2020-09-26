@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 import inspect
+import itertools
 import shutil
 import subprocess  # noqa: S404
 import sys
@@ -35,18 +36,14 @@ class Error(Exception):
     @classmethod
     def from_subprocess(cls, error: subprocess.CalledProcessError) -> Error:
         """Create an error from subprocess.CalledProcessError."""
-        command = "".join(error.cmd[1:2])
-
-        if command == "rev-parse" and "Needed a single revision" in error.stderr:
-            message = f"unknown revision {error.cmd[-1]!r}"
-        elif not error.stderr:
-            message = f"returned non-zero exit status {error.returncode}"
-        else:
-            line = error.stderr.splitlines()[-1]
-            if line.startswith("fatal: "):
-                message = removeprefix(line, "fatal: ")
-            else:
-                message = error.stderr
+        command = " ".join(
+            itertools.takewhile(lambda arg: not arg.startswith("-"), error.cmd[1:])
+        )
+        message = (
+            error.stderr
+            if error.stderr
+            else f"returned non-zero exit status {error.returncode}"
+        )
 
         return cls(command, message)
 
