@@ -132,7 +132,7 @@ def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]
     """Document the minimum Git version."""
 
     def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
-        @functools.wraps
+        @functools.wraps(f)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             if not _global.git.check_version(version):
                 raise exceptions.GitVersionRequired(
