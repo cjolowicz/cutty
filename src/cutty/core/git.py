@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 
 import packaging.version
 
+from . import exceptions
 from .compat import cached_property
 from .compat import contextmanager
 from .types import CompletedProcess
@@ -141,7 +142,7 @@ class Repository:
         """Initialize."""
         git = Git.find()
         if git is None:
-            raise Exception("git not found")
+            raise exceptions.GitNotFound()
 
         self.path = path or Path.cwd()
         self._git = git
