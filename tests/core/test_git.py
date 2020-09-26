@@ -47,12 +47,6 @@ def test_clone_non_existing_directory() -> None:
         git.Repository.clone("/no/such/directory")
 
 
-def test_parse_non_existing_revision(repository: git.Repository) -> None:
-    """It raises an error."""
-    with pytest.raises(git.Error, match="unknown revision"):
-        repository.rev_parse("no-such-revision", verify=True)
-
-
 def test_error_without_stderr(repository: git.Repository) -> None:
     """It reports the exit status."""
     with pytest.raises(git.Error, match="exit status"):
