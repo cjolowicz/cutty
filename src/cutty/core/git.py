@@ -157,9 +157,9 @@ class Repository:
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
-        self = cls(path)
-        self.git("init")
-        return self
+        _global.git.run("init", cwd=path)
+
+        return cls(path)
 
     @requires("1.6.0")  # --mirror
     @classmethod
@@ -177,9 +177,9 @@ class Repository:
         if path is None:
             path = Path(cls.name_from_location(location, bare=mirror))
 
-        self = cls(path)
         _global.git.run("clone", *options, location, str(path))
-        return self
+
+        return cls(path)
 
     @classmethod
     def name_from_location(cls, location: str, *, bare: bool = False) -> str:
