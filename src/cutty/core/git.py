@@ -98,6 +98,19 @@ class Git:
             raise Error.from_subprocess(error) from error
 
 
+class _GlobalContext:
+    @cached_property
+    def git(self) -> Git:
+        """Return the git program."""
+        git = Git.find()
+        if git is None:
+            raise exceptions.GitNotFound()
+        return git
+
+
+_global = _GlobalContext()
+
+
 T = TypeVar("T")
 
 
@@ -123,9 +136,9 @@ def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]
     def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps
         def wrapper(repository: Repository, *args: Any, **kwargs: Any) -> Any:
-            if not repository._git.check_version(version):
+            if not _global.git.check_version(version):
                 raise exceptions.GitVersionRequired(
-                    f.__func__.__name__, version, repository._git.version
+                    f.__func__.__name__, version, _global.git.version
                 )
             return f(repository, *args, **kwargs)
 
@@ -139,12 +152,7 @@ class Repository:
 
     def __init__(self, path: Optional[Path] = None) -> None:
         """Initialize."""
-        git = Git.find()
-        if git is None:
-            raise exceptions.GitNotFound()
-
         self.path = path or Path.cwd()
-        self._git = git
 
     # @requires("1.5.6")
     @classmethod
@@ -171,7 +179,7 @@ class Repository:
             path = Path(cls.name_from_location(location, bare=mirror))
 
         self = cls(path)
-        self._git.run("clone", *options, location, str(path))
+        _global.git.run("clone", *options, location, str(path))
         return self
 
     @classmethod
@@ -183,7 +191,7 @@ class Repository:
 
     def git(self, *args: StrPath) -> CompletedProcess:
         """Invoke git."""
-        return self._git.run(*args, cwd=self.path)
+        return _global.git.run(*args, cwd=self.path)
 
     @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
