@@ -259,7 +259,7 @@ class Repository:
         short: Optional[bool] = None,
         verify: Optional[bool] = None,
     ) -> str:
-        """Return the SHA1 hash for the given revision."""
+        """Return the SHA-1 hash for the given revision."""
         options = _format_options(quiet=quiet, short=short, verify=verify)
         process = self.git("rev-parse", *options, rev)
         return process.stdout.strip()
