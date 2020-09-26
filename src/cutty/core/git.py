@@ -159,16 +159,16 @@ class Repository:
         """Initialize."""
         self.path = path or Path.cwd()
 
-    @requires("1.5.6")
     @classmethod
+    @requires("1.5.6")
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
         _global.git.run("init", cwd=path)
 
         return cls(path)
 
-    @requires("1.6.0")  # --mirror
     @classmethod
+    @requires("1.6.0")  # --mirror
     def clone(
         cls,
         location: str,
