@@ -5,11 +5,13 @@ import functools
 import inspect
 import shutil
 import subprocess  # noqa: S404
+import sys
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Callable
+from typing import cast
 from typing import Iterator
 from typing import List
 from typing import MutableMapping
@@ -194,7 +196,12 @@ class Repository:
 
     def git(self, *args: StrPath) -> CompletedProcess:
         """Invoke git."""
-        return _global.git.run(*args, cwd=self.path)
+        process = _global.git.run(*args, cwd=self.path)
+        if sys.version_info <= (3, 7):
+            # Work around [no-any-return] with dataclasses on Python 3.7
+            return cast(CompletedProcess, process)
+        else:
+            return process
 
     @requires("1.5.1")
     def update_remote(self, prune: Optional[bool] = None) -> None:
