@@ -21,6 +21,7 @@ from .compat import cached_property
 from .compat import contextmanager
 from .types import CompletedProcess
 from .types import StrPath
+from .utils import as_optional_path
 from .utils import removeprefix
 
 
@@ -65,12 +66,10 @@ class Git:
     path: Path
 
     @classmethod
-    def find(cls) -> Git:
+    def find(cls) -> Optional[Git]:
         """Find the Git program."""
-        path = shutil.which("git")
-        if path is None:
-            raise Exception("git not found")
-        return cls(Path(path))
+        path = as_optional_path(shutil.which("git"))
+        return None if path is None else cls(path)
 
     @cached_property
     def version(self) -> str:
@@ -140,8 +139,12 @@ class Repository:
 
     def __init__(self, path: Optional[Path] = None) -> None:
         """Initialize."""
+        git = Git.find()
+        if git is None:
+            raise Exception("git not found")
+
         self.path = path or Path.cwd()
-        self._git = Git.find()
+        self._git = git
 
     # @requires("1.5.6")
     @classmethod
