@@ -135,12 +135,12 @@ def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]
 
     def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps
-        def wrapper(repository: Repository, *args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             if not _global.git.check_version(version):
                 raise exceptions.GitVersionRequired(
                     f.__func__.__name__, version, _global.git.version
                 )
-            return f(repository, *args, **kwargs)
+            return f(*args, **kwargs)
 
         return wrapper
 
@@ -154,7 +154,7 @@ class Repository:
         """Initialize."""
         self.path = path or Path.cwd()
 
-    # @requires("1.5.6")
+    @requires("1.5.6")
     @classmethod
     def init(cls, path: Path) -> Repository:
         """Create a repository."""
@@ -162,7 +162,7 @@ class Repository:
         self.git("init")
         return self
 
-    # @requires("1.6.0")  # --mirror
+    @requires("1.6.0")  # --mirror
     @classmethod
     def clone(
         cls,
