@@ -174,7 +174,7 @@ class Repository:
         options = _format_options(quiet=quiet, mirror=mirror)
 
         if path is None:
-            path = Path(cls.name_from_location(location, bare=mirror))
+            path = Path(cls.name_from_location(location, bare=mirror is True))
 
         _global.git.run("clone", *options, location, str(path))
 
