@@ -124,9 +124,8 @@ def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]
         @functools.wraps
         def wrapper(repository: Repository, *args: Any, **kwargs: Any) -> Any:
             if not repository._git.check_version(version):
-                raise Exception(
-                    f"{f.__func__.__name__} requires git version {version},"
-                    f" you have {repository._git.version}"
+                raise exceptions.GitVersionRequired(
+                    f.__func__.__name__, version, repository._git.version
                 )
             return f(repository, *args, **kwargs)
 

@@ -68,6 +68,10 @@ class GitNotFound(CuttyException):
     """Cannot find the git program."""
 
 
+class GitVersionRequired(CuttyException):
+    """{} requires git version {}, you have {}."""
+
+
 class CloneError(CuttyException):
     """Cannot download template from {}."""
 
