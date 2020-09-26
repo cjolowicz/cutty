@@ -109,25 +109,6 @@ class _GlobalContext:
 _global = _GlobalContext()
 
 
-T = TypeVar("T")
-
-
-def _format_option(key: str, value: T) -> str:
-    """Convert a key-value pair to a command-line option."""
-    name = key.replace("_", "-")
-    if isinstance(value, bool):
-        return f"--{name}" if value else f"--no-{name}"
-    else:
-        return f"--{name}={value}"
-
-
-def _format_options(**kwargs: Optional[T]) -> List[str]:
-    """Convert keyword arguments to command-line options."""
-    return [
-        _format_option(key, value) for key, value in kwargs.items() if value is not None
-    ]
-
-
 R = TypeVar("R")
 
 
@@ -147,6 +128,25 @@ def requires(version: str) -> Callable[[Callable[..., R]], Callable[..., R]]:
         return wrapper
 
     return decorator
+
+
+T = TypeVar("T")
+
+
+def _format_option(key: str, value: T) -> str:
+    """Convert a key-value pair to a command-line option."""
+    name = key.replace("_", "-")
+    if isinstance(value, bool):
+        return f"--{name}" if value else f"--no-{name}"
+    else:
+        return f"--{name}={value}"
+
+
+def _format_options(**kwargs: Optional[T]) -> List[str]:
+    """Convert keyword arguments to command-line options."""
+    return [
+        _format_option(key, value) for key, value in kwargs.items() if value is not None
+    ]
 
 
 class Repository:
