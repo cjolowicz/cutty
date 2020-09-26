@@ -128,12 +128,15 @@ def _format_options(**kwargs: Optional[T]) -> List[str]:
     ]
 
 
-def requires(version: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+R = TypeVar("R")
+
+
+def requires(version: str) -> Callable[[Callable[..., R]], Callable[..., R]]:
     """Document the minimum Git version."""
 
-    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
+    def decorator(f: Callable[..., R]) -> Callable[..., R]:
         @functools.wraps(f)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> R:
             if not _global.git.check_version(version):
                 raise exceptions.GitVersionRequired(
                     f.__func__.__name__, version, _global.git.version
