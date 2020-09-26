@@ -23,7 +23,6 @@ from .compat import cached_property
 from .compat import contextmanager
 from .types import CompletedProcess
 from .types import StrPath
-from .utils import as_optional_path
 from .utils import removeprefix
 
 
@@ -68,8 +67,8 @@ class Git:
     @classmethod
     def find(cls) -> Optional[Git]:
         """Find the Git program."""
-        path = as_optional_path(shutil.which("git"))
-        return None if path is None else cls(path)
+        path = shutil.which("git")
+        return None if path is None else cls(Path(path))
 
     @cached_property
     def version(self) -> str:
