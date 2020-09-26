@@ -5,6 +5,7 @@ import functools
 import shutil
 import subprocess  # noqa: S404
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Callable
@@ -57,14 +58,12 @@ class Error(Exception):
         return f"git {self.command}: {self.message}"
 
 
-env: MutableMapping[str, str] = {}
-
-
 @dataclass
 class Git:
     """Git program."""
 
     path: Path
+    env: MutableMapping[str, str] = field(default_factory=dict)
 
     @classmethod
     def find(cls) -> Optional[Git]:
@@ -91,7 +90,7 @@ class Git:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                env=env or None,
+                env=self.env or None,
                 cwd=cwd,
             )
         except subprocess.CalledProcessError as error:

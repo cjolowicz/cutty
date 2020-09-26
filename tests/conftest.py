@@ -15,7 +15,7 @@ from cutty.core.cache import Cache
 @pytest.fixture(scope="session", autouse=True)
 def git_author() -> None:
     """Provide author information to git commit."""
-    git.env.update(
+    git._global.git.env.update(
         {
             "GIT_AUTHOR_NAME": "Example Author",
             "GIT_AUTHOR_EMAIL": "example.author@example.com",
