@@ -77,9 +77,9 @@ class Git:
         output = self.run("--version").stdout.strip()
         return removeprefix(output, "git version ")
 
-    def check_version(self, required: str) -> bool:
-        """Return True if the local Git has at least the required version."""
-        return packaging.version.parse(required) < packaging.version.parse(self.version)
+    def check_version(self, version: str) -> bool:
+        """Return True if Git has at least the given version."""
+        return packaging.version.parse(version) <= packaging.version.parse(self.version)
 
     def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
