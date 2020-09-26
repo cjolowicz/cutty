@@ -64,6 +64,10 @@ class InvalidAbbreviation(CuttyException):
     """Invalid abbreviation {!r} in {!r}: {!r}."""
 
 
+class GitNotFound(CuttyException):
+    """Cannot find the git program."""
+
+
 class CloneError(CuttyException):
     """Cannot download template from {}."""
 
