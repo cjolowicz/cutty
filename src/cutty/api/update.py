@@ -18,5 +18,5 @@ def update(
     project = Project.load(Path.cwd())
 
     application.update_project(
-        project, directory=directory, revision=revision, interactive=interactive,
+        project, directory=directory, revision=revision, interactive=interactive
     )
