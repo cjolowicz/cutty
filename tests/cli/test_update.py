@@ -18,11 +18,15 @@ def test_help_succeeds(runner: CliRunner) -> None:
 
 @pytest.fixture
 def instance(
-    runner: CliRunner, user_cache_dir: Path, template: git.Repository,
+    runner: CliRunner,
+    user_cache_dir: Path,
+    template: git.Repository,
 ) -> git.Repository:
     """Fixture with a template instance."""
     runner.invoke(
-        create, [str(template.path)], input="example",
+        create,
+        [str(template.path)],
+        input="example",
     )
 
     instance = git.Repository(Path("example"))
@@ -33,7 +37,9 @@ def instance(
 
 
 def test_update(
-    runner: CliRunner, template: git.Repository, instance: git.Repository,
+    runner: CliRunner,
+    template: git.Repository,
+    instance: git.Repository,
 ) -> None:
     """It updates the project from the template."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
@@ -46,7 +52,9 @@ def test_update(
 
 
 def test_interactive(
-    runner: CliRunner, template: git.Repository, instance: git.Repository,
+    runner: CliRunner,
+    template: git.Repository,
+    instance: git.Repository,
 ) -> None:
     """It reads interactive input."""
     (template.path / "{{cookiecutter.project}}" / "LICENSE").touch()
