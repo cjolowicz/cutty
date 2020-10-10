@@ -55,14 +55,10 @@ You can install *Cutty* via pip_ from PyPI_:
    $ pip install cutty
 
 
-.. basic-usage
-
 Usage
 -----
 
 * TODO
-
-.. end-basic-usage
 
 Complete instructions can be found at `cutty.readthedocs.io`_.
 
