@@ -58,7 +58,7 @@ You can install *Cutty* via pip_ from PyPI_:
 Usage
 -----
 
-Complete instructions can be found at Usage_.
+Please see the `Command-line Reference <Usage_>`_ for details.
 
 
 Contributing
