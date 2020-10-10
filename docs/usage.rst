@@ -1,11 +1,6 @@
 Usage
 =====
 
-.. include:: ../README.rst
-   :start-after: basic-usage
-   :end-before: end-basic-usage
-
-
 Complete usage
 --------------
 
