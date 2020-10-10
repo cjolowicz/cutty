@@ -57,8 +57,8 @@ You can install *Cutty* via pip_ from PyPI_:
 
 .. basic-usage
 
-Basic usage
------------
+Usage
+-----
 
 * TODO
 
