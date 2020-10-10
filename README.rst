@@ -58,8 +58,6 @@ You can install *Cutty* via pip_ from PyPI_:
 Usage
 -----
 
-* TODO
-
 Complete instructions can be found at `cutty.readthedocs.io`_.
 
 
