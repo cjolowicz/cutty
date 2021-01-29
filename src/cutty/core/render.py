@@ -57,7 +57,7 @@ class Renderer:
 
         return str(value)
 
-    def render_path(self, path: Path) -> str:
+    def render_file(self, path: Path) -> str:
         """Render a file."""
         if path.is_absolute():
             path = path.relative_to(self.template.repository)

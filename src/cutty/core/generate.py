@@ -104,7 +104,7 @@ class Generator:
 
         with exceptions.ContentRenderError(source):
             text = (
-                self.renderer.render_path(source)
+                self.renderer.render_file(source)
                 if not self._is_copy_only(source)
                 else source.read_text()
             )
