@@ -24,10 +24,10 @@ class Survey:
     def run(self) -> None:
         """Bind variables from user input."""
         for variable in self.variables:
-            value = self.run_one(variable)
+            value = self.ask(variable)
             self.renderer.bind(variable.name, value)
 
-    def run_one(self, variable: Variable) -> Any:
+    def ask(self, variable: Variable) -> Any:
         """Return user input for a variable."""
         if variable.name.startswith("_"):
             return variable.value
