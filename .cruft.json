@@ -1,0 +1,17 @@
+{
+    "template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python",
+    "commit": "ae78c2988882b8d469d561e1c1d4bd78c29cf283",
+    "context": {
+        "cookiecutter": {
+            "project_name": "cutty",
+            "package_name": "cutty",
+            "friendly_name": "cutty",
+            "author": "Claudio Jolowicz",
+            "email": "mail@claudiojolowicz.com",
+            "github_user": "cjolowicz",
+            "version": "0.0.0",
+            "_template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python"
+        }
+    },
+    "directory": null
+}
