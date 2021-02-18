@@ -97,6 +97,13 @@ cutty.util.reraise
    :members:
 
 
+cutty.util.bus
+--------------
+
+.. automodule:: cutty.util.bus
+   :members:
+
+
 cutty.application.cookiecutter.templates
 ----------------------------------------
 
