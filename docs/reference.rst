@@ -27,6 +27,13 @@ cutty.domain.renderables
    :members:
 
 
+cutty.util.exceptionhandlers
+----------------------------
+
+.. automodule:: cutty.util.exceptionhandlers
+   :members:
+
+
 cutty.__main__
 --------------
 
