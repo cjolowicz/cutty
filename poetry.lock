@@ -15,6 +15,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "arrow"
+version = "1.0.3"
+description = "Better dates & times for Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+python-dateutil = ">=2.7.0"
+
+[[package]]
 name = "aspy.refactor-imports"
 version = "2.2.0"
 description = "Utilities for refactoring imports in python-like syntax."
@@ -356,6 +367,18 @@ MarkupSafe = ">=0.23"
 i18n = ["Babel (>=0.8)"]
 
 [[package]]
+name = "jinja2-time"
+version = "0.2.0"
+description = "Jinja2 Extension for Dates and Times"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+arrow = "*"
+jinja2 = "*"
+
+[[package]]
 name = "livereload"
 version = "2.6.3"
 description = "Python LiveReload is an awesome tool for web developers"
@@ -565,6 +588,17 @@ toml = "*"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "python-dateutil"
+version = "2.8.1"
+description = "Extensions to the standard Python datetime module"
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+
+[package.dependencies]
+six = ">=1.5"
+
+[[package]]
 name = "pytz"
 version = "2021.1"
 description = "World timezone definitions, modern and historical"
@@ -669,7 +703,7 @@ requests = "*"
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -944,7 +978,7 @@ tests = ["pytest", "pytest-cov", "codecov", "scikit-build", "cmake", "ninja", "p
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "626a54c5bf42e48dcd62524beda005a366bf977565787afab234718622440f3b"
+content-hash = "c28a852b83702c21ae0900c13a1bd3ef5f7ecec804a9d12e0e1b8c871cd5e694"
 
 [metadata.files]
 alabaster = [
@@ -954,6 +988,10 @@ alabaster = [
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
     {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
+]
+arrow = [
+    {file = "arrow-1.0.3-py3-none-any.whl", hash = "sha256:3515630f11a15c61dcb4cdd245883270dd334c83f3e639824e65a4b79cc48543"},
+    {file = "arrow-1.0.3.tar.gz", hash = "sha256:399c9c8ae732270e1aa58ead835a79a40d7be8aa109c579898eb41029b5a231d"},
 ]
 "aspy.refactor-imports" = [
     {file = "aspy.refactor_imports-2.2.0-py2.py3-none-any.whl", hash = "sha256:7a18039d2e8be6b02b4791ce98891deb46b459b575c52ed35ab818c4eaa0c098"},
@@ -1127,6 +1165,10 @@ jinja2 = [
     {file = "Jinja2-2.11.3-py2.py3-none-any.whl", hash = "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419"},
     {file = "Jinja2-2.11.3.tar.gz", hash = "sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6"},
 ]
+jinja2-time = [
+    {file = "jinja2-time-0.2.0.tar.gz", hash = "sha256:d14eaa4d315e7688daa4969f616f226614350c48730bfa1692d2caebd8c90d40"},
+    {file = "jinja2_time-0.2.0-py2.py3-none-any.whl", hash = "sha256:d3eab6605e3ec8b7a0863df09cc1d23714908fa61aa6986a845c20ba488b4efa"},
+]
 livereload = [
     {file = "livereload-2.6.3.tar.gz", hash = "sha256:776f2f865e59fde56490a56bcc6773b6917366bce0c267c60ee8aaf1a0959869"},
 ]
@@ -1256,6 +1298,10 @@ pyparsing = [
 pytest = [
     {file = "pytest-6.2.3-py3-none-any.whl", hash = "sha256:6ad9c7bdf517a808242b998ac20063c41532a570d088d77eec1ee12b0b5574bc"},
     {file = "pytest-6.2.3.tar.gz", hash = "sha256:671238a46e4df0f3498d1c3270e5deb9b32d25134c99b7d75370a68cfbe9b634"},
+]
+python-dateutil = [
+    {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
+    {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 pytz = [
     {file = "pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"},
