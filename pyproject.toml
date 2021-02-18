@@ -17,6 +17,7 @@ python = "^3.10"
 click = "^7.0"
 Jinja2 = "^2.11.3"
 jinja2-time = "^0.2.0"
+python-slugify = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
