@@ -6,6 +6,13 @@ Reference
     :backlinks: none
 
 
+cutty.domain.variables
+----------------------
+
+.. automodule:: cutty.domain.variables
+   :members:
+
+
 cutty.__main__
 --------------
 
