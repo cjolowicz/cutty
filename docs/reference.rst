@@ -27,6 +27,13 @@ cutty.domain.renderables
    :members:
 
 
+cutty.adapters.jinja.extensions
+-------------------------------
+
+.. automodule:: cutty.adapters.jinja.extensions
+   :members:
+
+
 cutty.util.exceptionhandlers
 ----------------------------
 
