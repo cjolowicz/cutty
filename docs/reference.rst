@@ -34,6 +34,13 @@ cutty.adapters.jinja.extensions
    :members:
 
 
+cutty.adapters.jinja.renderables
+--------------------------------
+
+.. automodule:: cutty.adapters.jinja.renderables
+   :members:
+
+
 cutty.util.exceptionhandlers
 ----------------------------
 
