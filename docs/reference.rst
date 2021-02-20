@@ -20,6 +20,13 @@ cutty.domain.paths
    :members:
 
 
+cutty.domain.renderables
+------------------------
+
+.. automodule:: cutty.domain.renderables
+   :members:
+
+
 cutty.__main__
 --------------
 
