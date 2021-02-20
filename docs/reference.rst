@@ -34,6 +34,13 @@ cutty.util.exceptionhandlers
    :members:
 
 
+cutty.util.reraise
+------------------
+
+.. automodule:: cutty.util.reraise
+   :members:
+
+
 cutty.__main__
 --------------
 
