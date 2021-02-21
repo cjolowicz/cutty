@@ -34,6 +34,13 @@ cutty.domain.varspecs
    :members:
 
 
+cutty.domain.prompts
+--------------------
+
+.. automodule:: cutty.domain.prompts
+   :members:
+
+
 cutty.adapters.jinja.extensions
 -------------------------------
 
