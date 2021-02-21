@@ -55,6 +55,13 @@ cutty.adapters.jinja.renderables
    :members:
 
 
+cutty.adapters.click.prompts
+----------------------------
+
+.. automodule:: cutty.adapters.click.prompts
+   :members:
+
+
 cutty.util.exceptionhandlers
 ----------------------------
 
