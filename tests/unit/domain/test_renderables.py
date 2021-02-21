@@ -36,18 +36,6 @@ def test_renderable_dict() -> None:
     assert renderable.render([]) == {"key": 42}
 
 
-class TrivialRenderableLoader(RenderableLoader):
-    """Fake a renderable loader using TrivialRenderable."""
-
-    def loadtext(self, text: str) -> Renderable[str]:
-        """Load renderable from text."""
-        return TrivialRenderable(text)
-
-    def get(self, name: str) -> Renderable[str]:
-        """Get renderable by name."""
-        return TrivialRenderable("")
-
-
 @pytest.mark.parametrize(
     "value, expected",
     [
@@ -61,8 +49,9 @@ class TrivialRenderableLoader(RenderableLoader):
         ),
     ],
 )
-def test_renderable_loader(value: Value, expected: Value) -> None:
+def test_renderable_loader(
+    renderable_loader: RenderableLoader, value: Value, expected: Value
+) -> None:
     """It returns a renderable that renders as expected."""
-    loader = TrivialRenderableLoader()
-    renderable = loader.load(value)
+    renderable = renderable_loader.load(value)
     assert expected == renderable.render([])
