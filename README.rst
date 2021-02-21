@@ -22,7 +22,7 @@ cutty
 .. |Tests| image:: https://github.com/cjolowicz/cutty/workflows/Tests/badge.svg
    :target: https://github.com/cjolowicz/cutty/actions?workflow=Tests
    :alt: Tests
-.. |Codecov| image:: https://codecov.io/gh/cjolowicz/cutty/branch/master/graph/badge.svg
+.. |Codecov| image:: https://codecov.io/gh/cjolowicz/cutty/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/cjolowicz/cutty
    :alt: Codecov
 .. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
