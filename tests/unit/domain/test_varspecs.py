@@ -1,27 +1,10 @@
 """Unit tests for cutty.domain.varspecs."""
 import dataclasses
 
-import pytest
-
 from cutty.domain.renderables import Renderable
-from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.varspecs import DefaultVariableBuilder
 from cutty.domain.varspecs import render
 from cutty.domain.varspecs import VariableSpecification
-from cutty.domain.varspecs import VariableType
-
-
-@pytest.fixture
-def specification() -> VariableSpecification[Renderable[str]]:
-    """Fixture with a renderable variable specification."""
-    return VariableSpecification(
-        name="project",
-        description="The name of the project",
-        type=VariableType.STRING,
-        default=TrivialRenderable("example"),
-        choices=(),
-        interactive=True,
-    )
 
 
 def test_render(specification: VariableSpecification[Renderable[str]]) -> None:
