@@ -1,10 +1,30 @@
 """Unit test fixtures for cutty."""
 import pytest
 
+from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
+from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
+
+
+class TrivialRenderableLoader(RenderableLoader):
+    """Fake a renderable loader using TrivialRenderable."""
+
+    def loadtext(self, text: str) -> Renderable[str]:
+        """Load renderable from text."""
+        return TrivialRenderable(text)
+
+    def get(self, path: Path) -> Renderable[str]:
+        """Get renderable by path."""
+        return TrivialRenderable("")
+
+
+@pytest.fixture
+def renderable_loader() -> RenderableLoader:
+    """Fixture for a renderable loader."""
+    return TrivialRenderableLoader()
 
 
 @pytest.fixture
