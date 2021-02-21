@@ -1,4 +1,4 @@
-"""Common fixtures for cutty.domain."""
+"""Unit test fixtures for cutty."""
 import pytest
 
 from cutty.domain.renderables import Renderable
