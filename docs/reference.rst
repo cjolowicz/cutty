@@ -13,6 +13,13 @@ cutty.domain.variables
    :members:
 
 
+cutty.domain.paths
+------------------
+
+.. automodule:: cutty.domain.paths
+   :members:
+
+
 cutty.__main__
 --------------
 
