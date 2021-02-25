@@ -3,29 +3,32 @@ import abc
 from collections.abc import Iterable
 from collections.abc import Sequence
 from typing import Generic
+from typing import TypeVar
 
 from cutty.domain.paths import Path
 from cutty.domain.variables import Value
-from cutty.domain.variables import ValueT_co
 from cutty.domain.variables import Variable
 
 
-class Renderable(abc.ABC, Generic[ValueT_co]):
+T_co = TypeVar("T_co", covariant=True)
+
+
+class Renderable(abc.ABC, Generic[T_co]):
     """Something that can be rendered using variables."""
 
     @abc.abstractmethod
-    def render(self, variables: Sequence[Variable[Value]]) -> ValueT_co:
+    def render(self, variables: Sequence[Variable[Value]]) -> T_co:
         """Render the object."""
 
 
-class TrivialRenderable(Renderable[ValueT_co]):
+class TrivialRenderable(Renderable[T_co]):
     """A renderable that just returns its value."""
 
-    def __init__(self, value: ValueT_co) -> None:
+    def __init__(self, value: T_co) -> None:
         """Initialize."""
         self.value = value
 
-    def render(self, variables: Sequence[Variable[Value]]) -> ValueT_co:
+    def render(self, variables: Sequence[Variable[Value]]) -> T_co:
         """Return the value."""
         return self.value
 
