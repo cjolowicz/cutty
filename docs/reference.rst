@@ -41,6 +41,13 @@ cutty.domain.prompts
    :members:
 
 
+cutty.domain.files
+------------------
+
+.. automodule:: cutty.domain.files
+   :members:
+
+
 cutty.adapters.jinja.extensions
 -------------------------------
 
