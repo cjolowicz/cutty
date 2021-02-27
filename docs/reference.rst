@@ -69,6 +69,13 @@ cutty.adapters.click.prompts
    :members:
 
 
+cutty.adapters.filesystem.files
+-------------------------------
+
+.. automodule:: cutty.adapters.filesystem.files
+   :members:
+
+
 cutty.util.exceptionhandlers
 ----------------------------
 
