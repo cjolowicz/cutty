@@ -27,7 +27,7 @@ def test_main_cookiecutter(runner: CliRunner, template_directory: Path) -> None:
     runner.invoke(
         __main__.main,
         [f"{template_directory}"],
-        input="foobar\n\n",
+        input="foobar\n\n\n",
         catch_exceptions=False,
     )
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
