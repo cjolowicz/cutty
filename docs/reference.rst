@@ -104,6 +104,13 @@ cutty.application.cookiecutter.templates
    :members:
 
 
+cutty.application.cookiecutter.main
+-----------------------------------
+
+.. automodule:: cutty.application.cookiecutter.main
+   :members:
+
+
 cutty.__main__
 --------------
 
