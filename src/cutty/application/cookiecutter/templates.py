@@ -5,8 +5,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
-from cutty.domain.files import RenderableFile
-from cutty.domain.files import RenderablePath
+from cutty.domain.files import RenderableFileLoader
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
@@ -76,20 +75,12 @@ def _walk_files(path: pathlib.Path) -> Iterator[pathlib.Path]:
             raise RuntimeError(f"{entry} is neither regular file nor directory")
 
 
-def _load_file(loader: RenderableLoader, filename: pathlib.Path) -> RenderableFile:
-    path = RenderablePath(loader.loadtext(part) for part in filename.parts)
-    blob = loader.get(Path.fromparts(filename.parts))
-    return RenderableFile(path, blob)
-
-
-def _load_files(
-    loader: RenderableLoader, repository: pathlib.Path
-) -> Iterator[RenderableFile]:
-    for filename in _walk_files(repository):
-        filename = filename.relative_to(repository)
-        root = filename.parts[0]
+def _load_paths(repository: pathlib.Path) -> Iterator[Path]:
+    for path in _walk_files(repository):
+        path = path.relative_to(repository)
+        root = path.parts[0]
         if all(token in root for token in ("{{", "cookiecutter", "}}")):
-            yield _load_file(loader, filename)
+            yield Path.fromparts(path.parts)
 
 
 def load(path: pathlib.Path) -> Template:
@@ -107,5 +98,7 @@ def load(path: pathlib.Path) -> Template:
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
     variables = _load_variables(loader, data)
-    files = _load_files(loader, path)
+    fileloader = RenderableFileLoader(loader)
+    paths = _load_paths(path)
+    files = fileloader.load(paths)
     return Template(variables=variables, files=files)
