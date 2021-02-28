@@ -5,7 +5,7 @@ from typing import TypeVar
 from typing import Union
 
 
-Value = Union[None, float, str, list, dict]
+Value = Union[None, bool, int, float, str, list, dict]
 ValueT = TypeVar("ValueT", bound=Value)
 ValueT_co = TypeVar("ValueT_co", bound=Value, covariant=True)
 
