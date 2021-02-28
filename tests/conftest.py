@@ -15,7 +15,10 @@ def template_directory(tmp_path: pathlib.Path) -> pathlib.Path:
     """Fixture for a template directory."""
     create(
         tmp_path / "cookiecutter.json",
-        '{"project": "example", "license": ["MIT", "GPL-3.0", "Apache-2.0"]}',
+        '{ "project": "example"'
+        ', "license": ["MIT", "GPL-3.0", "Apache-2.0"]'
+        ', "_extensions": ["jinja2_time.TimeExtension"]'
+        " }",
     )
     create(
         tmp_path / "{{ cookiecutter.project }}" / "README.md",
