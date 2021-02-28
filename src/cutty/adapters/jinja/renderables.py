@@ -53,7 +53,7 @@ class JinjaRenderableLoader(RenderableLoader):
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,
         )
-        return JinjaRenderableLoader(environment, context_prefix=context_prefix)
+        return cls(environment, context_prefix=context_prefix)
 
     def __init__(
         self,
