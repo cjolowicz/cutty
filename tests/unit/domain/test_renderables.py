@@ -41,11 +41,11 @@ def test_renderable_dict() -> None:
     [
         (
             {"key": 42},
-            {"key": "42"},
+            {"key": 42},
         ),
         (
             [1, 2, "three"],
-            ["1", "2", "three"],
+            [1, 2, "three"],
         ),
     ],
 )
