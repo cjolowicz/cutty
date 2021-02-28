@@ -21,6 +21,7 @@ def template_directory(tmp_path: pathlib.Path) -> pathlib.Path:
         {
           "project": "example",
           "license": ["MIT", "GPL-3.0", "Apache-2.0"],
+          "cli": true,
           "_extensions": ["jinja2_time.TimeExtension"]
         }
         """,
