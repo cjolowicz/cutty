@@ -5,7 +5,6 @@ from collections.abc import Iterator
 from typing import Any
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
-from cutty.domain.files import RenderableFileLoader
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
@@ -98,7 +97,5 @@ def load(path: pathlib.Path) -> Template:
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
     variables = _load_variables(loader, data)
-    fileloader = RenderableFileLoader(loader)
     paths = _load_paths(path)
-    files = fileloader.load(paths)
-    return Template(variables=variables, files=files)
+    return Template(loader=loader, variables=variables, paths=paths)
