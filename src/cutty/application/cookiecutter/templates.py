@@ -34,8 +34,6 @@ def _get_variable_type(value: Any) -> VariableType:
 def _load_variable(
     loader: RenderableLoader, name: str, value: Any
 ) -> VariableSpecification[Renderable[Value]]:
-    variable_type = _get_variable_type(value)
-
     if isinstance(value, list):
         [variable_type] = set(_get_variable_type(choice) for choice in value)
         choices = tuple(loader.load(choice) for choice in value)
@@ -51,7 +49,7 @@ def _load_variable(
     return VariableSpecification(
         name,
         name,
-        variable_type,
+        _get_variable_type(value),
         loader.load(value),
         choices=(),
         interactive=True,
