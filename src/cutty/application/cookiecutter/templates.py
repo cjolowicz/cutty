@@ -5,7 +5,18 @@ import pathlib
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.application.cookiecutter import paths
 from cutty.application.cookiecutter import variables
+from cutty.domain.renderables import Renderable
+from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.templates import Template
+from cutty.domain.variables import Value
+
+
+class CookiecutterRenderableLoader(JinjaRenderableLoader):
+    """Cookiecutter-flavored loader for Jinja templates."""
+
+    def loadscalar(self, value: Value) -> Renderable[Value]:
+        """Load renderable from scalar."""
+        return TrivialRenderable(str(value) if value is not None else None)
 
 
 def load(path: pathlib.Path) -> Template:
@@ -19,7 +30,7 @@ def load(path: pathlib.Path) -> Template:
     assert isinstance(extensions, list) and all(  # noqa: S101
         isinstance(item, str) for item in extensions
     )
-    loader = JinjaRenderableLoader.create(
+    loader = CookiecutterRenderableLoader.create(
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
     return Template(
