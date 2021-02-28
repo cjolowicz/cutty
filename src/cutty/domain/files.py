@@ -1,11 +1,13 @@
 """File abstraction."""
 import abc
 from collections.abc import Iterable
+from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
+from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
@@ -51,3 +53,23 @@ class RenderableFile(Renderable[File]):
         path = self.path.render(variables)
         blob = self.blob.render(variables)
         return File(path, blob)
+
+
+class RenderableFileLoader:
+    """A loader for renderable files."""
+
+    def __init__(self, loader: RenderableLoader) -> None:
+        """Initialize."""
+        self.loader = loader
+
+    def load(self, paths: Iterable[Path]) -> Iterator[RenderableFile]:
+        """Load renderable files."""
+        for path in paths:
+            yield self.loadfile(path)
+
+    def loadfile(self, path: Path) -> RenderableFile:
+        """Load a renderable file."""
+        return RenderableFile(
+            RenderablePath(self.loader.loadtext(part) for part in path.parts),
+            self.loader.get(path),
+        )
