@@ -79,7 +79,11 @@ class RenderableLoader(abc.ABC):
                 (self.loadtext(key), self.load(item)) for key, item in value.items()
             )
 
-        return TrivialRenderable(str(value) if value is not None else None)
+        return self.loadscalar(value)
+
+    def loadscalar(self, value: Value) -> Renderable[Value]:
+        """Load renderable from scalar."""
+        return TrivialRenderable(value)
 
     @abc.abstractmethod
     def loadtext(self, text: str) -> Renderable[str]:
