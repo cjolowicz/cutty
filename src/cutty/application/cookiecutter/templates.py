@@ -8,6 +8,7 @@ from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.templates import Template
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableSpecification
@@ -34,6 +35,16 @@ def _get_variable_type(value: Any) -> VariableType:
 def _load_variable(
     loader: RenderableLoader, name: str, value: Any
 ) -> VariableSpecification[Renderable[Value]]:
+    if name.startswith("_"):
+        return VariableSpecification(
+            name,
+            name,
+            _get_variable_type(value),
+            TrivialRenderable(value),
+            choices=(),
+            interactive=False,
+        )
+
     if isinstance(value, list):
         [variable_type] = set(_get_variable_type(choice) for choice in value)
         choices = tuple(loader.load(choice) for choice in value)
