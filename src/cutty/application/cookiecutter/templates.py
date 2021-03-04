@@ -5,7 +5,7 @@ from collections.abc import Iterator
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.application.cookiecutter import variables
-from cutty.domain.files import RenderableFileLoader
+from cutty.domain.files import DefaultRenderableFileRepository
 from cutty.domain.paths import Path
 from cutty.domain.templates import Template
 
@@ -35,5 +35,5 @@ def load(path: pathlib.Path) -> Template:
     loader = CookiecutterRenderableLoader.create(
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
-    fileloader = RenderableFileLoader(loader, loader)
-    return Template(files=fileloader, variables=variables.load(loader, data))
+    repository = DefaultRenderableFileRepository(loader, loader)
+    return Template(files=repository, variables=variables.load(loader, data))
