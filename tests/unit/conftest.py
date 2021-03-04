@@ -9,6 +9,7 @@ from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import RenderableRepository
 from cutty.domain.renderables import TrivialRenderable
+from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 
@@ -52,9 +53,9 @@ def renderable_repository() -> RenderableRepository:
 
 
 @pytest.fixture
-def specification() -> VariableSpecification[Renderable[str]]:
+def specification() -> Renderable[VariableSpecification[str]]:
     """Fixture with a renderable variable specification."""
-    return VariableSpecification(
+    return RenderableVariableSpecification(
         name="project",
         description="The name of the project",
         type=VariableType.STRING,
