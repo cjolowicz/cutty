@@ -11,6 +11,6 @@ def test_template(
     renderable_repository: RenderableRepository,
 ) -> None:
     """It can be rendered."""
-    loader = RenderableFileLoader(renderable_loader, renderable_repository, paths=[])
+    loader = RenderableFileLoader(renderable_loader, renderable_repository)
     template = Template(files=loader, variables=[])
     template.render(DefaultVariableBuilder())
