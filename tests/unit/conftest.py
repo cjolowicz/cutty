@@ -1,4 +1,5 @@
 """Unit test fixtures for cutty."""
+from collections.abc import Iterator
 from collections.abc import Mapping
 
 import pytest
@@ -34,6 +35,10 @@ class FakeRenderableRepository(RenderableRepository):
         self.renderables = {
             path: TrivialRenderable(text) for path, text in renderables.items()
         }
+
+    def list(self) -> Iterator[Path]:
+        """Iterate over the paths where renderables are located."""
+        return iter(self.renderables.keys())
 
     def get(self, path: Path) -> Renderable[str]:
         """Get renderable by path."""
