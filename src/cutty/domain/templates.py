@@ -6,7 +6,6 @@ from collections.abc import Iterator
 from cutty.domain.files import File
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.paths import EmptyPathComponent
-from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableBuilder
@@ -21,17 +20,15 @@ class Template:
         *,
         loader: RenderableFileLoader,
         variables: Iterable[VariableSpecification[Renderable[Value]]],
-        paths: Iterable[Path],
     ) -> None:
         """Initialize."""
         self.loader = loader
         self.variables = tuple(variables)
-        self.paths = tuple(paths)
 
     def render(self, builder: VariableBuilder) -> Iterator[File]:
         """Render the template."""
         variables = builder.build(self.variables)
 
-        for file in self.loader.load(self.paths):
+        for file in self.loader.load():
             with contextlib.suppress(EmptyPathComponent):
                 yield file.render(variables)
