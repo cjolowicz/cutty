@@ -10,6 +10,7 @@ from cutty.adapters.jinja import extensions
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
@@ -35,7 +36,7 @@ class JinjaRenderable(Renderable[str]):
         return self.template.render(context)
 
 
-class JinjaRenderableLoader(RenderableLoader):
+class JinjaRenderableLoader(RenderableLoader, RenderableRepository):
     """Wrapper for a Jinja environment."""
 
     @classmethod
@@ -45,7 +46,7 @@ class JinjaRenderableLoader(RenderableLoader):
         *,
         context_prefix: Optional[str] = None,
         extra_extensions: Iterable[str] = (),
-    ) -> RenderableLoader:
+    ) -> JinjaRenderableLoader:
         """Create a renderable loader using Jinja."""
         environment = jinja2.Environment(  # noqa: S701
             loader=jinja2.FileSystemLoader(str(directory)),
