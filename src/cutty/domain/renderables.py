@@ -1,6 +1,7 @@
 """Rendering."""
 import abc
 from collections.abc import Iterable
+from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Generic
 from typing import TypeVar
@@ -72,6 +73,10 @@ class RenderableLoader(abc.ABC):
 
 class RenderableRepository(abc.ABC):
     """Load renderables from paths."""
+
+    @abc.abstractmethod
+    def list(self) -> Iterator[Path]:
+        """Iterate over the paths where renderables are located."""
 
     @abc.abstractmethod
     def get(self, path: Path) -> Renderable[str]:
