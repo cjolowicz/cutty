@@ -1,12 +1,24 @@
 """Loading Cookiecutter templates."""
 import json
 import pathlib
+from collections.abc import Iterator
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
-from cutty.application.cookiecutter import paths
 from cutty.application.cookiecutter import variables
 from cutty.domain.files import RenderableFileLoader
+from cutty.domain.paths import Path
 from cutty.domain.templates import Template
+
+
+class CookiecutterRenderableLoader(JinjaRenderableLoader):
+    """Cookiecutter-flavored Jinja loader."""
+
+    def list(self) -> Iterator[Path]:
+        """Iterate over the paths where renderables are located."""
+        for path in super().list():
+            root = path.parts[0]
+            if all(token in root for token in ("{{", "cookiecutter", "}}")):
+                yield path
 
 
 def load(path: pathlib.Path) -> Template:
@@ -20,8 +32,8 @@ def load(path: pathlib.Path) -> Template:
     assert isinstance(extensions, list) and all(  # noqa: S101
         isinstance(item, str) for item in extensions
     )
-    loader = JinjaRenderableLoader.create(
+    loader = CookiecutterRenderableLoader.create(
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
-    fileloader = RenderableFileLoader(loader, loader, paths.load(path))
+    fileloader = RenderableFileLoader(loader, loader)
     return Template(files=fileloader, variables=variables.load(loader, data))
