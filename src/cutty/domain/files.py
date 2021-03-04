@@ -55,7 +55,15 @@ class RenderableFile(Renderable[File]):
         return File(path, blob)
 
 
-class RenderableFileLoader:
+class RenderableFileRepository(abc.ABC):
+    """A repository of renderable files."""
+
+    @abc.abstractmethod
+    def load(self) -> Iterator[RenderableFile]:
+        """Load renderable files."""
+
+
+class RenderableFileLoader(RenderableFileRepository):
     """A loader for renderable files."""
 
     def __init__(self, loader: RenderableLoader, paths: Iterable[Path]) -> None:
