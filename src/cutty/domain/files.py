@@ -71,16 +71,14 @@ class RenderableFileLoader(RenderableFileRepository):
         self,
         loader: RenderableLoader,
         repository: RenderableRepository,
-        paths: Iterable[Path],
     ) -> None:
         """Initialize."""
         self.loader = loader
         self.repository = repository
-        self.paths = tuple(paths)
 
     def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
-        for path in self.paths:
+        for path in self.repository.list():
             yield self.loadfile(path)
 
     def loadfile(self, path: Path) -> Renderable[File]:
