@@ -10,6 +10,7 @@ from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.domain.prompts import PromptVariableBuilder
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
@@ -29,6 +30,12 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
         monkeypatch.setattr("sys.stdin", StringIO(text))
 
     return _factory
+
+
+@pytest.fixture
+def value_loader(renderable_loader: RenderableLoader) -> RenderableValueLoader:
+    """Fixture for a renderable value loader."""
+    return RenderableValueLoader(renderable_loader)
 
 
 def test_noop_prompt(specification: VariableSpecification[Renderable[str]]) -> None:
@@ -86,7 +93,7 @@ def test_choices_prompt_invalid(
 
 
 def test_json_prompt(
-    renderable_loader: RenderableLoader,
+    value_loader: RenderableValueLoader,
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It loads JSON from stdin."""
@@ -96,7 +103,7 @@ def test_json_prompt(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=renderable_loader.load({"name": "example"}),
+        default=value_loader.load({"name": "example"}),
         choices=(),
         interactive=True,
     )
@@ -109,7 +116,7 @@ def test_json_prompt(
 
 
 def test_json_prompt_empty(
-    renderable_loader: RenderableLoader,
+    value_loader: RenderableValueLoader,
     specification: VariableSpecification[Renderable[Value]],
     patch_standard_input: PatchStandardInput,
 ) -> None:
@@ -120,7 +127,7 @@ def test_json_prompt_empty(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=renderable_loader.load({"name": "example"}),
+        default=value_loader.load({"name": "example"}),
         choices=(),
         interactive=True,
     )
@@ -133,7 +140,7 @@ def test_json_prompt_empty(
 
 
 def test_json_prompt_invalid(
-    renderable_loader: RenderableLoader,
+    value_loader: RenderableValueLoader,
     specification: VariableSpecification[Renderable[Value]],
     patch_standard_input: PatchStandardInput,
 ) -> None:
@@ -144,7 +151,7 @@ def test_json_prompt_invalid(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=renderable_loader.load({"name": "example"}),
+        default=value_loader.load({"name": "example"}),
         choices=(),
         interactive=True,
     )
