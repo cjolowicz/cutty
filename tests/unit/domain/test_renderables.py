@@ -5,6 +5,7 @@ from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableDict
 from cutty.domain.renderables import RenderableList
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Value
 
@@ -53,5 +54,6 @@ def test_renderable_loader(
     renderable_loader: RenderableLoader, value: Value, expected: Value
 ) -> None:
     """It returns a renderable that renders as expected."""
-    renderable = renderable_loader.load(value)
+    loader = RenderableValueLoader(renderable_loader)
+    renderable = loader.load(value)
     assert expected == renderable.render([])
