@@ -24,4 +24,4 @@ def load(path: pathlib.Path) -> Template:
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
     fileloader = RenderableFileLoader(loader, paths.load(path))
-    return Template(loader=fileloader, variables=variables.load(loader, data))
+    return Template(files=fileloader, variables=variables.load(loader, data))
