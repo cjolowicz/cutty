@@ -65,26 +65,6 @@ class RenderableDict(Renderable[dict[str, Value]]):
 class RenderableLoader(abc.ABC):
     """Load renderables."""
 
-    def load(self, value: Value) -> Renderable[Value]:
-        """Load renderable."""
-        if isinstance(value, str):
-            return self.loadtext(value)
-
-        if isinstance(value, list):
-            return RenderableList(self.load(item) for item in value)
-
-        if isinstance(value, dict):
-            assert all(isinstance(key, str) for key in value)  # noqa: S101
-            return RenderableDict(
-                (self.loadtext(key), self.load(item)) for key, item in value.items()
-            )
-
-        return self.loadscalar(value)
-
-    def loadscalar(self, value: Value) -> Renderable[Value]:
-        """Load renderable from scalar."""
-        return TrivialRenderable(value)
-
     @abc.abstractmethod
     def loadtext(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
@@ -92,3 +72,32 @@ class RenderableLoader(abc.ABC):
     @abc.abstractmethod
     def get(self, path: Path) -> Renderable[str]:
         """Get renderable by path."""
+
+
+class RenderableValueLoader:
+    """Load renderable values."""
+
+    def __init__(self, loader: RenderableLoader) -> None:
+        """Initialize."""
+        self.loader = loader
+
+    def load(self, value: Value) -> Renderable[Value]:
+        """Load renderable."""
+        if isinstance(value, str):
+            return self.loader.loadtext(value)
+
+        if isinstance(value, list):
+            return RenderableList(self.load(item) for item in value)
+
+        if isinstance(value, dict):
+            assert all(isinstance(key, str) for key in value)  # noqa: S101
+            return RenderableDict(
+                (self.loader.loadtext(key), self.load(item))
+                for key, item in value.items()
+            )
+
+        return self.loadscalar(value)
+
+    def loadscalar(self, value: Value) -> Renderable[Value]:
+        """Load renderable from scalar."""
+        return TrivialRenderable(value)
