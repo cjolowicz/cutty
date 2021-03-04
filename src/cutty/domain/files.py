@@ -59,7 +59,7 @@ class RenderableFileRepository(abc.ABC):
     """A repository of renderable files."""
 
     @abc.abstractmethod
-    def load(self) -> Iterator[RenderableFile]:
+    def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
 
 
@@ -71,12 +71,12 @@ class RenderableFileLoader(RenderableFileRepository):
         self.loader = loader
         self.paths = tuple(paths)
 
-    def load(self) -> Iterator[RenderableFile]:
+    def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
         for path in self.paths:
             yield self.loadfile(path)
 
-    def loadfile(self, path: Path) -> RenderableFile:
+    def loadfile(self, path: Path) -> Renderable[File]:
         """Load a renderable file."""
         return RenderableFile(
             RenderablePath(self.loader.loadtext(part) for part in path.parts),
