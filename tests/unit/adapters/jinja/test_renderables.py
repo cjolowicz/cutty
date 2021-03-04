@@ -7,6 +7,7 @@ import pytest
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.domain.paths import Path
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Variable
 
 
@@ -26,9 +27,15 @@ def save_template(tmp_path: pathlib.Path) -> SaveTemplate:
 
 
 @pytest.fixture
-def loader(tmp_path: pathlib.Path) -> RenderableLoader:
+def loader(tmp_path: pathlib.Path) -> JinjaRenderableLoader:
     """Fixture for a Jinja loader."""
     return JinjaRenderableLoader.create(tmp_path)
+
+
+@pytest.fixture
+def repository(loader: JinjaRenderableLoader) -> RenderableRepository:
+    """Fixture for a renderable repository."""
+    return loader
 
 
 @pytest.fixture
@@ -53,13 +60,13 @@ def test_load_with_context_prefix(cookiecutter_loader: RenderableLoader) -> None
     assert text == "42"
 
 
-def test_get(loader: RenderableLoader, save_template: SaveTemplate) -> None:
+def test_get(repository: RenderableRepository, save_template: SaveTemplate) -> None:
     """It loads a Jinja template."""
     variable = Variable("value", 42)
     path = Path(("template", "module"))
     save_template(path, "{{ value }}")
 
-    renderable = loader.get(path)
+    renderable = repository.get(path)
     text = renderable.render([variable])
 
     assert text == "42"
