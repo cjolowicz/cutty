@@ -3,25 +3,24 @@ import dataclasses
 
 from cutty.domain.renderables import Renderable
 from cutty.domain.varspecs import DefaultVariableBuilder
-from cutty.domain.varspecs import render
 from cutty.domain.varspecs import VariableSpecification
 
 
-def test_render(specification: VariableSpecification[Renderable[str]]) -> None:
+def test_render(specification: Renderable[VariableSpecification[str]]) -> None:
     """It renders the default and choices fields."""
-    renderedspec = render(specification, [])
-    attributes = dataclasses.asdict(renderedspec)
+    rendered = specification.render([])
+    attributes = dataclasses.asdict(rendered)
 
     for name, value in attributes.items():
         if name not in ["default", "choices"]:
             assert value == getattr(specification, name)
 
-    assert renderedspec.default == "example"
-    assert renderedspec.choices == ()
+    assert rendered.default == "example"
+    assert rendered.choices == ()
 
 
 def test_default_variable_builder(
-    specification: VariableSpecification[Renderable[str]],
+    specification: Renderable[VariableSpecification[str]],
 ) -> None:
     """It builds variables using only defaults."""
     builder = DefaultVariableBuilder()
