@@ -8,5 +8,5 @@ from cutty.domain.varspecs import DefaultVariableBuilder
 def test_template(renderable_loader: RenderableLoader) -> None:
     """It can be rendered."""
     loader = RenderableFileLoader(renderable_loader, paths=[])
-    template = Template(loader=loader, variables=[])
+    template = Template(files=loader, variables=[])
     template.render(DefaultVariableBuilder())
