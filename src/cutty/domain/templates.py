@@ -19,7 +19,7 @@ class Template:
         self,
         *,
         files: RenderableFileRepository,
-        variables: Iterable[VariableSpecification[Renderable[Value]]],
+        variables: Iterable[Renderable[VariableSpecification[Value]]],
     ) -> None:
         """Initialize."""
         self.files = files
