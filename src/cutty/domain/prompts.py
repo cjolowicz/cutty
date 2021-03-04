@@ -8,7 +8,6 @@ from cutty.domain.variables import Value
 from cutty.domain.variables import ValueT
 from cutty.domain.variables import ValueT_co
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import render
 from cutty.domain.varspecs import VariableBuilder
 from cutty.domain.varspecs import VariableSpecification
 
@@ -46,13 +45,13 @@ class PromptVariableBuilder(VariableBuilder):
         self.factory = factory
 
     def build(
-        self, specifications: Iterable[VariableSpecification[Renderable[Value]]]
+        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
         variables: list[Variable[Value]] = []
         for specification in specifications:
-            renderedspec = render(specification, variables)
-            prompt = self.factory.create(renderedspec)
+            rendered = specification.render(variables)
+            prompt = self.factory.create(rendered)
             variable = prompt.prompt()
             variables.append(variable)
         return variables
