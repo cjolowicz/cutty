@@ -3,10 +3,19 @@ from typing import Any
 
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
+
+
+class CookiecutterRenderableValueLoader(RenderableValueLoader):
+    """Cookiecutter-flavored loader for renderable values."""
+
+    def loadscalar(self, value: Value) -> Renderable[Value]:
+        """Load renderable from scalar."""
+        return TrivialRenderable(str(value) if value is not None else None)
 
 
 def get_variable_type(value: Any) -> VariableType:
@@ -28,7 +37,7 @@ def get_variable_type(value: Any) -> VariableType:
 
 
 def load_variable(
-    loader: RenderableLoader, name: str, value: Any
+    loader: RenderableValueLoader, name: str, value: Any
 ) -> VariableSpecification[Renderable[Value]]:
     """Load a Cookiecutter variable."""
     if name.startswith("_"):
@@ -67,4 +76,5 @@ def load(
     loader: RenderableLoader, data: dict[str, Any]
 ) -> list[VariableSpecification[Renderable[Value]]]:
     """Load Cookiecutter variables."""
-    return [load_variable(loader, name, value) for name, value in data.items()]
+    value_loader = CookiecutterRenderableValueLoader(loader)
+    return [load_variable(value_loader, name, value) for name, value in data.items()]
