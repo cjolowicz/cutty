@@ -69,6 +69,10 @@ class RenderableLoader(abc.ABC):
     def loadtext(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
 
+
+class RenderableRepository(abc.ABC):
+    """Load renderables from paths."""
+
     @abc.abstractmethod
     def get(self, path: Path) -> Renderable[str]:
         """Get renderable by path."""
