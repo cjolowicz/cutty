@@ -39,19 +39,25 @@ class VariableSpecification(Generic[T_co]):
     interactive: bool
 
 
-def render(
-    specification: VariableSpecification[Renderable[ValueT_co]],
-    variables: Sequence[Variable[Value]],
-) -> VariableSpecification[ValueT_co]:
-    """Render a variable specification."""
-    return VariableSpecification(
-        specification.name,
-        specification.description,
-        specification.type,
-        specification.default.render(variables),
-        tuple(choice.render(variables) for choice in specification.choices),
-        specification.interactive,
-    )
+class RenderableVariableSpecification(
+    Renderable[VariableSpecification[ValueT_co]],
+    VariableSpecification[Renderable[ValueT_co]],
+):
+    """A renderable specification for a template variable."""
+
+    def render(
+        self,
+        variables: Sequence[Variable[Value]],
+    ) -> VariableSpecification[ValueT_co]:
+        """Render a variable specification."""
+        return VariableSpecification(
+            self.name,
+            self.description,
+            self.type,
+            self.default.render(variables),
+            tuple(choice.render(variables) for choice in self.choices),
+            self.interactive,
+        )
 
 
 class VariableBuilder(abc.ABC):
@@ -59,7 +65,7 @@ class VariableBuilder(abc.ABC):
 
     @abc.abstractmethod
     def build(
-        self, specifications: Iterable[VariableSpecification[Renderable[Value]]]
+        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
 
@@ -68,14 +74,12 @@ class DefaultVariableBuilder(VariableBuilder):
     """Build variables using only their defaults."""
 
     def build(
-        self, specifications: Iterable[VariableSpecification[Renderable[Value]]]
+        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
         variables: list[Variable[Value]] = []
         for specification in specifications:
-            variable = Variable(
-                specification.name,
-                specification.default.render(variables),
-            )
+            rendered = specification.render(variables)
+            variable = Variable(rendered.name, rendered.default)
             variables.append(variable)
         return variables
