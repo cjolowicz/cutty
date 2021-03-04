@@ -6,6 +6,7 @@ from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Value
+from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 
@@ -38,10 +39,10 @@ def get_variable_type(value: Any) -> VariableType:
 
 def load_variable(
     loader: RenderableValueLoader, name: str, value: Any
-) -> VariableSpecification[Renderable[Value]]:
+) -> Renderable[VariableSpecification[Value]]:
     """Load a Cookiecutter variable."""
     if name.startswith("_"):
-        return VariableSpecification(
+        return RenderableVariableSpecification(
             name,
             name,
             get_variable_type(value),
@@ -53,7 +54,7 @@ def load_variable(
     if isinstance(value, list):
         [variable_type] = set(get_variable_type(choice) for choice in value)
         choices = tuple(loader.load(choice) for choice in value)
-        return VariableSpecification(
+        return RenderableVariableSpecification(
             name,
             name,
             variable_type,
@@ -62,7 +63,7 @@ def load_variable(
             interactive=True,
         )
 
-    return VariableSpecification(
+    return RenderableVariableSpecification(
         name,
         name,
         get_variable_type(value),
@@ -74,7 +75,7 @@ def load_variable(
 
 def load(
     loader: RenderableLoader, data: dict[str, Any]
-) -> list[VariableSpecification[Renderable[Value]]]:
+) -> list[Renderable[VariableSpecification[Value]]]:
     """Load Cookiecutter variables."""
     value_loader = CookiecutterRenderableValueLoader(loader)
     return [load_variable(value_loader, name, value) for name, value in data.items()]
