@@ -64,8 +64,8 @@ class RenderableFileRepository(abc.ABC):
         """Load renderable files."""
 
 
-class RenderableFileLoader(RenderableFileRepository):
-    """A loader for renderable files."""
+class DefaultRenderableFileRepository(RenderableFileRepository):
+    """A repository of renderable files (default implementation)."""
 
     def __init__(
         self,
