@@ -1,6 +1,7 @@
 """Rendering with Jinja."""
 import pathlib
 from collections.abc import Iterable
+from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Optional
 
@@ -70,6 +71,14 @@ class JinjaRenderableLoader(RenderableLoader, RenderableRepository):
         """Load renderable from text."""
         template = self.environment.from_string(text)
         return JinjaRenderable(template, context_prefix=self.context_prefix)
+
+    def list(self) -> Iterator[Path]:
+        """Iterate over the paths where renderables are located."""
+        names = (
+            self.environment.loader.list_templates()  # type: ignore[no-untyped-call]
+        )
+        for name in names:
+            yield Path.fromparts(name.split("/"))
 
     def get(self, path: Path) -> Renderable[str]:
         """Get renderable by path."""
