@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
@@ -66,9 +67,15 @@ class RenderableFileRepository(abc.ABC):
 class RenderableFileLoader(RenderableFileRepository):
     """A loader for renderable files."""
 
-    def __init__(self, loader: RenderableLoader, paths: Iterable[Path]) -> None:
+    def __init__(
+        self,
+        loader: RenderableLoader,
+        repository: RenderableRepository,
+        paths: Iterable[Path],
+    ) -> None:
         """Initialize."""
         self.loader = loader
+        self.repository = repository
         self.paths = tuple(paths)
 
     def load(self) -> Iterator[Renderable[File]]:
@@ -80,5 +87,5 @@ class RenderableFileLoader(RenderableFileRepository):
         """Load a renderable file."""
         return RenderableFile(
             RenderablePath(self.loader.loadtext(part) for part in path.parts),
-            self.loader.get(path),
+            self.repository.get(path),
         )
