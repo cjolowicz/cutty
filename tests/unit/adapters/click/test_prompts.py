@@ -1,5 +1,4 @@
 """Unit tests for cutty.adapters.click.prompts."""
-import dataclasses
 from io import StringIO
 from typing import Callable
 
@@ -12,9 +11,8 @@ from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
-from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import render
+from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 
@@ -38,9 +36,16 @@ def value_loader(renderable_loader: RenderableLoader) -> RenderableValueLoader:
     return RenderableValueLoader(renderable_loader)
 
 
-def test_noop_prompt(specification: VariableSpecification[Renderable[str]]) -> None:
+def test_noop_prompt() -> None:
     """It uses the default."""
-    specification = dataclasses.replace(specification, interactive=False)
+    specification = RenderableVariableSpecification(
+        name="project",
+        description="The name of the project",
+        type=VariableType.STRING,
+        default=TrivialRenderable("example"),
+        choices=(),
+        interactive=False,
+    )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
@@ -50,7 +55,7 @@ def test_noop_prompt(specification: VariableSpecification[Renderable[str]]) -> N
 
 
 def test_text_prompt(
-    specification: VariableSpecification[Renderable[str]],
+    specification: Renderable[VariableSpecification[str]],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It reads the value from stdin."""
@@ -64,16 +69,17 @@ def test_text_prompt(
     assert variable == Variable("project", "awesome-project")
 
 
-def test_choices_prompt(
-    specification: VariableSpecification[Renderable[str]],
-    patch_standard_input: PatchStandardInput,
-) -> None:
+def test_choices_prompt(patch_standard_input: PatchStandardInput) -> None:
     """It reads a number from stdin."""
     patch_standard_input("2\n")
 
-    specification = dataclasses.replace(
-        specification,
-        choices=(specification.default, TrivialRenderable("awesome-project")),
+    specification = RenderableVariableSpecification(
+        name="project",
+        description="The name of the project",
+        type=VariableType.STRING,
+        default=TrivialRenderable("example"),
+        choices=(TrivialRenderable("example"), TrivialRenderable("awesome-project")),
+        interactive=True,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
@@ -84,10 +90,10 @@ def test_choices_prompt(
 
 
 def test_choices_prompt_invalid(
-    specification: VariableSpecification[Renderable[str]],
+    specification: Renderable[VariableSpecification[str]],
 ) -> None:
     """It raises an exception when there are no choices."""
-    prompt = ChoicePrompt(render(specification, []))
+    prompt = ChoicePrompt(specification.render([]))
     with pytest.raises(ValueError):
         prompt.prompt()
 
@@ -99,7 +105,7 @@ def test_json_prompt(
     """It loads JSON from stdin."""
     patch_standard_input('{"name": "awesome"}\n')
 
-    specification = VariableSpecification(
+    specification = RenderableVariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
@@ -117,13 +123,12 @@ def test_json_prompt(
 
 def test_json_prompt_empty(
     value_loader: RenderableValueLoader,
-    specification: VariableSpecification[Renderable[Value]],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It returns the default."""
     patch_standard_input("\n")
 
-    specification = VariableSpecification(
+    specification = RenderableVariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
@@ -141,13 +146,12 @@ def test_json_prompt_empty(
 
 def test_json_prompt_invalid(
     value_loader: RenderableValueLoader,
-    specification: VariableSpecification[Renderable[Value]],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It prompts again."""
     patch_standard_input('invalid\n"not a dict"\n{}\n')
 
-    specification = VariableSpecification(
+    specification = RenderableVariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
