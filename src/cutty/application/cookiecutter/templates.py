@@ -5,6 +5,7 @@ import pathlib
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.application.cookiecutter import paths
 from cutty.application.cookiecutter import variables
+from cutty.domain.files import RenderableFileLoader
 from cutty.domain.templates import Template
 
 
@@ -23,7 +24,7 @@ def load(path: pathlib.Path) -> Template:
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
     return Template(
-        loader=loader,
+        loader=RenderableFileLoader(loader),
         variables=variables.load(loader, data),
         paths=paths.load(path),
     )
