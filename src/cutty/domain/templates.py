@@ -8,7 +8,6 @@ from cutty.domain.files import RenderableFileLoader
 from cutty.domain.paths import EmptyPathComponent
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
-from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableBuilder
 from cutty.domain.varspecs import VariableSpecification
@@ -20,12 +19,12 @@ class Template:
     def __init__(
         self,
         *,
-        loader: RenderableLoader,
+        loader: RenderableFileLoader,
         variables: Iterable[VariableSpecification[Renderable[Value]]],
         paths: Iterable[Path],
     ) -> None:
         """Initialize."""
-        self.loader = RenderableFileLoader(loader)
+        self.loader = loader
         self.variables = tuple(variables)
         self.paths = tuple(paths)
 
