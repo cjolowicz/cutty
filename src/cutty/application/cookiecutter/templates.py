@@ -23,5 +23,5 @@ def load(path: pathlib.Path) -> Template:
     loader = JinjaRenderableLoader.create(
         path, context_prefix="cookiecutter", extra_extensions=extensions
     )
-    fileloader = RenderableFileLoader(loader, paths.load(path))
+    fileloader = RenderableFileLoader(loader, loader, paths.load(path))
     return Template(files=fileloader, variables=variables.load(loader, data))
