@@ -40,7 +40,7 @@ def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader:
 def test_load(loader: RenderableLoader) -> None:
     """It loads a Jinja template."""
     variable = Variable("value", 42)
-    renderable = loader.load("{{ value }}")
+    renderable = loader.loadtext("{{ value }}")
     text = renderable.render([variable])
     assert text == "42"
 
@@ -48,7 +48,7 @@ def test_load(loader: RenderableLoader) -> None:
 def test_load_with_context_prefix(cookiecutter_loader: RenderableLoader) -> None:
     """It loads a Jinja template with a context prefix."""
     variable = Variable("value", 42)
-    renderable = cookiecutter_loader.load("{{ cookiecutter.value }}")
+    renderable = cookiecutter_loader.loadtext("{{ cookiecutter.value }}")
     text = renderable.render([variable])
     assert text == "42"
 
