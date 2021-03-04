@@ -25,7 +25,7 @@ class FakePromptFactory(PromptFactory):
 
 
 def test_prompt_variable_builder(
-    specification: VariableSpecification[Renderable[str]],
+    specification: Renderable[VariableSpecification[str]],
 ) -> None:
     """It builds variables using the prompts."""
     factory = FakePromptFactory()
