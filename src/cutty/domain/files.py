@@ -79,11 +79,7 @@ class DefaultRenderableFileRepository(RenderableFileRepository):
     def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
         for path in self.repository.list():
-            yield self.loadfile(path)
-
-    def loadfile(self, path: Path) -> Renderable[File]:
-        """Load a renderable file."""
-        return RenderableFile(
-            RenderablePath(self.loader.loadtext(part) for part in path.parts),
-            self.repository.get(path),
-        )
+            yield RenderableFile(
+                RenderablePath(self.loader.loadtext(part) for part in path.parts),
+                self.repository.get(path),
+            )
