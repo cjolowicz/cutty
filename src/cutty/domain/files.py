@@ -38,7 +38,7 @@ class RenderablePath(Renderable[Path]):
 
     def render(self, variables: Sequence[Variable[Value]]) -> Path:
         """Render to a Path."""
-        return Path.fromparts(part.render(variables) for part in self.parts)
+        return Path(part.render(variables) for part in self.parts)
 
 
 class RenderableFile(Renderable[File]):
