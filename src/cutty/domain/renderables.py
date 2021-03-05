@@ -1,12 +1,10 @@
 """Rendering."""
 import abc
 from collections.abc import Iterable
-from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Generic
 from typing import TypeVar
 
-from cutty.domain.paths import Path
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
@@ -69,18 +67,6 @@ class RenderableLoader(abc.ABC):
     @abc.abstractmethod
     def loadtext(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
-
-
-class RenderableRepository(abc.ABC):
-    """Load renderables from paths."""
-
-    @abc.abstractmethod
-    def list(self) -> Iterator[Path]:
-        """Iterate over the paths where renderables are located."""
-
-    @abc.abstractmethod
-    def get(self, path: Path) -> Renderable[str]:
-        """Get renderable by path."""
 
 
 class RenderableValueLoader:
