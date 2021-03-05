@@ -8,9 +8,20 @@ from dataclasses import dataclass
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
-from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
+
+
+class RenderableRepository(abc.ABC):
+    """Load renderables from paths."""
+
+    @abc.abstractmethod
+    def list(self) -> Iterator[Path]:
+        """Iterate over the paths where renderables are located."""
+
+    @abc.abstractmethod
+    def get(self, path: Path) -> Renderable[str]:
+        """Get renderable by path."""
 
 
 @dataclass(frozen=True)
