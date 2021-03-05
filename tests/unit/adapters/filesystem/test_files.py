@@ -8,7 +8,7 @@ from cutty.domain.paths import Path
 
 def test_storage(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
-    path = Path.fromparts(["example", "README.md"])
+    path = Path(["example", "README.md"])
     blob = "# example\n"
     file = File(path, blob)
 
