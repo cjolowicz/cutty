@@ -17,9 +17,8 @@ class Path:
 
     parts: tuple[str, ...]
 
-    @classmethod
-    def fromparts(cls, parts: Iterable[str]) -> Path:
-        """Create a Path from parts."""
+    def __init__(self, parts: Iterable[str]) -> None:
+        """Initialize."""
         parts = tuple(parts)
 
         for part in parts:
@@ -29,4 +28,4 @@ class Path:
             if "/" in part or "\\" in part or part == "." or part == "..":
                 raise InvalidPathComponent(parts, part)
 
-        return cls(parts)
+        object.__setattr__(self, "parts", parts)
