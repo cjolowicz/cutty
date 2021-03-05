@@ -5,9 +5,9 @@ from typing import Callable
 import pytest
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
+from cutty.domain.files import RenderableRepository
 from cutty.domain.paths import Path
 from cutty.domain.renderables import RenderableLoader
-from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Variable
 
 
