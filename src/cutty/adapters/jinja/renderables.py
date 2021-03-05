@@ -8,10 +8,10 @@ from typing import Optional
 import jinja2
 
 from cutty.adapters.jinja import extensions
+from cutty.domain.files import RenderableRepository
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
-from cutty.domain.renderables import RenderableRepository
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
