@@ -78,7 +78,7 @@ class JinjaRenderableLoader(RenderableLoader, RenderableRepository):
             self.environment.loader.list_templates()  # type: ignore[no-untyped-call]
         )
         for name in names:
-            yield Path.fromparts(name.split("/"))
+            yield Path(name.split("/"))
 
     def get(self, path: Path) -> Renderable[str]:
         """Get renderable by path."""
