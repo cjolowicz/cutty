@@ -15,10 +15,10 @@ from cutty.domain.paths import Path
         ["example", "", "README.md"],
     ],
 )
-def test_fromparts_empty(parts: list[str]) -> None:
+def test_empty(parts: list[str]) -> None:
     """It raises an exception."""
     with pytest.raises(EmptyPathComponent):
-        Path.fromparts(parts)
+        Path(parts)
 
 
 @pytest.mark.parametrize(
@@ -30,10 +30,10 @@ def test_fromparts_empty(parts: list[str]) -> None:
         ["example", ".", "README.md"],
     ],
 )
-def test_fromparts_invalid(parts: list[str]) -> None:
+def test_invalid(parts: list[str]) -> None:
     """It raises an exception."""
     with pytest.raises(InvalidPathComponent):
-        Path.fromparts(parts)
+        Path(parts)
 
 
 @pytest.mark.parametrize(
@@ -44,6 +44,6 @@ def test_fromparts_invalid(parts: list[str]) -> None:
         ["example", "README.md"],
     ],
 )
-def test_fromparts_valid(parts: list[str]) -> None:
+def test_valid(parts: list[str]) -> None:
     """It returns a Path instance."""
-    assert Path.fromparts(parts)
+    assert Path(parts)
