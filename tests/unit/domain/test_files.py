@@ -19,7 +19,7 @@ def test_renderable_path(parts: list[str]) -> None:
     """It renders to a Path."""
     renderable = RenderablePath([TrivialRenderable(part) for part in parts])
     path = renderable.render([])
-    assert path == Path.fromparts(parts)
+    assert path == Path(parts)
 
 
 @pytest.mark.parametrize(
@@ -35,5 +35,5 @@ def test_renderable_file(parts: list[str], text: str) -> None:
     renderableblob = TrivialRenderable(text)
     renderable = RenderableFile(renderablepath, renderableblob)
     file = renderable.render([])
-    assert file.path == Path.fromparts(parts)
+    assert file.path == Path(parts)
     assert file.blob == text
