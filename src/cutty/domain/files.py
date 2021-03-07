@@ -80,7 +80,7 @@ class DefaultRenderableFileRepository(RenderableFileRepository):
 
     def __init__(
         self,
-        loader: RenderableLoader,
+        loader: RenderableLoader[str],
         repository: RenderableRepository,
     ) -> None:
         """Initialize."""
@@ -91,6 +91,6 @@ class DefaultRenderableFileRepository(RenderableFileRepository):
         """Load renderable files."""
         for path in self.repository.list():
             yield RenderableFile(
-                RenderablePath(self.loader.loadtext(part) for part in path.parts),
+                RenderablePath(self.loader.load(part) for part in path.parts),
                 self.repository.get(path),
             )

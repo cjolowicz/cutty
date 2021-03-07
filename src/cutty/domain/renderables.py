@@ -9,6 +9,7 @@ from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
 
+T = TypeVar("T")
 T_co = TypeVar("T_co", covariant=True)
 
 
@@ -18,6 +19,14 @@ class Renderable(abc.ABC, Generic[T_co]):
     @abc.abstractmethod
     def render(self, variables: Sequence[Variable[Value]]) -> T_co:
         """Render the object."""
+
+
+class RenderableLoader(abc.ABC, Generic[T]):
+    """Something that can load renderables."""
+
+    @abc.abstractmethod
+    def load(self, value: T) -> Renderable[T]:
+        """Load the renderable."""
 
 
 class TrivialRenderable(Renderable[T_co]):
@@ -61,25 +70,17 @@ class RenderableDict(Renderable[dict[str, Value]]):
         }
 
 
-class RenderableLoader(abc.ABC):
-    """Load renderables."""
-
-    @abc.abstractmethod
-    def loadtext(self, text: str) -> Renderable[str]:
-        """Load renderable from text."""
-
-
 class RenderableValueLoader:
     """Load renderable values."""
 
-    def __init__(self, loader: RenderableLoader) -> None:
+    def __init__(self, loader: RenderableLoader[str]) -> None:
         """Initialize."""
         self.loader = loader
 
     def load(self, value: Value) -> Renderable[Value]:
         """Load renderable."""
         if isinstance(value, str):
-            return self.loader.loadtext(value)
+            return self.loader.load(value)
 
         if isinstance(value, list):
             return RenderableList(self.load(item) for item in value)
@@ -87,8 +88,7 @@ class RenderableValueLoader:
         if isinstance(value, dict):
             assert all(isinstance(key, str) for key in value)  # noqa: S101
             return RenderableDict(
-                (self.loader.loadtext(key), self.load(item))
-                for key, item in value.items()
+                (self.loader.load(key), self.load(item)) for key, item in value.items()
             )
 
         return self.loadscalar(value)

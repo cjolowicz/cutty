@@ -51,7 +51,7 @@ def test_renderable_dict() -> None:
     ],
 )
 def test_renderable_loader(
-    renderable_loader: RenderableLoader, value: Value, expected: Value
+    renderable_loader: RenderableLoader[str], value: Value, expected: Value
 ) -> None:
     """It returns a renderable that renders as expected."""
     loader = RenderableValueLoader(renderable_loader)
