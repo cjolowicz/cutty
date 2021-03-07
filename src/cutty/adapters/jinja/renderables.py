@@ -1,14 +1,12 @@
 """Rendering with Jinja."""
 import pathlib
 from collections.abc import Iterable
-from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Optional
 
 import jinja2
 
 from cutty.adapters.jinja import extensions
-from cutty.domain.files import RenderableRepository
 from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
@@ -37,7 +35,7 @@ class JinjaRenderable(Renderable[str]):
         return self.template.render(context)
 
 
-class JinjaRenderableLoader(RenderableLoader[str], RenderableRepository):
+class JinjaRenderableLoader(RenderableLoader[str]):
     """Wrapper for a Jinja environment."""
 
     @classmethod
@@ -67,21 +65,7 @@ class JinjaRenderableLoader(RenderableLoader[str], RenderableRepository):
         self.environment = environment
         self.context_prefix = context_prefix
 
-    def load(self, text: str) -> Renderable[str]:
+    def load(self, text: str, path: Optional[Path] = None) -> Renderable[str]:
         """Load renderable from text."""
         template = self.environment.from_string(text)
-        return JinjaRenderable(template, context_prefix=self.context_prefix)
-
-    def list(self) -> Iterator[Path]:
-        """Iterate over the paths where renderables are located."""
-        names = (
-            self.environment.loader.list_templates()  # type: ignore[no-untyped-call]
-        )
-        for name in names:
-            yield Path(name.split("/"))
-
-    def get(self, path: Path) -> Renderable[str]:
-        """Get renderable by path."""
-        name = "/".join(path.parts)
-        template = self.environment.get_template(name)
         return JinjaRenderable(template, context_prefix=self.context_prefix)
