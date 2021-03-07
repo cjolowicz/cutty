@@ -7,7 +7,7 @@ from cutty.domain.varspecs import DefaultVariableBuilder
 
 
 def test_template(
-    renderable_loader: RenderableLoader,
+    renderable_loader: RenderableLoader[str],
     renderable_repository: RenderableRepository,
 ) -> None:
     """It can be rendered."""

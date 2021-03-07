@@ -31,7 +31,7 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
 
 
 @pytest.fixture
-def value_loader(renderable_loader: RenderableLoader) -> RenderableValueLoader:
+def value_loader(renderable_loader: RenderableLoader[str]) -> RenderableValueLoader:
     """Fixture for a renderable value loader."""
     return RenderableValueLoader(renderable_loader)
 

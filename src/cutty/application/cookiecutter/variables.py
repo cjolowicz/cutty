@@ -74,7 +74,7 @@ def load_variable(
 
 
 def load(
-    loader: RenderableLoader, data: dict[str, Any]
+    loader: RenderableLoader[str], data: dict[str, Any]
 ) -> list[Renderable[VariableSpecification[Value]]]:
     """Load Cookiecutter variables."""
     value_loader = CookiecutterRenderableValueLoader(loader)

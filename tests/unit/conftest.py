@@ -14,16 +14,16 @@ from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 
 
-class TrivialRenderableLoader(RenderableLoader):
+class TrivialRenderableLoader(RenderableLoader[str]):
     """Fake a renderable loader using TrivialRenderable."""
 
-    def loadtext(self, text: str) -> Renderable[str]:
+    def load(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
         return TrivialRenderable(text)
 
 
 @pytest.fixture
-def renderable_loader() -> RenderableLoader:
+def renderable_loader() -> RenderableLoader[str]:
     """Fixture for a renderable loader."""
     return TrivialRenderableLoader()
 
