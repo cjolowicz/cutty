@@ -1,5 +1,6 @@
 """File abstraction."""
 import abc
+import enum
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
@@ -12,11 +13,19 @@ from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
 
+class Mode(enum.Flag):
+    """File mode."""
+
+    DEFAULT = 0
+    EXECUTABLE = enum.auto()
+
+
 @dataclass(frozen=True)
 class File:
     """A file in memory."""
 
     path: Path
+    mode: Mode
     blob: str
 
 
@@ -51,16 +60,17 @@ class RenderablePath(Renderable[Path]):
 class RenderableFile(Renderable[File]):
     """A renderable file."""
 
-    def __init__(self, path: RenderablePath, blob: Renderable[str]) -> None:
+    def __init__(self, path: RenderablePath, mode: Mode, blob: Renderable[str]) -> None:
         """Initialize."""
         self.path = path
+        self.mode = mode
         self.blob = blob
 
     def render(self, variables: Sequence[Variable[Value]]) -> File:
         """Render to a file."""
         path = self.path.render(variables)
         blob = self.blob.render(variables)
-        return File(path, blob)
+        return File(path, self.mode, blob)
 
 
 class RenderableFileLoader(RenderableLoader[File]):
@@ -74,7 +84,7 @@ class RenderableFileLoader(RenderableLoader[File]):
         """Load renderable file."""
         path = RenderablePath(self.loader.load(part) for part in file.path.parts)
         blob = self.loader.load(file.blob)
-        return RenderableFile(path, blob)
+        return RenderableFile(path, file.mode, blob)
 
 
 class RenderableFileRepository(abc.ABC):
