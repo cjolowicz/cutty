@@ -12,24 +12,20 @@ from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 
 
-class RenderableRepository(abc.ABC):
-    """Load renderables from paths."""
-
-    @abc.abstractmethod
-    def list(self) -> Iterator[Path]:
-        """Iterate over the paths where renderables are located."""
-
-    @abc.abstractmethod
-    def get(self, path: Path) -> Renderable[str]:
-        """Get renderable by path."""
-
-
 @dataclass(frozen=True)
 class File:
     """A file in memory."""
 
     path: Path
     blob: str
+
+
+class FileRepository(abc.ABC):
+    """A repository of files."""
+
+    @abc.abstractmethod
+    def load(self) -> Iterator[File]:
+        """Iterate over the files in the repository."""
 
 
 class FileStorage(abc.ABC):
@@ -67,30 +63,33 @@ class RenderableFile(Renderable[File]):
         return File(path, blob)
 
 
+class RenderableFileLoader(RenderableLoader[File]):
+    """A loader for renderable files."""
+
+    def __init__(self, loader: RenderableLoader[str]) -> None:
+        """Initialize."""
+        self.loader = loader
+
+    def load(self, file: File) -> Renderable[File]:
+        """Load renderable file."""
+        path = RenderablePath(self.loader.load(part) for part in file.path.parts)
+        blob = self.loader.load(file.blob)
+        return RenderableFile(path, blob)
+
+
 class RenderableFileRepository(abc.ABC):
     """A repository of renderable files."""
 
-    @abc.abstractmethod
-    def load(self) -> Iterator[Renderable[File]]:
-        """Load renderable files."""
-
-
-class DefaultRenderableFileRepository(RenderableFileRepository):
-    """A repository of renderable files (default implementation)."""
-
     def __init__(
         self,
-        loader: RenderableLoader[str],
-        repository: RenderableRepository,
+        repository: FileRepository,
+        loader: RenderableLoader[File],
     ) -> None:
         """Initialize."""
-        self.loader = loader
         self.repository = repository
+        self.loader = loader
 
     def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
-        for path in self.repository.list():
-            yield RenderableFile(
-                RenderablePath(self.loader.load(part) for part in path.parts),
-                self.repository.get(path),
-            )
+        for file in self.repository.load():
+            yield self.loader.load(file)
