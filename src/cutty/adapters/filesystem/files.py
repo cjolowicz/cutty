@@ -1,8 +1,38 @@
 """Filesystem implementation of the cutty.domain.files abstractions."""
 import pathlib
+from collections.abc import Iterator
 
 from cutty.domain.files import File
+from cutty.domain.files import FileRepository
 from cutty.domain.files import FileStorage
+from cutty.domain.paths import Path
+
+
+def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
+    """Iterate over the files under the path."""
+    if path.is_file():
+        yield path
+    elif path.is_dir():
+        for entry in path.iterdir():
+            yield from walkfiles(entry)
+    else:  # pragma: no cover
+        raise RuntimeError(f"{path}: not a regular file or directory")
+
+
+class FilesystemFileRepository(FileRepository):
+    """Filesystem-based repository of files."""
+
+    def __init__(self, path: pathlib.Path, *, relative_to: pathlib.Path) -> None:
+        """Initialize."""
+        self.path = path
+        self.root = relative_to
+
+    def load(self) -> Iterator[File]:
+        """Iterate over the files in the filesystem."""
+        for path in walkfiles(self.path):
+            blob = path.read_text()
+            path = path.relative_to(self.root)
+            yield File(Path(path.parts), blob)
 
 
 class FilesystemFileStorage(FileStorage):

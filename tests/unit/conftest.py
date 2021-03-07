@@ -1,11 +1,6 @@
 """Unit test fixtures for cutty."""
-from collections.abc import Iterator
-from collections.abc import Mapping
-
 import pytest
 
-from cutty.domain.files import RenderableRepository
-from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
@@ -26,30 +21,6 @@ class TrivialRenderableLoader(RenderableLoader[str]):
 def renderable_loader() -> RenderableLoader[str]:
     """Fixture for a renderable loader."""
     return TrivialRenderableLoader()
-
-
-class FakeRenderableRepository(RenderableRepository):
-    """Fake renderable repository."""
-
-    def __init__(self, renderables: Mapping[Path, str]) -> None:
-        """Initialize."""
-        self.renderables = {
-            path: TrivialRenderable(text) for path, text in renderables.items()
-        }
-
-    def list(self) -> Iterator[Path]:
-        """Iterate over the paths where renderables are located."""
-        return iter(self.renderables.keys())
-
-    def get(self, path: Path) -> Renderable[str]:
-        """Get renderable by path."""
-        return self.renderables[path]
-
-
-@pytest.fixture
-def renderable_repository() -> RenderableRepository:
-    """Fixture for a renderable loader."""
-    return FakeRenderableRepository({})
 
 
 @pytest.fixture
