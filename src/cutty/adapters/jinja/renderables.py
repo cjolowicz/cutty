@@ -37,7 +37,7 @@ class JinjaRenderable(Renderable[str]):
         return self.template.render(context)
 
 
-class JinjaRenderableLoader(RenderableLoader, RenderableRepository):
+class JinjaRenderableLoader(RenderableLoader[str], RenderableRepository):
     """Wrapper for a Jinja environment."""
 
     @classmethod
@@ -67,7 +67,7 @@ class JinjaRenderableLoader(RenderableLoader, RenderableRepository):
         self.environment = environment
         self.context_prefix = context_prefix
 
-    def loadtext(self, text: str) -> Renderable[str]:
+    def load(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
         template = self.environment.from_string(text)
         return JinjaRenderable(template, context_prefix=self.context_prefix)

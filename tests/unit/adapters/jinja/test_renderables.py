@@ -39,23 +39,23 @@ def repository(loader: JinjaRenderableLoader) -> RenderableRepository:
 
 
 @pytest.fixture
-def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader:
+def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader[str]:
     """Fixture for a Jinja loader with a cookiecutter prefix."""
     return JinjaRenderableLoader.create(tmp_path, context_prefix="cookiecutter")
 
 
-def test_load(loader: RenderableLoader) -> None:
+def test_load(loader: RenderableLoader[str]) -> None:
     """It loads a Jinja template."""
     variable = Variable("value", 42)
-    renderable = loader.loadtext("{{ value }}")
+    renderable = loader.load("{{ value }}")
     text = renderable.render([variable])
     assert text == "42"
 
 
-def test_load_with_context_prefix(cookiecutter_loader: RenderableLoader) -> None:
+def test_load_with_context_prefix(cookiecutter_loader: RenderableLoader[str]) -> None:
     """It loads a Jinja template with a context prefix."""
     variable = Variable("value", 42)
-    renderable = cookiecutter_loader.loadtext("{{ cookiecutter.value }}")
+    renderable = cookiecutter_loader.load("{{ cookiecutter.value }}")
     text = renderable.render([variable])
     assert text == "42"
 
