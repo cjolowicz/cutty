@@ -1,6 +1,7 @@
 """Unit tests for cutty.domain.files."""
 import pytest
 
+from cutty.domain.files import Mode
 from cutty.domain.files import RenderableFile
 from cutty.domain.files import RenderablePath
 from cutty.domain.paths import Path
@@ -33,7 +34,8 @@ def test_renderable_file(parts: list[str], text: str) -> None:
     """It renders to a File."""
     renderablepath = RenderablePath([TrivialRenderable(part) for part in parts])
     renderableblob = TrivialRenderable(text)
-    renderable = RenderableFile(renderablepath, renderableblob)
+    renderable = RenderableFile(renderablepath, Mode.DEFAULT, renderableblob)
     file = renderable.render([])
     assert file.path == Path(parts)
+    assert file.mode == Mode.DEFAULT
     assert file.blob == text
