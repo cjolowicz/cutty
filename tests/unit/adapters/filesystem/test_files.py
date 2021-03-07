@@ -8,7 +8,7 @@ from cutty.adapters.filesystem.files import FilesystemFileRepository
 from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.domain.files import File
 from cutty.domain.files import Mode
-from cutty.domain.paths import Path
+from cutty.domain.files import Path
 
 
 def test_storage(tmp_path: pathlib.Path) -> None:

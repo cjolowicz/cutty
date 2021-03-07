@@ -7,7 +7,7 @@ from cutty.domain.files import File
 from cutty.domain.files import FileRepository
 from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
-from cutty.domain.paths import Path
+from cutty.domain.files import Path
 
 
 def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
