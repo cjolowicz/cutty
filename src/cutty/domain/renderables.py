@@ -70,7 +70,7 @@ class RenderableDict(Renderable[dict[str, Value]]):
         }
 
 
-class RenderableValueLoader:
+class RenderableValueLoader(RenderableLoader[Value]):
     """Load renderable values."""
 
     def __init__(self, loader: RenderableLoader[str]) -> None:

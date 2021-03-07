@@ -38,7 +38,7 @@ def get_variable_type(value: Any) -> VariableType:
 
 
 def load_variable(
-    loader: RenderableValueLoader, name: str, value: Any
+    loader: RenderableLoader[Value], name: str, value: Any
 ) -> Renderable[VariableSpecification[Value]]:
     """Load a Cookiecutter variable."""
     if name.startswith("_"):

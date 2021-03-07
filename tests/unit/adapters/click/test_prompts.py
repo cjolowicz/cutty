@@ -11,6 +11,7 @@ from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.renderables import TrivialRenderable
+from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
@@ -31,7 +32,7 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
 
 
 @pytest.fixture
-def value_loader(renderable_loader: RenderableLoader[str]) -> RenderableValueLoader:
+def value_loader(renderable_loader: RenderableLoader[str]) -> RenderableLoader[Value]:
     """Fixture for a renderable value loader."""
     return RenderableValueLoader(renderable_loader)
 
@@ -99,7 +100,7 @@ def test_choices_prompt_invalid(
 
 
 def test_json_prompt(
-    value_loader: RenderableValueLoader,
+    value_loader: RenderableLoader[Value],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It loads JSON from stdin."""
@@ -122,7 +123,7 @@ def test_json_prompt(
 
 
 def test_json_prompt_empty(
-    value_loader: RenderableValueLoader,
+    value_loader: RenderableLoader[Value],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It returns the default."""
@@ -145,7 +146,7 @@ def test_json_prompt_empty(
 
 
 def test_json_prompt_invalid(
-    value_loader: RenderableValueLoader,
+    value_loader: RenderableLoader[Value],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It prompts again."""
