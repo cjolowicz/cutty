@@ -1,11 +1,56 @@
 """Unit tests for cutty.domain.files."""
 import pytest
 
+from cutty.domain.files import EmptyPathComponent
+from cutty.domain.files import InvalidPathComponent
 from cutty.domain.files import Mode
+from cutty.domain.files import Path
 from cutty.domain.files import RenderableFile
 from cutty.domain.files import RenderablePath
-from cutty.domain.paths import Path
 from cutty.domain.renderables import TrivialRenderable
+
+
+@pytest.mark.parametrize(
+    "parts",
+    [
+        [""],
+        ["example", ""],
+        ["", "example"],
+        ["example", "", "README.md"],
+    ],
+)
+def test_empty(parts: list[str]) -> None:
+    """It raises an exception."""
+    with pytest.raises(EmptyPathComponent):
+        Path(parts)
+
+
+@pytest.mark.parametrize(
+    "parts",
+    [
+        ["/", "boot", "vmlinuz"],
+        ["\\", "system32", "hal.dll"],
+        ["..", "README.md"],
+        ["example", ".", "README.md"],
+    ],
+)
+def test_invalid(parts: list[str]) -> None:
+    """It raises an exception."""
+    with pytest.raises(InvalidPathComponent):
+        Path(parts)
+
+
+@pytest.mark.parametrize(
+    "parts",
+    [
+        [],
+        ["README.md"],
+        ["example", "README.md"],
+    ],
+)
+def test_valid(parts: list[str]) -> None:
+    """It returns a Path instance."""
+    assert Path(parts)
 
 
 @pytest.mark.parametrize(

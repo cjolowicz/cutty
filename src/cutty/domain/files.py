@@ -6,11 +6,38 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from cutty.domain.paths import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
+
+
+class EmptyPathComponent(Exception):
+    """The rendered path has an empty component."""
+
+
+class InvalidPathComponent(Exception):
+    """The rendered path has an invalid component."""
+
+
+@dataclass(frozen=True)
+class Path:
+    """The location of a file within a template or project."""
+
+    parts: tuple[str, ...]
+
+    def __init__(self, parts: Iterable[str]) -> None:
+        """Initialize."""
+        parts = tuple(parts)
+
+        for part in parts:
+            if not part:
+                raise EmptyPathComponent(parts, part)
+
+            if "/" in part or "\\" in part or part == "." or part == "..":
+                raise InvalidPathComponent(parts, part)
+
+        object.__setattr__(self, "parts", parts)
 
 
 class Mode(enum.Flag):
