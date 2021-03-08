@@ -11,13 +11,15 @@ from cutty.domain.variables import Variable
 @pytest.fixture
 def loader(tmp_path: pathlib.Path) -> JinjaRenderableLoader:
     """Fixture for a Jinja loader."""
-    return JinjaRenderableLoader.create(tmp_path)
+    return JinjaRenderableLoader.create(searchpath=[tmp_path])
 
 
 @pytest.fixture
 def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader[str]:
     """Fixture for a Jinja loader with a cookiecutter prefix."""
-    return JinjaRenderableLoader.create(tmp_path, context_prefix="cookiecutter")
+    return JinjaRenderableLoader.create(
+        searchpath=[tmp_path], context_prefix="cookiecutter"
+    )
 
 
 def test_load(loader: RenderableLoader[str]) -> None:
