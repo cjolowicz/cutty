@@ -41,14 +41,16 @@ class JinjaRenderableLoader(RenderableLoader[str]):
     @classmethod
     def create(
         cls,
-        directory: pathlib.Path,
         *,
+        searchpath: Iterable[pathlib.Path],
         context_prefix: Optional[str] = None,
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderableLoader:
         """Create a renderable loader using Jinja."""
         environment = jinja2.Environment(  # noqa: S701
-            loader=jinja2.FileSystemLoader(str(directory)),
+            loader=jinja2.FileSystemLoader(
+                [str(directory) for directory in searchpath]
+            ),
             extensions=extensions.load(extra=extra_extensions),
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,

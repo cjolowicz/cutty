@@ -33,9 +33,12 @@ def load(path: pathlib.Path) -> Template:
         isinstance(item, str) for item in extensions
     )
 
-    files = FilesystemFileRepository(find_template_dir(path), relative_to=path)
+    template_dir = find_template_dir(path)
+    files = FilesystemFileRepository(template_dir, relative_to=path)
     loader = JinjaRenderableLoader.create(
-        path, context_prefix="cookiecutter", extra_extensions=extensions
+        searchpath=[template_dir],
+        context_prefix="cookiecutter",
+        extra_extensions=extensions,
     )
     fileloader = RenderableFileLoader(loader)
     repository = RenderableFileRepository(files, fileloader)
