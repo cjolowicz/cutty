@@ -8,12 +8,6 @@ from cutty.util.bus import Context
 from cutty.util.bus import Event
 
 
-@pytest.fixture
-def bus() -> Bus:
-    """Return an event bus."""
-    return Bus()
-
-
 def test_events_publish(bus: Bus) -> None:
     """It invokes the handler."""
     events = []
