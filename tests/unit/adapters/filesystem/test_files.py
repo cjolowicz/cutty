@@ -39,3 +39,15 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     repository = FilesystemFileRepository(tmp_path / "main.py", relative_to=tmp_path)
     [file] = repository.load()
     assert file.mode & Mode.EXECUTABLE
+
+
+def test_temporary() -> None:
+    """It creates temporary storage."""
+    file = File(Path(["file"]), Mode.DEFAULT, "")
+
+    with FilesystemFileStorage.temporary() as storage:
+        storage.store(file)
+        path = storage.resolve(file.path)
+        assert path.exists()
+
+    assert not path.exists()
