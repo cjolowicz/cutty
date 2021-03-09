@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 
 from cutty.domain.files import File
-from cutty.domain.files import RenderableFileRenderer
+from cutty.domain.files import renderfiles
 from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableBuilder
@@ -34,5 +34,4 @@ class TemplateRenderer:
     def render(self, template: Template) -> Iterator[File]:
         """Render the template."""
         variables = self.builder.build(template.variables)
-        renderer = RenderableFileRenderer(template.files)
-        yield from renderer.render(variables)
+        yield from renderfiles(template.files, variables)
