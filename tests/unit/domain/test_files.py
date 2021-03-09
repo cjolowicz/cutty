@@ -2,11 +2,14 @@
 import pytest
 
 from cutty.domain.files import EmptyPathComponent
+from cutty.domain.files import File
 from cutty.domain.files import InvalidPathComponent
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
 from cutty.domain.files import RenderableFile
+from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderablePath
+from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
 
 
@@ -84,3 +87,20 @@ def test_renderable_file(parts: list[str], text: str) -> None:
     assert file.path == Path(parts)
     assert file.mode == Mode.DEFAULT
     assert file.blob == text
+
+
+@pytest.mark.parametrize(
+    "parts,text",
+    [
+        (["README.md"], "# example\n"),
+        (["example", "README.md"], "# example\n"),
+    ],
+)
+def test_renderable_file_loader(
+    parts: list[str], text: str, renderable_loader: RenderableLoader[str]
+) -> None:
+    """It loads renderable files."""
+    loader = RenderableFileLoader(renderable_loader)
+    file = File(Path(parts), Mode.DEFAULT, text)
+    renderable = loader.load(file)
+    assert file == renderable.render([])
