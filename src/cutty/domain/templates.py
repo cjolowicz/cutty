@@ -1,10 +1,9 @@
 """Templates."""
-import contextlib
 from collections.abc import Iterable
 from collections.abc import Iterator
 
-from cutty.domain.files import EmptyPathComponent
 from cutty.domain.files import File
+from cutty.domain.files import RenderableFileRenderer
 from cutty.domain.files import RenderableFileRepository
 from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
@@ -28,7 +27,5 @@ class Template:
     def render(self, builder: VariableBuilder) -> Iterator[File]:
         """Render the template."""
         variables = builder.build(self.variables)
-
-        for file in self.files.load():
-            with contextlib.suppress(EmptyPathComponent):
-                yield file.render(variables)
+        renderer = RenderableFileRenderer(self.files)
+        yield from renderer.render(variables)
