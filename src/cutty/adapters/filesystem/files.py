@@ -47,8 +47,12 @@ class FilesystemFileStorage(FileStorage):
 
     def store(self, file: File) -> None:
         """Commit a file to storage."""
-        path = self.root.joinpath(*file.path.parts)
+        path = self.resolve(file.path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(file.blob)
         if file.mode & Mode.EXECUTABLE:
             path.chmod(path.stat().st_mode | 0o111)
+
+    def resolve(self, path: Path) -> pathlib.Path:
+        """Resolve the path to a filesystem location."""
+        return self.root.joinpath(*path.parts)
