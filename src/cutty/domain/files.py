@@ -1,5 +1,6 @@
 """File abstraction."""
 import abc
+import contextlib
 import enum
 from collections.abc import Iterable
 from collections.abc import Iterator
@@ -130,3 +131,17 @@ class RenderableFileRepository(abc.ABC):
         """Load renderable files."""
         for file in self.repository.load():
             yield self.loader.load(file)
+
+
+class RenderableFileRenderer:
+    """Render files."""
+
+    def __init__(self, repository: RenderableFileRepository) -> None:
+        """Initialize."""
+        self.repository = repository
+
+    def render(self, variables: Sequence[Variable[Value]]) -> Iterator[File]:
+        """Render the template."""
+        for file in self.repository.load():
+            with contextlib.suppress(EmptyPathComponent):
+                yield file.render(variables)
