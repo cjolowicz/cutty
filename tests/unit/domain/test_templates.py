@@ -1,10 +1,9 @@
 """Unit tests for cutty.domain.templates."""
 from cutty.domain.files import loadfiles
 from cutty.domain.files import RenderableFileLoader
+from cutty.domain.files import renderfiles
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
-from cutty.domain.templates import TemplateRenderer
-from cutty.domain.varspecs import DefaultVariableBuilder
 
 
 def test_template(
@@ -13,5 +12,4 @@ def test_template(
     """It can be rendered."""
     files = loadfiles([], RenderableFileLoader(renderable_loader))
     template = Template(files=files, variables=[])
-    renderer = TemplateRenderer(builder=DefaultVariableBuilder())
-    renderer.render(template)
+    renderfiles(template.files, [])
