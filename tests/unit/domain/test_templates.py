@@ -1,6 +1,6 @@
 """Unit tests for cutty.domain.templates."""
+from cutty.domain.files import loadfiles
 from cutty.domain.files import RenderableFileLoader
-from cutty.domain.files import RenderableFileRepository
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateRenderer
@@ -11,7 +11,7 @@ def test_template(
     renderable_loader: RenderableLoader[str],
 ) -> None:
     """It can be rendered."""
-    repository = RenderableFileRepository([], RenderableFileLoader(renderable_loader))
-    template = Template(files=repository, variables=[])
+    files = loadfiles([], RenderableFileLoader(renderable_loader))
+    template = Template(files=files, variables=[])
     renderer = TemplateRenderer(builder=DefaultVariableBuilder())
     renderer.render(template)
