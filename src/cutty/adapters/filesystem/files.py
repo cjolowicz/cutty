@@ -1,6 +1,8 @@
 """Filesystem implementation of the cutty.domain.files abstractions."""
+import contextlib
 import os
 import pathlib
+import tempfile
 from collections.abc import Iterator
 
 from cutty.domain.files import File
@@ -56,3 +58,11 @@ class FilesystemFileStorage(FileStorage):
     def resolve(self, path: Path) -> pathlib.Path:
         """Resolve the path to a filesystem location."""
         return self.root.joinpath(*path.parts)
+
+    @classmethod
+    @contextlib.contextmanager
+    def temporary(cls) -> Iterator[FilesystemFileStorage]:
+        """Return temporary storage."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = pathlib.Path(tmpdir)
+            yield cls(path)
