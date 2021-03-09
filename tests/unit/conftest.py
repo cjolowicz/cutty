@@ -7,6 +7,13 @@ from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
+from cutty.util.bus import Bus
+
+
+@pytest.fixture
+def bus() -> Bus:
+    """Return an event bus."""
+    return Bus()
 
 
 class TrivialRenderableLoader(RenderableLoader[str]):
