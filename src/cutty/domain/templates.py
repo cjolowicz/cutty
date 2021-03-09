@@ -4,7 +4,6 @@ from collections.abc import Iterator
 
 from cutty.domain.files import File
 from cutty.domain.files import RenderableFileRenderer
-from cutty.domain.files import RenderableFileRepository
 from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableBuilder
@@ -17,7 +16,7 @@ class Template:
     def __init__(
         self,
         *,
-        files: RenderableFileRepository,
+        files: Iterable[Renderable[File]],
         variables: Iterable[Renderable[VariableSpecification[Value]]],
     ) -> None:
         """Initialize."""
