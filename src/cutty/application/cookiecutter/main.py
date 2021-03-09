@@ -4,8 +4,8 @@ from pathlib import Path
 from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.application.cookiecutter import templates
+from cutty.domain.files import renderfiles
 from cutty.domain.prompts import PromptVariableBuilder
-from cutty.domain.templates import TemplateRenderer
 
 
 def main(directory: Path) -> None:
@@ -13,6 +13,6 @@ def main(directory: Path) -> None:
     template = templates.load(directory)
     builder = PromptVariableBuilder(ClickPromptFactory())
     storage = FilesystemFileStorage(Path.cwd())
-    renderer = TemplateRenderer(builder=builder)
-    for file in renderer.render(template):
+    variables = builder.build(template.variables)
+    for file in renderfiles(template.files, variables):
         storage.store(file)
