@@ -107,22 +107,12 @@ class RenderableFileLoader(RenderableLoader[File]):
         return RenderableFile(path, file.mode, blob)
 
 
-class RenderableFileRepository(Iterable[Renderable[File]]):
-    """A repository of renderable files."""
-
-    def __init__(
-        self,
-        files: Iterable[File],
-        loader: RenderableLoader[File],
-    ) -> None:
-        """Initialize."""
-        self.files = files
-        self.loader = loader
-
-    def __iter__(self) -> Iterator[Renderable[File]]:
-        """Load renderable files."""
-        for file in self.files:
-            yield self.loader.load(file)
+def loadfiles(
+    files: Iterable[File], loader: RenderableLoader[File]
+) -> Iterator[Renderable[File]]:
+    """Load renderable files."""
+    for file in files:
+        yield loader.load(file)
 
 
 def renderfiles(
