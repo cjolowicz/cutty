@@ -2,11 +2,11 @@
 import os
 import pathlib
 import tempfile
+from collections.abc import Iterable
 from collections.abc import Iterator
 
 from cutty.compat.contextlib import contextmanager
 from cutty.domain.files import File
-from cutty.domain.files import FileRepository
 from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
@@ -23,7 +23,7 @@ def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
         raise RuntimeError(f"{path}: not a regular file or directory")
 
 
-class FilesystemFileRepository(FileRepository):
+class FilesystemFileRepository(Iterable[File]):
     """Filesystem-based repository of files."""
 
     def __init__(self, path: pathlib.Path, *, relative_to: pathlib.Path) -> None:
@@ -31,7 +31,7 @@ class FilesystemFileRepository(FileRepository):
         self.path = path
         self.root = relative_to
 
-    def load(self) -> Iterator[File]:
+    def __iter__(self) -> Iterator[File]:
         """Iterate over the files in the filesystem."""
         for path in walkfiles(self.path):
             blob = path.read_text()

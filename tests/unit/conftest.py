@@ -1,13 +1,8 @@
 """Unit test fixtures for cutty."""
-from collections.abc import Callable
-from collections.abc import Iterable
-from collections.abc import Iterator
 from collections.abc import Sequence
 
 import pytest
 
-from cutty.domain.files import File
-from cutty.domain.files import FileRepository
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
@@ -64,28 +59,3 @@ def specification() -> Renderable[VariableSpecification[str]]:
         choices=(),
         interactive=True,
     )
-
-
-class FakeFileRepository(FileRepository):
-    """A fake repository of files."""
-
-    def __init__(self, files: Iterable[File]) -> None:
-        """Initialize."""
-        self.files = files
-
-    def load(self) -> Iterator[File]:
-        """Iterate over the files in the repository."""
-        return iter(self.files)
-
-
-CreateFileRepository = Callable[[Iterable[File]], FileRepository]
-
-
-@pytest.fixture
-def create_file_repository() -> CreateFileRepository:
-    """Factory fixture for a file repository."""
-
-    def _factory(files: Iterable[File]) -> FileRepository:
-        return FakeFileRepository(files)
-
-    return _factory
