@@ -2,7 +2,6 @@
 import os
 import pathlib
 import tempfile
-from collections.abc import Iterable
 from collections.abc import Iterator
 
 from cutty.compat.contextlib import contextmanager
@@ -23,21 +22,13 @@ def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
         raise RuntimeError(f"{path}: not a regular file or directory")
 
 
-class FilesystemFileRepository(Iterable[File]):
-    """Filesystem-based repository of files."""
-
-    def __init__(self, path: pathlib.Path, *, relative_to: pathlib.Path) -> None:
-        """Initialize."""
-        self.path = path
-        self.root = relative_to
-
-    def __iter__(self) -> Iterator[File]:
-        """Iterate over the files in the filesystem."""
-        for path in walkfiles(self.path):
-            blob = path.read_text()
-            mode = Mode.EXECUTABLE if os.access(path, os.X_OK) else Mode.DEFAULT
-            path = path.relative_to(self.root)
-            yield File(Path(path.parts), mode, blob)
+def listfiles(root: pathlib.Path, *, relative_to: pathlib.Path) -> Iterator[File]:
+    """Iterate over the files in the filesystem."""
+    for path in walkfiles(root):
+        blob = path.read_text()
+        mode = Mode.EXECUTABLE if os.access(path, os.X_OK) else Mode.DEFAULT
+        path = path.relative_to(relative_to)
+        yield File(Path(path.parts), mode, blob)
 
 
 class FilesystemFileStorage(FileStorage):

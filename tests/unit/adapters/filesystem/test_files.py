@@ -4,8 +4,8 @@ import platform
 
 import pytest
 
-from cutty.adapters.filesystem.files import FilesystemFileRepository
 from cutty.adapters.filesystem.files import FilesystemFileStorage
+from cutty.adapters.filesystem.files import listfiles
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
@@ -36,7 +36,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
 
-    [file] = FilesystemFileRepository(tmp_path / "main.py", relative_to=tmp_path)
+    [file] = listfiles(tmp_path / "main.py", relative_to=tmp_path)
     assert file.mode & Mode.EXECUTABLE
 
 
