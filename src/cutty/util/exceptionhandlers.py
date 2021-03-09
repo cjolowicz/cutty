@@ -98,8 +98,8 @@ associative, this makes exception handlers with composition a simple monoid_.
 .. _monoid: https://en.wikipedia.org/wiki/Monoid
 """
 import contextlib
+from collections.abc import Callable
 from types import TracebackType
-from typing import Callable
 from typing import Generic
 from typing import get_type_hints
 from typing import Optional
