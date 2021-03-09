@@ -1,6 +1,6 @@
 """Unit tests for cutty.adapters.jinja.extensions."""
 import string
-from typing import Callable
+from collections.abc import Callable
 
 import jinja2.ext
 import pytest

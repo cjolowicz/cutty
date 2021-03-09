@@ -1,6 +1,6 @@
 """Unit tests for cutty.adapters.click.prompts."""
+from collections.abc import Callable
 from io import StringIO
-from typing import Callable
 
 import pytest
 
