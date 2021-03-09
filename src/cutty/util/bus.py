@@ -50,12 +50,13 @@ copy complete.
 from collections import defaultdict
 from collections.abc import Iterator
 from contextlib import AbstractContextManager
-from contextlib import contextmanager
 from contextlib import ExitStack
 from typing import Any
 from typing import get_type_hints
 from typing import Protocol
 from typing import TypeVar
+
+from cutty.compat.contextlib import contextmanager
 
 
 __all__ = [
