@@ -2,6 +2,7 @@
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 import pytest
 
@@ -10,6 +11,8 @@ from cutty.domain.files import FileRepository
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
+from cutty.domain.variables import Value
+from cutty.domain.variables import Variable
 from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
@@ -22,18 +25,32 @@ def bus() -> Bus:
     return Bus()
 
 
-class TrivialRenderableLoader(RenderableLoader[str]):
-    """Fake a renderable loader using TrivialRenderable."""
+class FormatRenderable(Renderable[str]):
+    """A renderable using Python format strings."""
+
+    def __init__(self, text: str) -> None:
+        """Initialize."""
+        self.text = text
+
+    def render(self, variables: Sequence[Variable[Value]]) -> str:
+        """Render the text."""
+        return self.text.format_map(
+            {variable.name: variable.value for variable in variables}
+        )
+
+
+class FormatRenderableLoader(RenderableLoader[str]):
+    """Renderable loader using FormatRenderable."""
 
     def load(self, text: str) -> Renderable[str]:
         """Load renderable from text."""
-        return TrivialRenderable(text)
+        return FormatRenderable(text)
 
 
 @pytest.fixture
 def renderable_loader() -> RenderableLoader[str]:
     """Fixture for a renderable loader."""
-    return TrivialRenderableLoader()
+    return FormatRenderableLoader()
 
 
 @pytest.fixture
