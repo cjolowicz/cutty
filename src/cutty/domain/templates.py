@@ -13,9 +13,11 @@ class Template:
     def __init__(
         self,
         *,
-        files: Iterable[Renderable[File]],
         variables: Iterable[Renderable[VariableSpecification[Value]]],
+        files: Iterable[Renderable[File]],
+        hooks: Iterable[Renderable[File]] = (),
     ) -> None:
         """Initialize."""
-        self.files = files
         self.variables = tuple(variables)
+        self.files = files
+        self.hooks = hooks
