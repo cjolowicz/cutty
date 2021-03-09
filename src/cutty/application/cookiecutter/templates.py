@@ -2,7 +2,7 @@
 import json
 import pathlib
 
-from cutty.adapters.filesystem.files import FilesystemFileRepository
+from cutty.adapters.filesystem.files import listfiles
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.application.cookiecutter import variables
 from cutty.domain.files import loadfiles
@@ -34,7 +34,7 @@ def load(path: pathlib.Path) -> Template:
     )
 
     template_dir = find_template_dir(path)
-    files = FilesystemFileRepository(template_dir, relative_to=path)
+    files = listfiles(template_dir, relative_to=path)
     loader = JinjaRenderableLoader.create(
         searchpath=[template_dir],
         context_prefix="cookiecutter",
