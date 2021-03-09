@@ -5,6 +5,7 @@ from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderableFileRepository
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
+from cutty.domain.templates import TemplateRenderer
 from cutty.domain.varspecs import DefaultVariableBuilder
 
 
@@ -18,4 +19,5 @@ def test_template(
         RenderableFileLoader(renderable_loader),
     )
     template = Template(files=repository, variables=[])
-    template.render(DefaultVariableBuilder())
+    renderer = TemplateRenderer(builder=DefaultVariableBuilder())
+    renderer.render(template)

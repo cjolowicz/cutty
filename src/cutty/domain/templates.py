@@ -24,8 +24,16 @@ class Template:
         self.files = files
         self.variables = tuple(variables)
 
-    def render(self, builder: VariableBuilder) -> Iterator[File]:
+
+class TemplateRenderer:
+    """A renderer for templates."""
+
+    def __init__(self, *, builder: VariableBuilder) -> None:
+        """Initialize."""
+        self.builder = builder
+
+    def render(self, template: Template) -> Iterator[File]:
         """Render the template."""
-        variables = builder.build(self.variables)
-        renderer = RenderableFileRenderer(self.files)
+        variables = self.builder.build(template.variables)
+        renderer = RenderableFileRenderer(template.files)
         yield from renderer.render(variables)
