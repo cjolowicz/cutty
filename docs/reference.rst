@@ -118,13 +118,6 @@ cutty.application.cookiecutter.variables
    :members:
 
 
-cutty.application.cookiecutter.paths
-------------------------------------
-
-.. automodule:: cutty.application.cookiecutter.paths
-   :members:
-
-
 cutty.application.cookiecutter.main
 -----------------------------------
 
