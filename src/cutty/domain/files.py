@@ -133,7 +133,7 @@ class RenderableFileRenderer:
         self.files = files
 
     def render(self, variables: Sequence[Variable[Value]]) -> Iterator[File]:
-        """Render the template."""
+        """Render the files."""
         for file in self.files:
             with contextlib.suppress(EmptyPathComponent):
                 yield file.render(variables)
