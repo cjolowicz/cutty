@@ -1,5 +1,6 @@
 """Unit tests for cutty.domain.files."""
 import pytest
+from tests.unit.conftest import CreateFileRepository
 
 from cutty.domain.files import EmptyPathComponent
 from cutty.domain.files import File
@@ -8,6 +9,7 @@ from cutty.domain.files import Mode
 from cutty.domain.files import Path
 from cutty.domain.files import RenderableFile
 from cutty.domain.files import RenderableFileLoader
+from cutty.domain.files import RenderableFileRepository
 from cutty.domain.files import RenderablePath
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
@@ -103,4 +105,27 @@ def test_renderable_file_loader(
     loader = RenderableFileLoader(renderable_loader)
     file = File(Path(parts), Mode.DEFAULT, text)
     renderable = loader.load(file)
+    assert file == renderable.render([])
+
+
+@pytest.mark.parametrize(
+    "parts,text",
+    [
+        (["README.md"], "# example\n"),
+        (["example", "README.md"], "# example\n"),
+    ],
+)
+def test_renderable_file_repository(
+    parts: list[str],
+    text: str,
+    renderable_loader: RenderableLoader[str],
+    create_file_repository: CreateFileRepository,
+) -> None:
+    """It loads renderable files."""
+    file = File(Path(parts), Mode.DEFAULT, text)
+    repository = RenderableFileRepository(
+        create_file_repository([file]),
+        RenderableFileLoader(renderable_loader),
+    )
+    [renderable] = repository.load()
     assert file == renderable.render([])
