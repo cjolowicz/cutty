@@ -125,15 +125,10 @@ class RenderableFileRepository(Iterable[Renderable[File]]):
             yield self.loader.load(file)
 
 
-class RenderableFileRenderer:
-    """Render files."""
-
-    def __init__(self, files: Iterable[Renderable[File]]) -> None:
-        """Initialize."""
-        self.files = files
-
-    def render(self, variables: Sequence[Variable[Value]]) -> Iterator[File]:
-        """Render the files."""
-        for file in self.files:
-            with contextlib.suppress(EmptyPathComponent):
-                yield file.render(variables)
+def renderfiles(
+    files: Iterable[Renderable[File]], variables: Sequence[Variable[Value]]
+) -> Iterator[File]:
+    """Render the files, skipping those with empty path components."""
+    for file in files:
+        with contextlib.suppress(EmptyPathComponent):
+            yield file.render(variables)

@@ -8,9 +8,9 @@ from cutty.domain.files import Mode
 from cutty.domain.files import Path
 from cutty.domain.files import RenderableFile
 from cutty.domain.files import RenderableFileLoader
-from cutty.domain.files import RenderableFileRenderer
 from cutty.domain.files import RenderableFileRepository
 from cutty.domain.files import RenderablePath
+from cutty.domain.files import renderfiles
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Variable
@@ -148,8 +148,7 @@ def test_renderable_file_renderer(
         [file],
         RenderableFileLoader(renderable_loader),
     )
-    renderer = RenderableFileRenderer(repository)
-    [rendered] = renderer.render([])
+    [rendered] = renderfiles(repository, [])
     assert file == rendered
 
 
@@ -163,6 +162,5 @@ def test_renderable_file_renderer_empty_path(
         [file],
         RenderableFileLoader(renderable_loader),
     )
-    renderer = RenderableFileRenderer(repository)
-    rendered = renderer.render([variable])
+    rendered = renderfiles(repository, [variable])
     assert not list(rendered)
