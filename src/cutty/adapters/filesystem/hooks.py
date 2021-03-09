@@ -1,5 +1,4 @@
 """Filesystem implementation of the cutty.domain.hooks abstractions."""
-import contextlib
 import pathlib
 import platform
 import subprocess  # noqa: S404
@@ -7,6 +6,7 @@ import sys
 from collections.abc import Iterator
 
 from cutty.adapters.filesystem.files import FilesystemFileStorage
+from cutty.compat.contextlib import contextmanager
 from cutty.domain.hooks import Hook
 from cutty.domain.hooks import HookExecutor
 
@@ -23,7 +23,7 @@ class FilesystemHookExecutor(HookExecutor):
         with self.store(hook) as path:
             self.run(path)
 
-    @contextlib.contextmanager
+    @contextmanager
     def store(self, hook: Hook) -> Iterator[pathlib.Path]:
         """Store the hook in the filesystem."""
         with FilesystemFileStorage.temporary() as storage:
