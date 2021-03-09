@@ -5,8 +5,8 @@ import pathlib
 from cutty.adapters.filesystem.files import FilesystemFileRepository
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.application.cookiecutter import variables
+from cutty.domain.files import loadfiles
 from cutty.domain.files import RenderableFileLoader
-from cutty.domain.files import RenderableFileRepository
 from cutty.domain.templates import Template
 
 
@@ -41,6 +41,8 @@ def load(path: pathlib.Path) -> Template:
         extra_extensions=extensions,
     )
     fileloader = RenderableFileLoader(loader)
-    repository = RenderableFileRepository(files, fileloader)
 
-    return Template(files=repository, variables=variables.load(loader, data))
+    return Template(
+        files=loadfiles(files, fileloader),
+        variables=variables.load(loader, data),
+    )

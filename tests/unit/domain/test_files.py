@@ -4,11 +4,11 @@ import pytest
 from cutty.domain.files import EmptyPathComponent
 from cutty.domain.files import File
 from cutty.domain.files import InvalidPathComponent
+from cutty.domain.files import loadfiles
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
 from cutty.domain.files import RenderableFile
 from cutty.domain.files import RenderableFileLoader
-from cutty.domain.files import RenderableFileRepository
 from cutty.domain.files import RenderablePath
 from cutty.domain.files import renderfiles
 from cutty.domain.renderables import RenderableLoader
@@ -116,17 +116,15 @@ def test_renderable_file_loader(
         (["example", "README.md"], "# example\n"),
     ],
 )
-def test_renderable_file_repository(
+def test_loadfiles(
     parts: list[str],
     text: str,
     renderable_loader: RenderableLoader[str],
 ) -> None:
     """It loads renderable files."""
     file = File(Path(parts), Mode.DEFAULT, text)
-    [renderable] = RenderableFileRepository(
-        [file],
-        RenderableFileLoader(renderable_loader),
-    )
+    loader = RenderableFileLoader(renderable_loader)
+    [renderable] = loadfiles([file], loader)
     assert file == renderable.render([])
 
 
@@ -144,10 +142,8 @@ def test_renderable_file_renderer(
 ) -> None:
     """It renders files."""
     file = File(Path(parts), Mode.DEFAULT, text)
-    repository = RenderableFileRepository(
-        [file],
-        RenderableFileLoader(renderable_loader),
-    )
+    loader = RenderableFileLoader(renderable_loader)
+    repository = loadfiles([file], loader)
     [rendered] = renderfiles(repository, [])
     assert file == rendered
 
@@ -158,9 +154,7 @@ def test_renderable_file_renderer_empty_path(
     """It skips files with an empty path segment."""
     variable = Variable("project", "")
     file = File(Path(["{project}", "README.md"]), Mode.DEFAULT, "text")
-    repository = RenderableFileRepository(
-        [file],
-        RenderableFileLoader(renderable_loader),
-    )
+    loader = RenderableFileLoader(renderable_loader)
+    repository = loadfiles([file], loader)
     rendered = renderfiles(repository, [variable])
     assert not list(rendered)
