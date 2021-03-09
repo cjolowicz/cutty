@@ -123,11 +123,10 @@ def test_renderable_file_repository(
 ) -> None:
     """It loads renderable files."""
     file = File(Path(parts), Mode.DEFAULT, text)
-    repository = RenderableFileRepository(
+    [renderable] = RenderableFileRepository(
         [file],
         RenderableFileLoader(renderable_loader),
     )
-    [renderable] = repository.load()
     assert file == renderable.render([])
 
 
