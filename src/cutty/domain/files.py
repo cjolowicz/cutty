@@ -115,7 +115,7 @@ class RenderableFileLoader(RenderableLoader[File]):
         return RenderableFile(path, file.mode, blob)
 
 
-class RenderableFileRepository(abc.ABC):
+class RenderableFileRepository:
     """A repository of renderable files."""
 
     def __init__(
