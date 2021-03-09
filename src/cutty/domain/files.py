@@ -57,14 +57,6 @@ class File:
     blob: str
 
 
-class FileRepository(abc.ABC):
-    """A repository of files."""
-
-    @abc.abstractmethod
-    def load(self) -> Iterator[File]:
-        """Iterate over the files in the repository."""
-
-
 class FileStorage(abc.ABC):
     """Any store for files."""
 
@@ -120,16 +112,16 @@ class RenderableFileRepository:
 
     def __init__(
         self,
-        repository: FileRepository,
+        files: Iterable[File],
         loader: RenderableLoader[File],
     ) -> None:
         """Initialize."""
-        self.repository = repository
+        self.files = files
         self.loader = loader
 
     def load(self) -> Iterator[Renderable[File]]:
         """Load renderable files."""
-        for file in self.repository.load():
+        for file in self.files:
             yield self.loader.load(file)
 
 

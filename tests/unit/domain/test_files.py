@@ -1,6 +1,5 @@
 """Unit tests for cutty.domain.files."""
 import pytest
-from tests.unit.conftest import CreateFileRepository
 
 from cutty.domain.files import EmptyPathComponent
 from cutty.domain.files import File
@@ -121,12 +120,11 @@ def test_renderable_file_repository(
     parts: list[str],
     text: str,
     renderable_loader: RenderableLoader[str],
-    create_file_repository: CreateFileRepository,
 ) -> None:
     """It loads renderable files."""
     file = File(Path(parts), Mode.DEFAULT, text)
     repository = RenderableFileRepository(
-        create_file_repository([file]),
+        [file],
         RenderableFileLoader(renderable_loader),
     )
     [renderable] = repository.load()
@@ -144,12 +142,11 @@ def test_renderable_file_renderer(
     parts: list[str],
     text: str,
     renderable_loader: RenderableLoader[str],
-    create_file_repository: CreateFileRepository,
 ) -> None:
     """It renders files."""
     file = File(Path(parts), Mode.DEFAULT, text)
     repository = RenderableFileRepository(
-        create_file_repository([file]),
+        [file],
         RenderableFileLoader(renderable_loader),
     )
     renderer = RenderableFileRenderer(repository)
@@ -159,13 +156,12 @@ def test_renderable_file_renderer(
 
 def test_renderable_file_renderer_empty_path(
     renderable_loader: RenderableLoader[str],
-    create_file_repository: CreateFileRepository,
 ) -> None:
     """It skips files with an empty path segment."""
     variable = Variable("project", "")
     file = File(Path(["{project}", "README.md"]), Mode.DEFAULT, "text")
     repository = RenderableFileRepository(
-        create_file_repository([file]),
+        [file],
         RenderableFileLoader(renderable_loader),
     )
     renderer = RenderableFileRenderer(repository)

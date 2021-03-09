@@ -36,8 +36,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
 
-    repository = FilesystemFileRepository(tmp_path / "main.py", relative_to=tmp_path)
-    [file] = repository.load()
+    [file] = FilesystemFileRepository(tmp_path / "main.py", relative_to=tmp_path)
     assert file.mode & Mode.EXECUTABLE
 
 
