@@ -35,6 +35,7 @@ def load(path: pathlib.Path) -> Template:
 
     template_dir = find_template_dir(path)
     files = listfiles(template_dir, relative_to=path)
+    hooks = listfiles(path / "hooks", relative_to=path)  # TODO: filter
     loader = JinjaRenderableLoader.create(
         searchpath=[template_dir],
         context_prefix="cookiecutter",
@@ -43,6 +44,7 @@ def load(path: pathlib.Path) -> Template:
     fileloader = RenderableFileLoader(loader)
 
     return Template(
-        files=loadfiles(files, fileloader),
         variables=variables.load(loader, data),
+        files=loadfiles(files, fileloader),
+        hooks=loadfiles(hooks, fileloader),
     )
