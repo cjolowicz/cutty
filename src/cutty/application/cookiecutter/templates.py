@@ -35,6 +35,7 @@ def load(path: pathlib.Path) -> Template:
 
     template_dir = find_template_dir(path)
     files = loadbuffers(template_dir, relative_to=path)
+    # FIXME: will crash later if the template has no hooks directory
     hooks = loadbuffers(path / "hooks", relative_to=path)  # TODO: filter
     loader = JinjaRenderableLoader.create(
         searchpath=[template_dir],
