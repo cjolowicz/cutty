@@ -112,6 +112,10 @@ class Filesystem(abc.ABC):
         """Return True if this is a symbolic link."""
 
     @abc.abstractmethod
+    def readlink(self, path: Path) -> Path:
+        """Return the target of a symbolic link."""
+
+    @abc.abstractmethod
     def access(self, path: Path, mode: Access) -> bool:
         """Return True if the user can access the path."""
 
@@ -158,6 +162,11 @@ class FilesystemPath(Path):
     def is_symlink(self) -> bool:
         """Return True if this is a symbolic link."""
         return self._filesystem.is_symlink(self)
+
+    def readlink(self) -> FilesystemPath:
+        """Return the target of a symbolic link."""
+        path = self._filesystem.readlink(self)
+        return self._copy(path)
 
     def access(self, mode: Access) -> bool:
         """Return True if the user can access the path."""
