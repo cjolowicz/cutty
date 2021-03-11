@@ -9,7 +9,7 @@ from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
-from cutty.domain.files import Path
+from cutty.domain.filesystem import Path
 
 
 def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
@@ -33,7 +33,7 @@ def loadbuffers(root: pathlib.Path, *, relative_to: pathlib.Path) -> Iterator[Bu
         blob = path.read_text()
         mode = Mode.EXECUTABLE if os.access(path, os.X_OK) else Mode.DEFAULT
         path = path.relative_to(relative_to)
-        yield Buffer(Path(path.parts), mode, blob)
+        yield Buffer(Path(*path.parts), mode, blob)
 
 
 class FilesystemFileStorage(FileStorage):
