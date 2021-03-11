@@ -12,4 +12,4 @@ def test_load(template_directory: pathlib.Path) -> None:
     variables = DefaultVariableBuilder().build(template.variables)
     [readme] = renderfiles(template.files, variables)
     assert readme.path.parts == ("example", "README.md")
-    assert readme.blob == "# example\n"
+    assert readme.read() == "# example\n"

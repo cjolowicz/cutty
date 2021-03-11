@@ -56,6 +56,10 @@ class File:
     mode: Mode
     blob: str
 
+    def read(self) -> str:
+        """Return the file contents."""
+        return self.blob
+
 
 class FileStorage(abc.ABC):
     """Any store for files."""
@@ -103,7 +107,7 @@ class RenderableFileLoader(RenderableLoader[File]):
     def load(self, file: File) -> Renderable[File]:
         """Load renderable file."""
         path = RenderablePath(self.loader.load(part) for part in file.path.parts)
-        blob = self.loader.load(file.blob)
+        blob = self.loader.load(file.read())
         return RenderableFile(path, file.mode, blob)
 
 
