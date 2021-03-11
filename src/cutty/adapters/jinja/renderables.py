@@ -7,7 +7,7 @@ from typing import Optional
 import jinja2
 
 from cutty.adapters.jinja import extensions
-from cutty.domain.files import Path
+from cutty.domain.filesystem import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value

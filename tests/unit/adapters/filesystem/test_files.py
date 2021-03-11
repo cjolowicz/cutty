@@ -8,12 +8,12 @@ from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.adapters.filesystem.files import loadbuffers
 from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
-from cutty.domain.files import Path
+from cutty.domain.filesystem import Path
 
 
 def test_storage(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
-    path = Path(["example", "README.md"])
+    path = Path("example", "README.md")
     blob = "# example\n"
     file = Buffer(path, Mode.DEFAULT, blob)
 
@@ -29,7 +29,7 @@ def test_storage(tmp_path: pathlib.Path) -> None:
 )
 def test_executable(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
-    path = Path(["main.py"])
+    path = Path("main.py")
     blob = "#!/usr/bin/env python"
     file = Buffer(path, Mode.EXECUTABLE, blob)
 
@@ -42,7 +42,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
 
 def test_temporary() -> None:
     """It creates temporary storage."""
-    file = Buffer(Path(["file"]), Mode.DEFAULT, "")
+    file = Buffer(Path("file"), Mode.DEFAULT, "")
 
     with FilesystemFileStorage.temporary() as storage:
         storage.store(file)
