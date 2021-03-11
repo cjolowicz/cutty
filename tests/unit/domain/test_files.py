@@ -1,13 +1,13 @@
 """Unit tests for cutty.domain.files."""
 import pytest
 
+from cutty.domain.files import Buffer
 from cutty.domain.files import EmptyPathComponent
-from cutty.domain.files import File
 from cutty.domain.files import InvalidPathComponent
 from cutty.domain.files import loadfiles
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
-from cutty.domain.files import RenderableFile
+from cutty.domain.files import RenderableBuffer
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderablePath
 from cutty.domain.files import renderfiles
@@ -81,11 +81,11 @@ def test_renderable_path(parts: list[str]) -> None:
         (["example", "README.md"], "# example\n"),
     ],
 )
-def test_renderable_file(parts: list[str], text: str) -> None:
-    """It renders to a File."""
+def test_renderable_buffer(parts: list[str], text: str) -> None:
+    """It renders to a Buffer."""
     renderablepath = RenderablePath([TrivialRenderable(part) for part in parts])
     renderableblob = TrivialRenderable(text)
-    renderable = RenderableFile(renderablepath, Mode.DEFAULT, renderableblob)
+    renderable = RenderableBuffer(renderablepath, Mode.DEFAULT, renderableblob)
     file = renderable.render([])
     assert file.path == Path(parts)
     assert file.mode == Mode.DEFAULT
@@ -104,7 +104,7 @@ def test_renderable_file_loader(
 ) -> None:
     """It loads renderable files."""
     loader = RenderableFileLoader(renderable_loader)
-    file = File(Path(parts), Mode.DEFAULT, text)
+    file = Buffer(Path(parts), Mode.DEFAULT, text)
     renderable = loader.load(file)
     assert file == renderable.render([])
 
@@ -122,7 +122,7 @@ def test_loadfiles(
     renderable_loader: RenderableLoader[str],
 ) -> None:
     """It loads renderable files."""
-    file = File(Path(parts), Mode.DEFAULT, text)
+    file = Buffer(Path(parts), Mode.DEFAULT, text)
     loader = RenderableFileLoader(renderable_loader)
     [renderable] = loadfiles([file], loader)
     assert file == renderable.render([])
@@ -141,7 +141,7 @@ def test_renderable_file_renderer(
     renderable_loader: RenderableLoader[str],
 ) -> None:
     """It renders files."""
-    file = File(Path(parts), Mode.DEFAULT, text)
+    file = Buffer(Path(parts), Mode.DEFAULT, text)
     loader = RenderableFileLoader(renderable_loader)
     repository = loadfiles([file], loader)
     [rendered] = renderfiles(repository, [])
@@ -153,7 +153,7 @@ def test_renderable_file_renderer_empty_path(
 ) -> None:
     """It skips files with an empty path segment."""
     variable = Variable("project", "")
-    file = File(Path(["{project}", "README.md"]), Mode.DEFAULT, "text")
+    file = Buffer(Path(["{project}", "README.md"]), Mode.DEFAULT, "text")
     loader = RenderableFileLoader(renderable_loader)
     repository = loadfiles([file], loader)
     rendered = renderfiles(repository, [variable])
