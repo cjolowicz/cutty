@@ -48,17 +48,45 @@ class Mode(enum.Flag):
     EXECUTABLE = enum.auto()
 
 
+class File(abc.ABC):
+    """File abstraction."""
+
+    @property
+    @abc.abstractmethod
+    def path(self) -> Path:
+        """Return the file path."""
+
+    @property
+    @abc.abstractmethod
+    def mode(self) -> Mode:
+        """Return the file mode."""
+
+    @abc.abstractmethod
+    def read(self) -> str:
+        """Return the file contents."""
+
+
 @dataclass(frozen=True)
-class File:
+class Buffer(File):
     """A file in memory."""
 
-    path: Path
-    mode: Mode
-    blob: str
+    _path: Path
+    _mode: Mode
+    _blob: str
+
+    @property
+    def path(self) -> Path:
+        """Return the file path."""
+        return self._path
+
+    @property
+    def mode(self) -> Mode:
+        """Return the file mode."""
+        return self._mode
 
     def read(self) -> str:
         """Return the file contents."""
-        return self.blob
+        return self._blob
 
 
 class FileStorage(abc.ABC):
@@ -81,8 +109,8 @@ class RenderablePath(Renderable[Path]):
         return Path(part.render(variables) for part in self.parts)
 
 
-class RenderableFile(Renderable[File]):
-    """A renderable file."""
+class RenderableBuffer(Renderable[Buffer]):
+    """A renderable buffer."""
 
     def __init__(self, path: RenderablePath, mode: Mode, blob: Renderable[str]) -> None:
         """Initialize."""
@@ -90,11 +118,11 @@ class RenderableFile(Renderable[File]):
         self.mode = mode
         self.blob = blob
 
-    def render(self, variables: Sequence[Variable[Value]]) -> File:
+    def render(self, variables: Sequence[Variable[Value]]) -> Buffer:
         """Render to a file."""
         path = self.path.render(variables)
         blob = self.blob.render(variables)
-        return File(path, self.mode, blob)
+        return Buffer(path, self.mode, blob)
 
 
 class RenderableFileLoader(RenderableLoader[File]):
@@ -108,7 +136,7 @@ class RenderableFileLoader(RenderableLoader[File]):
         """Load renderable file."""
         path = RenderablePath(self.loader.load(part) for part in file.path.parts)
         blob = self.loader.load(file.read())
-        return RenderableFile(path, file.mode, blob)
+        return RenderableBuffer(path, file.mode, blob)
 
 
 def loadfiles(

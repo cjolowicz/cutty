@@ -5,6 +5,7 @@ import tempfile
 from collections.abc import Iterator
 
 from cutty.compat.contextlib import contextmanager
+from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
@@ -22,13 +23,13 @@ def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:
         raise RuntimeError(f"{path}: not a regular file or directory")
 
 
-def listfiles(root: pathlib.Path, *, relative_to: pathlib.Path) -> Iterator[File]:
+def loadbuffers(root: pathlib.Path, *, relative_to: pathlib.Path) -> Iterator[Buffer]:
     """Iterate over the files in the filesystem."""
     for path in walkfiles(root):
         blob = path.read_text()
         mode = Mode.EXECUTABLE if os.access(path, os.X_OK) else Mode.DEFAULT
         path = path.relative_to(relative_to)
-        yield File(Path(path.parts), mode, blob)
+        yield Buffer(Path(path.parts), mode, blob)
 
 
 class FilesystemFileStorage(FileStorage):

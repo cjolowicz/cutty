@@ -1,7 +1,7 @@
 """Unit tests for cutty.domain.hooks."""
 import pytest
 
-from cutty.domain.files import File
+from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
 from cutty.domain.hooks import Hook
@@ -23,7 +23,7 @@ class FakeHookExecutor(HookExecutor):
 @pytest.mark.parametrize("event", [PreGenerateProject, PostGenerateProject, Event])
 def test_manager(bus: Bus, event: type[Event]) -> None:
     """It subscribes the hooks."""
-    file = File(Path(()), Mode.DEFAULT, "")
+    file = Buffer(Path(()), Mode.DEFAULT, "")
     hook = Hook(file=file, event=event)
     executor = FakeHookExecutor()
     manager = HookManager([hook], executor)
