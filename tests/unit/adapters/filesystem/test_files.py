@@ -5,8 +5,8 @@ import platform
 import pytest
 
 from cutty.adapters.filesystem.files import FilesystemFileStorage
-from cutty.adapters.filesystem.files import listfiles
-from cutty.domain.files import File
+from cutty.adapters.filesystem.files import loadbuffers
+from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
 from cutty.domain.files import Path
 
@@ -15,7 +15,7 @@ def test_storage(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
     path = Path(["example", "README.md"])
     blob = "# example\n"
-    file = File(path, Mode.DEFAULT, blob)
+    file = Buffer(path, Mode.DEFAULT, blob)
 
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
@@ -31,18 +31,18 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
     path = Path(["main.py"])
     blob = "#!/usr/bin/env python"
-    file = File(path, Mode.EXECUTABLE, blob)
+    file = Buffer(path, Mode.EXECUTABLE, blob)
 
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
 
-    [file] = listfiles(tmp_path / "main.py", relative_to=tmp_path)
+    [file] = loadbuffers(tmp_path / "main.py", relative_to=tmp_path)
     assert file.mode & Mode.EXECUTABLE
 
 
 def test_temporary() -> None:
     """It creates temporary storage."""
-    file = File(Path(["file"]), Mode.DEFAULT, "")
+    file = Buffer(Path(["file"]), Mode.DEFAULT, "")
 
     with FilesystemFileStorage.temporary() as storage:
         storage.store(file)
