@@ -93,12 +93,20 @@ class DictFilesystem(Filesystem):
 
     def __init__(self, tree: Any) -> None:
         """Initialize."""
+        # Tree = str | Path | dict[str, Tree]
         self.tree = tree
 
     def _lookup(self, path: Path) -> Any:
-        entry = self.tree
+        def _resolve(entry: Any, current: Path) -> tuple[Any, Path]:
+            if isinstance(entry, Path):
+                current = current.parent.joinpath(*entry.parts)
+                entry = self._lookup(current)
+            return entry, current
+
+        entry, current = _resolve(self.tree, Path())
         for part in path.parts:
-            entry = entry[part]
+            current /= part
+            entry, current = _resolve(entry[part], current)
         return entry
 
     def iterdir(self, path: Path) -> Iterator[Path]:
@@ -132,7 +140,18 @@ class DictFilesystem(Filesystem):
 
     def is_symlink(self, path: Path) -> bool:
         """Return True if this is a symbolic link."""
-        return False
+        try:
+            entry = self._lookup(path.parent)[path.name]
+        except KeyError:
+            return False
+        return isinstance(entry, Path)
+
+    def readlink(self, path: Path) -> Path:
+        """Return the target of a symbolic link."""
+        entry = self._lookup(path.parent)[path.name]
+        if not isinstance(entry, Path):
+            raise ValueError("not a symbolic link")
+        return entry
 
     def access(self, path: Path, mode: Access) -> bool:
         """Return True if the user can access the path."""
@@ -152,6 +171,7 @@ def filesystem() -> Filesystem:
         {
             "etc": {"passwd": "root:x:0:0:root:/root:/bin/sh"},
             "root": {".profile": "# .profile\n"},
+            "root2": Path("root"),
         }
     )
 
@@ -237,9 +257,10 @@ def test_parent_file(filesystem: Filesystem) -> None:
 
 def test_iterdir_root(filesystem: Filesystem) -> None:
     """It iterates over the files in the directory."""
-    first, second = filesystem.root.iterdir()
+    first, second, third = filesystem.root.iterdir()
     assert str(first) == "etc"
     assert str(second) == "root"
+    assert str(third) == "root2"
 
 
 def test_iterdir_directory(filesystem: Filesystem) -> None:
@@ -251,7 +272,7 @@ def test_iterdir_directory(filesystem: Filesystem) -> None:
 
 def test_read_text(filesystem: Filesystem) -> None:
     """It returns the file contents."""
-    path = filesystem.root / "root" / ".profile"
+    path = filesystem.root / "root2" / ".profile"
     assert path.read_text() == "# .profile\n"
 
 
@@ -267,10 +288,29 @@ def test_is_dir(filesystem: Filesystem) -> None:
     assert not path.is_dir()
 
 
-def test_is_symlink(filesystem: Filesystem) -> None:
+def test_is_symlink_false(filesystem: Filesystem) -> None:
     """It returns False if the path is not a symbolic link."""
     path = filesystem.root / "etc"
     assert not path.is_symlink()
+
+
+def test_is_symlink_true(filesystem: Filesystem) -> None:
+    """It returns True if the path is a symbolic link."""
+    path = filesystem.root / "root2"
+    assert path.is_symlink()
+
+
+def test_readlink_good(filesystem: Filesystem) -> None:
+    """It returns the target path."""
+    path = filesystem.root / "root2"
+    assert path.readlink() == filesystem.root / "root"
+
+
+def test_readlink_bad(filesystem: Filesystem) -> None:
+    """It raises if the path is not a symbolic link."""
+    path = filesystem.root / "etc"
+    with pytest.raises(ValueError):
+        path.readlink()
 
 
 def test_access(filesystem: Filesystem) -> None:
