@@ -89,7 +89,7 @@ def test_renderable_file(parts: list[str], text: str) -> None:
     file = renderable.render([])
     assert file.path == Path(parts)
     assert file.mode == Mode.DEFAULT
-    assert file.blob == text
+    assert file.read() == text
 
 
 @pytest.mark.parametrize(
