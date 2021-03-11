@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 
+from cutty.domain.filesystem import Access
 from cutty.domain.filesystem import EmptyPathComponent
 from cutty.domain.filesystem import Filesystem
 from cutty.domain.filesystem import InvalidPathComponent
@@ -115,13 +116,33 @@ class DictFilesystem(Filesystem):
 
     def is_file(self, path: Path) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
-        entry = self._lookup(path)
+        try:
+            entry = self._lookup(path)
+        except KeyError:
+            return False
         return isinstance(entry, str)
 
     def is_dir(self, path: Path) -> bool:
         """Return True if this is a directory."""
-        entry = self._lookup(path)
+        try:
+            entry = self._lookup(path)
+        except KeyError:
+            return False
         return isinstance(entry, dict)
+
+    def is_symlink(self, path: Path) -> bool:
+        """Return True if this is a symbolic link."""
+        return False
+
+    def access(self, path: Path, mode: Access) -> bool:
+        """Return True if the user can access the path."""
+        try:
+            self._lookup(path)
+        except KeyError:
+            return False
+        if mode & Access.EXECUTE:
+            return self.is_dir(path)
+        return True
 
 
 @pytest.fixture
@@ -244,3 +265,15 @@ def test_is_dir(filesystem: Filesystem) -> None:
     """It returns False if the path is a not directory."""
     path = filesystem.root / "root" / ".profile"
     assert not path.is_dir()
+
+
+def test_is_symlink(filesystem: Filesystem) -> None:
+    """It returns False if the path is not a symbolic link."""
+    path = filesystem.root / "etc"
+    assert not path.is_symlink()
+
+
+def test_access(filesystem: Filesystem) -> None:
+    """It returns False if the path cannot be accessed as specified."""
+    path = filesystem.root / "etc" / "passwd"
+    assert not path.access(Access.EXECUTE)
