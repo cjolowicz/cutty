@@ -1,5 +1,6 @@
 """Filesystem abstraction."""
 import abc
+import enum
 from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
@@ -73,6 +74,15 @@ class Path:
         return self._copy(path)
 
 
+class Access(enum.Flag):
+    """File access mode."""
+
+    DEFAULT = 0
+    EXECUTE = enum.auto()
+    WRITE = enum.auto()
+    READ = enum.auto()
+
+
 class Filesystem(abc.ABC):
     """A filesystem abstraction."""
 
@@ -96,6 +106,14 @@ class Filesystem(abc.ABC):
     @abc.abstractmethod
     def is_dir(self, path: Path) -> bool:
         """Return True if this is a directory."""
+
+    @abc.abstractmethod
+    def is_symlink(self, path: Path) -> bool:
+        """Return True if this is a symbolic link."""
+
+    @abc.abstractmethod
+    def access(self, path: Path, mode: Access) -> bool:
+        """Return True if the user can access the path."""
 
     def eq(self, path: Path, other: Path) -> bool:
         """Return True if the paths are considered equal."""
@@ -136,6 +154,14 @@ class FilesystemPath(Path):
     def is_dir(self) -> bool:
         """Return True if this is a directory."""
         return self._filesystem.is_dir(self)
+
+    def is_symlink(self) -> bool:
+        """Return True if this is a symbolic link."""
+        return self._filesystem.is_symlink(self)
+
+    def access(self, mode: Access) -> bool:
+        """Return True if the user can access the path."""
+        return self._filesystem.access(self, mode)
 
     def __hash__(self) -> int:
         """Return the hash value of the path."""
