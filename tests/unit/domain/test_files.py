@@ -2,14 +2,14 @@
 import pytest
 
 from cutty.domain.files import Buffer
+from cutty.domain.files import EmptyPathComponent
+from cutty.domain.files import InvalidPathComponent
 from cutty.domain.files import loadfiles
 from cutty.domain.files import Mode
 from cutty.domain.files import RenderableBuffer
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderablePath
 from cutty.domain.files import renderfiles
-from cutty.domain.filesystem import EmptyPathComponent
-from cutty.domain.filesystem import InvalidPathComponent
 from cutty.domain.filesystem import Path
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
