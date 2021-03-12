@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from cutty.domain.filesystem import EmptyPathComponent
+from cutty.domain.filesystem import InvalidPathComponent
 from cutty.domain.filesystem import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
@@ -80,7 +81,20 @@ class RenderablePath(Renderable[Path]):
 
     def render(self, variables: Sequence[Variable[Value]]) -> Path:
         """Render to a Path."""
-        return Path(*[part.render(variables) for part in self.parts])
+
+        def _iterparts() -> Iterator[str]:
+            for renderable in self.parts:
+                part = renderable.render(variables)
+
+                if not part:
+                    raise EmptyPathComponent()
+
+                if "/" in part or "\\" in part or part == "." or part == "..":
+                    raise InvalidPathComponent(part)
+
+                yield part
+
+        return Path(*_iterparts())
 
 
 class RenderableBuffer(Renderable[Buffer]):
