@@ -7,8 +7,6 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from cutty.domain.filesystem import EmptyPathComponent
-from cutty.domain.filesystem import InvalidPathComponent
 from cutty.domain.filesystem import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
@@ -70,6 +68,14 @@ class FileStorage(abc.ABC):
     @abc.abstractmethod
     def store(self, file: File) -> None:
         """Commit a file to storage."""
+
+
+class EmptyPathComponent(Exception):
+    """The rendered path has an empty component."""
+
+
+class InvalidPathComponent(Exception):
+    """The rendered path has an invalid component."""
 
 
 class RenderablePath(Renderable[Path]):
