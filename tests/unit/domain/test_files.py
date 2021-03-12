@@ -8,10 +8,44 @@ from cutty.domain.files import RenderableBuffer
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderablePath
 from cutty.domain.files import renderfiles
+from cutty.domain.filesystem import EmptyPathComponent
+from cutty.domain.filesystem import InvalidPathComponent
 from cutty.domain.filesystem import Path
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Variable
+
+
+@pytest.mark.parametrize(
+    "parts",
+    [
+        [""],
+        ["example", ""],
+        ["", "example"],
+        ["example", "", "README.md"],
+    ],
+)
+def test_renderable_path_empty(parts: list[str]) -> None:
+    """It raises an exception."""
+    renderable = RenderablePath([TrivialRenderable(part) for part in parts])
+    with pytest.raises(EmptyPathComponent):
+        renderable.render([])
+
+
+@pytest.mark.parametrize(
+    "parts",
+    [
+        ["/", "boot", "vmlinuz"],
+        ["\\", "system32", "hal.dll"],
+        ["..", "README.md"],
+        ["example", ".", "README.md"],
+    ],
+)
+def test_renderable_path_invalid(parts: list[str]) -> None:
+    """It raises an exception."""
+    renderable = RenderablePath([TrivialRenderable(part) for part in parts])
+    with pytest.raises(InvalidPathComponent):
+        renderable.render([])
 
 
 @pytest.mark.parametrize(
@@ -22,7 +56,7 @@ from cutty.domain.variables import Variable
         ["example", "README.md"],
     ],
 )
-def test_renderable_path(parts: list[str]) -> None:
+def test_renderable_path_good(parts: list[str]) -> None:
     """It renders to a Path."""
     renderable = RenderablePath([TrivialRenderable(part) for part in parts])
     path = renderable.render([])
