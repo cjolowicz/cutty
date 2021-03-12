@@ -7,14 +7,6 @@ from typing import Any
 from typing import TypeVar
 
 
-class EmptyPathComponent(Exception):
-    """The rendered path has an empty component."""
-
-
-class InvalidPathComponent(Exception):
-    """The rendered path has an invalid component."""
-
-
 PathT = TypeVar("PathT", bound="Path")
 
 
@@ -26,13 +18,6 @@ class Path:
 
     def __init__(self, *parts: str) -> None:
         """Initialize."""
-        for part in parts:
-            if not part:
-                raise EmptyPathComponent(parts, part)
-
-            if "/" in part or "\\" in part or part == "." or part == "..":
-                raise InvalidPathComponent(parts, part)
-
         object.__setattr__(self, "parts", parts)
 
     def _copy(self: PathT, path: Path) -> PathT:
