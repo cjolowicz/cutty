@@ -5,6 +5,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import TypeVar
 
+from cutty.util.typeguard_ignore import typeguard_ignore
+
 
 PathT = TypeVar("PathT", bound="Path")
 
@@ -160,6 +162,7 @@ class FilesystemPath(Path):
         """Return the hash value of the path."""
         return hash((self.parts, self._filesystem))
 
+    @typeguard_ignore
     def __eq__(self, other: object) -> bool:
         """Return True if the paths are equal."""
         if not isinstance(other, FilesystemPath):
@@ -168,6 +171,7 @@ class FilesystemPath(Path):
             self, other
         )
 
+    @typeguard_ignore
     def __lt__(self, other: object) -> bool:
         """Return True if the path is less than the other path."""
         if not isinstance(other, FilesystemPath):
@@ -176,6 +180,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return self._filesystem.lt(self, other)
 
+    @typeguard_ignore
     def __gt__(self, other: object) -> bool:
         """Return True if the path is greater than the other path."""
         if not isinstance(other, FilesystemPath):
@@ -184,6 +189,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return self._filesystem.lt(other, self)
 
+    @typeguard_ignore
     def __le__(self, other: object) -> bool:
         """Return True if the path is less than or equal to the other path."""
         if not isinstance(other, FilesystemPath):
@@ -192,6 +198,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return not self._filesystem.lt(other, self)
 
+    @typeguard_ignore
     def __ge__(self, other: object) -> bool:
         """Return True if the path is greater than or equal to the other path."""
         if not isinstance(other, FilesystemPath):
