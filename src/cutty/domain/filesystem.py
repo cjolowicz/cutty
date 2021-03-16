@@ -153,7 +153,7 @@ class FilesystemPath(Path):
         """Return the target of a symbolic link."""
         return self._filesystem.readlink(self)
 
-    def access(self, mode: Access) -> bool:
+    def access(self, mode: Access = Access.DEFAULT) -> bool:
         """Return True if the user can access the path."""
         return self._filesystem.access(self, mode)
 
