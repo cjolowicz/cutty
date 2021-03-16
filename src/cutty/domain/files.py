@@ -7,7 +7,7 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from cutty.domain.filesystem import Path
+from cutty.domain.filesystem import PurePath
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
@@ -26,7 +26,7 @@ class File(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def path(self) -> Path:
+    def path(self) -> PurePath:
         """Return the file path."""
 
     @property
@@ -43,12 +43,12 @@ class File(abc.ABC):
 class Buffer(File):
     """A file in memory."""
 
-    _path: Path
+    _path: PurePath
     _mode: Mode
     _blob: str
 
     @property
-    def path(self) -> Path:
+    def path(self) -> PurePath:
         """Return the file path."""
         return self._path
 
@@ -78,15 +78,15 @@ class InvalidPathComponent(Exception):
     """The rendered path has an invalid component."""
 
 
-class RenderablePath(Renderable[Path]):
+class RenderablePath(Renderable[PurePath]):
     """A renderable path."""
 
     def __init__(self, parts: Iterable[Renderable[str]]) -> None:
         """Initialize."""
         self.parts = tuple(parts)
 
-    def render(self, variables: Sequence[Variable[Value]]) -> Path:
-        """Render to a Path."""
+    def render(self, variables: Sequence[Variable[Value]]) -> PurePath:
+        """Render to a PurePath."""
 
         def _iterparts() -> Iterator[str]:
             for renderable in self.parts:
@@ -100,7 +100,7 @@ class RenderablePath(Renderable[Path]):
 
                 yield part
 
-        return Path(*_iterparts())
+        return PurePath(*_iterparts())
 
 
 class RenderableBuffer(Renderable[Buffer]):

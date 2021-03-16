@@ -6,7 +6,7 @@ import pytest
 
 from cutty.domain.filesystem import Access
 from cutty.domain.filesystem import Filesystem
-from cutty.domain.filesystem import Path
+from cutty.domain.filesystem import PurePath
 
 
 @pytest.mark.parametrize(
@@ -26,24 +26,24 @@ from cutty.domain.filesystem import Path
     ],
 )
 def test_valid(parts: list[str]) -> None:
-    """It returns a Path instance."""
-    assert Path(*parts)
+    """It returns a PurePath instance."""
+    assert PurePath(*parts)
 
 
 def test_div() -> None:
     """It returns a path with the part appended."""
-    assert Path("etc") / "passwd" == Path("etc", "passwd")
+    assert PurePath("etc") / "passwd" == PurePath("etc", "passwd")
 
 
 @pytest.mark.parametrize(
     "path,expected",
     [
-        (Path(), ""),
-        (Path("README.md"), "README.md"),
-        (Path("example", "README.md"), "README.md"),
+        (PurePath(), ""),
+        (PurePath("README.md"), "README.md"),
+        (PurePath("example", "README.md"), "README.md"),
     ],
 )
-def test_name(path: Path, expected: str) -> None:
+def test_name(path: PurePath, expected: str) -> None:
     """It returns the final component, if any."""
     assert path.name == expected
 
@@ -51,15 +51,15 @@ def test_name(path: Path, expected: str) -> None:
 @pytest.mark.parametrize(
     "path,expected",
     [
-        (Path(), ""),
-        (Path("README"), "README"),
-        (Path("README.md"), "README"),
-        (Path("example", "README.md"), "README"),
-        (Path("archive.tar.gz"), "archive.tar"),
-        (Path(".profile"), ".profile"),
+        (PurePath(), ""),
+        (PurePath("README"), "README"),
+        (PurePath("README.md"), "README"),
+        (PurePath("example", "README.md"), "README"),
+        (PurePath("archive.tar.gz"), "archive.tar"),
+        (PurePath(".profile"), ".profile"),
     ],
 )
-def test_stem(path: Path, expected: str) -> None:
+def test_stem(path: PurePath, expected: str) -> None:
     """It returns the final component, minus its last suffix."""
     assert path.stem == expected
 
@@ -69,16 +69,16 @@ class DictFilesystem(Filesystem):
 
     def __init__(self, tree: Any) -> None:
         """Initialize."""
-        # Node = str | Path | dict[str, Node]
+        # Node = str | PurePath | dict[str, Node]
         # Tree = dict[str, Node]
         self.tree = tree
 
-    def lookup(self, path: Path) -> Any:
+    def lookup(self, path: PurePath) -> Any:
         """Return the filesystem node at the given path."""
         # Traversed filesystem nodes, starting at the root.
         nodes = [self.tree]
 
-        def _lookup(path: Path) -> Any:
+        def _lookup(path: PurePath) -> Any:
             """Return the filesystem node for the given path."""
             for part in path.parts:
                 if part == ".":
@@ -91,7 +91,7 @@ class DictFilesystem(Filesystem):
 
                 node = nodes[-1][part]
 
-                if isinstance(node, Path):
+                if isinstance(node, PurePath):
                     node = _lookup(node)
 
                 nodes.append(node)
@@ -100,7 +100,7 @@ class DictFilesystem(Filesystem):
 
         return _lookup(path)
 
-    def is_dir(self, path: Path) -> bool:
+    def is_dir(self, path: PurePath) -> bool:
         """Return True if this is a directory."""
         try:
             entry = self.lookup(path)
@@ -108,14 +108,14 @@ class DictFilesystem(Filesystem):
             return False
         return isinstance(entry, dict)
 
-    def iterdir(self, path: Path) -> Iterator[Path]:
+    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
         """Iterate over the files in this directory."""
         entry = self.lookup(path)
         assert isinstance(entry, dict)
         for key in entry:
             yield path / key
 
-    def is_file(self, path: Path) -> bool:
+    def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
         try:
             entry = self.lookup(path)
@@ -123,28 +123,28 @@ class DictFilesystem(Filesystem):
             return False
         return isinstance(entry, str)
 
-    def read_text(self, path: Path) -> str:
+    def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
         entry = self.lookup(path)
         assert isinstance(entry, str)
         return entry
 
-    def is_symlink(self, path: Path) -> bool:
+    def is_symlink(self, path: PurePath) -> bool:
         """Return True if this is a symbolic link."""
         try:
             entry = self.lookup(path.parent)[path.name]
         except KeyError:
             return False
-        return isinstance(entry, Path)
+        return isinstance(entry, PurePath)
 
-    def readlink(self, path: Path) -> Path:
+    def readlink(self, path: PurePath) -> PurePath:
         """Return the target of a symbolic link."""
         entry = self.lookup(path.parent)[path.name]
-        if not isinstance(entry, Path):
+        if not isinstance(entry, PurePath):
             raise ValueError("not a symbolic link")
         return entry
 
-    def access(self, path: Path, mode: Access) -> bool:
+    def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
         try:
             self.lookup(path)
@@ -162,7 +162,7 @@ def filesystem() -> Filesystem:
         {
             "etc": {"passwd": "root:x:0:0:root:/root:/bin/sh"},
             "root": {".profile": "# .profile\n"},
-            "home": {"root": Path("..", "root")},
+            "home": {"root": PurePath("..", "root")},
         }
     )
 
@@ -300,7 +300,7 @@ def test_is_symlink_true(filesystem: Filesystem) -> None:
 def test_readlink_good(filesystem: Filesystem) -> None:
     """It returns the target path."""
     path = filesystem.root / "home" / "root"
-    assert path.readlink() == Path() / ".." / "root"
+    assert path.readlink() == PurePath() / ".." / "root"
 
 
 def test_readlink_bad(filesystem: Filesystem) -> None:
