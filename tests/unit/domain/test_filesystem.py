@@ -306,7 +306,7 @@ def test_is_symlink_true(filesystem: Filesystem) -> None:
 def test_readlink_good(filesystem: Filesystem) -> None:
     """It returns the target path."""
     path = filesystem.root / "home" / "root"
-    assert path.readlink() == filesystem.root / ".." / "root"  # FIXME
+    assert path.readlink() == Path() / ".." / "root"
 
 
 def test_readlink_bad(filesystem: Filesystem) -> None:
