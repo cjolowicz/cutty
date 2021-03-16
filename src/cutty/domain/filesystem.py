@@ -8,11 +8,11 @@ from typing import TypeVar
 from cutty.util.typeguard_ignore import typeguard_ignore
 
 
-PathT = TypeVar("PathT", bound="Path")
+PurePathT = TypeVar("PurePathT", bound="PurePath")
 
 
 @dataclass
-class Path:
+class PurePath:
     """Location in a filesystem."""
 
     parts: tuple[str, ...]
@@ -21,7 +21,7 @@ class Path:
         """Initialize."""
         object.__setattr__(self, "parts", parts)
 
-    def _copy(self: PathT, path: Path) -> PathT:
+    def _copy(self: PurePathT, path: PurePath) -> PurePathT:
         """Create a copy of the given path."""
         return self.__class__(*path.parts)
 
@@ -29,7 +29,7 @@ class Path:
         """Return a readable representation."""
         return "/".join(self.parts)
 
-    def __truediv__(self: PathT, part: str) -> PathT:
+    def __truediv__(self: PurePathT, part: str) -> PurePathT:
         """Return a path with the part appended."""
         return self.joinpath(part)
 
@@ -46,17 +46,17 @@ class Path:
         return name[:index] if 0 < index < len(name) - 1 else name
 
     @property
-    def parent(self: PathT) -> PathT:
+    def parent(self: PurePathT) -> PurePathT:
         """Return the parent of this path."""
         if not self.parts:
             return self
 
-        path = Path(*self.parts[:-1])
+        path = PurePath(*self.parts[:-1])
         return self._copy(path)
 
-    def joinpath(self: PathT, *parts: str) -> PathT:
+    def joinpath(self: PurePathT, *parts: str) -> PurePathT:
         """Return a path with the parts appended."""
-        path = Path(*self.parts, *parts)
+        path = PurePath(*self.parts, *parts)
         return self._copy(path)
 
 
@@ -73,48 +73,48 @@ class Filesystem(abc.ABC):
     """A filesystem abstraction."""
 
     @property
-    def root(self) -> FilesystemPath:
+    def root(self) -> Path:
         """Return the path at the root of the filesystem."""
-        return FilesystemPath(filesystem=self)
+        return Path(filesystem=self)
 
     @abc.abstractmethod
-    def is_dir(self, path: Path) -> bool:
+    def is_dir(self, path: PurePath) -> bool:
         """Return True if this is a directory."""
 
     @abc.abstractmethod
-    def iterdir(self, path: Path) -> Iterator[Path]:
+    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
         """Iterate over the files in this directory."""
 
     @abc.abstractmethod
-    def is_file(self, path: Path) -> bool:
+    def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
 
     @abc.abstractmethod
-    def read_text(self, path: Path) -> str:
+    def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
 
     @abc.abstractmethod
-    def is_symlink(self, path: Path) -> bool:
+    def is_symlink(self, path: PurePath) -> bool:
         """Return True if this is a symbolic link."""
 
     @abc.abstractmethod
-    def readlink(self, path: Path) -> Path:
+    def readlink(self, path: PurePath) -> PurePath:
         """Return the target of a symbolic link."""
 
     @abc.abstractmethod
-    def access(self, path: Path, mode: Access) -> bool:
+    def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
 
-    def eq(self, path: Path, other: Path) -> bool:
+    def eq(self, path: PurePath, other: PurePath) -> bool:
         """Return True if the paths are considered equal."""
         return path.parts == other.parts
 
-    def lt(self, path: Path, other: Path) -> bool:
+    def lt(self, path: PurePath, other: PurePath) -> bool:
         """Return True if the path is less than the other path."""
         return path.parts < other.parts
 
 
-class FilesystemPath(Path):
+class Path(PurePath):
     """Location in a filesystem, with methods for accessing the filesystem."""
 
     _filesystem: Filesystem
@@ -124,15 +124,15 @@ class FilesystemPath(Path):
         super().__init__(*parts)
         object.__setattr__(self, "_filesystem", filesystem)
 
-    def _copy(self, path: Path) -> FilesystemPath:
+    def _copy(self, path: PurePath) -> Path:
         """Create a copy of the given path."""
-        return FilesystemPath(*path.parts, filesystem=self._filesystem)
+        return Path(*path.parts, filesystem=self._filesystem)
 
     def is_dir(self) -> bool:
         """Return True if this is a directory."""
         return self._filesystem.is_dir(self)
 
-    def iterdir(self) -> Iterator[FilesystemPath]:
+    def iterdir(self) -> Iterator[Path]:
         """Iterate over the files in this directory."""
         for path in self._filesystem.iterdir(self):
             yield self._copy(path)
@@ -149,7 +149,7 @@ class FilesystemPath(Path):
         """Return True if this is a symbolic link."""
         return self._filesystem.is_symlink(self)
 
-    def readlink(self) -> Path:
+    def readlink(self) -> PurePath:
         """Return the target of a symbolic link."""
         return self._filesystem.readlink(self)
 
@@ -164,7 +164,7 @@ class FilesystemPath(Path):
     @typeguard_ignore
     def __eq__(self, other: object) -> bool:
         """Return True if the paths are equal."""
-        if not isinstance(other, FilesystemPath):
+        if not isinstance(other, Path):
             return NotImplemented
         return self._filesystem is other._filesystem and self._filesystem.eq(
             self, other
@@ -173,7 +173,7 @@ class FilesystemPath(Path):
     @typeguard_ignore
     def __lt__(self, other: object) -> bool:
         """Return True if the path is less than the other path."""
-        if not isinstance(other, FilesystemPath):
+        if not isinstance(other, Path):
             return NotImplemented
         if self._filesystem is not other._filesystem:
             raise ValueError("cannot compare paths on different filesystems")
@@ -182,7 +182,7 @@ class FilesystemPath(Path):
     @typeguard_ignore
     def __gt__(self, other: object) -> bool:
         """Return True if the path is greater than the other path."""
-        if not isinstance(other, FilesystemPath):
+        if not isinstance(other, Path):
             return NotImplemented
         if self._filesystem is not other._filesystem:
             raise ValueError("cannot compare paths on different filesystems")
@@ -191,7 +191,7 @@ class FilesystemPath(Path):
     @typeguard_ignore
     def __le__(self, other: object) -> bool:
         """Return True if the path is less than or equal to the other path."""
-        if not isinstance(other, FilesystemPath):
+        if not isinstance(other, Path):
             return NotImplemented
         if self._filesystem is not other._filesystem:
             raise ValueError("cannot compare paths on different filesystems")
@@ -200,7 +200,7 @@ class FilesystemPath(Path):
     @typeguard_ignore
     def __ge__(self, other: object) -> bool:
         """Return True if the path is greater than or equal to the other path."""
-        if not isinstance(other, FilesystemPath):
+        if not isinstance(other, Path):
             return NotImplemented
         if self._filesystem is not other._filesystem:
             raise ValueError("cannot compare paths on different filesystems")
