@@ -69,39 +69,60 @@ class DictFilesystem(Filesystem):
 
     def __init__(self, tree: Any) -> None:
         """Initialize."""
-        # Tree = str | Path | dict[str, Tree]
+        # Node = str | Path | dict[str, Node]
+        # Tree = dict[str, Node]
         self.tree = tree
 
-    def _lookup(self, path: Path) -> Any:
-        def _resolve(entry: Any, current: Path) -> tuple[Any, Path]:
-            if isinstance(entry, Path):
-                current = current.parent.joinpath(*entry.parts)
-                entry = self._lookup(current)
-            return entry, current
+    def lookup(self, path: Path) -> Any:
+        """Return the filesystem node at the given path."""
+        # Traversed filesystem nodes, starting at the root.
+        nodes = [self.tree]
+        realpath = Path()
 
-        entry, current = _resolve(self.tree, Path())
-        for part in path.parts:
-            current /= part
-            entry, current = _resolve(entry[part], current)
-        return entry
+        def _lookup(path: Path) -> Any:
+            """Return the filesystem node for the given path."""
+            nonlocal realpath
+
+            for part in path.parts:
+                if part == ".":
+                    continue
+
+                if part == "..":
+                    realpath = realpath.parent
+                    if len(nodes) > 1:
+                        nodes.pop()
+                    continue
+
+                node = nodes[-1][part]
+
+                if isinstance(node, Path):
+                    node = _lookup(node)
+                else:
+                    realpath /= part
+
+                nodes.append(node)
+
+            return nodes[-1]
+
+        return _lookup(path)
 
     def iterdir(self, path: Path) -> Iterator[Path]:
         """Iterate over the files in this directory."""
-        entry = self._lookup(path)
+        entry = self.lookup(path)
         assert isinstance(entry, dict)
-        for key in self._lookup(path):
+        for key in entry:
             yield path / key
 
     def read_text(self, path: Path) -> str:
         """Return the contents of this file."""
-        entry = self._lookup(path)
+        entry = self.lookup(path)
         assert isinstance(entry, str)
         return entry
 
     def is_file(self, path: Path) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
         try:
-            entry = self._lookup(path)
+            entry = self.lookup(path)
         except KeyError:
             return False
         return isinstance(entry, str)
@@ -109,7 +130,7 @@ class DictFilesystem(Filesystem):
     def is_dir(self, path: Path) -> bool:
         """Return True if this is a directory."""
         try:
-            entry = self._lookup(path)
+            entry = self.lookup(path)
         except KeyError:
             return False
         return isinstance(entry, dict)
@@ -117,14 +138,14 @@ class DictFilesystem(Filesystem):
     def is_symlink(self, path: Path) -> bool:
         """Return True if this is a symbolic link."""
         try:
-            entry = self._lookup(path.parent)[path.name]
+            entry = self.lookup(path.parent)[path.name]
         except KeyError:
             return False
         return isinstance(entry, Path)
 
     def readlink(self, path: Path) -> Path:
         """Return the target of a symbolic link."""
-        entry = self._lookup(path.parent)[path.name]
+        entry = self.lookup(path.parent)[path.name]
         if not isinstance(entry, Path):
             raise ValueError("not a symbolic link")
         return entry
@@ -132,7 +153,7 @@ class DictFilesystem(Filesystem):
     def access(self, path: Path, mode: Access) -> bool:
         """Return True if the user can access the path."""
         try:
-            self._lookup(path)
+            self.lookup(path)
         except KeyError:
             return False
         if mode & Access.EXECUTE:
@@ -147,7 +168,7 @@ def filesystem() -> Filesystem:
         {
             "etc": {"passwd": "root:x:0:0:root:/root:/bin/sh"},
             "root": {".profile": "# .profile\n"},
-            "root2": Path("root"),
+            "home": {"root": Path("..", "root")},
         }
     )
 
@@ -236,7 +257,7 @@ def test_iterdir_root(filesystem: Filesystem) -> None:
     first, second, third = filesystem.root.iterdir()
     assert str(first) == "etc"
     assert str(second) == "root"
-    assert str(third) == "root2"
+    assert str(third) == "home"
 
 
 def test_iterdir_directory(filesystem: Filesystem) -> None:
@@ -248,7 +269,13 @@ def test_iterdir_directory(filesystem: Filesystem) -> None:
 
 def test_read_text(filesystem: Filesystem) -> None:
     """It returns the file contents."""
-    path = filesystem.root / "root2" / ".profile"
+    path = filesystem.root / "root" / ".profile"
+    assert path.read_text() == "# .profile\n"
+
+
+def test_read_text_symlink(filesystem: Filesystem) -> None:
+    """It returns the file contents."""
+    path = filesystem.root / "home" / "root" / ".profile"
     assert path.read_text() == "# .profile\n"
 
 
@@ -272,14 +299,14 @@ def test_is_symlink_false(filesystem: Filesystem) -> None:
 
 def test_is_symlink_true(filesystem: Filesystem) -> None:
     """It returns True if the path is a symbolic link."""
-    path = filesystem.root / "root2"
+    path = filesystem.root / "home" / "root"
     assert path.is_symlink()
 
 
 def test_readlink_good(filesystem: Filesystem) -> None:
     """It returns the target path."""
-    path = filesystem.root / "root2"
-    assert path.readlink() == filesystem.root / "root"
+    path = filesystem.root / "home" / "root"
+    assert path.readlink() == filesystem.root / ".." / "root"  # FIXME
 
 
 def test_readlink_bad(filesystem: Filesystem) -> None:
