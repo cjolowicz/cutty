@@ -106,18 +106,20 @@ class DictFilesystem(Filesystem):
 
         return _lookup(path)
 
+    def is_dir(self, path: Path) -> bool:
+        """Return True if this is a directory."""
+        try:
+            entry = self.lookup(path)
+        except KeyError:
+            return False
+        return isinstance(entry, dict)
+
     def iterdir(self, path: Path) -> Iterator[Path]:
         """Iterate over the files in this directory."""
         entry = self.lookup(path)
         assert isinstance(entry, dict)
         for key in entry:
             yield path / key
-
-    def read_text(self, path: Path) -> str:
-        """Return the contents of this file."""
-        entry = self.lookup(path)
-        assert isinstance(entry, str)
-        return entry
 
     def is_file(self, path: Path) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
@@ -127,13 +129,11 @@ class DictFilesystem(Filesystem):
             return False
         return isinstance(entry, str)
 
-    def is_dir(self, path: Path) -> bool:
-        """Return True if this is a directory."""
-        try:
-            entry = self.lookup(path)
-        except KeyError:
-            return False
-        return isinstance(entry, dict)
+    def read_text(self, path: Path) -> str:
+        """Return the contents of this file."""
+        entry = self.lookup(path)
+        assert isinstance(entry, str)
+        return entry
 
     def is_symlink(self, path: Path) -> bool:
         """Return True if this is a symbolic link."""
