@@ -77,18 +77,14 @@ class DictFilesystem(Filesystem):
         """Return the filesystem node at the given path."""
         # Traversed filesystem nodes, starting at the root.
         nodes = [self.tree]
-        realpath = Path()
 
         def _lookup(path: Path) -> Any:
             """Return the filesystem node for the given path."""
-            nonlocal realpath
-
             for part in path.parts:
                 if part == ".":
                     continue
 
                 if part == "..":
-                    realpath = realpath.parent
                     if len(nodes) > 1:
                         nodes.pop()
                     continue
@@ -97,8 +93,6 @@ class DictFilesystem(Filesystem):
 
                 if isinstance(node, Path):
                     node = _lookup(node)
-                else:
-                    realpath /= part
 
                 nodes.append(node)
 
