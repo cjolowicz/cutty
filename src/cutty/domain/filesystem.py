@@ -3,7 +3,6 @@ import abc
 import enum
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any
 from typing import TypeVar
 
 
@@ -161,7 +160,7 @@ class FilesystemPath(Path):
         """Return the hash value of the path."""
         return hash((self.parts, self._filesystem))
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return True if the paths are equal."""
         if not isinstance(other, FilesystemPath):
             return NotImplemented
@@ -169,7 +168,7 @@ class FilesystemPath(Path):
             self, other
         )
 
-    def __lt__(self, other: Any) -> bool:
+    def __lt__(self, other: object) -> bool:
         """Return True if the path is less than the other path."""
         if not isinstance(other, FilesystemPath):
             return NotImplemented
@@ -177,7 +176,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return self._filesystem.lt(self, other)
 
-    def __gt__(self, other: Any) -> bool:
+    def __gt__(self, other: object) -> bool:
         """Return True if the path is greater than the other path."""
         if not isinstance(other, FilesystemPath):
             return NotImplemented
@@ -185,7 +184,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return self._filesystem.lt(other, self)
 
-    def __le__(self, other: Any) -> bool:
+    def __le__(self, other: object) -> bool:
         """Return True if the path is less than or equal to the other path."""
         if not isinstance(other, FilesystemPath):
             return NotImplemented
@@ -193,7 +192,7 @@ class FilesystemPath(Path):
             raise ValueError("cannot compare paths on different filesystems")
         return not self._filesystem.lt(other, self)
 
-    def __ge__(self, other: Any) -> bool:
+    def __ge__(self, other: object) -> bool:
         """Return True if the path is greater than or equal to the other path."""
         if not isinstance(other, FilesystemPath):
             return NotImplemented
