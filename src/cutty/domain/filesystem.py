@@ -78,20 +78,20 @@ class Filesystem(abc.ABC):
         return FilesystemPath(filesystem=self)
 
     @abc.abstractmethod
-    def iterdir(self, path: Path) -> Iterator[Path]:
-        """Iterate over the files in this directory."""
+    def is_dir(self, path: Path) -> bool:
+        """Return True if this is a directory."""
 
     @abc.abstractmethod
-    def read_text(self, path: Path) -> str:
-        """Return the contents of this file."""
+    def iterdir(self, path: Path) -> Iterator[Path]:
+        """Iterate over the files in this directory."""
 
     @abc.abstractmethod
     def is_file(self, path: Path) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
 
     @abc.abstractmethod
-    def is_dir(self, path: Path) -> bool:
-        """Return True if this is a directory."""
+    def read_text(self, path: Path) -> str:
+        """Return the contents of this file."""
 
     @abc.abstractmethod
     def is_symlink(self, path: Path) -> bool:
@@ -128,22 +128,22 @@ class FilesystemPath(Path):
         """Create a copy of the given path."""
         return FilesystemPath(*path.parts, filesystem=self._filesystem)
 
+    def is_dir(self) -> bool:
+        """Return True if this is a directory."""
+        return self._filesystem.is_dir(self)
+
     def iterdir(self) -> Iterator[FilesystemPath]:
         """Iterate over the files in this directory."""
         for path in self._filesystem.iterdir(self):
             yield self._copy(path)
 
-    def read_text(self) -> str:
-        """Return the contents of this file."""
-        return self._filesystem.read_text(self)
-
     def is_file(self) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
         return self._filesystem.is_file(self)
 
-    def is_dir(self) -> bool:
-        """Return True if this is a directory."""
-        return self._filesystem.is_dir(self)
+    def read_text(self) -> str:
+        """Return the contents of this file."""
+        return self._filesystem.read_text(self)
 
     def is_symlink(self) -> bool:
         """Return True if this is a symbolic link."""
