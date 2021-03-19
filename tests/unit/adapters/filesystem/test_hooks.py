@@ -6,9 +6,9 @@ import pytest
 from cutty.adapters.filesystem.hooks import FilesystemHookExecutor
 from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
-from cutty.domain.filesystem import PurePath
 from cutty.domain.hooks import Hook
 from cutty.domain.hooks import PostGenerateProject
+from cutty.filesystem.pure import PurePath
 
 
 def test_executor(tmp_path: pathlib.Path, capfd: pytest.CaptureFixture[str]) -> None:

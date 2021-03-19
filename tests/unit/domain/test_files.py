@@ -10,10 +10,10 @@ from cutty.domain.files import RenderableBuffer
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.files import RenderablePath
 from cutty.domain.files import renderfiles
-from cutty.domain.filesystem import PurePath
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import TrivialRenderable
 from cutty.domain.variables import Variable
+from cutty.filesystem.pure import PurePath
 
 
 @pytest.mark.parametrize(

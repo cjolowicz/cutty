@@ -8,7 +8,7 @@ from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.adapters.filesystem.files import loadbuffers
 from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
-from cutty.domain.filesystem import PurePath
+from cutty.filesystem.pure import PurePath
 
 
 def test_storage(tmp_path: pathlib.Path) -> None:
