@@ -91,8 +91,4 @@ class RenderableValueLoader(RenderableLoader[Value]):
                 (self.loader.load(key), self.load(item)) for key, item in value.items()
             )
 
-        return self.loadscalar(value)
-
-    def loadscalar(self, value: Value) -> Renderable[Value]:
-        """Load renderable from scalar."""
         return TrivialRenderable(value)
