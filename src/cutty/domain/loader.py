@@ -7,6 +7,7 @@ from cutty.domain.files import RenderableFileLoader
 from cutty.domain.filesystem import Path
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
+from cutty.domain.variables import Value
 from cutty.domain.varspecs import RenderableVariableSpecificationLoader
 from cutty.domain.varspecs import VariableSpecification
 
