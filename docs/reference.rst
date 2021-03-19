@@ -41,6 +41,20 @@ cutty.domain.files
    :members:
 
 
+cutty.domain.hooks
+------------------
+
+.. automodule:: cutty.domain.hooks
+   :members:
+
+
+cutty.domain.filesystem
+-----------------------
+
+.. automodule:: cutty.domain.filesystem
+   :members:
+
+
 cutty.domain.templates
 ----------------------
 
@@ -76,6 +90,20 @@ cutty.adapters.filesystem.files
    :members:
 
 
+cutty.adapters.filesystem.filesystem
+------------------------------------
+
+.. automodule:: cutty.adapters.filesystem.filesystem
+   :members:
+
+
+cutty.adapters.filesystem.hooks
+-------------------------------
+
+.. automodule:: cutty.adapters.filesystem.hooks
+   :members:
+
+
 cutty.util.exceptionhandlers
 ----------------------------
 
@@ -97,17 +125,24 @@ cutty.util.bus
    :members:
 
 
-cutty.application.cookiecutter.templates
-----------------------------------------
+cutty.util.typeguard_ignore
+---------------------------
 
-.. automodule:: cutty.application.cookiecutter.templates
+.. automodule:: cutty.util.typeguard_ignore
    :members:
 
 
-cutty.application.cookiecutter.variables
-----------------------------------------
+cutty.compat.contextlib
+-----------------------
 
-.. automodule:: cutty.application.cookiecutter.variables
+.. automodule:: cutty.compat.contextlib
+   :members:
+
+
+cutty.application.cookiecutter.loader
+-------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.loader
    :members:
 
 
