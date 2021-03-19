@@ -4,7 +4,6 @@ import pytest
 from cutty.domain.files import Buffer
 from cutty.domain.files import EmptyPathComponent
 from cutty.domain.files import InvalidPathComponent
-from cutty.domain.files import loadfiles
 from cutty.domain.files import Mode
 from cutty.domain.files import RenderableBuffer
 from cutty.domain.files import RenderableFileLoader
@@ -105,25 +104,6 @@ def test_renderable_file_loader(
         (["example", "README.md"], "# example\n"),
     ],
 )
-def test_loadfiles(
-    parts: list[str],
-    text: str,
-    renderable_loader: RenderableLoader[str],
-) -> None:
-    """It loads renderable files."""
-    file = Buffer(PurePath(*parts), Mode.DEFAULT, text)
-    loader = RenderableFileLoader(renderable_loader)
-    [renderable] = loadfiles([file], loader)
-    assert file == renderable.render([])
-
-
-@pytest.mark.parametrize(
-    "parts,text",
-    [
-        (["README.md"], "# example\n"),
-        (["example", "README.md"], "# example\n"),
-    ],
-)
 def test_renderable_file_renderer(
     parts: list[str],
     text: str,
@@ -132,8 +112,8 @@ def test_renderable_file_renderer(
     """It renders files."""
     file = Buffer(PurePath(*parts), Mode.DEFAULT, text)
     loader = RenderableFileLoader(renderable_loader)
-    repository = loadfiles([file], loader)
-    [rendered] = renderfiles(repository, [])
+    renderable = loader.load(file)
+    [rendered] = renderfiles([renderable], [])
     assert file == rendered
 
 
@@ -144,6 +124,6 @@ def test_renderable_file_renderer_empty_path(
     variable = Variable("project", "")
     file = Buffer(PurePath("{project}", "README.md"), Mode.DEFAULT, "text")
     loader = RenderableFileLoader(renderable_loader)
-    repository = loadfiles([file], loader)
-    rendered = renderfiles(repository, [variable])
+    renderable = loader.load(file)
+    rendered = renderfiles([renderable], [variable])
     assert not list(rendered)
