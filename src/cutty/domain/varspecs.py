@@ -8,6 +8,7 @@ from typing import Generic
 from typing import TypeVar
 
 from cutty.domain.renderables import Renderable
+from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import ValueT_co
 from cutty.domain.variables import Variable
@@ -57,6 +58,29 @@ class RenderableVariableSpecification(
             self.default.render(variables),
             tuple(choice.render(variables) for choice in self.choices),
             self.interactive,
+        )
+
+
+class RenderableVariableSpecificationLoader(
+    RenderableLoader[VariableSpecification[Value]]
+):
+    """A loader for renderable variable specifications."""
+
+    def __init__(self, loader: RenderableLoader[str]) -> None:
+        """Initialize."""
+        self.loader = RenderableValueLoader(loader)
+
+    def load(
+        self, value: VariableSpecification[Value]
+    ) -> Renderable[VariableSpecification[Value]]:
+        """Load the renderable."""
+        return RenderableVariableSpecification(
+            value.name,
+            value.description,
+            value.type,
+            self.loader.load(value.default),
+            tuple(self.loader.load(choice) for choice in value.choices),
+            value.interactive,
         )
 
 
