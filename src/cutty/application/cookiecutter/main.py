@@ -5,9 +5,7 @@ from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.application.cookiecutter.loader import CookiecutterFileLoader
 from cutty.application.cookiecutter.loader import CookiecutterRenderableLoaderFactory
-from cutty.application.cookiecutter.loader import (
-    CookiecutterVariableSpecificationLoader,
-)
+from cutty.application.cookiecutter.loader import CookiecutterTemplateConfigLoader
 from cutty.domain.loader import TemplateLoader
 from cutty.domain.prompts import PromptVariableBuilder
 from cutty.domain.templates import TemplateRenderer
@@ -19,8 +17,8 @@ def main(directory: pathlib.Path) -> None:
     """Generate a project from a Cookiecutter template."""
     path = Path(filesystem=DiskFilesystem(directory))
     loader = TemplateLoader(
+        configloader=CookiecutterTemplateConfigLoader(),
         loaderfactory=CookiecutterRenderableLoaderFactory(),
-        varloader=CookiecutterVariableSpecificationLoader(),
         fileloader=CookiecutterFileLoader(),
     )
     renderer = TemplateRenderer(
