@@ -1,5 +1,6 @@
 """Rendering with Jinja."""
 import contextlib
+import itertools
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Sequence
@@ -23,14 +24,19 @@ class JinjaRenderable(Renderable[str]):
         template: jinja2.Template,
         *,
         context_prefix: Optional[str] = None,
+        extra_variables: Iterable[Variable[Value]] = (),
     ) -> None:
         """Initialize."""
         self.template = template
         self.context_prefix = context_prefix
+        self.extra_variables = tuple(extra_variables)
 
     def render(self, variables: Sequence[Variable[Value]]) -> str:
         """Render the object to a string."""
-        context = {variable.name: variable.value for variable in variables}
+        context = {
+            variable.name: variable.value
+            for variable in itertools.chain(self.extra_variables, variables)
+        }
         if self.context_prefix is not None:
             context = {self.context_prefix: context}
         return self.template.render(context)
@@ -88,6 +94,7 @@ class JinjaRenderableLoader(RenderableLoader[str]):
         *,
         searchpath: Iterable[Path],
         context_prefix: Optional[str] = None,
+        extra_variables: Iterable[Variable[Value]] = (),
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderableLoader:
         """Create a renderable loader using Jinja."""
@@ -97,19 +104,29 @@ class JinjaRenderableLoader(RenderableLoader[str]):
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,
         )
-        return cls(environment, context_prefix=context_prefix)
+        return cls(
+            environment,
+            context_prefix=context_prefix,
+            extra_variables=extra_variables,
+        )
 
     def __init__(
         self,
         environment: jinja2.Environment,
         *,
         context_prefix: Optional[str] = None,
+        extra_variables: Iterable[Variable[Value]] = (),
     ) -> None:
         """Initialize."""
         self.environment = environment
         self.context_prefix = context_prefix
+        self.extra_variables = tuple(extra_variables)
 
     def load(self, text: str, path: Optional[Path] = None) -> Renderable[str]:
         """Load renderable from text."""
         template = self.environment.from_string(text)
-        return JinjaRenderable(template, context_prefix=self.context_prefix)
+        return JinjaRenderable(
+            template,
+            context_prefix=self.context_prefix,
+            extra_variables=self.extra_variables,
+        )
