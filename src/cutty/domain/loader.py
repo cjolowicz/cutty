@@ -7,9 +7,7 @@ from cutty.domain.files import RenderableFileLoader
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateConfig
-from cutty.domain.variables import Value
 from cutty.domain.varspecs import RenderableVariableSpecificationLoader
-from cutty.domain.varspecs import VariableSpecification
 from cutty.filesystem.path import Path
 
 
@@ -21,12 +19,12 @@ class FileLoader(abc.ABC):
         """Load project files."""
 
 
-class VariableSpecificationLoader(abc.ABC):
-    """Interface for loading variable specifications for a template."""
+class TemplateConfigLoader(abc.ABC):
+    """Interface for loading template configurations."""
 
     @abc.abstractmethod
-    def load(self, path: Path) -> Iterator[VariableSpecification[Value]]:
-        """Load variable specifications."""
+    def load(self, path: Path) -> TemplateConfig:
+        """Load template configuration."""
 
 
 class RenderableLoaderFactory(abc.ABC):
@@ -43,18 +41,18 @@ class TemplateLoader:
     def __init__(
         self,
         *,
+        configloader: TemplateConfigLoader,
         loaderfactory: RenderableLoaderFactory,
-        varloader: VariableSpecificationLoader,
         fileloader: FileLoader,
     ) -> None:
         """Initialize."""
+        self.configloader = configloader
         self.loaderfactory = loaderfactory
-        self.varloader = varloader
         self.fileloader = fileloader
 
     def load(self, path: Path) -> Template:
         """Load a template."""
-        config = TemplateConfig(variables=tuple(self.varloader.load(path)))
+        config = self.configloader.load(path)
         loader = self.loaderfactory.create(path, config)
         variables = map(
             RenderableVariableSpecificationLoader(loader).load,
