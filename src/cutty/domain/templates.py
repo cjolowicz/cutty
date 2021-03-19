@@ -7,6 +7,7 @@ from cutty.domain.files import FileStorage
 from cutty.domain.files import renderfiles
 from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
+from cutty.domain.variables import Variable
 from cutty.domain.varspecs import VariableBuilder
 from cutty.domain.varspecs import VariableSpecification
 
@@ -15,6 +16,7 @@ from cutty.domain.varspecs import VariableSpecification
 class TemplateConfig:
     """Template configuration."""
 
+    settings: tuple[Variable[Value], ...]
     variables: tuple[VariableSpecification[Value], ...]
 
 
