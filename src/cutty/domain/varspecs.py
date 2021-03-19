@@ -8,6 +8,7 @@ from typing import Generic
 from typing import TypeVar
 
 from cutty.domain.renderables import Renderable
+from cutty.domain.renderables import RenderableLoader
 from cutty.domain.renderables import RenderableValueLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import ValueT_co
