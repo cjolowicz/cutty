@@ -9,7 +9,7 @@ from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.domain.loader import FileLoader
 from cutty.domain.loader import RenderableLoaderFactory
-from cutty.domain.loader import VariableSpecificationLoader
+from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import TemplateConfig
 from cutty.domain.variables import Value
@@ -104,11 +104,11 @@ def loadvariable(name: str, value: Value) -> VariableSpecification[Value]:
     )
 
 
-class CookiecutterVariableSpecificationLoader(VariableSpecificationLoader):
-    """Loading variable specifications for a Cookiecutter template."""
+class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
+    """Loading Cookiecutter template configurations."""
 
-    def load(self, path: Path) -> Iterator[VariableSpecification[Value]]:
-        """Load variable specifications."""
+    def load(self, path: Path) -> TemplateConfig:
+        """Load template configuration."""
         text = (path / "cookiecutter.json").read_text()
         data = json.loads(text)
 
@@ -116,9 +116,11 @@ class CookiecutterVariableSpecificationLoader(VariableSpecificationLoader):
             isinstance(name, str) for name in data
         )
 
-        for name, value in data.items():
-            value = loadvalue(value)
-            yield loadvariable(name, value)
+        variables = tuple(
+            loadvariable(name, loadvalue(value)) for name, value in data.items()
+        )
+
+        return TemplateConfig(variables)
 
 
 class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
