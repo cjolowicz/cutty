@@ -133,14 +133,6 @@ class RenderableFileLoader(RenderableLoader[File]):
         return RenderableBuffer(path, file.mode, blob)
 
 
-def loadfiles(
-    files: Iterable[File], loader: RenderableLoader[File]
-) -> Iterator[Renderable[File]]:
-    """Load renderable files."""
-    for file in files:
-        yield loader.load(file)
-
-
 def renderfiles(
     files: Iterable[Renderable[File]], variables: Sequence[Variable[Value]]
 ) -> Iterator[File]:
