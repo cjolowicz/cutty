@@ -3,6 +3,7 @@ import pathlib
 
 import pytest
 
+from cutty.adapters.filesystem.filesystem import DiskFilesystem
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Variable
@@ -11,14 +12,16 @@ from cutty.domain.variables import Variable
 @pytest.fixture
 def loader(tmp_path: pathlib.Path) -> JinjaRenderableLoader:
     """Fixture for a Jinja loader."""
-    return JinjaRenderableLoader.create(searchpath=[tmp_path])
+    filesystem = DiskFilesystem(tmp_path)
+    return JinjaRenderableLoader.create(searchpath=[filesystem.root])
 
 
 @pytest.fixture
 def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader[str]:
     """Fixture for a Jinja loader with a cookiecutter prefix."""
+    filesystem = DiskFilesystem(tmp_path)
     return JinjaRenderableLoader.create(
-        searchpath=[tmp_path], context_prefix="cookiecutter"
+        searchpath=[filesystem.root], context_prefix="cookiecutter"
     )
 
 
