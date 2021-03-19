@@ -13,6 +13,7 @@ from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import TemplateConfig
 from cutty.domain.variables import Value
+from cutty.domain.variables import Variable
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 from cutty.filesystem.base import Access
@@ -80,10 +81,7 @@ def loadvalue(value: Any) -> Value:
 
 def loadvariable(name: str, value: Value) -> VariableSpecification[Value]:
     """Load a variable specification."""
-    interactive = not name.startswith("_")
-    # FIXME: Do not render variables with a leading underscore.
-
-    if interactive and isinstance(value, list):
+    if isinstance(value, list):
         [variable_type] = set(get_variable_type(choice) for choice in value)
         return VariableSpecification(
             name=name,
@@ -91,7 +89,7 @@ def loadvariable(name: str, value: Value) -> VariableSpecification[Value]:
             type=variable_type,
             default=value[0],
             choices=tuple(value),
-            interactive=interactive,
+            interactive=True,
         )
 
     return VariableSpecification(
@@ -100,7 +98,7 @@ def loadvariable(name: str, value: Value) -> VariableSpecification[Value]:
         type=get_variable_type(value),
         default=value,
         choices=(),
-        interactive=interactive,
+        interactive=True,
     )
 
 
@@ -116,11 +114,19 @@ class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
             isinstance(name, str) for name in data
         )
 
-        variables = tuple(
-            loadvariable(name, loadvalue(value)) for name, value in data.items()
+        settings = tuple(
+            Variable(name, loadvalue(value))
+            for name, value in data.items()
+            if name.startswith("_")
         )
 
-        return TemplateConfig(variables)
+        variables = tuple(
+            loadvariable(name, loadvalue(value))
+            for name, value in data.items()
+            if not name.startswith("_")
+        )
+
+        return TemplateConfig(settings, variables)
 
 
 class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
@@ -128,9 +134,10 @@ class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
 
     def create(self, path: Path, config: TemplateConfig) -> RenderableLoader[str]:
         """Create renderable loader."""
-        for variable in config.variables:
-            if variable.name == "_extensions":
-                extensions = variable.default
+        for setting in config.settings:
+            if setting.name == "_extensions":
+                extensions = setting.value
+                break
         else:
             extensions = []
 
@@ -141,5 +148,6 @@ class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
         return JinjaRenderableLoader.create(
             searchpath=[path],
             context_prefix="cookiecutter",
+            extra_variables=config.settings,
             extra_extensions=extensions,
         )
