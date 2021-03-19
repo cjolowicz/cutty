@@ -11,14 +11,6 @@ from cutty.domain.varspecs import RenderableVariableSpecificationLoader
 from cutty.filesystem.path import Path
 
 
-class FileLoader(abc.ABC):
-    """Interface for loading project files for a template."""
-
-    @abc.abstractmethod
-    def load(self, path: Path) -> Iterator[File]:
-        """Load project files."""
-
-
 class TemplateConfigLoader(abc.ABC):
     """Interface for loading template configurations."""
 
@@ -33,6 +25,14 @@ class RenderableLoaderFactory(abc.ABC):
     @abc.abstractmethod
     def create(self, path: Path, config: TemplateConfig) -> RenderableLoader[str]:
         """Create renderable loader."""
+
+
+class FileLoader(abc.ABC):
+    """Interface for loading project files for a template."""
+
+    @abc.abstractmethod
+    def load(self, path: Path) -> Iterator[File]:
+        """Load project files."""
 
 
 class TemplateLoader:
