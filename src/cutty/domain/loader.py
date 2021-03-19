@@ -1,12 +1,15 @@
 """Loading project templates from the filesystem."""
 import abc
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 from cutty.domain.files import File
 from cutty.domain.files import RenderableFileLoader
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateConfig
+from cutty.domain.variables import Value
+from cutty.domain.variables import Variable
 from cutty.domain.varspecs import RenderableVariableSpecificationLoader
 from cutty.filesystem.path import Path
 
@@ -23,7 +26,9 @@ class RenderableLoaderFactory(abc.ABC):
     """Interface for creating a renderable loader."""
 
     @abc.abstractmethod
-    def create(self, path: Path, config: TemplateConfig) -> RenderableLoader[str]:
+    def create(
+        self, path: Path, *, settings: Sequence[Variable[Value]]
+    ) -> RenderableLoader[str]:
         """Create renderable loader."""
 
 
@@ -53,7 +58,7 @@ class TemplateLoader:
     def load(self, path: Path) -> Template:
         """Load a template."""
         config = self.configloader.load(path)
-        loader = self.loaderfactory.create(path, config)
+        loader = self.loaderfactory.create(path, settings=config.settings)
         variables = map(
             RenderableVariableSpecificationLoader(loader).load,
             config.variables,

@@ -1,6 +1,7 @@
 """Cookiecutter loader."""
 import json
 from collections.abc import Iterator
+from collections.abc import Sequence
 from typing import Any
 
 from cutty.adapters.jinja.renderables import JinjaRenderableLoader
@@ -132,9 +133,11 @@ class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
 class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
     """Creating a renderable loader."""
 
-    def create(self, path: Path, config: TemplateConfig) -> RenderableLoader[str]:
+    def create(
+        self, path: Path, settings: Sequence[Variable[Value]]
+    ) -> RenderableLoader[str]:
         """Create renderable loader."""
-        for setting in config.settings:
+        for setting in settings:
             if setting.name == "_extensions":
                 extensions = setting.value
                 break
@@ -148,6 +151,6 @@ class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
         return JinjaRenderableLoader.create(
             searchpath=[path],
             context_prefix="cookiecutter",
-            extra_variables=config.settings,
+            extra_variables=settings,
             extra_extensions=extensions,
         )
