@@ -11,6 +11,7 @@ from cutty.domain.loader import FileLoader
 from cutty.domain.loader import RenderableLoaderFactory
 from cutty.domain.loader import VariableSpecificationLoader
 from cutty.domain.renderables import RenderableLoader
+from cutty.domain.templates import TemplateConfig
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
@@ -123,16 +124,13 @@ class CookiecutterVariableSpecificationLoader(VariableSpecificationLoader):
 class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
     """Creating a renderable loader."""
 
-    def create(self, path: Path) -> RenderableLoader[str]:
+    def create(self, path: Path, config: TemplateConfig) -> RenderableLoader[str]:
         """Create renderable loader."""
-        text = (path / "cookiecutter.json").read_text()
-        data = json.loads(text)
-
-        assert isinstance(data, dict) and all(  # noqa: S101
-            isinstance(name, str) for name in data
-        )
-
-        extensions = data.get("_extensions", [])
+        for variable in config.variables:
+            if variable.name == "_extensions":
+                extensions = variable.default
+        else:
+            extensions = []
 
         assert isinstance(extensions, list) and all(  # noqa: S101
             isinstance(item, str) for item in extensions
