@@ -1,5 +1,6 @@
 """Templates."""
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
@@ -8,6 +9,13 @@ from cutty.domain.renderables import Renderable
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableBuilder
 from cutty.domain.varspecs import VariableSpecification
+
+
+@dataclass
+class TemplateConfig:
+    """Template configuration."""
+
+    variables: tuple[VariableSpecification[Value], ...]
 
 
 class Template:
