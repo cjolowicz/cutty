@@ -1,11 +1,11 @@
 """Unit tests for cutty.adapters.filesystem.files."""
+import os
 import pathlib
 import platform
 
 import pytest
 
 from cutty.adapters.filesystem.files import FilesystemFileStorage
-from cutty.adapters.filesystem.files import loadbuffers
 from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
@@ -36,8 +36,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
 
-    [file] = loadbuffers(tmp_path / "main.py", relative_to=tmp_path)
-    assert file.mode & Mode.EXECUTABLE
+    assert os.access(tmp_path / "main.py", os.X_OK)
 
 
 def test_temporary() -> None:
