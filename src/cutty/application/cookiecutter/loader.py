@@ -7,8 +7,6 @@ from cutty.adapters.jinja.renderables import JinjaRenderableLoader
 from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
-from cutty.domain.filesystem import Access
-from cutty.domain.filesystem import Path
 from cutty.domain.loader import FileLoader
 from cutty.domain.loader import RenderableLoaderFactory
 from cutty.domain.loader import VariableSpecificationLoader
@@ -16,6 +14,8 @@ from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
+from cutty.filesystem.base import Access
+from cutty.filesystem.path import Path
 
 
 def walkfiles(path: Path) -> Iterator[Path]:

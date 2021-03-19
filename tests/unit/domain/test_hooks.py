@@ -3,12 +3,12 @@ import pytest
 
 from cutty.domain.files import Buffer
 from cutty.domain.files import Mode
-from cutty.domain.filesystem import PurePath
 from cutty.domain.hooks import Hook
 from cutty.domain.hooks import HookExecutor
 from cutty.domain.hooks import HookManager
 from cutty.domain.hooks import PostGenerateProject
 from cutty.domain.hooks import PreGenerateProject
+from cutty.filesystem.pure import PurePath
 from cutty.util.bus import Bus
 from cutty.util.bus import Event
 

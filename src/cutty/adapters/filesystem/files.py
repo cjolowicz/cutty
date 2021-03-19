@@ -9,7 +9,7 @@ from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
-from cutty.domain.filesystem import PurePath
+from cutty.filesystem.pure import PurePath
 
 
 def walkfiles(path: pathlib.Path) -> Iterator[pathlib.Path]:

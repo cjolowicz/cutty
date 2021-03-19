@@ -7,11 +7,11 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from cutty.domain.filesystem import PurePath
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
+from cutty.filesystem.pure import PurePath
 
 
 class Mode(enum.Flag):

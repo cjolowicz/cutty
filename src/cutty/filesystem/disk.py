@@ -1,11 +1,11 @@
-"""Filesystem implementation based on pathlib."""
+"""Disk-based filesystem implementation using pathlib."""
 import os
 import pathlib
 from collections.abc import Iterator
 
-from cutty.domain.filesystem import Access
-from cutty.domain.filesystem import Filesystem
-from cutty.domain.filesystem import PurePath
+from cutty.filesystem.base import Access
+from cutty.filesystem.base import Filesystem
+from cutty.filesystem.pure import PurePath
 
 
 def _fromaccess(access: Access) -> int:
