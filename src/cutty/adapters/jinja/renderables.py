@@ -8,11 +8,11 @@ from typing import Optional
 import jinja2
 
 from cutty.adapters.jinja import extensions
-from cutty.domain.filesystem import Path
 from cutty.domain.renderables import Renderable
 from cutty.domain.renderables import RenderableLoader
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
+from cutty.filesystem.path import Path
 
 
 class JinjaRenderable(Renderable[str]):
