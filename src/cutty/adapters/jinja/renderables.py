@@ -1,5 +1,6 @@
 """Rendering with Jinja."""
-import pathlib
+import contextlib
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Sequence
 from typing import Optional
@@ -35,6 +36,49 @@ class JinjaRenderable(Renderable[str]):
         return self.template.render(context)
 
 
+def splitpath(pathstr: str) -> tuple[str, ...]:
+    """Split a path into segments and perform a sanity check.
+
+    If it detects '..' in the path it will raise a `TemplateNotFound` error.
+
+    source: jinja2.loaders.split_template_path
+    """
+    # TODO: Add string parsing to PurePath?
+    # TODO: Add common validation function? (see also RenderablePath)
+    import os.path
+
+    separators = [sep for sep in (os.path.sep, os.path.altsep) if sep]
+    parts = tuple(part for part in pathstr.split("/") if part and part != ".")
+
+    if any(
+        any(sep in part for sep in separators) or part == os.path.pardir
+        for part in parts
+    ):
+        raise jinja2.TemplateNotFound(pathstr)
+
+    return parts
+
+
+class _FilesystemLoader(jinja2.BaseLoader):
+    """Load templates from a directory in the file system."""
+
+    def __init__(self, *, searchpath: Iterable[Path]):
+        """Initialize."""
+        self.searchpath = tuple(searchpath)
+
+    def get_source(
+        self, environment: jinja2.Environment, template: str
+    ) -> tuple[str, str, Callable[[], bool]]:
+        """Get the template source, filename and reload helper for a template."""
+        parts = splitpath(template)
+        for searchpath in self.searchpath:
+            path = searchpath.joinpath(*parts)
+            with contextlib.suppress(FileNotFoundError):
+                return path.read_text(), str(path), lambda: True
+
+        raise jinja2.TemplateNotFound(template)
+
+
 class JinjaRenderableLoader(RenderableLoader[str]):
     """Wrapper for a Jinja environment."""
 
@@ -42,15 +86,13 @@ class JinjaRenderableLoader(RenderableLoader[str]):
     def create(
         cls,
         *,
-        searchpath: Iterable[pathlib.Path],
+        searchpath: Iterable[Path],
         context_prefix: Optional[str] = None,
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderableLoader:
         """Create a renderable loader using Jinja."""
         environment = jinja2.Environment(  # noqa: S701
-            loader=jinja2.FileSystemLoader(
-                [str(directory) for directory in searchpath]
-            ),
+            loader=_FilesystemLoader(searchpath=searchpath),
             extensions=extensions.load(extra=extra_extensions),
             keep_trailing_newline=True,
             undefined=jinja2.StrictUndefined,
