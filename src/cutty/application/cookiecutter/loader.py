@@ -6,7 +6,6 @@ from typing import Any
 
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
-from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.domain.loader import FileLoader
@@ -48,7 +47,7 @@ class CookiecutterFileLoader(FileLoader):
         for path in walkfiles(template_dir):
             blob = path.read_text()
             mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
-            yield Buffer(path, mode, blob)
+            yield File(path, mode, blob)
 
 
 def loadvalue(value: Any) -> Value:

@@ -13,45 +13,13 @@ class Mode(enum.Flag):
     EXECUTABLE = enum.auto()
 
 
-class File(abc.ABC):
-    """File abstraction."""
-
-    @property
-    @abc.abstractmethod
-    def path(self) -> PurePath:
-        """Return the file path."""
-
-    @property
-    @abc.abstractmethod
-    def mode(self) -> Mode:
-        """Return the file mode."""
-
-    @abc.abstractmethod
-    def read(self) -> str:
-        """Return the file contents."""
-
-
 @dataclass(frozen=True)
-class Buffer(File):
+class File:
     """A file in memory."""
 
-    _path: PurePath
-    _mode: Mode
-    _blob: str
-
-    @property
-    def path(self) -> PurePath:
-        """Return the file path."""
-        return self._path
-
-    @property
-    def mode(self) -> Mode:
-        """Return the file mode."""
-        return self._mode
-
-    def read(self) -> str:
-        """Return the file contents."""
-        return self._blob
+    path: PurePath
+    mode: Mode
+    blob: str
 
 
 class FileStorage(abc.ABC):
