@@ -1,6 +1,6 @@
 """Template variables."""
 import abc
-from collections.abc import Iterable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Generic
 from typing import TYPE_CHECKING
@@ -34,10 +34,10 @@ class Binder(abc.ABC):
     @abc.abstractmethod
     def bind(
         self,
-        variables: Iterable[Variable],
-        settings: Iterable[Binding],
+        variables: Sequence[Variable],
+        settings: Sequence[Binding],
         render: Renderer,
-    ) -> list[Binding]:
+    ) -> Sequence[Binding]:
         """Bind the variables."""
 
 
@@ -46,12 +46,11 @@ class DefaultBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[Variable],
-        settings: Iterable[Binding],
+        variables: Sequence[Variable],
+        settings: Sequence[Binding],
         render: Renderer,
-    ) -> list[Binding]:
+    ) -> Sequence[Binding]:
         """Bind the variables."""
-        settings = tuple(settings)
         bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings, settings)
