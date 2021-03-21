@@ -3,12 +3,12 @@ import abc
 from collections.abc import Sequence
 from typing import Generic
 
+from cutty.domain.binders import Binder
 from cutty.domain.bindings import Binding
 from cutty.domain.bindings import GenericBinding
 from cutty.domain.render import Renderer
 from cutty.domain.values import ValueT
 from cutty.domain.values import ValueT_co
-from cutty.domain.variables import Binder
 from cutty.domain.variables import GenericVariable
 from cutty.domain.variables import Variable
 
