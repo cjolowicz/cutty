@@ -1,8 +1,8 @@
 """Unit test fixtures for cutty."""
 import pytest
 
-from cutty.domain.bindings import ValueType
 from cutty.domain.render import Renderer
+from cutty.domain.values import ValueType
 from cutty.domain.variables import GenericVariable
 from cutty.util.bus import Bus
 

@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from cutty.domain.render import Renderer
-from cutty.domain.bindings import Value
-from cutty.domain.bindings import ValueT_co
-from cutty.domain.bindings import ValueType
+from cutty.domain.values import Value
+from cutty.domain.values import ValueT_co
+from cutty.domain.values import ValueType
 from cutty.domain.bindings import Binding
 
 

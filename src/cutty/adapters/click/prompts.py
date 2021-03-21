@@ -4,12 +4,12 @@ from typing import Optional
 
 import click
 
-from cutty.domain.bindings import Value
-from cutty.domain.bindings import ValueT
-from cutty.domain.bindings import ValueT_co
-from cutty.domain.bindings import ValueType
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptFactory
+from cutty.domain.values import Value
+from cutty.domain.values import ValueT
+from cutty.domain.values import ValueT_co
+from cutty.domain.values import ValueType
 from cutty.domain.variables import GenericVariable
 
 
