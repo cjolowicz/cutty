@@ -10,7 +10,7 @@ from cutty.domain.bindings import ValueT_co
 from cutty.domain.bindings import ValueType
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptFactory
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 
 
 class NoopPrompt(Prompt[ValueT_co]):
@@ -98,7 +98,7 @@ def _load_json_dict(value: Optional[str]) -> dict[str, Value]:
 class ClickPromptFactory(PromptFactory):
     """Given a variable, return a prompt."""
 
-    def create(self, variable: Variable[ValueT]) -> Prompt[ValueT]:
+    def create(self, variable: GenericVariable[ValueT]) -> Prompt[ValueT]:
         """Create a prompt."""
         if not variable.interactive:
             return NoopPrompt(variable)

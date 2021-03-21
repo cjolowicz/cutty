@@ -11,7 +11,7 @@ from typing import Union
 from cutty.domain.bindings import Binding
 from cutty.domain.bindings import Value
 from cutty.domain.files import Buffer
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 from cutty.filesystem.pure import PurePath
 
 
@@ -107,14 +107,14 @@ class Renderer:
                 for key, value in mapping.items()
             }
 
-        @render.register(Variable)  # type: ignore[no-redef]
+        @render.register(GenericVariable)  # type: ignore[no-redef]
         def _(
-            variable: Variable[Value],
+            variable: GenericVariable[Value],
             bindings: Sequence[Binding],
             settings: Sequence[Binding],
             render: RenderFunction[T],
-        ) -> Variable[Value]:
-            return Variable(
+        ) -> GenericVariable[Value]:
+            return GenericVariable(
                 variable.name,
                 variable.description,
                 variable.type,

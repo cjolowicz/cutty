@@ -3,7 +3,7 @@ import pytest
 
 from cutty.domain.bindings import ValueType
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 from cutty.util.bus import Bus
 
 
@@ -26,9 +26,9 @@ def render() -> Renderer:
 
 
 @pytest.fixture
-def variable() -> Variable[str]:
+def variable() -> GenericVariable[str]:
     """Fixture with a variable."""
-    return Variable(
+    return GenericVariable(
         name="project",
         description="The name of the project",
         type=ValueType.STRING,

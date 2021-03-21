@@ -14,7 +14,7 @@ from cutty.domain.bindings import Binding
 
 
 @dataclass(frozen=True)
-class Variable(Generic[ValueT_co]):
+class GenericVariable(Generic[ValueT_co]):
     """Specification for a template variable."""
 
     name: str
@@ -31,7 +31,7 @@ class Binder(abc.ABC):
     @abc.abstractmethod
     def bind(
         self,
-        variables: Iterable[Variable[Value]],
+        variables: Iterable[GenericVariable[Value]],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:
@@ -43,7 +43,7 @@ class DefaultBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[Variable[Value]],
+        variables: Iterable[GenericVariable[Value]],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:
