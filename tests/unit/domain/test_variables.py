@@ -1,6 +1,6 @@
 """Unit tests for cutty.domain.variables."""
+from cutty.domain.binders import DefaultBinder
 from cutty.domain.render import Renderer
-from cutty.domain.variables import DefaultBinder
 from cutty.domain.variables import GenericVariable
 
 
