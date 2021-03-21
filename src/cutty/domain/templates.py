@@ -4,11 +4,11 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from cutty.domain.binders import Binder
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Binder
 from cutty.domain.variables import Variable
 
 
