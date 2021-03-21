@@ -15,7 +15,7 @@ def test_default_variable_binder(
     """It binds variables using only defaults."""
     binder = DefaultBinder()
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding.name == "project"
     assert binding.value == "example"
