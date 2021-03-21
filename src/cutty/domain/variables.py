@@ -3,6 +3,7 @@ import abc
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 from typing import Generic
 from typing import TYPE_CHECKING
 
@@ -22,6 +23,24 @@ class ValueType(str, Enum):
     STRING = "string"
     ARRAY = "array"
     OBJECT = "object"
+
+
+def getvaluetype(value: Any) -> ValueType:
+    """Return the appropriate value type for the value."""
+    mapping = {
+        type(None): ValueType.NULL,
+        bool: ValueType.BOOLEAN,
+        float: ValueType.NUMBER,
+        str: ValueType.STRING,
+        list: ValueType.ARRAY,
+        dict: ValueType.OBJECT,
+    }
+
+    for cls, valuetype in mapping.items():
+        if isinstance(value, cls):
+            return valuetype
+
+    raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
 @dataclass(frozen=True)
