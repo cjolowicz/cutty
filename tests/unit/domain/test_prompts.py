@@ -31,7 +31,7 @@ def test_prompt_variable_binder(
     factory = FakePromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding.name == "project"
     assert binding.value == "example"
