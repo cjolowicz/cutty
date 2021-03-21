@@ -7,9 +7,9 @@ import click
 from cutty.domain.bindings import Value
 from cutty.domain.bindings import ValueT
 from cutty.domain.bindings import ValueT_co
+from cutty.domain.bindings import ValueType
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptFactory
-from cutty.domain.variables import ValueType
 from cutty.domain.variables import Variable
 
 
