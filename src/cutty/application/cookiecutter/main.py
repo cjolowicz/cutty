@@ -7,7 +7,7 @@ from cutty.application.cookiecutter.loader import CookiecutterFileLoader
 from cutty.application.cookiecutter.loader import CookiecutterRendererFactory
 from cutty.application.cookiecutter.loader import CookiecutterTemplateConfigLoader
 from cutty.domain.loader import TemplateLoader
-from cutty.domain.prompts import PromptVariableBuilder
+from cutty.domain.prompts import PromptBinder
 from cutty.domain.templates import TemplateRenderer
 from cutty.filesystem.disk import DiskFilesystem
 from cutty.filesystem.path import Path
@@ -22,7 +22,7 @@ def main(directory: pathlib.Path) -> None:
         fileloader=CookiecutterFileLoader(),
     )
     renderer = TemplateRenderer(
-        builder=PromptVariableBuilder(ClickPromptFactory()),
+        binder=PromptBinder(ClickPromptFactory()),
         storage=FilesystemFileStorage(pathlib.Path.cwd()),
     )
     template = loader.load(path)

@@ -2,8 +2,8 @@
 import pytest
 
 from cutty.domain.render import Renderer
-from cutty.domain.varspecs import VariableSpecification
-from cutty.domain.varspecs import VariableType
+from cutty.domain.variables import ValueType
+from cutty.domain.variables import Variable
 from cutty.util.bus import Bus
 
 
@@ -19,21 +19,19 @@ def render() -> Renderer:
     render = Renderer.create()
 
     @render.register(str)
-    def _(value, variables, settings, _):  # type: ignore[no-untyped-def]
-        return value.format_map(
-            {variable.name: variable.value for variable in variables}
-        )
+    def _(value, bindings, settings, _):  # type: ignore[no-untyped-def]
+        return value.format_map({binding.name: binding.value for binding in bindings})
 
     return render
 
 
 @pytest.fixture
-def specification() -> VariableSpecification[str]:
-    """Fixture with a variable specification."""
-    return VariableSpecification(
+def variable() -> Variable[str]:
+    """Fixture with a variable."""
+    return Variable(
         name="project",
         description="The name of the project",
-        type=VariableType.STRING,
+        type=ValueType.STRING,
         default="example",
         choices=(),
         interactive=True,

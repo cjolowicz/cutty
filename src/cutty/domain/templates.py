@@ -4,21 +4,21 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from cutty.domain.bindings import Binding
+from cutty.domain.bindings import Value
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Value
+from cutty.domain.variables import Binder
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import VariableBuilder
-from cutty.domain.varspecs import VariableSpecification
 
 
 @dataclass
 class TemplateConfig:
     """Template configuration."""
 
-    settings: tuple[Variable[Value], ...]
-    variables: tuple[VariableSpecification[Value], ...]
+    settings: tuple[Binding[Value], ...]
+    bindings: tuple[Variable[Value], ...]
 
 
 class InvalidPathComponent(Exception):
@@ -42,10 +42,10 @@ class Template:
         self.hooks = hooks
         self.renderer = renderer
 
-    def render(self, variables: Sequence[Variable[Value]]) -> Iterator[File]:
+    def render(self, bindings: Sequence[Binding[Value]]) -> Iterator[File]:
         """Render the template."""
         for file in self.files:
-            file = self.renderer(file, variables, self.config.settings)
+            file = self.renderer(file, bindings, self.config.settings)
 
             if not all(part for part in file.path.parts):
                 continue
@@ -62,18 +62,18 @@ class Template:
 class TemplateRenderer:
     """A renderer for templates."""
 
-    def __init__(self, *, builder: VariableBuilder, storage: FileStorage) -> None:
+    def __init__(self, *, binder: Binder, storage: FileStorage) -> None:
         """Initialize."""
-        self.builder = builder
+        self.binder = binder
         self.storage = storage
 
     def render(self, template: Template) -> None:
         """Render the template."""
-        variables = self.builder.build(
-            template.config.variables,
+        bindings = self.binder.bind(
+            template.config.bindings,
             template.config.settings,
             template.renderer,
         )
 
-        for file in template.render(variables):
+        for file in template.render(bindings):
             self.storage.store(file)

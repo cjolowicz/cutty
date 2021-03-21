@@ -4,8 +4,8 @@ import pathlib
 import pytest
 
 from cutty.adapters.jinja.render import JinjaRenderer
+from cutty.domain.bindings import Binding
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
 from cutty.filesystem.disk import DiskFilesystem
 from cutty.filesystem.path import Path
 
@@ -30,13 +30,13 @@ def cookiecutter_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
 
 def test_render(jinja_render: Renderer) -> None:
     """It renders a Jinja template."""
-    variable = Variable("value", 42)
+    variable = Binding("value", 42)
     text = jinja_render("{{ value }}", [variable], [])
     assert text == "42"
 
 
 def test_render_with_context_prefix(cookiecutter_render: Renderer) -> None:
     """It renders a Jinja template with a context prefix."""
-    variable = Variable("value", 42)
+    variable = Binding("value", 42)
     text = cookiecutter_render("{{ cookiecutter.value }}", [variable], [])
     assert text == "42"

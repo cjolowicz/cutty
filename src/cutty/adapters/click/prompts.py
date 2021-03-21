@@ -4,13 +4,13 @@ from typing import Optional
 
 import click
 
+from cutty.domain.bindings import Value
+from cutty.domain.bindings import ValueT
+from cutty.domain.bindings import ValueT_co
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptFactory
-from cutty.domain.variables import Value
-from cutty.domain.variables import ValueT
-from cutty.domain.variables import ValueT_co
-from cutty.domain.varspecs import VariableSpecification
-from cutty.domain.varspecs import VariableType
+from cutty.domain.variables import ValueType
+from cutty.domain.variables import Variable
 
 
 class NoopPrompt(Prompt[ValueT_co]):
@@ -18,7 +18,7 @@ class NoopPrompt(Prompt[ValueT_co]):
 
     def promptvalue(self) -> ValueT_co:
         """Ask the user for a value."""
-        return self.specification.default
+        return self.variable.default
 
 
 class TextPrompt(Prompt[ValueT_co]):
@@ -28,8 +28,8 @@ class TextPrompt(Prompt[ValueT_co]):
         """Ask the user for a value."""
         # typeshed incorrectly requires Optional[str] for `default`
         value: ValueT_co = click.prompt(
-            self.specification.name,
-            default=self.specification.default,  # type: ignore[arg-type]
+            self.variable.name,
+            default=self.variable.default,  # type: ignore[arg-type]
         )
         return value
 
@@ -39,16 +39,15 @@ class ChoicePrompt(Prompt[ValueT_co]):
 
     def promptvalue(self) -> ValueT_co:
         """Ask the user for a value."""
-        if not self.specification.choices:
-            raise ValueError("variable specification with empty choices")
+        if not self.variable.choices:
+            raise ValueError("variable with empty choices")
 
         choices = {
-            str(number): value
-            for number, value in enumerate(self.specification.choices, 1)
+            str(number): value for number, value in enumerate(self.variable.choices, 1)
         }
 
         lines = [
-            f"Select {self.specification.name}:",
+            f"Select {self.variable.name}:",
             *[f"{number} - {value}" for number, value in choices.items()],
             "Choose from {}".format(", ".join(choices.keys())),
         ]
@@ -69,14 +68,14 @@ class JSONPrompt(Prompt[ValueT_co]):
     def promptvalue(self) -> ValueT_co:
         """Ask the user for a value."""
         value: ValueT_co = click.prompt(
-            self.specification.name,
+            self.variable.name,
             default="default",
             type=click.STRING,
             value_proc=_load_json_dict,
         )
 
         if value == "default":
-            return self.specification.default
+            return self.variable.default
 
         return value
 
@@ -97,17 +96,17 @@ def _load_json_dict(value: Optional[str]) -> dict[str, Value]:
 
 
 class ClickPromptFactory(PromptFactory):
-    """Given a variable specification, return a prompt."""
+    """Given a variable, return a prompt."""
 
-    def create(self, specification: VariableSpecification[ValueT]) -> Prompt[ValueT]:
+    def create(self, variable: Variable[ValueT]) -> Prompt[ValueT]:
         """Create a prompt."""
-        if not specification.interactive:
-            return NoopPrompt(specification)
+        if not variable.interactive:
+            return NoopPrompt(variable)
 
-        if specification.choices:
-            return ChoicePrompt(specification)
+        if variable.choices:
+            return ChoicePrompt(variable)
 
-        if specification.type is VariableType.OBJECT:
-            return JSONPrompt(specification)
+        if variable.type is ValueType.OBJECT:
+            return JSONPrompt(variable)
 
-        return TextPrompt(specification)
+        return TextPrompt(variable)
