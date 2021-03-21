@@ -44,7 +44,7 @@ class Template:
     def render(self, bindings: Sequence[Binding]) -> Iterator[File]:
         """Render the template."""
         for file in self.files:
-            file = self.renderer(file, bindings, self.config.settings)
+            file = self.renderer(file, bindings)
 
             if not all(file.path.parts):
                 # FIXME: Shouldn't have rendered the blob at all.

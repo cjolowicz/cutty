@@ -19,7 +19,7 @@ def render() -> Renderer:
     render = Renderer.create()
 
     @render.register(str)
-    def _(value, bindings, settings, _):  # type: ignore[no-untyped-def]
+    def _(value, bindings, _):  # type: ignore[no-untyped-def]
         return value.format_map({binding.name: binding.value for binding in bindings})
 
     return render

@@ -17,10 +17,8 @@ from cutty.filesystem.pure import PurePath
 
 T = TypeVar("T")
 U = TypeVar("U")
-RenderFunction = Callable[[T, Sequence[Binding], Sequence[Binding]], T]
-RenderContinuation = Callable[
-    [T, Sequence[Binding], Sequence[Binding], RenderFunction[U]], T
-]
+RenderFunction = Callable[[T, Sequence[Binding]], T]
+RenderContinuation = Callable[[T, Sequence[Binding], RenderFunction[U]], T]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
 
 
@@ -31,18 +29,14 @@ class Renderer:
         """Initialize."""
 
         @functools.singledispatch
-        def _render(
-            value: T, bindings: Sequence[Binding], settings: Sequence[Binding]
-        ) -> T:
+        def _render(value: T, bindings: Sequence[Binding]) -> T:
             return value
 
         self._render = _render
 
-    def __call__(
-        self, value: T, bindings: Sequence[Binding], settings: Sequence[Binding]
-    ) -> T:
+    def __call__(self, value: T, bindings: Sequence[Binding]) -> T:
         """Render."""
-        return self._render(value, bindings, settings)
+        return self._render(value, bindings)
 
     @overload
     def register(
@@ -75,9 +69,9 @@ class Renderer:
             )
 
         @self._render.register(cls)
-        def _(value: T, bindings: Sequence[Binding], settings: Sequence[Binding]) -> T:
+        def _(value: T, bindings: Sequence[Binding]) -> T:
             assert function is not None  # noqa: S101
-            return function(value, bindings, settings, self)
+            return function(value, bindings, self)
 
         return function
 
@@ -88,22 +82,18 @@ class Renderer:
 
         @render.register(list)
         def _(
-            values: list[T],
-            bindings: Sequence[Binding],
-            settings: Sequence[Binding],
-            render: RenderFunction[T],
+            values: list[T], bindings: Sequence[Binding], render: RenderFunction[T]
         ) -> list[T]:
-            return [render(value, bindings, settings) for value in values]
+            return [render(value, bindings) for value in values]
 
         @render.register(dict)  # type: ignore[no-redef]
         def _(
             mapping: dict[str, T],
             bindings: Sequence[Binding],
-            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> dict[str, T]:
             return {
-                render(key, bindings, settings): render(value, bindings, settings)
+                render(key, bindings): render(value, bindings)
                 for key, value in mapping.items()
             }
 
@@ -111,17 +101,14 @@ class Renderer:
         def _(
             variable: Variable,
             bindings: Sequence[Binding],
-            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> Variable:
             return Variable(
                 variable.name,
                 variable.description,
                 variable.type,
-                render(variable.default, bindings, settings),
-                tuple(
-                    render(choice, bindings, settings) for choice in variable.choices
-                ),
+                render(variable.default, bindings),
+                tuple(render(choice, bindings) for choice in variable.choices),
                 variable.interactive,
             )
 
@@ -129,22 +116,20 @@ class Renderer:
         def _(
             path: PurePath,
             bindings: Sequence[Binding],
-            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> PurePath:
-            return PurePath(*(render(part, bindings, settings) for part in path.parts))
+            return PurePath(*(render(part, bindings) for part in path.parts))
 
         @render.register  # type: ignore[no-redef]
         def _(
             file: File,
             bindings: Sequence[Binding],
-            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> File:
             return File(
-                render(file.path, bindings, settings),
+                render(file.path, bindings),
                 file.mode,
-                render(file.blob, bindings, settings),
+                render(file.blob, bindings),
             )
 
         return render
