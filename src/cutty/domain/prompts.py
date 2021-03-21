@@ -1,6 +1,6 @@
 """Prompting the user for template bindings."""
 import abc
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Generic
 
 from cutty.domain.bindings import Binding
@@ -47,12 +47,11 @@ class PromptBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[Variable],
-        settings: Iterable[Binding],
+        variables: Sequence[Variable],
+        settings: Sequence[Binding],
         render: Renderer,
-    ) -> list[Binding]:
+    ) -> Sequence[Binding]:
         """Bind the variables."""
-        settings = tuple(settings)
         bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings, settings)
