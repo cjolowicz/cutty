@@ -17,7 +17,7 @@ class TemplateConfig:
     """Template configuration."""
 
     settings: tuple[Binding, ...]
-    bindings: tuple[Variable, ...]
+    variables: tuple[Variable, ...]
 
 
 class InvalidPathComponent(Exception):
@@ -69,7 +69,7 @@ class TemplateRenderer:
     def render(self, template: Template) -> None:
         """Render the template."""
         bindings = self.binder.bind(
-            template.config.bindings,
+            template.config.variables,
             template.config.settings,
             template.renderer,
         )
