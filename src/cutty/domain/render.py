@@ -9,9 +9,9 @@ from typing import TypeVar
 from typing import Union
 
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import Value
 from cutty.domain.files import Buffer
 from cutty.domain.variables import GenericVariable
+from cutty.domain.variables import Variable
 from cutty.filesystem.pure import PurePath
 
 
@@ -109,12 +109,12 @@ class Renderer:
 
         @render.register(GenericVariable)  # type: ignore[no-redef]
         def _(
-            variable: GenericVariable[Value],
+            variable: Variable,
             bindings: Sequence[Binding],
             settings: Sequence[Binding],
             render: RenderFunction[T],
-        ) -> GenericVariable[Value]:
-            return GenericVariable(
+        ) -> Variable:
+            return Variable(
                 variable.name,
                 variable.description,
                 variable.type,
