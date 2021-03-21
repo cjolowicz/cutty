@@ -25,13 +25,16 @@ class GenericVariable(Generic[ValueT_co]):
     interactive: bool
 
 
+Variable = GenericVariable[Value]
+
+
 class Binder(abc.ABC):
     """Interface for binding variables."""
 
     @abc.abstractmethod
     def bind(
         self,
-        variables: Iterable[GenericVariable[Value]],
+        variables: Iterable[Variable],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:
@@ -43,7 +46,7 @@ class DefaultBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[GenericVariable[Value]],
+        variables: Iterable[Variable],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:
