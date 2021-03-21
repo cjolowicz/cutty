@@ -3,40 +3,40 @@ import pathlib
 
 import pytest
 
-from cutty.adapters.jinja.renderables import JinjaRenderableLoader
-from cutty.domain.renderables import RenderableLoader
+from cutty.adapters.jinja.renderables import JinjaRenderer
+from cutty.domain.render import Renderer
 from cutty.domain.variables import Variable
 from cutty.filesystem.disk import DiskFilesystem
 from cutty.filesystem.path import Path
 
 
 @pytest.fixture
-def loader(tmp_path: pathlib.Path) -> JinjaRenderableLoader:
-    """Fixture for a Jinja loader."""
+def jinja_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
+    """Fixture for a Jinja renderer."""
     root = Path(filesystem=DiskFilesystem(tmp_path))
-    return JinjaRenderableLoader.create(searchpath=[root])
+    render.register(str, JinjaRenderer.create(searchpath=[root]))
+    return render
 
 
 @pytest.fixture
-def cookiecutter_loader(tmp_path: pathlib.Path) -> RenderableLoader[str]:
-    """Fixture for a Jinja loader with a cookiecutter prefix."""
+def cookiecutter_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
+    """Fixture for a Jinja renderer with a cookiecutter prefix."""
     root = Path(filesystem=DiskFilesystem(tmp_path))
-    return JinjaRenderableLoader.create(
-        searchpath=[root], context_prefix="cookiecutter"
+    render.register(
+        str, JinjaRenderer.create(searchpath=[root], context_prefix="cookiecutter")
     )
+    return render
 
 
-def test_load(loader: RenderableLoader[str]) -> None:
-    """It loads a Jinja template."""
+def test_render(jinja_render: Renderer) -> None:
+    """It renders a Jinja template."""
     variable = Variable("value", 42)
-    renderable = loader.load("{{ value }}")
-    text = renderable.render([variable])
+    text = jinja_render("{{ value }}", [variable], [])
     assert text == "42"
 
 
-def test_load_with_context_prefix(cookiecutter_loader: RenderableLoader[str]) -> None:
-    """It loads a Jinja template with a context prefix."""
+def test_render_with_context_prefix(cookiecutter_render: Renderer) -> None:
+    """It renders a Jinja template with a context prefix."""
     variable = Variable("value", 42)
-    renderable = cookiecutter_loader.load("{{ cookiecutter.value }}")
-    text = renderable.render([variable])
+    text = cookiecutter_render("{{ cookiecutter.value }}", [variable], [])
     assert text == "42"

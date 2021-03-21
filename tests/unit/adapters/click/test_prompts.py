@@ -7,13 +7,8 @@ import pytest
 from cutty.adapters.click.prompts import ChoicePrompt
 from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.domain.prompts import PromptVariableBuilder
-from cutty.domain.renderables import Renderable
-from cutty.domain.renderables import RenderableLoader
-from cutty.domain.renderables import RenderableValueLoader
-from cutty.domain.renderables import TrivialRenderable
-from cutty.domain.variables import Value
+from cutty.domain.render import Renderer
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import RenderableVariableSpecification
 from cutty.domain.varspecs import VariableSpecification
 from cutty.domain.varspecs import VariableType
 
@@ -31,32 +26,27 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
     return _factory
 
 
-@pytest.fixture
-def value_loader(renderable_loader: RenderableLoader[str]) -> RenderableLoader[Value]:
-    """Fixture for a renderable value loader."""
-    return RenderableValueLoader(renderable_loader)
-
-
-def test_noop_prompt() -> None:
+def test_noop_prompt(render: Renderer) -> None:
     """It uses the default."""
-    specification = RenderableVariableSpecification(
+    specification = VariableSpecification(
         name="project",
         description="The name of the project",
         type=VariableType.STRING,
-        default=TrivialRenderable("example"),
+        default="example",
         choices=(),
         interactive=False,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("project", "example")
 
 
 def test_text_prompt(
-    specification: Renderable[VariableSpecification[str]],
+    render: Renderer,
+    specification: VariableSpecification[str],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It reads the value from stdin."""
@@ -65,104 +55,104 @@ def test_text_prompt(
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("project", "awesome-project")
 
 
-def test_choices_prompt(patch_standard_input: PatchStandardInput) -> None:
+def test_choices_prompt(
+    render: Renderer, patch_standard_input: PatchStandardInput
+) -> None:
     """It reads a number from stdin."""
     patch_standard_input("2\n")
 
-    specification = RenderableVariableSpecification(
+    specification = VariableSpecification(
         name="project",
         description="The name of the project",
         type=VariableType.STRING,
-        default=TrivialRenderable("example"),
-        choices=(TrivialRenderable("example"), TrivialRenderable("awesome-project")),
+        default="example",
+        choices=("example", "awesome-project"),
         interactive=True,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("project", "awesome-project")
 
 
 def test_choices_prompt_invalid(
-    specification: Renderable[VariableSpecification[str]],
+    render: Renderer, specification: VariableSpecification[str]
 ) -> None:
     """It raises an exception when there are no choices."""
-    prompt = ChoicePrompt(specification.render([]))
+    prompt = ChoicePrompt(specification)
     with pytest.raises(ValueError):
         prompt.prompt()
 
 
 def test_json_prompt(
-    value_loader: RenderableLoader[Value],
+    render: Renderer,
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It loads JSON from stdin."""
     patch_standard_input('{"name": "awesome"}\n')
 
-    specification = RenderableVariableSpecification(
+    specification = VariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=value_loader.load({"name": "example"}),
+        default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("metadata", {"name": "awesome"})
 
 
 def test_json_prompt_empty(
-    value_loader: RenderableLoader[Value],
-    patch_standard_input: PatchStandardInput,
+    render: Renderer, patch_standard_input: PatchStandardInput
 ) -> None:
     """It returns the default."""
     patch_standard_input("\n")
 
-    specification = RenderableVariableSpecification(
+    specification = VariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=value_loader.load({"name": "example"}),
+        default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("metadata", {"name": "example"})
 
 
 def test_json_prompt_invalid(
-    value_loader: RenderableLoader[Value],
-    patch_standard_input: PatchStandardInput,
+    render: Renderer, patch_standard_input: PatchStandardInput
 ) -> None:
     """It prompts again."""
     patch_standard_input('invalid\n"not a dict"\n{}\n')
 
-    specification = RenderableVariableSpecification(
+    specification = VariableSpecification(
         name="metadata",
         description="metadata",
         type=VariableType.OBJECT,
-        default=value_loader.load({"name": "example"}),
+        default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable == Variable("metadata", {})

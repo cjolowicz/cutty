@@ -1,31 +1,22 @@
 """Unit tests for cutty.domain.varspecs."""
-import dataclasses
-
-from cutty.domain.renderables import Renderable
+from cutty.domain.render import Renderer
 from cutty.domain.varspecs import DefaultVariableBuilder
 from cutty.domain.varspecs import VariableSpecification
 
 
-def test_render(specification: Renderable[VariableSpecification[str]]) -> None:
+def test_render(specification: VariableSpecification[str], render: Renderer) -> None:
     """It renders the default and choices fields."""
-    rendered = specification.render([])
-    attributes = dataclasses.asdict(rendered)
-
-    for name, value in attributes.items():
-        if name not in ["default", "choices"]:
-            assert value == getattr(specification, name)
-
-    assert rendered.default == "example"
-    assert rendered.choices == ()
+    rendered = render(specification, [], [])
+    assert rendered == specification
 
 
 def test_default_variable_builder(
-    specification: Renderable[VariableSpecification[str]],
+    specification: VariableSpecification[str], render: Renderer
 ) -> None:
     """It builds variables using only defaults."""
     builder = DefaultVariableBuilder()
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable.name == "project"
     assert variable.value == "example"

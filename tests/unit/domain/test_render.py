@@ -6,20 +6,6 @@ from cutty.domain.variables import Variable
 from cutty.filesystem.pure import PurePath
 
 
-@pytest.fixture
-def render() -> Renderer:
-    """Fixture with a renderer based on ``str.format``."""
-    render = Renderer.create()
-
-    @render.register(str)
-    def _(value, variables, settings, _):  # type: ignore[no-untyped-def]
-        return value.format_map(
-            {variable.name: variable.value for variable in variables}
-        )
-
-    return render
-
-
 @pytest.mark.parametrize(
     "template,expected",
     [
