@@ -42,8 +42,11 @@ def getvaluetype(value: Any) -> ValueType:
 
 
 @dataclass(frozen=True)
-class Binding(Generic[ValueT_co]):
+class GenericBinding(Generic[ValueT_co]):
     """A variable binds a name to a value."""
 
     name: str
     value: ValueT_co
+
+
+Binding = GenericBinding[Value]

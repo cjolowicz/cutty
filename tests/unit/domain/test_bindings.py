@@ -17,8 +17,8 @@ from cutty.domain.bindings import Value
         ("metadata", {"name": "example"}),
     ],
 )
-def test_variable(name: str, value: Value) -> None:
+def test_binding(name: str, value: Value) -> None:
     """It contains a name and value."""
-    variable = Binding(name, value)
-    assert variable.name == name
-    assert variable.value == value
+    binding = Binding(name, value)
+    assert binding.name == name
+    assert binding.value == value
