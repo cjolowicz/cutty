@@ -7,9 +7,9 @@ import pytest
 from cutty.adapters.click.prompts import ChoicePrompt
 from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.domain.bindings import Binding
+from cutty.domain.bindings import ValueType
 from cutty.domain.prompts import PromptBinder
 from cutty.domain.render import Renderer
-from cutty.domain.variables import ValueType
 from cutty.domain.variables import Variable
 
 
