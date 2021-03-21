@@ -6,7 +6,7 @@ from cutty.domain.variables import GenericVariable
 
 def test_render(variable: GenericVariable[str], render: Renderer) -> None:
     """It renders the variable."""
-    assert variable == render(variable, [], [])
+    assert variable == render(variable, [])
 
 
 def test_default_variable_binder(

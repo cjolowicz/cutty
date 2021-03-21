@@ -154,10 +154,9 @@ class CookiecutterRendererFactory(RendererFactory):
         def _(
             file: File,
             bindings: Sequence[Binding],
-            settings: Sequence[Binding],
             render: RenderFunction[Any],
         ) -> File:
-            path = render(file.path, bindings, settings)
+            path = render(file.path, bindings)
 
             if any(
                 fnmatch.fnmatch(pattern, str(file.path))
@@ -165,6 +164,6 @@ class CookiecutterRendererFactory(RendererFactory):
             ):
                 return File(path, file.mode, file.blob)
 
-            return File(path, file.mode, render(file.blob, bindings, settings))
+            return File(path, file.mode, render(file.blob, bindings))
 
         return render

@@ -54,7 +54,7 @@ class PromptBinder(Binder):
         """Bind the variables."""
         bindings: list[Binding] = []
         for variable in variables:
-            variable = render(variable, bindings, settings)
+            variable = render(variable, bindings)
             prompt = self.factory.create(variable)
             binding = prompt.prompt()
             bindings.append(binding)

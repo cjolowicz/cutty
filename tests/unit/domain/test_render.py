@@ -18,4 +18,4 @@ def test_render(render: Renderer, template: object, expected: object) -> None:
     """It renders the template as expected."""
     binding = Binding("x", "teapot")
 
-    assert expected == render(template, [binding], [])
+    assert expected == render(template, [binding])

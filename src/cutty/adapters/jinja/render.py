@@ -95,11 +95,7 @@ class JinjaRenderer:
         self.extra_bindings = tuple(extra_bindings)
 
     def __call__(
-        self,
-        text: str,
-        bindings: Iterable[Binding],
-        settings: Iterable[Binding],
-        render: RenderFunction[T],
+        self, text: str, bindings: Iterable[Binding], render: RenderFunction[T]
     ) -> str:
         """Render the text."""
         template = self.environment.from_string(text)

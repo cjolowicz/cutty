@@ -32,7 +32,7 @@ class DefaultBinder(Binder):
         """Bind the variables."""
         bindings: list[Binding] = []
         for variable in variables:
-            variable = render(variable, bindings, settings)
+            variable = render(variable, bindings)
             binding = Binding(variable.name, variable.default)
             bindings.append(binding)
         return bindings
