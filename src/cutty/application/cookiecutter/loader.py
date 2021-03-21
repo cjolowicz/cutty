@@ -15,7 +15,7 @@ from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.templates import TemplateConfig
-from cutty.domain.variables import ValueType
+from cutty.domain.variables import getvaluetype
 from cutty.domain.variables import Variable
 from cutty.filesystem.base import Access
 from cutty.filesystem.path import Path
@@ -49,24 +49,6 @@ class CookiecutterFileLoader(FileLoader):
             blob = path.read_text()
             mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
             yield Buffer(path, mode, blob)
-
-
-def getvaluetype(value: Any) -> ValueType:
-    """Return the appropriate value type for the value."""
-    mapping = {
-        type(None): ValueType.NULL,
-        bool: ValueType.BOOLEAN,
-        float: ValueType.NUMBER,
-        str: ValueType.STRING,
-        list: ValueType.ARRAY,
-        dict: ValueType.OBJECT,
-    }
-
-    for cls, valuetype in mapping.items():
-        if isinstance(value, cls):
-            return valuetype
-
-    raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
 def loadvalue(value: Any) -> Value:
