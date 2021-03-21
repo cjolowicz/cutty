@@ -6,8 +6,6 @@ from typing import Any
 
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import getvaluetype
-from cutty.domain.bindings import Value
 from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
@@ -16,6 +14,8 @@ from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.templates import TemplateConfig
+from cutty.domain.values import getvaluetype
+from cutty.domain.values import Value
 from cutty.domain.variables import Variable
 from cutty.filesystem.base import Access
 from cutty.filesystem.path import Path

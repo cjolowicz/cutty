@@ -2,7 +2,7 @@
 import pytest
 
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import Value
+from cutty.domain.values import Value
 
 
 @pytest.mark.parametrize(
