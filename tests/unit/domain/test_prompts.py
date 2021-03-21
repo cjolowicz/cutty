@@ -1,10 +1,10 @@
 """Unit tests for cutty.domain.prompts."""
-from cutty.domain.bindings import ValueT
-from cutty.domain.bindings import ValueT_co
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptBinder
 from cutty.domain.prompts import PromptFactory
 from cutty.domain.render import Renderer
+from cutty.domain.values import ValueT
+from cutty.domain.values import ValueT_co
 from cutty.domain.variables import GenericVariable
 
 
