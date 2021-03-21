@@ -6,7 +6,7 @@ import platform
 import pytest
 
 from cutty.adapters.filesystem.files import FilesystemFileStorage
-from cutty.domain.files import Buffer
+from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
 
@@ -15,7 +15,7 @@ def test_storage(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
     path = PurePath("example", "README.md")
     blob = "# example\n"
-    file = Buffer(path, Mode.DEFAULT, blob)
+    file = File(path, Mode.DEFAULT, blob)
 
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
@@ -31,7 +31,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     """It stores the file."""
     path = PurePath("main.py")
     blob = "#!/usr/bin/env python"
-    file = Buffer(path, Mode.EXECUTABLE, blob)
+    file = File(path, Mode.EXECUTABLE, blob)
 
     storage = FilesystemFileStorage(tmp_path)
     storage.store(file)
@@ -41,7 +41,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
 
 def test_temporary() -> None:
     """It creates temporary storage."""
-    file = Buffer(PurePath("file"), Mode.DEFAULT, "")
+    file = File(PurePath("file"), Mode.DEFAULT, "")
 
     with FilesystemFileStorage.temporary() as storage:
         storage.store(file)

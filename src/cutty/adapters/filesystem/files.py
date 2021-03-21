@@ -21,7 +21,7 @@ class FilesystemFileStorage(FileStorage):
         """Commit a file to storage."""
         path = self.resolve(file.path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(file.read())
+        path.write_text(file.blob)
         if file.mode & Mode.EXECUTABLE:
             path.chmod(path.stat().st_mode | 0o111)
 
