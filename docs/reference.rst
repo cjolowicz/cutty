@@ -13,13 +13,6 @@ cutty.domain.variables
    :members:
 
 
-cutty.domain.renderables
-------------------------
-
-.. automodule:: cutty.domain.renderables
-   :members:
-
-
 cutty.domain.varspecs
 ---------------------
 
@@ -69,10 +62,10 @@ cutty.adapters.jinja.extensions
    :members:
 
 
-cutty.adapters.jinja.renderables
---------------------------------
+cutty.adapters.jinja.render
+---------------------------
 
-.. automodule:: cutty.adapters.jinja.renderables
+.. automodule:: cutty.adapters.jinja.render
    :members:
 
 
