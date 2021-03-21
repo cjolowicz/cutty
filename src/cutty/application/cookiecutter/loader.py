@@ -115,7 +115,7 @@ class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
 class CookiecutterRendererFactory(RendererFactory):
     """Creating a renderer."""
 
-    def create(self, path: Path, settings: Sequence[Binding[Value]]) -> Renderer:
+    def create(self, path: Path, settings: Sequence[Binding]) -> Renderer:
         """Create renderer."""
         for setting in settings:
             if setting.name == "_extensions":

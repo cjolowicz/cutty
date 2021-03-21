@@ -32,9 +32,9 @@ class Binder(abc.ABC):
     def bind(
         self,
         variables: Iterable[Variable[Value]],
-        settings: Iterable[Binding[Value]],
+        settings: Iterable[Binding],
         render: Renderer,
-    ) -> list[Binding[Value]]:
+    ) -> list[Binding]:
         """Bind the variables."""
 
 
@@ -44,12 +44,12 @@ class DefaultBinder(Binder):
     def bind(
         self,
         variables: Iterable[Variable[Value]],
-        settings: Iterable[Binding[Value]],
+        settings: Iterable[Binding],
         render: Renderer,
-    ) -> list[Binding[Value]]:
+    ) -> list[Binding]:
         """Bind the variables."""
         settings = tuple(settings)
-        bindings: list[Binding[Value]] = []
+        bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings, settings)
             binding = Binding(variable.name, variable.default)

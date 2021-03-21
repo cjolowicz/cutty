@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from typing import Generic
 
 from cutty.domain.bindings import Binding
+from cutty.domain.bindings import GenericBinding
 from cutty.domain.bindings import Value
 from cutty.domain.bindings import ValueT
 from cutty.domain.bindings import ValueT_co
@@ -19,10 +20,10 @@ class Prompt(abc.ABC, Generic[ValueT_co]):
         """Initialize."""
         self.variable = variable
 
-    def prompt(self) -> Binding[ValueT_co]:
+    def prompt(self) -> GenericBinding[ValueT_co]:
         """Ask the user for a value."""
         value = self.promptvalue()
-        return Binding(self.variable.name, value)
+        return GenericBinding(self.variable.name, value)
 
     @abc.abstractmethod
     def promptvalue(self) -> ValueT_co:
@@ -47,12 +48,12 @@ class PromptBinder(Binder):
     def bind(
         self,
         variables: Iterable[Variable[Value]],
-        settings: Iterable[Binding[Value]],
+        settings: Iterable[Binding],
         render: Renderer,
-    ) -> list[Binding[Value]]:
+    ) -> list[Binding]:
         """Bind the variables."""
         settings = tuple(settings)
-        bindings: list[Binding[Value]] = []
+        bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings, settings)
             prompt = self.factory.create(variable)
