@@ -55,13 +55,6 @@ cutty.domain.hooks
    :members:
 
 
-cutty.domain.filesystem
------------------------
-
-.. automodule:: cutty.domain.filesystem
-   :members:
-
-
 cutty.domain.templates
 ----------------------
 
@@ -97,13 +90,6 @@ cutty.adapters.filesystem.files
    :members:
 
 
-cutty.adapters.filesystem.filesystem
-------------------------------------
-
-.. automodule:: cutty.adapters.filesystem.filesystem
-   :members:
-
-
 cutty.adapters.filesystem.hooks
 -------------------------------
 
@@ -136,6 +122,41 @@ cutty.util.typeguard_ignore
 ---------------------------
 
 .. automodule:: cutty.util.typeguard_ignore
+   :members:
+
+
+cutty.filesystem.pure
+---------------------
+
+.. automodule:: cutty.filesystem.pure
+   :members:
+
+
+cutty.filesystem.base
+---------------------
+
+.. automodule:: cutty.filesystem.base
+   :members:
+
+
+cutty.filesystem.path
+---------------------
+
+.. automodule:: cutty.filesystem.path
+   :members:
+
+
+cutty.filesystem.dict
+---------------------
+
+.. automodule:: cutty.filesystem.dict
+   :members:
+
+
+cutty.filesystem.disk
+---------------------
+
+.. automodule:: cutty.filesystem.disk
    :members:
 
 
