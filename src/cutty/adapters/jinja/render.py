@@ -8,10 +8,10 @@ from typing import Optional
 import jinja2
 
 from cutty.adapters.jinja import extensions
+from cutty.domain.bindings import Binding
+from cutty.domain.bindings import Value
 from cutty.domain.render import RenderFunction
 from cutty.domain.render import T
-from cutty.domain.variables import Value
-from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 
 
@@ -67,7 +67,7 @@ class JinjaRenderer:
         *,
         searchpath: Iterable[Path],
         context_prefix: Optional[str] = None,
-        extra_variables: Iterable[Variable[Value]] = (),
+        extra_bindings: Iterable[Binding[Value]] = (),
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderer:
         """Create a renderer using Jinja."""
@@ -80,7 +80,7 @@ class JinjaRenderer:
         return cls(
             environment,
             context_prefix=context_prefix,
-            extra_variables=extra_variables,
+            extra_bindings=extra_bindings,
         )
 
     def __init__(
@@ -88,25 +88,25 @@ class JinjaRenderer:
         environment: jinja2.Environment,
         *,
         context_prefix: Optional[str] = None,
-        extra_variables: Iterable[Variable[Value]] = (),
+        extra_bindings: Iterable[Binding[Value]] = (),
     ) -> None:
         """Initialize."""
         self.environment = environment
         self.context_prefix = context_prefix
-        self.extra_variables = tuple(extra_variables)
+        self.extra_bindings = tuple(extra_bindings)
 
     def __call__(
         self,
         text: str,
-        variables: Iterable[Variable[Value]],
-        settings: Iterable[Variable[Value]],
+        bindings: Iterable[Binding[Value]],
+        settings: Iterable[Binding[Value]],
         render: RenderFunction[T],
     ) -> str:
         """Render the text."""
         template = self.environment.from_string(text)
         context = {
             variable.name: variable.value
-            for variable in itertools.chain(self.extra_variables, variables)
+            for variable in itertools.chain(self.extra_bindings, bindings)
         }
 
         if self.context_prefix is not None:

@@ -8,18 +8,18 @@ from typing import overload
 from typing import TypeVar
 from typing import Union
 
+from cutty.domain.bindings import Binding
+from cutty.domain.bindings import Value
 from cutty.domain.files import Buffer
-from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import VariableSpecification
 from cutty.filesystem.pure import PurePath
 
 
 T = TypeVar("T")
 U = TypeVar("U")
-Variables = Sequence[Variable[Value]]
-RenderFunction = Callable[[T, Variables, Variables], T]
-RenderContinuation = Callable[[T, Variables, Variables, RenderFunction[U]], T]
+Bindings = Sequence[Binding[Value]]
+RenderFunction = Callable[[T, Bindings, Bindings], T]
+RenderContinuation = Callable[[T, Bindings, Bindings, RenderFunction[U]], T]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
 
 
@@ -30,14 +30,14 @@ class Renderer:
         """Initialize."""
 
         @functools.singledispatch
-        def _render(value: T, variables: Variables, settings: Variables) -> T:
+        def _render(value: T, bindings: Bindings, settings: Bindings) -> T:
             return value
 
         self._render = _render
 
-    def __call__(self, value: T, variables: Variables, settings: Variables) -> T:
+    def __call__(self, value: T, bindings: Bindings, settings: Bindings) -> T:
         """Render."""
-        return self._render(value, variables, settings)
+        return self._render(value, bindings, settings)
 
     @overload
     def register(
@@ -70,9 +70,9 @@ class Renderer:
             )
 
         @self._render.register(cls)
-        def _(value: T, variables: Variables, settings: Variables) -> T:
+        def _(value: T, bindings: Bindings, settings: Bindings) -> T:
             assert function is not None  # noqa: S101
-            return function(value, variables, settings, self)
+            return function(value, bindings, settings, self)
 
         return function
 
@@ -84,63 +84,62 @@ class Renderer:
         @render.register(list)
         def _(
             values: list[T],
-            variables: Variables,
-            settings: Variables,
+            bindings: Bindings,
+            settings: Bindings,
             render: RenderFunction[T],
         ) -> list[T]:
-            return [render(value, variables, settings) for value in values]
+            return [render(value, bindings, settings) for value in values]
 
         @render.register(dict)  # type: ignore[no-redef]
         def _(
             mapping: dict[str, T],
-            variables: Variables,
-            settings: Variables,
+            bindings: Bindings,
+            settings: Bindings,
             render: RenderFunction[T],
         ) -> dict[str, T]:
             return {
-                render(key, variables, settings): render(value, variables, settings)
+                render(key, bindings, settings): render(value, bindings, settings)
                 for key, value in mapping.items()
             }
 
-        @render.register(VariableSpecification)  # type: ignore[no-redef]
+        @render.register(Variable)  # type: ignore[no-redef]
         def _(
-            specification: VariableSpecification[Value],
-            variables: Variables,
-            settings: Variables,
+            variable: Variable[Value],
+            bindings: Bindings,
+            settings: Bindings,
             render: RenderFunction[T],
-        ) -> VariableSpecification[Value]:
-            return VariableSpecification(
-                specification.name,
-                specification.description,
-                specification.type,
-                render(specification.default, variables, settings),
+        ) -> Variable[Value]:
+            return Variable(
+                variable.name,
+                variable.description,
+                variable.type,
+                render(variable.default, bindings, settings),
                 tuple(
-                    render(choice, variables, settings)
-                    for choice in specification.choices
+                    render(choice, bindings, settings) for choice in variable.choices
                 ),
-                specification.interactive,
+                variable.interactive,
             )
 
         @render.register  # type: ignore[no-redef]
         def _(
             path: PurePath,
-            variables: Variables,
-            settings: Variables,
+            bindings: Bindings,
+            settings: Bindings,
             render: RenderFunction[T],
         ) -> PurePath:
-            return PurePath(*(render(part, variables, settings) for part in path.parts))
+            return PurePath(*(render(part, bindings, settings) for part in path.parts))
 
         @render.register  # type: ignore[no-redef]
         def _(
             buffer: Buffer,
-            variables: Variables,
-            settings: Variables,
+            bindings: Bindings,
+            settings: Bindings,
             render: RenderFunction[T],
         ) -> Buffer:
             return Buffer(
-                render(buffer.path, variables, settings),
+                render(buffer.path, bindings, settings),
                 buffer.mode,
-                render(buffer.read(), variables, settings),
+                render(buffer.read(), bindings, settings),
             )
 
         return render

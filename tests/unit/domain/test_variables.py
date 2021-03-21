@@ -1,24 +1,19 @@
-"""Unit tests for the variables module."""
-import pytest
-
-from cutty.domain.variables import Value
+"""Unit tests for cutty.domain.variables."""
+from cutty.domain.render import Renderer
+from cutty.domain.variables import DefaultBinder
 from cutty.domain.variables import Variable
 
 
-@pytest.mark.parametrize(
-    "name,value",
-    [
-        ("optional", None),
-        ("generate_cli", True),
-        ("year", 2021),
-        ("pi", 3.14),
-        ("project", "example"),
-        ("licenses", ["MIT", "GPLv3"]),
-        ("metadata", {"name": "example"}),
-    ],
-)
-def test_variable(name: str, value: Value) -> None:
-    """It contains a name and value."""
-    variable = Variable(name, value)
-    assert variable.name == name
-    assert variable.value == value
+def test_render(variable: Variable[str], render: Renderer) -> None:
+    """It renders the variable."""
+    assert variable == render(variable, [], [])
+
+
+def test_default_variable_binder(variable: Variable[str], render: Renderer) -> None:
+    """It binds variables using only defaults."""
+    binder = DefaultBinder()
+
+    [binding] = binder.bind([variable], [], render)
+
+    assert binding.name == "project"
+    assert binding.value == "example"
