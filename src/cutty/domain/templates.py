@@ -47,6 +47,8 @@ class Template:
             file = self.renderer(file, bindings, self.config.settings)
 
             if not all(file.path.parts):
+                # FIXME: Shouldn't have rendered the blob at all.
+                # FIXME: Can we avoid traversing that directory?
                 continue
 
             if any(
