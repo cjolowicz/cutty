@@ -4,14 +4,14 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.adapters.jinja.renderables import JinjaRenderableLoader
+from cutty.adapters.jinja.renderables import JinjaRenderer
 from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.domain.loader import FileLoader
-from cutty.domain.loader import RenderableLoaderFactory
+from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
-from cutty.domain.renderables import RenderableLoader
+from cutty.domain.render import Renderer
 from cutty.domain.templates import TemplateConfig
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
@@ -130,13 +130,11 @@ class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
         return TemplateConfig(settings, variables)
 
 
-class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
-    """Creating a renderable loader."""
+class CookiecutterRendererFactory(RendererFactory):
+    """Creating a renderer."""
 
-    def create(
-        self, path: Path, settings: Sequence[Variable[Value]]
-    ) -> RenderableLoader[str]:
-        """Create renderable loader."""
+    def create(self, path: Path, settings: Sequence[Variable[Value]]) -> Renderer:
+        """Create renderer."""
         for setting in settings:
             if setting.name == "_extensions":
                 extensions = setting.value
@@ -148,9 +146,13 @@ class CookiecutterRenderableLoaderFactory(RenderableLoaderFactory):
             isinstance(item, str) for item in extensions
         )
 
-        return JinjaRenderableLoader.create(
+        jinja = JinjaRenderer.create(
             searchpath=[path],
             context_prefix="cookiecutter",
             extra_variables=settings,
             extra_extensions=extensions,
         )
+
+        render = Renderer.create()
+        render.register(str, jinja)
+        return render

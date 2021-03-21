@@ -3,43 +3,16 @@ import contextlib
 import itertools
 from collections.abc import Callable
 from collections.abc import Iterable
-from collections.abc import Sequence
 from typing import Optional
 
 import jinja2
 
 from cutty.adapters.jinja import extensions
-from cutty.domain.renderables import Renderable
-from cutty.domain.renderables import RenderableLoader
+from cutty.domain.render import RenderFunction
+from cutty.domain.render import T
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
-
-
-class JinjaRenderable(Renderable[str]):
-    """Wrapper for a Jinja template."""
-
-    def __init__(
-        self,
-        template: jinja2.Template,
-        *,
-        context_prefix: Optional[str] = None,
-        extra_variables: Iterable[Variable[Value]] = (),
-    ) -> None:
-        """Initialize."""
-        self.template = template
-        self.context_prefix = context_prefix
-        self.extra_variables = tuple(extra_variables)
-
-    def render(self, variables: Sequence[Variable[Value]]) -> str:
-        """Render the object to a string."""
-        context = {
-            variable.name: variable.value
-            for variable in itertools.chain(self.extra_variables, variables)
-        }
-        if self.context_prefix is not None:
-            context = {self.context_prefix: context}
-        return self.template.render(context)
 
 
 def splitpath(pathstr: str) -> tuple[str, ...]:
@@ -85,7 +58,7 @@ class _FilesystemLoader(jinja2.BaseLoader):
         raise jinja2.TemplateNotFound(template)
 
 
-class JinjaRenderableLoader(RenderableLoader[str]):
+class JinjaRenderer:
     """Wrapper for a Jinja environment."""
 
     @classmethod
@@ -96,7 +69,7 @@ class JinjaRenderableLoader(RenderableLoader[str]):
         context_prefix: Optional[str] = None,
         extra_variables: Iterable[Variable[Value]] = (),
         extra_extensions: Iterable[str] = (),
-    ) -> JinjaRenderableLoader:
+    ) -> JinjaRenderer:
         """Create a renderable loader using Jinja."""
         environment = jinja2.Environment(  # noqa: S701
             loader=_FilesystemLoader(searchpath=searchpath),
@@ -122,11 +95,21 @@ class JinjaRenderableLoader(RenderableLoader[str]):
         self.context_prefix = context_prefix
         self.extra_variables = tuple(extra_variables)
 
-    def load(self, text: str, path: Optional[Path] = None) -> Renderable[str]:
+    def __call__(
+        self,
+        text: str,
+        variables: Iterable[Variable[Value]],
+        settings: Iterable[Variable[Value]],
+        render: RenderFunction[T],
+    ) -> str:
         """Load renderable from text."""
         template = self.environment.from_string(text)
-        return JinjaRenderable(
-            template,
-            context_prefix=self.context_prefix,
-            extra_variables=self.extra_variables,
-        )
+        context = {
+            variable.name: variable.value
+            for variable in itertools.chain(self.extra_variables, variables)
+        }
+
+        if self.context_prefix is not None:
+            context = {self.context_prefix: context}
+
+        return template.render(context)

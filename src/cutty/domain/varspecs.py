@@ -1,21 +1,16 @@
 """Specifications for template variables."""
 import abc
 from collections.abc import Iterable
-from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from typing import Generic
-from typing import TypeVar
+from typing import TYPE_CHECKING
 
-from cutty.domain.renderables import Renderable
-from cutty.domain.renderables import RenderableLoader
-from cutty.domain.renderables import RenderableValueLoader
+if TYPE_CHECKING:
+    from cutty.domain.render import Renderer
 from cutty.domain.variables import Value
 from cutty.domain.variables import ValueT_co
 from cutty.domain.variables import Variable
-
-
-T_co = TypeVar("T_co", covariant=True)
 
 
 class VariableType(str, Enum):
@@ -30,59 +25,15 @@ class VariableType(str, Enum):
 
 
 @dataclass(frozen=True)
-class VariableSpecification(Generic[T_co]):
+class VariableSpecification(Generic[ValueT_co]):
     """Specification for a template variable."""
 
     name: str
     description: str
     type: VariableType
-    default: T_co
-    choices: tuple[T_co, ...]
+    default: ValueT_co
+    choices: tuple[ValueT_co, ...]
     interactive: bool
-
-
-class RenderableVariableSpecification(
-    Renderable[VariableSpecification[ValueT_co]],
-    VariableSpecification[Renderable[ValueT_co]],
-):
-    """A renderable specification for a template variable."""
-
-    def render(
-        self,
-        variables: Sequence[Variable[Value]],
-    ) -> VariableSpecification[ValueT_co]:
-        """Render a variable specification."""
-        return VariableSpecification(
-            self.name,
-            self.description,
-            self.type,
-            self.default.render(variables),
-            tuple(choice.render(variables) for choice in self.choices),
-            self.interactive,
-        )
-
-
-class RenderableVariableSpecificationLoader(
-    RenderableLoader[VariableSpecification[Value]]
-):
-    """A loader for renderable variable specifications."""
-
-    def __init__(self, loader: RenderableLoader[str]) -> None:
-        """Initialize."""
-        self.loader = RenderableValueLoader(loader)
-
-    def load(
-        self, value: VariableSpecification[Value]
-    ) -> Renderable[VariableSpecification[Value]]:
-        """Load the renderable."""
-        return RenderableVariableSpecification(
-            value.name,
-            value.description,
-            value.type,
-            self.loader.load(value.default),
-            tuple(self.loader.load(choice) for choice in value.choices),
-            value.interactive,
-        )
 
 
 class VariableBuilder(abc.ABC):
@@ -90,7 +41,10 @@ class VariableBuilder(abc.ABC):
 
     @abc.abstractmethod
     def build(
-        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
+        self,
+        specifications: Iterable[VariableSpecification[Value]],
+        settings: Iterable[Variable[Value]],
+        render: Renderer,
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
 
@@ -99,12 +53,16 @@ class DefaultVariableBuilder(VariableBuilder):
     """Build variables using only their defaults."""
 
     def build(
-        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
+        self,
+        specifications: Iterable[VariableSpecification[Value]],
+        settings: Iterable[Variable[Value]],
+        render: Renderer,
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
+        settings = tuple(settings)
         variables: list[Variable[Value]] = []
         for specification in specifications:
-            rendered = specification.render(variables)
+            rendered = render(specification, variables, settings)
             variable = Variable(rendered.name, rendered.default)
             variables.append(variable)
         return variables

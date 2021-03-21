@@ -3,7 +3,7 @@ import abc
 from collections.abc import Iterable
 from typing import Generic
 
-from cutty.domain.renderables import Renderable
+from cutty.domain.render import Renderer
 from cutty.domain.variables import Value
 from cutty.domain.variables import ValueT
 from cutty.domain.variables import ValueT_co
@@ -45,12 +45,16 @@ class PromptVariableBuilder(VariableBuilder):
         self.factory = factory
 
     def build(
-        self, specifications: Iterable[Renderable[VariableSpecification[Value]]]
+        self,
+        specifications: Iterable[VariableSpecification[Value]],
+        settings: Iterable[Variable[Value]],
+        render: Renderer,
     ) -> list[Variable[Value]]:
         """Build variables to the specifications."""
+        settings = tuple(settings)
         variables: list[Variable[Value]] = []
         for specification in specifications:
-            rendered = specification.render(variables)
+            rendered = render(specification, variables, settings)
             prompt = self.factory.create(rendered)
             variable = prompt.prompt()
             variables.append(variable)

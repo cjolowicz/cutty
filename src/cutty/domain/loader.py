@@ -4,13 +4,11 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 
 from cutty.domain.files import File
-from cutty.domain.files import RenderableFileLoader
-from cutty.domain.renderables import RenderableLoader
+from cutty.domain.render import Renderer
 from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateConfig
 from cutty.domain.variables import Value
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import RenderableVariableSpecificationLoader
 from cutty.filesystem.path import Path
 
 
@@ -22,14 +20,12 @@ class TemplateConfigLoader(abc.ABC):
         """Load template configuration."""
 
 
-class RenderableLoaderFactory(abc.ABC):
-    """Interface for creating a renderable loader."""
+class RendererFactory(abc.ABC):
+    """Interface for creating a renderer."""
 
     @abc.abstractmethod
-    def create(
-        self, path: Path, *, settings: Sequence[Variable[Value]]
-    ) -> RenderableLoader[str]:
-        """Create renderable loader."""
+    def create(self, path: Path, *, settings: Sequence[Variable[Value]]) -> Renderer:
+        """Create a renderer."""
 
 
 class FileLoader(abc.ABC):
@@ -47,24 +43,17 @@ class TemplateLoader:
         self,
         *,
         configloader: TemplateConfigLoader,
-        loaderfactory: RenderableLoaderFactory,
+        rendererfactory: RendererFactory,
         fileloader: FileLoader,
     ) -> None:
         """Initialize."""
         self.configloader = configloader
-        self.loaderfactory = loaderfactory
+        self.rendererfactory = rendererfactory
         self.fileloader = fileloader
 
     def load(self, path: Path) -> Template:
         """Load a template."""
         config = self.configloader.load(path)
-        loader = self.loaderfactory.create(path, settings=config.settings)
-        variables = map(
-            RenderableVariableSpecificationLoader(loader).load,
-            config.variables,
-        )
-        files = map(
-            RenderableFileLoader(loader).load,
-            self.fileloader.load(path),
-        )
-        return Template(variables=variables, files=files)
+        renderer = self.rendererfactory.create(path, settings=config.settings)
+        files = self.fileloader.load(path)
+        return Template(config=config, files=files, renderer=renderer)
