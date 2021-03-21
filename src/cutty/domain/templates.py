@@ -46,7 +46,7 @@ class Template:
         for file in self.files:
             file = self.renderer(file, bindings, self.config.settings)
 
-            if not all(part for part in file.path.parts):
+            if not all(file.path.parts):
                 continue
 
             if any(
