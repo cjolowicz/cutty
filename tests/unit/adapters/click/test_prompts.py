@@ -6,11 +6,11 @@ import pytest
 
 from cutty.adapters.click.prompts import ChoicePrompt
 from cutty.adapters.click.prompts import ClickPromptFactory
-from cutty.domain.prompts import PromptVariableBuilder
+from cutty.domain.bindings import Binding
+from cutty.domain.prompts import PromptBinder
 from cutty.domain.render import Renderer
+from cutty.domain.variables import ValueType
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import VariableSpecification
-from cutty.domain.varspecs import VariableType
 
 
 PatchStandardInput = Callable[[str], None]
@@ -28,36 +28,36 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
 
 def test_noop_prompt(render: Renderer) -> None:
     """It uses the default."""
-    specification = VariableSpecification(
+    variable = Variable(
         name="project",
         description="The name of the project",
-        type=VariableType.STRING,
+        type=ValueType.STRING,
         default="example",
         choices=(),
         interactive=False,
     )
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("project", "example")
+    assert binding == Binding("project", "example")
 
 
 def test_text_prompt(
     render: Renderer,
-    specification: VariableSpecification[str],
+    variable: Variable[str],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It reads the value from stdin."""
     patch_standard_input("awesome-project\n")
 
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("project", "awesome-project")
+    assert binding == Binding("project", "awesome-project")
 
 
 def test_choices_prompt(
@@ -66,27 +66,25 @@ def test_choices_prompt(
     """It reads a number from stdin."""
     patch_standard_input("2\n")
 
-    specification = VariableSpecification(
+    variable = Variable(
         name="project",
         description="The name of the project",
-        type=VariableType.STRING,
+        type=ValueType.STRING,
         default="example",
         choices=("example", "awesome-project"),
         interactive=True,
     )
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("project", "awesome-project")
+    assert binding == Binding("project", "awesome-project")
 
 
-def test_choices_prompt_invalid(
-    render: Renderer, specification: VariableSpecification[str]
-) -> None:
+def test_choices_prompt_invalid(render: Renderer, variable: Variable[str]) -> None:
     """It raises an exception when there are no choices."""
-    prompt = ChoicePrompt(specification)
+    prompt = ChoicePrompt(variable)
     with pytest.raises(ValueError):
         prompt.prompt()
 
@@ -98,20 +96,20 @@ def test_json_prompt(
     """It loads JSON from stdin."""
     patch_standard_input('{"name": "awesome"}\n')
 
-    specification = VariableSpecification(
+    variable = Variable(
         name="metadata",
         description="metadata",
-        type=VariableType.OBJECT,
+        type=ValueType.OBJECT,
         default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("metadata", {"name": "awesome"})
+    assert binding == Binding("metadata", {"name": "awesome"})
 
 
 def test_json_prompt_empty(
@@ -120,20 +118,20 @@ def test_json_prompt_empty(
     """It returns the default."""
     patch_standard_input("\n")
 
-    specification = VariableSpecification(
+    variable = Variable(
         name="metadata",
         description="metadata",
-        type=VariableType.OBJECT,
+        type=ValueType.OBJECT,
         default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("metadata", {"name": "example"})
+    assert binding == Binding("metadata", {"name": "example"})
 
 
 def test_json_prompt_invalid(
@@ -142,17 +140,17 @@ def test_json_prompt_invalid(
     """It prompts again."""
     patch_standard_input('invalid\n"not a dict"\n{}\n')
 
-    specification = VariableSpecification(
+    variable = Variable(
         name="metadata",
         description="metadata",
-        type=VariableType.OBJECT,
+        type=ValueType.OBJECT,
         default={"name": "example"},
         choices=(),
         interactive=True,
     )
     factory = ClickPromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable == Variable("metadata", {})
+    assert binding == Binding("metadata", {})

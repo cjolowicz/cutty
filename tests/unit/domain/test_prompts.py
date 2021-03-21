@@ -1,11 +1,11 @@
 """Unit tests for cutty.domain.prompts."""
+from cutty.domain.bindings import ValueT
+from cutty.domain.bindings import ValueT_co
 from cutty.domain.prompts import Prompt
+from cutty.domain.prompts import PromptBinder
 from cutty.domain.prompts import PromptFactory
-from cutty.domain.prompts import PromptVariableBuilder
 from cutty.domain.render import Renderer
-from cutty.domain.variables import ValueT
-from cutty.domain.variables import ValueT_co
-from cutty.domain.varspecs import VariableSpecification
+from cutty.domain.variables import Variable
 
 
 class FakePrompt(Prompt[ValueT_co]):
@@ -13,25 +13,23 @@ class FakePrompt(Prompt[ValueT_co]):
 
     def promptvalue(self) -> ValueT_co:
         """Return the default."""
-        return self.specification.default
+        return self.variable.default
 
 
 class FakePromptFactory(PromptFactory):
     """Create fake prompts."""
 
-    def create(self, specification: VariableSpecification[ValueT]) -> Prompt[ValueT]:
+    def create(self, variable: Variable[ValueT]) -> Prompt[ValueT]:
         """Return a fake prompt."""
-        return FakePrompt(specification)
+        return FakePrompt(variable)
 
 
-def test_prompt_variable_builder(
-    specification: VariableSpecification[str], render: Renderer
-) -> None:
-    """It builds variables using the prompts."""
+def test_prompt_variable_binder(variable: Variable[str], render: Renderer) -> None:
+    """It binds variables using the prompts."""
     factory = FakePromptFactory()
-    builder = PromptVariableBuilder(factory)
+    binder = PromptBinder(factory)
 
-    [variable] = builder.build([specification], [], render)
+    [binding] = binder.bind([variable], [], render)
 
-    assert variable.name == "project"
-    assert variable.value == "example"
+    assert binding.name == "project"
+    assert binding.value == "example"

@@ -5,6 +5,8 @@ from collections.abc import Sequence
 from typing import Any
 
 from cutty.adapters.jinja.render import JinjaRenderer
+from cutty.domain.bindings import Binding
+from cutty.domain.bindings import Value
 from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
@@ -13,10 +15,8 @@ from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.templates import TemplateConfig
-from cutty.domain.variables import Value
+from cutty.domain.variables import ValueType
 from cutty.domain.variables import Variable
-from cutty.domain.varspecs import VariableSpecification
-from cutty.domain.varspecs import VariableType
 from cutty.filesystem.base import Access
 from cutty.filesystem.path import Path
 
@@ -51,22 +51,22 @@ class CookiecutterFileLoader(FileLoader):
             yield Buffer(path, mode, blob)
 
 
-def get_variable_type(value: Any) -> VariableType:
-    """Return the appropriate variable type for the value."""
+def getvaluetype(value: Any) -> ValueType:
+    """Return the appropriate value type for the value."""
     mapping = {
-        type(None): VariableType.NULL,
-        bool: VariableType.BOOLEAN,
-        float: VariableType.NUMBER,
-        str: VariableType.STRING,
-        list: VariableType.ARRAY,
-        dict: VariableType.OBJECT,
+        type(None): ValueType.NULL,
+        bool: ValueType.BOOLEAN,
+        float: ValueType.NUMBER,
+        str: ValueType.STRING,
+        list: ValueType.ARRAY,
+        dict: ValueType.OBJECT,
     }
 
-    for value_type, variable_type in mapping.items():
-        if isinstance(value, value_type):
-            return variable_type
+    for cls, valuetype in mapping.items():
+        if isinstance(value, cls):
+            return valuetype
 
-    raise RuntimeError(f"unsupported variable type {type(value)}")  # pragma: no cover
+    raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
 def loadvalue(value: Any) -> Value:
@@ -77,26 +77,26 @@ def loadvalue(value: Any) -> Value:
     if isinstance(value, (type(None), str, list, dict)):
         return value
 
-    raise RuntimeError(f"unsupported variable type {type(value)}")  # pragma: no cover
+    raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
-def loadvariable(name: str, value: Value) -> VariableSpecification[Value]:
-    """Load a variable specification."""
+def loadvariable(name: str, value: Value) -> Variable[Value]:
+    """Load a variable."""
     if isinstance(value, list):
-        [variable_type] = set(get_variable_type(choice) for choice in value)
-        return VariableSpecification(
+        [valuetype] = set(getvaluetype(choice) for choice in value)
+        return Variable(
             name=name,
             description=name,
-            type=variable_type,
+            type=valuetype,
             default=value[0],
             choices=tuple(value),
             interactive=True,
         )
 
-    return VariableSpecification(
+    return Variable(
         name=name,
         description=name,
-        type=get_variable_type(value),
+        type=getvaluetype(value),
         default=value,
         choices=(),
         interactive=True,
@@ -116,24 +116,24 @@ class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
         )
 
         settings = tuple(
-            Variable(name, loadvalue(value))
+            Binding(name, loadvalue(value))
             for name, value in data.items()
             if name.startswith("_")
         )
 
-        variables = tuple(
+        bindings = tuple(
             loadvariable(name, loadvalue(value))
             for name, value in data.items()
             if not name.startswith("_")
         )
 
-        return TemplateConfig(settings, variables)
+        return TemplateConfig(settings, bindings)
 
 
 class CookiecutterRendererFactory(RendererFactory):
     """Creating a renderer."""
 
-    def create(self, path: Path, settings: Sequence[Variable[Value]]) -> Renderer:
+    def create(self, path: Path, settings: Sequence[Binding[Value]]) -> Renderer:
         """Create renderer."""
         for setting in settings:
             if setting.name == "_extensions":
@@ -149,7 +149,7 @@ class CookiecutterRendererFactory(RendererFactory):
         jinja = JinjaRenderer.create(
             searchpath=[path],
             context_prefix="cookiecutter",
-            extra_variables=settings,
+            extra_bindings=settings,
             extra_extensions=extensions,
         )
 

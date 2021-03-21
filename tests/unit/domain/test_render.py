@@ -1,8 +1,8 @@
 """Unit tests for cutty.domain.render."""
 import pytest
 
+from cutty.domain.bindings import Binding
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
 from cutty.filesystem.pure import PurePath
 
 
@@ -16,6 +16,6 @@ from cutty.filesystem.pure import PurePath
 )
 def test_render(render: Renderer, template: object, expected: object) -> None:
     """It renders the template as expected."""
-    variable = Variable("x", "teapot")
+    variable = Binding("x", "teapot")
 
     assert expected == render(template, [variable], [])
