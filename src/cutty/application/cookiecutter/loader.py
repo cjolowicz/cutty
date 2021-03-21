@@ -1,4 +1,5 @@
 """Cookiecutter loader."""
+import fnmatch
 import json
 from collections.abc import Iterator
 from collections.abc import Sequence
@@ -12,6 +13,7 @@ from cutty.domain.files import Mode
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
+from cutty.domain.render import RenderFunction
 from cutty.domain.templates import TemplateConfig
 from cutty.domain.values import getvaluetype
 from cutty.domain.values import Value
@@ -127,6 +129,17 @@ class CookiecutterRendererFactory(RendererFactory):
             isinstance(item, str) for item in extensions
         )
 
+        for setting in settings:
+            if setting.name == "_copy_without_render":
+                copy_without_render = setting.value
+                break
+        else:
+            copy_without_render = []
+
+        assert isinstance(copy_without_render, list) and all(  # noqa: S101
+            isinstance(item, str) for item in copy_without_render
+        )
+
         jinja = JinjaRenderer.create(
             searchpath=[path],
             context_prefix="cookiecutter",
@@ -136,4 +149,22 @@ class CookiecutterRendererFactory(RendererFactory):
 
         render = Renderer.create()
         render.register(str, jinja)
+
+        @render.register
+        def _(
+            file: File,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
+            render: RenderFunction[Any],
+        ) -> File:
+            path = render(file.path, bindings, settings)
+
+            if any(
+                fnmatch.fnmatch(pattern, str(file.path))
+                for pattern in copy_without_render  # type: ignore[union-attr]
+            ):
+                return File(path, file.mode, file.blob)
+
+            return File(path, file.mode, render(file.blob, bindings, settings))
+
         return render
