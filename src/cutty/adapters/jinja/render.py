@@ -23,7 +23,7 @@ def splitpath(pathstr: str) -> tuple[str, ...]:
     source: jinja2.loaders.split_template_path
     """
     # TODO: Add string parsing to PurePath?
-    # TODO: Add common validation function? (see also RenderablePath)
+    # TODO: Add common validation function? (see also Template.render)
     import os.path
 
     separators = [sep for sep in (os.path.sep, os.path.altsep) if sep]
@@ -70,7 +70,7 @@ class JinjaRenderer:
         extra_variables: Iterable[Variable[Value]] = (),
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderer:
-        """Create a renderable loader using Jinja."""
+        """Create a renderer using Jinja."""
         environment = jinja2.Environment(  # noqa: S701
             loader=_FilesystemLoader(searchpath=searchpath),
             extensions=extensions.load(extra=extra_extensions),
@@ -102,7 +102,7 @@ class JinjaRenderer:
         settings: Iterable[Variable[Value]],
         render: RenderFunction[T],
     ) -> str:
-        """Load renderable from text."""
+        """Render the text."""
         template = self.environment.from_string(text)
         context = {
             variable.name: variable.value
