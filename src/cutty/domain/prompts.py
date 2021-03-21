@@ -46,10 +46,7 @@ class PromptBinder(Binder):
         self.factory = factory
 
     def bind(
-        self,
-        variables: Sequence[Variable],
-        settings: Sequence[Binding],
-        render: Renderer,
+        self, variables: Sequence[Variable], render: Renderer
     ) -> Sequence[Binding]:
         """Bind the variables."""
         bindings: list[Binding] = []

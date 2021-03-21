@@ -12,10 +12,7 @@ class Binder(abc.ABC):
 
     @abc.abstractmethod
     def bind(
-        self,
-        variables: Sequence[Variable],
-        settings: Sequence[Binding],
-        render: Renderer,
+        self, variables: Sequence[Variable], render: Renderer
     ) -> Sequence[Binding]:
         """Bind the variables."""
 
@@ -24,10 +21,7 @@ class DefaultBinder(Binder):
     """Bind variables using only their defaults."""
 
     def bind(
-        self,
-        variables: Sequence[Variable],
-        settings: Sequence[Binding],
-        render: Renderer,
+        self, variables: Sequence[Variable], render: Renderer
     ) -> Sequence[Binding]:
         """Bind the variables."""
         bindings: list[Binding] = []

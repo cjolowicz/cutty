@@ -39,7 +39,7 @@ def test_noop_prompt(render: Renderer) -> None:
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("project", "example")
 
@@ -55,7 +55,7 @@ def test_text_prompt(
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -77,7 +77,7 @@ def test_choices_prompt(
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -109,7 +109,7 @@ def test_json_prompt(
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("metadata", {"name": "awesome"})
 
@@ -131,7 +131,7 @@ def test_json_prompt_empty(
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("metadata", {"name": "example"})
 
@@ -153,6 +153,6 @@ def test_json_prompt_invalid(
     factory = ClickPromptFactory()
     binder = PromptBinder(factory)
 
-    [binding] = binder.bind([variable], [], render)
+    [binding] = binder.bind([variable], render)
 
     assert binding == Binding("metadata", {})
