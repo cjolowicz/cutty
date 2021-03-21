@@ -1,9 +1,9 @@
-"""Unit tests for cutty.adapters.jinja.renderables."""
+"""Unit tests for cutty.adapters.jinja.render."""
 import pathlib
 
 import pytest
 
-from cutty.adapters.jinja.renderables import JinjaRenderer
+from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.render import Renderer
 from cutty.domain.variables import Variable
 from cutty.filesystem.disk import DiskFilesystem

@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.adapters.jinja.renderables import JinjaRenderer
+from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.files import Buffer
 from cutty.domain.files import File
 from cutty.domain.files import Mode
