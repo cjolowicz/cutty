@@ -1,10 +1,9 @@
 """Loading project templates from the filesystem."""
 import abc
-from collections.abc import Iterator
 from collections.abc import Sequence
 
 from cutty.domain.bindings import Binding
-from cutty.domain.files import File
+from cutty.domain.files import FileLoader
 from cutty.domain.render import Renderer
 from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateConfig
@@ -25,14 +24,6 @@ class RendererFactory(abc.ABC):
     @abc.abstractmethod
     def create(self, path: Path, *, settings: Sequence[Binding]) -> Renderer:
         """Create a renderer."""
-
-
-class FileLoader(abc.ABC):
-    """Interface for loading project files for a template."""
-
-    @abc.abstractmethod
-    def load(self, path: Path) -> Iterator[File]:
-        """Load project files."""
 
 
 class TemplateLoader:

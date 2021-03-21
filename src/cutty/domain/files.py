@@ -1,8 +1,10 @@
 """File abstraction."""
 import abc
 import enum
+from collections.abc import Iterator
 from dataclasses import dataclass
 
+from cutty.filesystem.path import Path
 from cutty.filesystem.pure import PurePath
 
 
@@ -20,6 +22,14 @@ class File:
     path: PurePath
     mode: Mode
     blob: str
+
+
+class FileLoader(abc.ABC):
+    """Interface for loading project files for a template."""
+
+    @abc.abstractmethod
+    def load(self, path: Path) -> Iterator[File]:
+        """Load project files."""
 
 
 class FileStorage(abc.ABC):
