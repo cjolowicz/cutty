@@ -5,7 +5,7 @@ from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptBinder
 from cutty.domain.prompts import PromptFactory
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 
 
 class FakePrompt(Prompt[ValueT_co]):
@@ -19,12 +19,14 @@ class FakePrompt(Prompt[ValueT_co]):
 class FakePromptFactory(PromptFactory):
     """Create fake prompts."""
 
-    def create(self, variable: Variable[ValueT]) -> Prompt[ValueT]:
+    def create(self, variable: GenericVariable[ValueT]) -> Prompt[ValueT]:
         """Return a fake prompt."""
         return FakePrompt(variable)
 
 
-def test_prompt_variable_binder(variable: Variable[str], render: Renderer) -> None:
+def test_prompt_variable_binder(
+    variable: GenericVariable[str], render: Renderer
+) -> None:
     """It binds variables using the prompts."""
     factory = FakePromptFactory()
     binder = PromptBinder(factory)

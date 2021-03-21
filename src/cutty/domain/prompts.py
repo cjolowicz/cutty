@@ -10,13 +10,13 @@ from cutty.domain.bindings import ValueT
 from cutty.domain.bindings import ValueT_co
 from cutty.domain.render import Renderer
 from cutty.domain.variables import Binder
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 
 
 class Prompt(abc.ABC, Generic[ValueT_co]):
     """User prompt."""
 
-    def __init__(self, variable: Variable[ValueT_co]) -> None:
+    def __init__(self, variable: GenericVariable[ValueT_co]) -> None:
         """Initialize."""
         self.variable = variable
 
@@ -34,7 +34,7 @@ class PromptFactory(abc.ABC):
     """Given a variable, return a prompt."""
 
     @abc.abstractmethod
-    def create(self, variable: Variable[ValueT]) -> Prompt[ValueT]:
+    def create(self, variable: GenericVariable[ValueT]) -> Prompt[ValueT]:
         """Create a prompt."""
 
 
@@ -47,7 +47,7 @@ class PromptBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[Variable[Value]],
+        variables: Iterable[GenericVariable[Value]],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:

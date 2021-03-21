@@ -10,7 +10,7 @@ from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
 from cutty.domain.variables import Binder
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 
 
 @dataclass
@@ -18,7 +18,7 @@ class TemplateConfig:
     """Template configuration."""
 
     settings: tuple[Binding, ...]
-    bindings: tuple[Variable[Value], ...]
+    bindings: tuple[GenericVariable[Value], ...]
 
 
 class InvalidPathComponent(Exception):

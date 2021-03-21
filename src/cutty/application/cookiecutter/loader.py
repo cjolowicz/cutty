@@ -16,7 +16,7 @@ from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.templates import TemplateConfig
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 from cutty.filesystem.base import Access
 from cutty.filesystem.path import Path
 
@@ -62,11 +62,11 @@ def loadvalue(value: Any) -> Value:
     raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
-def loadvariable(name: str, value: Value) -> Variable[Value]:
+def loadvariable(name: str, value: Value) -> GenericVariable[Value]:
     """Load a variable."""
     if isinstance(value, list):
         [valuetype] = set(getvaluetype(choice) for choice in value)
-        return Variable(
+        return GenericVariable(
             name=name,
             description=name,
             type=valuetype,
@@ -75,7 +75,7 @@ def loadvariable(name: str, value: Value) -> Variable[Value]:
             interactive=True,
         )
 
-    return Variable(
+    return GenericVariable(
         name=name,
         description=name,
         type=getvaluetype(value),
