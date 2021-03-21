@@ -2,7 +2,7 @@
 from cutty.domain.prompts import Prompt
 from cutty.domain.prompts import PromptFactory
 from cutty.domain.prompts import PromptVariableBuilder
-from cutty.domain.renderables import Renderable
+from cutty.domain.render import Renderer
 from cutty.domain.variables import ValueT
 from cutty.domain.variables import ValueT_co
 from cutty.domain.varspecs import VariableSpecification
@@ -25,13 +25,13 @@ class FakePromptFactory(PromptFactory):
 
 
 def test_prompt_variable_builder(
-    specification: Renderable[VariableSpecification[str]],
+    specification: VariableSpecification[str], render: Renderer
 ) -> None:
     """It builds variables using the prompts."""
     factory = FakePromptFactory()
     builder = PromptVariableBuilder(factory)
 
-    [variable] = builder.build([specification])
+    [variable] = builder.build([specification], [], render)
 
     assert variable.name == "project"
     assert variable.value == "example"
