@@ -10,7 +10,7 @@ from cutty.domain.bindings import Binding
 from cutty.domain.bindings import ValueType
 from cutty.domain.prompts import PromptBinder
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
+from cutty.domain.variables import GenericVariable
 
 
 PatchStandardInput = Callable[[str], None]
@@ -28,7 +28,7 @@ def patch_standard_input(monkeypatch: pytest.MonkeyPatch) -> PatchStandardInput:
 
 def test_noop_prompt(render: Renderer) -> None:
     """It uses the default."""
-    variable = Variable(
+    variable = GenericVariable(
         name="project",
         description="The name of the project",
         type=ValueType.STRING,
@@ -46,7 +46,7 @@ def test_noop_prompt(render: Renderer) -> None:
 
 def test_text_prompt(
     render: Renderer,
-    variable: Variable[str],
+    variable: GenericVariable[str],
     patch_standard_input: PatchStandardInput,
 ) -> None:
     """It reads the value from stdin."""
@@ -66,7 +66,7 @@ def test_choices_prompt(
     """It reads a number from stdin."""
     patch_standard_input("2\n")
 
-    variable = Variable(
+    variable = GenericVariable(
         name="project",
         description="The name of the project",
         type=ValueType.STRING,
@@ -82,7 +82,9 @@ def test_choices_prompt(
     assert binding == Binding("project", "awesome-project")
 
 
-def test_choices_prompt_invalid(render: Renderer, variable: Variable[str]) -> None:
+def test_choices_prompt_invalid(
+    render: Renderer, variable: GenericVariable[str]
+) -> None:
     """It raises an exception when there are no choices."""
     prompt = ChoicePrompt(variable)
     with pytest.raises(ValueError):
@@ -96,7 +98,7 @@ def test_json_prompt(
     """It loads JSON from stdin."""
     patch_standard_input('{"name": "awesome"}\n')
 
-    variable = Variable(
+    variable = GenericVariable(
         name="metadata",
         description="metadata",
         type=ValueType.OBJECT,
@@ -118,7 +120,7 @@ def test_json_prompt_empty(
     """It returns the default."""
     patch_standard_input("\n")
 
-    variable = Variable(
+    variable = GenericVariable(
         name="metadata",
         description="metadata",
         type=ValueType.OBJECT,
@@ -140,7 +142,7 @@ def test_json_prompt_invalid(
     """It prompts again."""
     patch_standard_input('invalid\n"not a dict"\n{}\n')
 
-    variable = Variable(
+    variable = GenericVariable(
         name="metadata",
         description="metadata",
         type=ValueType.OBJECT,
