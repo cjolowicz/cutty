@@ -4,7 +4,6 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import Value
 from cutty.domain.files import File
 from cutty.domain.render import Renderer
 from cutty.domain.templates import Template
@@ -24,7 +23,7 @@ class RendererFactory(abc.ABC):
     """Interface for creating a renderer."""
 
     @abc.abstractmethod
-    def create(self, path: Path, *, settings: Sequence[Binding[Value]]) -> Renderer:
+    def create(self, path: Path, *, settings: Sequence[Binding]) -> Renderer:
         """Create a renderer."""
 
 

@@ -17,9 +17,10 @@ from cutty.filesystem.pure import PurePath
 
 T = TypeVar("T")
 U = TypeVar("U")
-Bindings = Sequence[Binding[Value]]
-RenderFunction = Callable[[T, Bindings, Bindings], T]
-RenderContinuation = Callable[[T, Bindings, Bindings, RenderFunction[U]], T]
+RenderFunction = Callable[[T, Sequence[Binding], Sequence[Binding]], T]
+RenderContinuation = Callable[
+    [T, Sequence[Binding], Sequence[Binding], RenderFunction[U]], T
+]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
 
 
@@ -30,12 +31,16 @@ class Renderer:
         """Initialize."""
 
         @functools.singledispatch
-        def _render(value: T, bindings: Bindings, settings: Bindings) -> T:
+        def _render(
+            value: T, bindings: Sequence[Binding], settings: Sequence[Binding]
+        ) -> T:
             return value
 
         self._render = _render
 
-    def __call__(self, value: T, bindings: Bindings, settings: Bindings) -> T:
+    def __call__(
+        self, value: T, bindings: Sequence[Binding], settings: Sequence[Binding]
+    ) -> T:
         """Render."""
         return self._render(value, bindings, settings)
 
@@ -70,7 +75,7 @@ class Renderer:
             )
 
         @self._render.register(cls)
-        def _(value: T, bindings: Bindings, settings: Bindings) -> T:
+        def _(value: T, bindings: Sequence[Binding], settings: Sequence[Binding]) -> T:
             assert function is not None  # noqa: S101
             return function(value, bindings, settings, self)
 
@@ -84,8 +89,8 @@ class Renderer:
         @render.register(list)
         def _(
             values: list[T],
-            bindings: Bindings,
-            settings: Bindings,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> list[T]:
             return [render(value, bindings, settings) for value in values]
@@ -93,8 +98,8 @@ class Renderer:
         @render.register(dict)  # type: ignore[no-redef]
         def _(
             mapping: dict[str, T],
-            bindings: Bindings,
-            settings: Bindings,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> dict[str, T]:
             return {
@@ -105,8 +110,8 @@ class Renderer:
         @render.register(Variable)  # type: ignore[no-redef]
         def _(
             variable: Variable[Value],
-            bindings: Bindings,
-            settings: Bindings,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> Variable[Value]:
             return Variable(
@@ -123,8 +128,8 @@ class Renderer:
         @render.register  # type: ignore[no-redef]
         def _(
             path: PurePath,
-            bindings: Bindings,
-            settings: Bindings,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> PurePath:
             return PurePath(*(render(part, bindings, settings) for part in path.parts))
@@ -132,8 +137,8 @@ class Renderer:
         @render.register  # type: ignore[no-redef]
         def _(
             buffer: Buffer,
-            bindings: Bindings,
-            settings: Bindings,
+            bindings: Sequence[Binding],
+            settings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> Buffer:
             return Buffer(

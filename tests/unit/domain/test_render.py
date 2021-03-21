@@ -16,6 +16,6 @@ from cutty.filesystem.pure import PurePath
 )
 def test_render(render: Renderer, template: object, expected: object) -> None:
     """It renders the template as expected."""
-    variable = Binding("x", "teapot")
+    binding = Binding("x", "teapot")
 
-    assert expected == render(template, [variable], [])
+    assert expected == render(template, [binding], [])

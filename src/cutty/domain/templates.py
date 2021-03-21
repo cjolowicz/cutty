@@ -17,7 +17,7 @@ from cutty.domain.variables import Variable
 class TemplateConfig:
     """Template configuration."""
 
-    settings: tuple[Binding[Value], ...]
+    settings: tuple[Binding, ...]
     bindings: tuple[Variable[Value], ...]
 
 
@@ -42,7 +42,7 @@ class Template:
         self.hooks = hooks
         self.renderer = renderer
 
-    def render(self, bindings: Sequence[Binding[Value]]) -> Iterator[File]:
+    def render(self, bindings: Sequence[Binding]) -> Iterator[File]:
         """Render the template."""
         for file in self.files:
             file = self.renderer(file, bindings, self.config.settings)

@@ -9,7 +9,6 @@ import jinja2
 
 from cutty.adapters.jinja import extensions
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import Value
 from cutty.domain.render import RenderFunction
 from cutty.domain.render import T
 from cutty.filesystem.path import Path
@@ -67,7 +66,7 @@ class JinjaRenderer:
         *,
         searchpath: Iterable[Path],
         context_prefix: Optional[str] = None,
-        extra_bindings: Iterable[Binding[Value]] = (),
+        extra_bindings: Iterable[Binding] = (),
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderer:
         """Create a renderer using Jinja."""
@@ -88,7 +87,7 @@ class JinjaRenderer:
         environment: jinja2.Environment,
         *,
         context_prefix: Optional[str] = None,
-        extra_bindings: Iterable[Binding[Value]] = (),
+        extra_bindings: Iterable[Binding] = (),
     ) -> None:
         """Initialize."""
         self.environment = environment
@@ -98,8 +97,8 @@ class JinjaRenderer:
     def __call__(
         self,
         text: str,
-        bindings: Iterable[Binding[Value]],
-        settings: Iterable[Binding[Value]],
+        bindings: Iterable[Binding],
+        settings: Iterable[Binding],
         render: RenderFunction[T],
     ) -> str:
         """Render the text."""
