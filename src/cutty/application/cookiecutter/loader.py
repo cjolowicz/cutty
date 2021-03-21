@@ -7,8 +7,8 @@ from typing import Any
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
+from cutty.domain.files import FileLoader
 from cutty.domain.files import Mode
-from cutty.domain.loader import FileLoader
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
