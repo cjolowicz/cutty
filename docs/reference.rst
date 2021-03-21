@@ -41,6 +41,13 @@ cutty.domain.files
    :members:
 
 
+cutty.domain.render
+-------------------
+
+.. automodule:: cutty.domain.render
+   :members:
+
+
 cutty.domain.hooks
 ------------------
 
