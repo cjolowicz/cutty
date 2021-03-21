@@ -2,8 +2,6 @@
 import abc
 from collections.abc import Iterable
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any
 from typing import Generic
 from typing import TYPE_CHECKING
 
@@ -11,36 +9,8 @@ if TYPE_CHECKING:
     from cutty.domain.render import Renderer
 from cutty.domain.bindings import Value
 from cutty.domain.bindings import ValueT_co
+from cutty.domain.bindings import ValueType
 from cutty.domain.bindings import Binding
-
-
-class ValueType(str, Enum):
-    """The kinds of values a template variable can hold."""
-
-    NULL = "null"
-    BOOLEAN = "boolean"
-    NUMBER = "number"
-    STRING = "string"
-    ARRAY = "array"
-    OBJECT = "object"
-
-
-def getvaluetype(value: Any) -> ValueType:
-    """Return the appropriate value type for the value."""
-    mapping = {
-        type(None): ValueType.NULL,
-        bool: ValueType.BOOLEAN,
-        float: ValueType.NUMBER,
-        str: ValueType.STRING,
-        list: ValueType.ARRAY,
-        dict: ValueType.OBJECT,
-    }
-
-    for cls, valuetype in mapping.items():
-        if isinstance(value, cls):
-            return valuetype
-
-    raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
 @dataclass(frozen=True)
