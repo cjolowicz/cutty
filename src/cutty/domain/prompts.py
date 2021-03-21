@@ -5,12 +5,12 @@ from typing import Generic
 
 from cutty.domain.bindings import Binding
 from cutty.domain.bindings import GenericBinding
-from cutty.domain.bindings import Value
 from cutty.domain.bindings import ValueT
 from cutty.domain.bindings import ValueT_co
 from cutty.domain.render import Renderer
 from cutty.domain.variables import Binder
 from cutty.domain.variables import GenericVariable
+from cutty.domain.variables import Variable
 
 
 class Prompt(abc.ABC, Generic[ValueT_co]):
@@ -47,7 +47,7 @@ class PromptBinder(Binder):
 
     def bind(
         self,
-        variables: Iterable[GenericVariable[Value]],
+        variables: Iterable[Variable],
         settings: Iterable[Binding],
         render: Renderer,
     ) -> list[Binding]:

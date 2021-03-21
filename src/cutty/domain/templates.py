@@ -5,12 +5,11 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from cutty.domain.bindings import Binding
-from cutty.domain.bindings import Value
 from cutty.domain.files import File
 from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
 from cutty.domain.variables import Binder
-from cutty.domain.variables import GenericVariable
+from cutty.domain.variables import Variable
 
 
 @dataclass
@@ -18,7 +17,7 @@ class TemplateConfig:
     """Template configuration."""
 
     settings: tuple[Binding, ...]
-    bindings: tuple[GenericVariable[Value], ...]
+    bindings: tuple[Variable, ...]
 
 
 class InvalidPathComponent(Exception):
