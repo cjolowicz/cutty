@@ -13,8 +13,11 @@ from typing import Union
 
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
+from cutty.domain.files import loadfile
+from cutty.domain.files import walkfiles
 from cutty.domain.variables import GenericVariable
 from cutty.domain.variables import Variable
+from cutty.filesystem.path import Path
 from cutty.filesystem.pure import PurePath
 
 
@@ -159,9 +162,11 @@ class Renderer:
 
 
 def renderfiles(
-    files: Iterable[File], *, render: Renderer, bindings: Sequence[Binding]
+    paths: Iterable[Path], *, render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
-    """Render the template."""
-    for file in files:
-        with contextlib.suppress(EmptyPathComponent):
-            yield render(file, bindings)
+    """Render the files."""
+    for path in paths:
+        for path in walkfiles(path):
+            file = loadfile(path)
+            with contextlib.suppress(EmptyPathComponent):
+                yield render(file, bindings)
