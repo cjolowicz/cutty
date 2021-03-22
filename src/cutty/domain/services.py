@@ -20,13 +20,13 @@ class RenderService:
         self,
         *,
         renderbind: RenderBinder,
-        configloader: TemplateConfigLoader,
+        loadconfig: TemplateConfigLoader,
         rendererfactory: RendererFactory,
         loadpaths: PathLoader,
         storefile: FileStorage
     ):
         """Initialize."""
-        self.configloader = configloader
+        self.loadconfig = loadconfig
         self.rendererfactory = rendererfactory
         self.loadpaths = loadpaths
         self.renderbind = renderbind
@@ -34,7 +34,7 @@ class RenderService:
 
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
-        config = self.configloader.load(path)
+        config = self.loadconfig(path)
         render = self.rendererfactory.create(path, settings=config.settings)
         bindings = self.renderbind(render, config.variables)
         paths = self.loadpaths(path)

@@ -10,7 +10,6 @@ from cutty.domain.bindings import Binding
 from cutty.domain.files import File
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfig
-from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.render import RenderFunction
 from cutty.domain.values import getvaluetype
@@ -62,31 +61,28 @@ def loadvariable(name: str, value: Value) -> Variable:
     )
 
 
-class CookiecutterTemplateConfigLoader(TemplateConfigLoader):
-    """Loading Cookiecutter template configurations."""
+def loadconfig(path: Path) -> TemplateConfig:
+    """Load the configurations for a Cookiecutter template."""
+    text = (path / "cookiecutter.json").read_text()
+    data = json.loads(text)
 
-    def load(self, path: Path) -> TemplateConfig:
-        """Load template configuration."""
-        text = (path / "cookiecutter.json").read_text()
-        data = json.loads(text)
+    assert isinstance(data, dict) and all(  # noqa: S101
+        isinstance(name, str) for name in data
+    )
 
-        assert isinstance(data, dict) and all(  # noqa: S101
-            isinstance(name, str) for name in data
-        )
+    settings = tuple(
+        Binding(name, loadvalue(value))
+        for name, value in data.items()
+        if name.startswith("_")
+    )
 
-        settings = tuple(
-            Binding(name, loadvalue(value))
-            for name, value in data.items()
-            if name.startswith("_")
-        )
+    bindings = tuple(
+        loadvariable(name, loadvalue(value))
+        for name, value in data.items()
+        if not name.startswith("_")
+    )
 
-        bindings = tuple(
-            loadvariable(name, loadvalue(value))
-            for name, value in data.items()
-            if not name.startswith("_")
-        )
-
-        return TemplateConfig(settings, bindings)
+    return TemplateConfig(settings, bindings)
 
 
 class CookiecutterRendererFactory(RendererFactory):
