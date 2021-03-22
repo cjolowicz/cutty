@@ -1,4 +1,5 @@
 """Templates."""
+import contextlib
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
@@ -18,6 +19,10 @@ class TemplateConfig:
 
     settings: tuple[Binding, ...]
     variables: tuple[Variable, ...]
+
+
+class EmptyPathComponent(Exception):
+    """The rendered path has an empty component."""
 
 
 class InvalidPathComponent(Exception):
@@ -44,20 +49,25 @@ class Template:
     def render(self, bindings: Sequence[Binding]) -> Iterator[File]:
         """Render the template."""
         for file in self.files:
-            file = self.renderer(file, bindings)
+            with contextlib.suppress(EmptyPathComponent):
+                yield self.renderfile(file, bindings)
 
-            if not all(file.path.parts):
-                # FIXME: Shouldn't have rendered the blob at all.
-                # FIXME: Can we avoid traversing that directory?
-                continue
+    def renderfile(self, file: File, bindings: Sequence[Binding]) -> File:
+        """Render the file."""
+        file = self.renderer(file, bindings)
 
-            if any(
-                "/" in part or "\\" in part or part == "." or part == ".."
-                for part in file.path.parts
-            ):
-                raise InvalidPathComponent(str(file.path))
+        if not all(file.path.parts):
+            # FIXME: Shouldn't have rendered the blob at all.
+            # FIXME: Can we avoid traversing that directory?
+            raise EmptyPathComponent(str(file.path))
 
-            yield file
+        if any(
+            "/" in part or "\\" in part or part == "." or part == ".."
+            for part in file.path.parts
+        ):
+            raise InvalidPathComponent(str(file.path))
+
+        return file
 
 
 class TemplateRenderer:
