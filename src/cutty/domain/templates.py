@@ -44,11 +44,14 @@ class Template:
         self.hooks = hooks
         self.renderer = renderer
 
-    def render(self, bindings: Sequence[Binding]) -> Iterator[File]:
-        """Render the template."""
-        for file in self.files:
-            with contextlib.suppress(EmptyPathComponent):
-                yield renderfile(file, render=self.renderer, bindings=bindings)
+
+def renderfiles(
+    files: Iterable[File], *, render: Renderer, bindings: Sequence[Binding]
+) -> Iterator[File]:
+    """Render the template."""
+    for file in files:
+        with contextlib.suppress(EmptyPathComponent):
+            yield renderfile(file, render=render, bindings=bindings)
 
 
 def renderfile(file: File, *, render: Renderer, bindings: Sequence[Binding]) -> File:
