@@ -8,7 +8,6 @@ from typing import Any
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
-from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfig
 from cutty.domain.render import Renderer
 from cutty.domain.render import RenderFunction
@@ -85,57 +84,54 @@ def loadconfig(path: Path) -> TemplateConfig:
     return TemplateConfig(settings, bindings)
 
 
-class CookiecutterRendererFactory(RendererFactory):
-    """Creating a renderer."""
+def loadrenderer(path: Path, settings: Sequence[Binding]) -> Renderer:
+    """Create renderer."""
+    for setting in settings:
+        if setting.name == "_extensions":
+            extensions = setting.value
+            break
+    else:
+        extensions = []
 
-    def create(self, path: Path, settings: Sequence[Binding]) -> Renderer:
-        """Create renderer."""
-        for setting in settings:
-            if setting.name == "_extensions":
-                extensions = setting.value
-                break
-        else:
-            extensions = []
+    assert isinstance(extensions, list) and all(  # noqa: S101
+        isinstance(item, str) for item in extensions
+    )
 
-        assert isinstance(extensions, list) and all(  # noqa: S101
-            isinstance(item, str) for item in extensions
-        )
+    for setting in settings:
+        if setting.name == "_copy_without_render":
+            copy_without_render = setting.value
+            break
+    else:
+        copy_without_render = []
 
-        for setting in settings:
-            if setting.name == "_copy_without_render":
-                copy_without_render = setting.value
-                break
-        else:
-            copy_without_render = []
+    assert isinstance(copy_without_render, list) and all(  # noqa: S101
+        isinstance(item, str) for item in copy_without_render
+    )
 
-        assert isinstance(copy_without_render, list) and all(  # noqa: S101
-            isinstance(item, str) for item in copy_without_render
-        )
+    jinja = JinjaRenderer.create(
+        searchpath=[path],
+        context_prefix="cookiecutter",
+        extra_bindings=settings,
+        extra_extensions=extensions,
+    )
 
-        jinja = JinjaRenderer.create(
-            searchpath=[path],
-            context_prefix="cookiecutter",
-            extra_bindings=settings,
-            extra_extensions=extensions,
-        )
+    render = Renderer.create()
+    render.register(str, jinja)
 
-        render = Renderer.create()
-        render.register(str, jinja)
+    @render.register
+    def _(
+        file: File,
+        bindings: Sequence[Binding],
+        render: RenderFunction[Any],
+    ) -> File:
+        path = render(file.path, bindings)
 
-        @render.register
-        def _(
-            file: File,
-            bindings: Sequence[Binding],
-            render: RenderFunction[Any],
-        ) -> File:
-            path = render(file.path, bindings)
+        if any(
+            fnmatch.fnmatch(pattern, str(file.path))
+            for pattern in copy_without_render  # type: ignore[union-attr]
+        ):
+            return File(path, file.mode, file.blob)
 
-            if any(
-                fnmatch.fnmatch(pattern, str(file.path))
-                for pattern in copy_without_render  # type: ignore[union-attr]
-            ):
-                return File(path, file.mode, file.blob)
+        return File(path, file.mode, render(file.blob, bindings))
 
-            return File(path, file.mode, render(file.blob, bindings))
-
-        return render
+    return render

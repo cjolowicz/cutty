@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from cutty.domain.binders import RenderBinder
 from cutty.domain.files import FileStorage
-from cutty.domain.loader import RendererFactory
+from cutty.domain.loader import RendererLoader
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
@@ -21,13 +21,13 @@ class RenderService:
         *,
         renderbind: RenderBinder,
         loadconfig: TemplateConfigLoader,
-        rendererfactory: RendererFactory,
+        loadrenderer: RendererLoader,
         loadpaths: PathLoader,
         storefile: FileStorage
     ):
         """Initialize."""
         self.loadconfig = loadconfig
-        self.rendererfactory = rendererfactory
+        self.loadrenderer = loadrenderer
         self.loadpaths = loadpaths
         self.renderbind = renderbind
         self.storefile = storefile
@@ -35,7 +35,7 @@ class RenderService:
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
         config = self.loadconfig(path)
-        render = self.rendererfactory.create(path, settings=config.settings)
+        render = self.loadrenderer(path, config.settings)
         bindings = self.renderbind(render, config.variables)
         paths = self.loadpaths(path)
         for file in renderfiles(paths, render, bindings):

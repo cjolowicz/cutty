@@ -1,5 +1,4 @@
 """Loading project templates from the filesystem."""
-import abc
 from collections.abc import Callable
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -19,11 +18,4 @@ class TemplateConfig:
 
 
 TemplateConfigLoader = Callable[[Path], TemplateConfig]
-
-
-class RendererFactory(abc.ABC):
-    """Interface for creating a renderer."""
-
-    @abc.abstractmethod
-    def create(self, path: Path, *, settings: Sequence[Binding]) -> Renderer:
-        """Create a renderer."""
+RendererLoader = Callable[[Path, Sequence[Binding]], Renderer]
