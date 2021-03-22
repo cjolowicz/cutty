@@ -6,7 +6,7 @@ import pytest
 
 from cutty.adapters.click.binders import choiceprompt
 from cutty.adapters.click.binders import prompt
-from cutty.domain.binders import create_render_binder
+from cutty.domain.binders import renderbindwith
 from cutty.domain.bindings import Binding
 from cutty.domain.render import Renderer
 from cutty.domain.values import ValueType
@@ -36,7 +36,7 @@ def test_noop_prompt(render: Renderer) -> None:
         choices=(),
         interactive=False,
     )
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
@@ -51,7 +51,7 @@ def test_text_prompt(
     """It reads the value from stdin."""
     patch_standard_input("awesome-project\n")
 
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
@@ -72,7 +72,7 @@ def test_choices_prompt(
         choices=("example", "awesome-project"),
         interactive=True,
     )
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
@@ -102,7 +102,7 @@ def test_json_prompt(
         choices=(),
         interactive=True,
     )
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
@@ -123,7 +123,7 @@ def test_json_prompt_empty(
         choices=(),
         interactive=True,
     )
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
@@ -144,7 +144,7 @@ def test_json_prompt_invalid(
         choices=(),
         interactive=True,
     )
-    renderbind = create_render_binder(prompt)
+    renderbind = renderbindwith(prompt)
 
     [binding] = renderbind(render, [variable])
 
