@@ -13,7 +13,6 @@ from typing import Union
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
 from cutty.domain.files import loadfile
-from cutty.domain.files import walkfiles
 from cutty.domain.variables import GenericVariable
 from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
@@ -153,15 +152,18 @@ def renderfiles(
 ) -> Iterator[File]:
     """Render the files."""
     for path in paths:
-        for path in walkfiles(path):
-            name = render(path.name, bindings)
+        name = render(path.name, bindings)
+        if not name:
+            continue
 
-            if not name:
-                # FIXME: Can we avoid traversing that directory?
-                continue
+        if "/" in name or "\\" in name or name == "." or name == "..":
+            raise InvalidPathComponent(str(path), name)
 
-            if "/" in name or "\\" in name or name == "." or name == "..":
-                raise InvalidPathComponent(str(path))
-
+        if path.is_file():
             file = loadfile(path)
             yield render(file, bindings)
+        elif path.is_dir():
+            entries = path.iterdir()
+            yield from renderfiles(entries, render, bindings)
+        else:  # pragma: no cover
+            raise RuntimeError(f"{path}: not a regular file or directory")
