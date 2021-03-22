@@ -14,7 +14,7 @@ class RenderService:
     def __init__(
         self,
         *,
-        binder: Binder,
+        bind: Binder,
         configloader: TemplateConfigLoader,
         rendererfactory: RendererFactory,
         fileloader: FileLoader,
@@ -24,14 +24,14 @@ class RenderService:
         self.configloader = configloader
         self.rendererfactory = rendererfactory
         self.fileloader = fileloader
-        self.binder = binder
+        self.bind = bind
         self.storage = storage
 
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
         config = self.configloader.load(path)
         render = self.rendererfactory.create(path, settings=config.settings)
-        bindings = self.binder(config.variables, render=render)
+        bindings = self.bind(config.variables, render=render)
         files = self.fileloader.load(path)
 
         for file in renderfiles(files, render=render, bindings=bindings):
