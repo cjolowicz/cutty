@@ -1,4 +1,5 @@
 """Binding variables."""
+from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Protocol
 
@@ -16,13 +17,20 @@ class Binder(Protocol):
         """Bind the variables."""
 
 
-def bind_default(
-    variables: Sequence[Variable], *, render: Renderer
-) -> Sequence[Binding]:
-    """Bind variables using only their defaults."""
-    bindings: list[Binding] = []
-    for variable in variables:
-        variable = render(variable, bindings)
-        binding = Binding(variable.name, variable.default)
-        bindings.append(binding)
-    return bindings
+def create_binder(bind: Callable[[Variable], Binding]) -> Binder:
+    """Create a binder."""
+
+    def _bind(variables: Sequence[Variable], *, render: Renderer) -> Sequence[Binding]:
+        bindings: list[Binding] = []
+        for variable in variables:
+            variable = render(variable, bindings)
+            binding = bind(variable)
+            bindings.append(binding)
+        return bindings
+
+    return _bind
+
+
+default_binder = create_binder(
+    lambda variable: Binding(variable.name, variable.default)
+)
