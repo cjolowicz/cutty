@@ -162,7 +162,7 @@ class Renderer:
 
 
 def renderfiles(
-    paths: Iterable[Path], *, render: Renderer, bindings: Sequence[Binding]
+    paths: Iterable[Path], render: RenderFunction[File], bindings: Sequence[Binding]
 ) -> Iterator[File]:
     """Render the files."""
     for path in paths:
