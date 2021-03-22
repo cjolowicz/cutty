@@ -1,5 +1,4 @@
 """File abstraction."""
-import abc
 import enum
 from collections.abc import Callable
 from collections.abc import Iterator
@@ -26,11 +25,4 @@ class File:
 
 
 FileLoader = Callable[[Path], Iterator[File]]
-
-
-class FileStorage(abc.ABC):
-    """Any store for files."""
-
-    @abc.abstractmethod
-    def store(self, file: File) -> None:
-        """Commit a file to storage."""
+FileStorage = Callable[[File], None]

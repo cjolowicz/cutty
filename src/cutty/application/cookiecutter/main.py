@@ -14,12 +14,13 @@ from cutty.filesystem.path import Path
 
 def main(directory: pathlib.Path) -> None:
     """Generate a project from a Cookiecutter template."""
+    path = Path(filesystem=DiskFilesystem(directory))
+    storage = FilesystemFileStorage(pathlib.Path.cwd())
     service = RenderService(
         configloader=CookiecutterTemplateConfigLoader(),
         rendererfactory=CookiecutterRendererFactory(),
         loadfiles=loadfiles,
         renderbind=create_render_binder(prompt),
-        storage=FilesystemFileStorage(pathlib.Path.cwd()),
+        storefile=storage.store,
     )
-    path = Path(filesystem=DiskFilesystem(directory))
     service.render(path)

@@ -5,12 +5,11 @@ from collections.abc import Iterator
 
 from cutty.compat.contextlib import contextmanager
 from cutty.domain.files import File
-from cutty.domain.files import FileStorage
 from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
 
 
-class FilesystemFileStorage(FileStorage):
+class FilesystemFileStorage:
     """Filesystem-based store for files."""
 
     def __init__(self, root: pathlib.Path) -> None:
