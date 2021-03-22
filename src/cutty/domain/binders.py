@@ -28,9 +28,9 @@ def renderbind(
     return bindings
 
 
-def create_render_binder(bind: Binder) -> RenderBinder:
-    """Create a rendering binder."""
+def renderbindwith(bind: Binder) -> RenderBinder:
+    """Render and bind variables using the given binder."""
     return lambda render, variables: renderbind(render, bind, variables)
 
 
-renderbinddefault = create_render_binder(binddefault)
+renderbinddefault = renderbindwith(binddefault)
