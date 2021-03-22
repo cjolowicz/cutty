@@ -4,6 +4,7 @@ from cutty.domain.files import FileLoader
 from cutty.domain.files import FileStorage
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
+from cutty.domain.templates import renderfiles
 from cutty.domain.templates import Template
 from cutty.filesystem.path import Path
 
@@ -35,5 +36,5 @@ class RenderService:
         files = self.fileloader.load(path)
         template = Template(config=config, files=files, renderer=renderer)
 
-        for file in template.render(bindings):
+        for file in renderfiles(template.files, render=renderer, bindings=bindings):
             self.storage.store(file)
