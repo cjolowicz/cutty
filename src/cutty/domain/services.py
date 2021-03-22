@@ -31,7 +31,7 @@ class RenderService:
         """Render the template at the given path."""
         config = self.configloader.load(path)
         render = self.rendererfactory.create(path, settings=config.settings)
-        bindings = self.renderbind(config.variables, render=render)
+        bindings = self.renderbind(render, config.variables)
         files = self.fileloader.load(path)
 
         for file in renderfiles(files, render=render, bindings=bindings):
