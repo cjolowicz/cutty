@@ -8,7 +8,7 @@ from cutty.domain.values import ValueT_co
 
 @dataclass(frozen=True)
 class GenericBinding(Generic[ValueT_co]):
-    """A variable binds a name to a value."""
+    """A binding associates a name with a value."""
 
     name: str
     value: ValueT_co
