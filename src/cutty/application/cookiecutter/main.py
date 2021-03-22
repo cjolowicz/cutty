@@ -1,7 +1,7 @@
 """Main entry point for the Cookiecutter compatibility layer."""
 import pathlib
 
-from cutty.adapters.click.prompts import prompt
+from cutty.adapters.click.binders import prompt
 from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.application.cookiecutter.loader import CookiecutterFileLoader
 from cutty.application.cookiecutter.loader import CookiecutterRendererFactory
