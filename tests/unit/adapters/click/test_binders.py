@@ -1,11 +1,11 @@
-"""Unit tests for cutty.adapters.click.prompts."""
+"""Unit tests for cutty.adapters.click.binders."""
 from collections.abc import Callable
 from io import StringIO
 
 import pytest
 
-from cutty.adapters.click.prompts import choiceprompt
-from cutty.adapters.click.prompts import prompt
+from cutty.adapters.click.binders import choiceprompt
+from cutty.adapters.click.binders import prompt
 from cutty.domain.binders import create_binder
 from cutty.domain.bindings import Binding
 from cutty.domain.render import Renderer
