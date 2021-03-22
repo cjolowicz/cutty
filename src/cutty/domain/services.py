@@ -17,30 +17,19 @@ TemplateConfigLoader = Callable[[Path], TemplateConfig]
 RendererLoader = Callable[[Path, Sequence[Binding]], Renderer]
 
 
-class RenderService:
-    """Service for rendering a template."""
-
-    def __init__(
-        self,
-        *,
-        renderbind: RenderBinder,
-        loadconfig: TemplateConfigLoader,
-        loadrenderer: RendererLoader,
-        loadpaths: PathLoader,
-        storefile: FileStorage
-    ):
-        """Initialize."""
-        self.loadconfig = loadconfig
-        self.loadrenderer = loadrenderer
-        self.loadpaths = loadpaths
-        self.renderbind = renderbind
-        self.storefile = storefile
-
-    def render(self, path: Path) -> None:
-        """Render the template at the given path."""
-        config = self.loadconfig(path)
-        render = self.loadrenderer(path, config.settings)
-        bindings = self.renderbind(render, config.variables)
-        paths = self.loadpaths(path)
-        for file in renderfiles(paths, render, bindings):
-            self.storefile(file)
+def render(
+    path: Path,
+    *,
+    renderbind: RenderBinder,
+    loadconfig: TemplateConfigLoader,
+    loadrenderer: RendererLoader,
+    loadpaths: PathLoader,
+    storefile: FileStorage
+) -> None:
+    """Render the template at the given path."""
+    config = loadconfig(path)
+    render = loadrenderer(path, config.settings)
+    bindings = renderbind(render, config.variables)
+    paths = loadpaths(path)
+    for file in renderfiles(paths, render, bindings):
+        storefile(file)
