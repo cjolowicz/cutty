@@ -7,7 +7,7 @@ import pytest
 from cutty.adapters.click.prompts import ChoicePrompt
 from cutty.adapters.click.prompts import ClickPromptFactory
 from cutty.domain.bindings import Binding
-from cutty.domain.prompts import PromptBinder
+from cutty.domain.prompts import create_prompt_binder
 from cutty.domain.render import Renderer
 from cutty.domain.values import ValueType
 from cutty.domain.variables import GenericVariable
@@ -37,9 +37,9 @@ def test_noop_prompt(render: Renderer) -> None:
         interactive=False,
     )
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("project", "example")
 
@@ -53,9 +53,9 @@ def test_text_prompt(
     patch_standard_input("awesome-project\n")
 
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -75,9 +75,9 @@ def test_choices_prompt(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -107,9 +107,9 @@ def test_json_prompt(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("metadata", {"name": "awesome"})
 
@@ -129,9 +129,9 @@ def test_json_prompt_empty(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("metadata", {"name": "example"})
 
@@ -151,8 +151,8 @@ def test_json_prompt_invalid(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding == Binding("metadata", {})

@@ -38,21 +38,16 @@ class PromptFactory(abc.ABC):
         """Create a prompt."""
 
 
-class PromptBinder(Binder):
+def create_prompt_binder(prompts: PromptFactory) -> Binder:
     """Bind variables by prompting the user."""
 
-    def __init__(self, factory: PromptFactory) -> None:
-        """Initialize."""
-        self.factory = factory
-
-    def bind(
-        self, variables: Sequence[Variable], render: Renderer
-    ) -> Sequence[Binding]:
-        """Bind the variables."""
+    def _bind(variables: Sequence[Variable], *, render: Renderer) -> Sequence[Binding]:
         bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings)
-            prompt = self.factory.create(variable)
+            prompt = prompts.create(variable)
             binding = prompt.prompt()
             bindings.append(binding)
         return bindings
+
+    return _bind
