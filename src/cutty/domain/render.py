@@ -151,14 +151,12 @@ def renderfiles(
         if not name:
             continue
 
-        if "/" in name or "\\" in name or name == "." or name == "..":
+        if "/" in name or "\\" in name or name in (".", ".."):
             raise InvalidPathComponent(str(path), name)
 
         if path.is_file():
-            file = File.load(path)
-            yield render(file, bindings)
+            yield render(File.load(path), bindings)
         elif path.is_dir():
-            entries = path.iterdir()
-            yield from renderfiles(entries, render, bindings)
+            yield from renderfiles(path.iterdir(), render, bindings)
         else:  # pragma: no cover
             raise RuntimeError(f"{path}: not a regular file or directory")
