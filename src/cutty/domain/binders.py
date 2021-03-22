@@ -11,8 +11,8 @@ from cutty.domain.variables import Variable
 Bind = Callable[[Variable], Binding]
 
 
-class Binder(Protocol):
-    """Protocol for binding variables."""
+class RenderBinder(Protocol):
+    """Protocol for rendering and binding variables."""
 
     def __call__(
         self, variables: Sequence[Variable], *, render: Renderer
@@ -20,7 +20,7 @@ class Binder(Protocol):
         """Bind the variables."""
 
 
-def create_binder(bind: Bind) -> Binder:
+def create_binder(bind: Bind) -> RenderBinder:
     """Create a binder."""
 
     def _bind(variables: Sequence[Variable], *, render: Renderer) -> Sequence[Binding]:

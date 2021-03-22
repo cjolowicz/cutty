@@ -18,7 +18,7 @@ def main(directory: pathlib.Path) -> None:
         configloader=CookiecutterTemplateConfigLoader(),
         rendererfactory=CookiecutterRendererFactory(),
         fileloader=CookiecutterFileLoader(),
-        bind=create_binder(prompt),
+        renderbind=create_binder(prompt),
         storage=FilesystemFileStorage(pathlib.Path.cwd()),
     )
     path = Path(filesystem=DiskFilesystem(directory))
