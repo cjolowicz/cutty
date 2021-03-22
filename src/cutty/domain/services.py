@@ -4,7 +4,6 @@ from collections.abc import Iterator
 
 from cutty.domain.binders import RenderBinder
 from cutty.domain.files import FileStorage
-from cutty.domain.files import loadfiles
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import renderfiles
@@ -38,7 +37,6 @@ class RenderService:
         config = self.configloader.load(path)
         render = self.rendererfactory.create(path, settings=config.settings)
         bindings = self.renderbind(render, config.variables)
-        for path in self.loadpaths(path):
-            files = loadfiles(path)
-            for file in renderfiles(files, render=render, bindings=bindings):
-                self.storefile(file)
+        paths = self.loadpaths(path)
+        for file in renderfiles(paths, render=render, bindings=bindings):
+            self.storefile(file)
