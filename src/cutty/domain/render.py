@@ -25,6 +25,14 @@ RenderContinuation = Callable[[T, Sequence[Binding], RenderFunction[U]], T]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
 
 
+class EmptyPathComponent(Exception):
+    """The rendered path has an empty component."""
+
+
+class InvalidPathComponent(Exception):
+    """The rendered path has an invalid component."""
+
+
 class Renderer:
     """Render."""
 
@@ -121,7 +129,19 @@ class Renderer:
             bindings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> PurePath:
-            return PurePath(*(render(part, bindings) for part in path.parts))
+            parts = [render(part, bindings) for part in path.parts]
+
+            if not all(parts):
+                # FIXME: Can we avoid traversing that directory?
+                raise EmptyPathComponent(str(path), "/".join(parts))
+
+            if any(
+                "/" in part or "\\" in part or part == "." or part == ".."
+                for part in parts
+            ):
+                raise InvalidPathComponent(str(path), "/".join(parts))
+
+            return PurePath(*parts)
 
         @render.register  # type: ignore[no-redef]
         def _(
@@ -138,36 +158,10 @@ class Renderer:
         return render
 
 
-class EmptyPathComponent(Exception):
-    """The rendered path has an empty component."""
-
-
-class InvalidPathComponent(Exception):
-    """The rendered path has an invalid component."""
-
-
 def renderfiles(
     files: Iterable[File], *, render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
     """Render the template."""
     for file in files:
         with contextlib.suppress(EmptyPathComponent):
-            yield renderfile(file, render=render, bindings=bindings)
-
-
-def renderfile(file: File, *, render: Renderer, bindings: Sequence[Binding]) -> File:
-    """Render the file."""
-    file = render(file, bindings)
-
-    if not all(file.path.parts):
-        # FIXME: Shouldn't have rendered the blob at all.
-        # FIXME: Can we avoid traversing that directory?
-        raise EmptyPathComponent(str(file.path))
-
-    if any(
-        "/" in part or "\\" in part or part == "." or part == ".."
-        for part in file.path.parts
-    ):
-        raise InvalidPathComponent(str(file.path))
-
-    return file
+            yield render(file, bindings)
