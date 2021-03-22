@@ -11,7 +11,7 @@ def test_render(variable: GenericVariable[str], render: Renderer) -> None:
 
 def test_renderbinddefault(variable: GenericVariable[str], render: Renderer) -> None:
     """It binds variables using only defaults."""
-    [binding] = renderbinddefault([variable], render=render)
+    [binding] = renderbinddefault(render, [variable])
 
     assert binding.name == "project"
     assert binding.value == "example"

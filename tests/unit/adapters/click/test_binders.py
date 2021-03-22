@@ -36,9 +36,9 @@ def test_noop_prompt(render: Renderer) -> None:
         choices=(),
         interactive=False,
     )
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("project", "example")
 
@@ -51,9 +51,9 @@ def test_text_prompt(
     """It reads the value from stdin."""
     patch_standard_input("awesome-project\n")
 
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("project", "awesome-project")
 
@@ -72,9 +72,9 @@ def test_choices_prompt(
         choices=("example", "awesome-project"),
         interactive=True,
     )
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("project", "awesome-project")
 
@@ -102,9 +102,9 @@ def test_json_prompt(
         choices=(),
         interactive=True,
     )
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("metadata", {"name": "awesome"})
 
@@ -123,9 +123,9 @@ def test_json_prompt_empty(
         choices=(),
         interactive=True,
     )
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("metadata", {"name": "example"})
 
@@ -144,8 +144,8 @@ def test_json_prompt_invalid(
         choices=(),
         interactive=True,
     )
-    bind = create_render_binder(prompt)
+    renderbind = create_render_binder(prompt)
 
-    [binding] = bind([variable], render=render)
+    [binding] = renderbind(render, [variable])
 
     assert binding == Binding("metadata", {})
