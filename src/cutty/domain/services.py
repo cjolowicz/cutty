@@ -30,9 +30,9 @@ class RenderService:
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
         config = self.configloader.load(path)
-        renderer = self.rendererfactory.create(path, settings=config.settings)
-        bindings = self.binder(config.variables, render=renderer)
+        render = self.rendererfactory.create(path, settings=config.settings)
+        bindings = self.binder(config.variables, render=render)
         files = self.fileloader.load(path)
 
-        for file in renderfiles(files, render=renderer, bindings=bindings):
+        for file in renderfiles(files, render=render, bindings=bindings):
             self.storage.store(file)
