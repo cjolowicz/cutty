@@ -147,7 +147,7 @@ def renderfiles(
 ) -> Iterator[File]:
     """Render the files."""
     for path in paths:
-        name = render(path.name, bindings)
+        name = render(path, bindings).name
         if not name:
             continue
 
