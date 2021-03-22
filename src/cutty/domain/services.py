@@ -4,7 +4,7 @@ from cutty.domain.files import FileLoader
 from cutty.domain.files import FileStorage
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
-from cutty.domain.templates import renderfiles
+from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
 
 
