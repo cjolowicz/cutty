@@ -5,8 +5,8 @@ from collections.abc import Sequence
 
 from cutty.domain.binders import RenderBinder
 from cutty.domain.bindings import Binding
+from cutty.domain.config import TemplateConfig
 from cutty.domain.files import FileStorage
-from cutty.domain.loader import TemplateConfig
 from cutty.domain.render import Renderer
 from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
