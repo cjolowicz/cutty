@@ -20,10 +20,12 @@ class RenderBinder(Protocol):
         """Bind the variables."""
 
 
-def create_binder(bind: Binder) -> RenderBinder:
-    """Create a binder."""
+def create_render_binder(bind: Binder) -> RenderBinder:
+    """Create a rendering binder."""
 
-    def _bind(variables: Sequence[Variable], *, render: Renderer) -> Sequence[Binding]:
+    def _renderbind(
+        variables: Sequence[Variable], *, render: Renderer
+    ) -> Sequence[Binding]:
         bindings: list[Binding] = []
         for variable in variables:
             variable = render(variable, bindings)
@@ -31,7 +33,7 @@ def create_binder(bind: Binder) -> RenderBinder:
             bindings.append(binding)
         return bindings
 
-    return _bind
+    return _renderbind
 
 
 def binddefault(variable: Variable) -> Binding:
@@ -39,4 +41,4 @@ def binddefault(variable: Variable) -> Binding:
     return Binding(variable.name, variable.default)
 
 
-default_binder = create_binder(binddefault)
+default_binder = create_render_binder(binddefault)
