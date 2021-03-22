@@ -9,7 +9,7 @@ from cutty.domain.values import ValueType
 
 @dataclass(frozen=True)
 class GenericVariable(Generic[ValueT_co]):
-    """Specification for a template variable."""
+    """Template variables are specifications for bindings."""
 
     name: str
     description: str
