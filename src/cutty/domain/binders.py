@@ -31,6 +31,4 @@ def create_binder(bind: Callable[[Variable], Binding]) -> Binder:
     return _bind
 
 
-default_binder = create_binder(
-    lambda variable: Binding(variable.name, variable.default)
-)
+default_bind = create_binder(lambda variable: Binding(variable.name, variable.default))
