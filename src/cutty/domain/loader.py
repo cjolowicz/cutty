@@ -1,5 +1,6 @@
 """Loading project templates from the filesystem."""
 import abc
+from collections.abc import Callable
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -17,12 +18,7 @@ class TemplateConfig:
     variables: tuple[Variable, ...]
 
 
-class TemplateConfigLoader(abc.ABC):
-    """Interface for loading template configurations."""
-
-    @abc.abstractmethod
-    def load(self, path: Path) -> TemplateConfig:
-        """Load template configuration."""
+TemplateConfigLoader = Callable[[Path], TemplateConfig]
 
 
 class RendererFactory(abc.ABC):
