@@ -3,20 +3,10 @@ import contextlib
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
-from dataclasses import dataclass
 
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
 from cutty.domain.render import Renderer
-from cutty.domain.variables import Variable
-
-
-@dataclass
-class TemplateConfig:
-    """Template configuration."""
-
-    settings: tuple[Binding, ...]
-    variables: tuple[Variable, ...]
 
 
 class EmptyPathComponent(Exception):

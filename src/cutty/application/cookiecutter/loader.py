@@ -11,10 +11,10 @@ from cutty.domain.files import File
 from cutty.domain.files import FileLoader
 from cutty.domain.files import Mode
 from cutty.domain.loader import RendererFactory
+from cutty.domain.loader import TemplateConfig
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.render import Renderer
 from cutty.domain.render import RenderFunction
-from cutty.domain.templates import TemplateConfig
 from cutty.domain.values import getvaluetype
 from cutty.domain.values import Value
 from cutty.domain.variables import Variable
