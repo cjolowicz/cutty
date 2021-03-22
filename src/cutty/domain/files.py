@@ -1,6 +1,7 @@
 """File abstraction."""
 import abc
 import enum
+from collections.abc import Callable
 from collections.abc import Iterator
 from dataclasses import dataclass
 
@@ -24,12 +25,7 @@ class File:
     blob: str
 
 
-class FileLoader(abc.ABC):
-    """Interface for loading project files for a template."""
-
-    @abc.abstractmethod
-    def load(self, path: Path) -> Iterator[File]:
-        """Load project files."""
+FileLoader = Callable[[Path], Iterator[File]]
 
 
 class FileStorage(abc.ABC):

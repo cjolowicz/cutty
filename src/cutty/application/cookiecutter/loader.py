@@ -8,7 +8,6 @@ from typing import Any
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
-from cutty.domain.files import FileLoader
 from cutty.domain.files import Mode
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfig
@@ -33,23 +32,18 @@ def walkfiles(path: Path) -> Iterator[Path]:
         raise RuntimeError(f"{path}: not a regular file or directory")
 
 
-class CookiecutterFileLoader(FileLoader):
-    """A loader for project files in a Cookiecutter template."""
+def loadfiles(path: Path) -> Iterator[File]:
+    """Load project files in a Cookiecutter template."""
+    for template_dir in path.iterdir():
+        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
+            break
+    else:
+        raise RuntimeError("template directory not found")  # pragma: no cover
 
-    def load(self, path: Path) -> Iterator[File]:
-        """Load project files."""
-        for template_dir in path.iterdir():
-            if all(
-                token in template_dir.name for token in ("{{", "cookiecutter", "}}")
-            ):
-                break
-        else:
-            raise RuntimeError("template directory not found")  # pragma: no cover
-
-        for path in walkfiles(template_dir):
-            blob = path.read_text()
-            mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
-            yield File(path, mode, blob)
+    for path in walkfiles(template_dir):
+        blob = path.read_text()
+        mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
+        yield File(path, mode, blob)
 
 
 def loadvalue(value: Any) -> Value:

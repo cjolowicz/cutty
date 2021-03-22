@@ -3,9 +3,9 @@ import pathlib
 
 from cutty.adapters.click.binders import prompt
 from cutty.adapters.filesystem.files import FilesystemFileStorage
-from cutty.application.cookiecutter.loader import CookiecutterFileLoader
 from cutty.application.cookiecutter.loader import CookiecutterRendererFactory
 from cutty.application.cookiecutter.loader import CookiecutterTemplateConfigLoader
+from cutty.application.cookiecutter.loader import loadfiles
 from cutty.domain.binders import create_render_binder
 from cutty.domain.services import RenderService
 from cutty.filesystem.disk import DiskFilesystem
@@ -17,7 +17,7 @@ def main(directory: pathlib.Path) -> None:
     service = RenderService(
         configloader=CookiecutterTemplateConfigLoader(),
         rendererfactory=CookiecutterRendererFactory(),
-        fileloader=CookiecutterFileLoader(),
+        loadfiles=loadfiles,
         renderbind=create_render_binder(prompt),
         storage=FilesystemFileStorage(pathlib.Path.cwd()),
     )
