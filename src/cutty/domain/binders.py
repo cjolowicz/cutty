@@ -11,6 +11,11 @@ from cutty.domain.variables import Variable
 Binder = Callable[[Variable], Binding]
 
 
+def binddefault(variable: Variable) -> Binding:
+    """Bind a variable to its default value."""
+    return Binding(variable.name, variable.default)
+
+
 class RenderBinder(Protocol):
     """Protocol for rendering and binding variables."""
 
@@ -34,11 +39,6 @@ def create_render_binder(bind: Binder) -> RenderBinder:
         return bindings
 
     return _renderbind
-
-
-def binddefault(variable: Variable) -> Binding:
-    """Bind a variable to its default value."""
-    return Binding(variable.name, variable.default)
 
 
 default_binder = create_render_binder(binddefault)
