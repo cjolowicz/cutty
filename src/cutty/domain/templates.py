@@ -48,21 +48,22 @@ class Template:
         """Render the template."""
         for file in self.files:
             with contextlib.suppress(EmptyPathComponent):
-                yield self.renderfile(file, bindings)
+                yield renderfile(file, render=self.renderer, bindings=bindings)
 
-    def renderfile(self, file: File, bindings: Sequence[Binding]) -> File:
-        """Render the file."""
-        file = self.renderer(file, bindings)
 
-        if not all(file.path.parts):
-            # FIXME: Shouldn't have rendered the blob at all.
-            # FIXME: Can we avoid traversing that directory?
-            raise EmptyPathComponent(str(file.path))
+def renderfile(file: File, *, render: Renderer, bindings: Sequence[Binding]) -> File:
+    """Render the file."""
+    file = render(file, bindings)
 
-        if any(
-            "/" in part or "\\" in part or part == "." or part == ".."
-            for part in file.path.parts
-        ):
-            raise InvalidPathComponent(str(file.path))
+    if not all(file.path.parts):
+        # FIXME: Shouldn't have rendered the blob at all.
+        # FIXME: Can we avoid traversing that directory?
+        raise EmptyPathComponent(str(file.path))
 
-        return file
+    if any(
+        "/" in part or "\\" in part or part == "." or part == ".."
+        for part in file.path.parts
+    ):
+        raise InvalidPathComponent(str(file.path))
+
+    return file
