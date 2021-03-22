@@ -1,16 +1,20 @@
 """Domain services."""
 from collections.abc import Callable
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 from cutty.domain.binders import RenderBinder
+from cutty.domain.bindings import Binding
 from cutty.domain.files import FileStorage
-from cutty.domain.loader import RendererLoader
-from cutty.domain.loader import TemplateConfigLoader
+from cutty.domain.loader import TemplateConfig
+from cutty.domain.render import Renderer
 from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
 
 
 PathLoader = Callable[[Path], Iterator[Path]]
+TemplateConfigLoader = Callable[[Path], TemplateConfig]
+RendererLoader = Callable[[Path, Sequence[Binding]], Renderer]
 
 
 class RenderService:
