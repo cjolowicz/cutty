@@ -1,6 +1,6 @@
 """Unit tests for cutty.domain.prompts."""
+from cutty.domain.prompts import create_prompt_binder
 from cutty.domain.prompts import Prompt
-from cutty.domain.prompts import PromptBinder
 from cutty.domain.prompts import PromptFactory
 from cutty.domain.render import Renderer
 from cutty.domain.values import ValueT
@@ -29,9 +29,9 @@ def test_prompt_variable_binder(
 ) -> None:
     """It binds variables using the prompts."""
     factory = FakePromptFactory()
-    binder = PromptBinder(factory)
+    binder = create_prompt_binder(factory)
 
-    [binding] = binder.bind([variable], render)
+    [binding] = binder([variable], render=render)
 
     assert binding.name == "project"
     assert binding.value == "example"

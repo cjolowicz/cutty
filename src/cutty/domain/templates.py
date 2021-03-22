@@ -80,7 +80,7 @@ class TemplateRenderer:
 
     def render(self, template: Template) -> None:
         """Render the template."""
-        bindings = self.binder.bind(template.config.variables, template.renderer)
+        bindings = self.binder(template.config.variables, render=template.renderer)
 
         for file in template.render(bindings):
             self.storage.store(file)
