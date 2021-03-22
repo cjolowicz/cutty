@@ -7,5 +7,4 @@ from cutty.domain.templates import TemplateConfig
 def test_template(render: Renderer) -> None:
     """It can be rendered."""
     config = TemplateConfig(variables=(), settings=())
-    template = Template(config=config, files=(), renderer=render)
-    template.render(())
+    Template(config=config, files=(), renderer=render)
