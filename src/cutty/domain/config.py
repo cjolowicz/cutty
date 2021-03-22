@@ -1,4 +1,4 @@
-"""Loading project templates from the filesystem."""
+"""Configuration."""
 from dataclasses import dataclass
 
 from cutty.domain.bindings import Binding
