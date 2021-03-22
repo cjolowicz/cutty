@@ -1,5 +1,4 @@
 """Rendering."""
-import contextlib
 import functools
 from collections.abc import Callable
 from collections.abc import Iterable
@@ -132,19 +131,7 @@ class Renderer:
             bindings: Sequence[Binding],
             render: RenderFunction[T],
         ) -> PurePath:
-            parts = [render(part, bindings) for part in path.parts]
-
-            if not all(parts):
-                # FIXME: Can we avoid traversing that directory?
-                raise EmptyPathComponent(str(path), "/".join(parts))
-
-            if any(
-                "/" in part or "\\" in part or part == "." or part == ".."
-                for part in parts
-            ):
-                raise InvalidPathComponent(str(path), "/".join(parts))
-
-            return PurePath(*parts)
+            return PurePath(*(render(part, bindings) for part in path.parts))
 
         @render.register  # type: ignore[no-redef]
         def _(
@@ -162,11 +149,19 @@ class Renderer:
 
 
 def renderfiles(
-    paths: Iterable[Path], render: RenderFunction[File], bindings: Sequence[Binding]
+    paths: Iterable[Path], render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
     """Render the files."""
     for path in paths:
         for path in walkfiles(path):
+            name = render(path.name, bindings)
+
+            if not name:
+                # FIXME: Can we avoid traversing that directory?
+                continue
+
+            if "/" in name or "\\" in name or name == "." or name == "..":
+                raise InvalidPathComponent(str(path))
+
             file = loadfile(path)
-            with contextlib.suppress(EmptyPathComponent):
-                yield render(file, bindings)
+            yield render(file, bindings)
