@@ -1,12 +1,11 @@
 """Prompting the user for template bindings."""
 import abc
-from collections.abc import Sequence
 from typing import Generic
 
 from cutty.domain.binders import Binder
+from cutty.domain.binders import create_binder
 from cutty.domain.bindings import Binding
 from cutty.domain.bindings import GenericBinding
-from cutty.domain.render import Renderer
 from cutty.domain.values import ValueT
 from cutty.domain.values import ValueT_co
 from cutty.domain.variables import GenericVariable
@@ -41,13 +40,8 @@ class PromptFactory(abc.ABC):
 def create_prompt_binder(prompts: PromptFactory) -> Binder:
     """Bind variables by prompting the user."""
 
-    def _bind(variables: Sequence[Variable], *, render: Renderer) -> Sequence[Binding]:
-        bindings: list[Binding] = []
-        for variable in variables:
-            variable = render(variable, bindings)
-            prompt = prompts.create(variable)
-            binding = prompt.prompt()
-            bindings.append(binding)
-        return bindings
+    def _prompt(variable: Variable) -> Binding:
+        prompt = prompts.create(variable)
+        return prompt.prompt()
 
-    return _bind
+    return create_binder(_prompt)
