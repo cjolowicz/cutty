@@ -29,9 +29,9 @@ def test_prompt_variable_binder(
 ) -> None:
     """It binds variables using the prompts."""
     factory = FakePromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding.name == "project"
     assert binding.value == "example"

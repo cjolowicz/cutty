@@ -37,9 +37,9 @@ def test_noop_prompt(render: Renderer) -> None:
         interactive=False,
     )
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("project", "example")
 
@@ -53,9 +53,9 @@ def test_text_prompt(
     patch_standard_input("awesome-project\n")
 
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -75,9 +75,9 @@ def test_choices_prompt(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("project", "awesome-project")
 
@@ -107,9 +107,9 @@ def test_json_prompt(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("metadata", {"name": "awesome"})
 
@@ -129,9 +129,9 @@ def test_json_prompt_empty(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("metadata", {"name": "example"})
 
@@ -151,8 +151,8 @@ def test_json_prompt_invalid(
         interactive=True,
     )
     factory = ClickPromptFactory()
-    binder = create_prompt_binder(factory)
+    bind = create_prompt_binder(factory)
 
-    [binding] = binder([variable], render=render)
+    [binding] = bind([variable], render=render)
 
     assert binding == Binding("metadata", {})
