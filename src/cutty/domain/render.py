@@ -26,10 +26,6 @@ RenderContinuation = Callable[[T, Sequence[Binding], RenderFunction[U]], T]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
 
 
-class EmptyPathComponent(Exception):
-    """The rendered path has an empty component."""
-
-
 class InvalidPathComponent(Exception):
     """The rendered path has an invalid component."""
 
