@@ -5,7 +5,6 @@ from cutty.domain.files import FileStorage
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfigLoader
 from cutty.domain.templates import Template
-from cutty.domain.templates import TemplateRenderer
 from cutty.filesystem.path import Path
 
 
@@ -25,15 +24,16 @@ class RenderService:
         self.configloader = configloader
         self.rendererfactory = rendererfactory
         self.fileloader = fileloader
-        self.renderer = TemplateRenderer(
-            binder=binder,
-            storage=storage,
-        )
+        self.binder = binder
+        self.storage = storage
 
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
         config = self.configloader.load(path)
         renderer = self.rendererfactory.create(path, settings=config.settings)
+        bindings = self.binder(config.variables, render=renderer)
         files = self.fileloader.load(path)
         template = Template(config=config, files=files, renderer=renderer)
-        self.renderer.render(template)
+
+        for file in template.render(bindings):
+            self.storage.store(file)
