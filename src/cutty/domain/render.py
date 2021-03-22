@@ -12,7 +12,6 @@ from typing import Union
 
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
-from cutty.domain.files import loadfile
 from cutty.domain.variables import GenericVariable
 from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
@@ -156,7 +155,7 @@ def renderfiles(
             raise InvalidPathComponent(str(path), name)
 
         if path.is_file():
-            file = loadfile(path)
+            file = File.load(path)
             yield render(file, bindings)
         elif path.is_dir():
             entries = path.iterdir()

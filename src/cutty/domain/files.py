@@ -23,12 +23,12 @@ class File:
     mode: Mode
     blob: str
 
+    @classmethod
+    def load(cls, path: Path) -> File:
+        """Load file from path."""
+        blob = path.read_text()
+        mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
+        return cls(path, mode, blob)
+
 
 FileStorage = Callable[[File], None]
-
-
-def loadfile(path: Path) -> File:
-    """Load file from path."""
-    blob = path.read_text()
-    mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
-    return File(path, mode, blob)
