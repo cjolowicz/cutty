@@ -22,7 +22,7 @@ def splitpath(pathstr: str) -> tuple[str, ...]:
     source: jinja2.loaders.split_template_path
     """
     # TODO: Add string parsing to PurePath?
-    # TODO: Add common validation function? (see also Template.render)
+    # TODO: Add common validation function? (see cutty.domain.render.renderfiles)
     import os.path
 
     separators = [sep for sep in (os.path.sep, os.path.altsep) if sep]
