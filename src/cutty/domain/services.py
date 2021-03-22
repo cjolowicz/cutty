@@ -18,14 +18,14 @@ class RenderService:
         configloader: TemplateConfigLoader,
         rendererfactory: RendererFactory,
         loadfiles: FileLoader,
-        storage: FileStorage
+        storefile: FileStorage
     ):
         """Initialize."""
         self.configloader = configloader
         self.rendererfactory = rendererfactory
         self.loadfiles = loadfiles
         self.renderbind = renderbind
-        self.storage = storage
+        self.storefile = storefile
 
     def render(self, path: Path) -> None:
         """Render the template at the given path."""
@@ -35,4 +35,4 @@ class RenderService:
         files = self.loadfiles(path)
 
         for file in renderfiles(files, render=render, bindings=bindings):
-            self.storage.store(file)
+            self.storefile(file)
