@@ -28,6 +28,13 @@ class File:
 FileStorage = Callable[[File], None]
 
 
+def loadfile(path: Path) -> File:
+    """Load file from path."""
+    blob = path.read_text()
+    mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
+    return File(path, mode, blob)
+
+
 def walkfiles(path: Path) -> Iterator[Path]:
     """Iterate over the files under the path."""
     if path.is_file():
@@ -37,11 +44,3 @@ def walkfiles(path: Path) -> Iterator[Path]:
             yield from walkfiles(entry)
     else:  # pragma: no cover
         raise RuntimeError(f"{path}: not a regular file or directory")
-
-
-def loadfiles(path: Path) -> Iterator[File]:
-    """Load files."""
-    for path in walkfiles(path):
-        blob = path.read_text()
-        mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
-        yield File(path, mode, blob)
