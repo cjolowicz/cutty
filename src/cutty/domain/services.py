@@ -38,5 +38,5 @@ class RenderService:
         render = self.rendererfactory.create(path, settings=config.settings)
         bindings = self.renderbind(render, config.variables)
         paths = self.loadpaths(path)
-        for file in renderfiles(paths, render=render, bindings=bindings):
+        for file in renderfiles(paths, render, bindings):
             self.storefile(file)
