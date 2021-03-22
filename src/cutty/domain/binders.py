@@ -25,18 +25,25 @@ class RenderBinder(Protocol):
         """Bind the variables."""
 
 
+def renderbind(
+    render: Renderer, bind: Binder, variables: Sequence[Variable]
+) -> Sequence[Binding]:
+    """Successively render and bind variables."""
+    bindings: list[Binding] = []
+    for variable in variables:
+        variable = render(variable, bindings)
+        binding = bind(variable)
+        bindings.append(binding)
+    return bindings
+
+
 def create_render_binder(bind: Binder) -> RenderBinder:
     """Create a rendering binder."""
 
     def _renderbind(
         variables: Sequence[Variable], *, render: Renderer
     ) -> Sequence[Binding]:
-        bindings: list[Binding] = []
-        for variable in variables:
-            variable = render(variable, bindings)
-            binding = bind(variable)
-            bindings.append(binding)
-        return bindings
+        return renderbind(render, bind, variables)
 
     return _renderbind
 
