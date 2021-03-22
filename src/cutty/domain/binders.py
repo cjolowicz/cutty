@@ -41,4 +41,4 @@ def create_render_binder(bind: Binder) -> RenderBinder:
     return _renderbind
 
 
-default_binder = create_render_binder(binddefault)
+renderbinddefault = create_render_binder(binddefault)

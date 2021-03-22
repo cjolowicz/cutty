@@ -1,5 +1,5 @@
 """Unit tests for cutty.domain.variables."""
-from cutty.domain.binders import default_binder
+from cutty.domain.binders import renderbinddefault
 from cutty.domain.render import Renderer
 from cutty.domain.variables import GenericVariable
 
@@ -9,11 +9,9 @@ def test_render(variable: GenericVariable[str], render: Renderer) -> None:
     assert variable == render(variable, [])
 
 
-def test_default_variable_binder(
-    variable: GenericVariable[str], render: Renderer
-) -> None:
+def test_renderbinddefault(variable: GenericVariable[str], render: Renderer) -> None:
     """It binds variables using only defaults."""
-    [binding] = default_binder([variable], render=render)
+    [binding] = renderbinddefault([variable], render=render)
 
     assert binding.name == "project"
     assert binding.value == "example"
