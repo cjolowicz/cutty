@@ -27,24 +27,6 @@ class InvalidPathComponent(Exception):
     """The rendered path has an invalid component."""
 
 
-class Template:
-    """A project template."""
-
-    def __init__(
-        self,
-        *,
-        config: TemplateConfig,
-        renderer: Renderer,
-        files: Iterable[File],
-        hooks: Iterable[File] = (),
-    ) -> None:
-        """Initialize."""
-        self.config = config
-        self.files = files
-        self.hooks = hooks
-        self.renderer = renderer
-
-
 def renderfiles(
     files: Iterable[File], *, render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
