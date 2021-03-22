@@ -17,13 +17,13 @@ class RenderService:
         renderbind: RenderBinder,
         configloader: TemplateConfigLoader,
         rendererfactory: RendererFactory,
-        fileloader: FileLoader,
+        loadfiles: FileLoader,
         storage: FileStorage
     ):
         """Initialize."""
         self.configloader = configloader
         self.rendererfactory = rendererfactory
-        self.fileloader = fileloader
+        self.loadfiles = loadfiles
         self.renderbind = renderbind
         self.storage = storage
 
@@ -32,7 +32,7 @@ class RenderService:
         config = self.configloader.load(path)
         render = self.rendererfactory.create(path, settings=config.settings)
         bindings = self.renderbind(render, config.variables)
-        files = self.fileloader.load(path)
+        files = self.loadfiles(path)
 
         for file in renderfiles(files, render=render, bindings=bindings):
             self.storage.store(file)
