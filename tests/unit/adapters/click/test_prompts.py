@@ -4,10 +4,10 @@ from io import StringIO
 
 import pytest
 
-from cutty.adapters.click.prompts import ChoicePrompt
-from cutty.adapters.click.prompts import ClickPromptFactory
+from cutty.adapters.click.prompts import choiceprompt
+from cutty.adapters.click.prompts import prompt
+from cutty.domain.binders import create_binder
 from cutty.domain.bindings import Binding
-from cutty.domain.prompts import create_prompt_binder
 from cutty.domain.render import Renderer
 from cutty.domain.values import ValueType
 from cutty.domain.variables import GenericVariable
@@ -36,8 +36,7 @@ def test_noop_prompt(render: Renderer) -> None:
         choices=(),
         interactive=False,
     )
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
@@ -52,8 +51,7 @@ def test_text_prompt(
     """It reads the value from stdin."""
     patch_standard_input("awesome-project\n")
 
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
@@ -74,8 +72,7 @@ def test_choices_prompt(
         choices=("example", "awesome-project"),
         interactive=True,
     )
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
@@ -86,9 +83,8 @@ def test_choices_prompt_invalid(
     render: Renderer, variable: GenericVariable[str]
 ) -> None:
     """It raises an exception when there are no choices."""
-    prompt = ChoicePrompt(variable)
     with pytest.raises(ValueError):
-        prompt.prompt()
+        choiceprompt(variable)
 
 
 def test_json_prompt(
@@ -106,8 +102,7 @@ def test_json_prompt(
         choices=(),
         interactive=True,
     )
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
@@ -128,8 +123,7 @@ def test_json_prompt_empty(
         choices=(),
         interactive=True,
     )
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
@@ -150,8 +144,7 @@ def test_json_prompt_invalid(
         choices=(),
         interactive=True,
     )
-    factory = ClickPromptFactory()
-    bind = create_prompt_binder(factory)
+    bind = create_binder(prompt)
 
     [binding] = bind([variable], render=render)
 
