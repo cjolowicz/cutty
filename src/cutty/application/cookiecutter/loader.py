@@ -8,7 +8,6 @@ from typing import Any
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
-from cutty.domain.files import loadfiles as _loadfiles
 from cutty.domain.loader import RendererFactory
 from cutty.domain.loader import TemplateConfig
 from cutty.domain.loader import TemplateConfigLoader
@@ -20,11 +19,11 @@ from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 
 
-def loadfiles(path: Path) -> Iterator[File]:
+def loadpaths(path: Path) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
-            return _loadfiles(template_dir)
+            return iter([template_dir])
     else:
         raise RuntimeError("template directory not found")  # pragma: no cover
 

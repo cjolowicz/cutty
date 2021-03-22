@@ -25,7 +25,6 @@ class File:
     blob: str
 
 
-FileLoader = Callable[[Path], Iterator[File]]
 FileStorage = Callable[[File], None]
 
 
