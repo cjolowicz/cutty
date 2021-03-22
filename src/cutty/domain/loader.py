@@ -3,9 +3,7 @@ import abc
 from collections.abc import Sequence
 
 from cutty.domain.bindings import Binding
-from cutty.domain.files import FileLoader
 from cutty.domain.render import Renderer
-from cutty.domain.templates import Template
 from cutty.domain.templates import TemplateConfig
 from cutty.filesystem.path import Path
 
@@ -24,26 +22,3 @@ class RendererFactory(abc.ABC):
     @abc.abstractmethod
     def create(self, path: Path, *, settings: Sequence[Binding]) -> Renderer:
         """Create a renderer."""
-
-
-class TemplateLoader:
-    """A loader for project templates."""
-
-    def __init__(
-        self,
-        *,
-        configloader: TemplateConfigLoader,
-        rendererfactory: RendererFactory,
-        fileloader: FileLoader,
-    ) -> None:
-        """Initialize."""
-        self.configloader = configloader
-        self.rendererfactory = rendererfactory
-        self.fileloader = fileloader
-
-    def load(self, path: Path) -> Template:
-        """Load a template."""
-        config = self.configloader.load(path)
-        renderer = self.rendererfactory.create(path, settings=config.settings)
-        files = self.fileloader.load(path)
-        return Template(config=config, files=files, renderer=renderer)
