@@ -34,4 +34,9 @@ def create_binder(bind: Bind) -> Binder:
     return _bind
 
 
-default_bind = create_binder(lambda variable: Binding(variable.name, variable.default))
+def binddefault(variable: Variable) -> Binding:
+    """Bind a variable to its default value."""
+    return Binding(variable.name, variable.default)
+
+
+default_binder = create_binder(binddefault)

@@ -1,12 +1,12 @@
 """Main entry point for the Cookiecutter compatibility layer."""
 import pathlib
 
-from cutty.adapters.click.prompts import ClickPromptFactory
+from cutty.adapters.click.prompts import prompt
 from cutty.adapters.filesystem.files import FilesystemFileStorage
 from cutty.application.cookiecutter.loader import CookiecutterFileLoader
 from cutty.application.cookiecutter.loader import CookiecutterRendererFactory
 from cutty.application.cookiecutter.loader import CookiecutterTemplateConfigLoader
-from cutty.domain.prompts import create_prompt_binder
+from cutty.domain.binders import create_binder
 from cutty.domain.services import RenderService
 from cutty.filesystem.disk import DiskFilesystem
 from cutty.filesystem.path import Path
@@ -18,7 +18,7 @@ def main(directory: pathlib.Path) -> None:
         configloader=CookiecutterTemplateConfigLoader(),
         rendererfactory=CookiecutterRendererFactory(),
         fileloader=CookiecutterFileLoader(),
-        bind=create_prompt_binder(ClickPromptFactory()),
+        bind=create_binder(prompt),
         storage=FilesystemFileStorage(pathlib.Path.cwd()),
     )
     path = Path(filesystem=DiskFilesystem(directory))
