@@ -84,9 +84,9 @@ def loadconfig(path: Path) -> TemplateConfig:
     return TemplateConfig(settings, bindings)
 
 
-def loadrenderer(path: Path, settings: Sequence[Binding]) -> Renderer:
+def loadrenderer(path: Path, config: TemplateConfig) -> Renderer:
     """Create renderer."""
-    for setting in settings:
+    for setting in config.settings:
         if setting.name == "_extensions":
             extensions = setting.value
             break
@@ -97,7 +97,7 @@ def loadrenderer(path: Path, settings: Sequence[Binding]) -> Renderer:
         isinstance(item, str) for item in extensions
     )
 
-    for setting in settings:
+    for setting in config.settings:
         if setting.name == "_copy_without_render":
             copy_without_render = setting.value
             break
@@ -111,7 +111,7 @@ def loadrenderer(path: Path, settings: Sequence[Binding]) -> Renderer:
     jinja = JinjaRenderer.create(
         searchpath=[path],
         context_prefix="cookiecutter",
-        extra_bindings=settings,
+        extra_bindings=config.settings,
         extra_extensions=extensions,
     )
 
