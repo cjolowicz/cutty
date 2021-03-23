@@ -1,5 +1,6 @@
 """Utility for handling an exception by raising another one."""
 from typing import NoReturn
+from typing import Union
 
 from cutty.util.exceptionhandlers import ExceptionHandler
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -8,7 +9,7 @@ from cutty.util.exceptionhandlers import exceptionhandler
 def reraise(
     exception: BaseException,
     *,
-    when: type[BaseException] | tuple[type[BaseException], ...] = ()
+    when: Union[type[BaseException], tuple[type[BaseException], ...]] = ()
 ) -> ExceptionHandler:
     """Raise the given exception when any of the specified exceptions is caught."""
     if not isinstance(when, tuple):

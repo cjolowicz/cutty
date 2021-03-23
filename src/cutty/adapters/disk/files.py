@@ -1,4 +1,6 @@
 """Disk-based implementation of cutty.domain.files abstractions."""
+from __future__ import annotations
+
 import pathlib
 import tempfile
 from collections.abc import Iterator

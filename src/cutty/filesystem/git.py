@@ -1,6 +1,7 @@
 """Git-based filesystem using libgit2."""
 import functools
 import operator
+import pathlib
 from collections.abc import Iterator
 
 import pygit2
@@ -40,7 +41,8 @@ class GitFilesystem(Filesystem):
         """Return the contents of this file."""
         blob = self.resolve(path)
         assert isinstance(blob, pygit2.Blob)  # noqa: S101
-        return blob.data.decode()
+        text: str = blob.data.decode()
+        return text
 
     def is_symlink(self, path: PurePath) -> bool:
         """Return True if this is a symbolic link."""
@@ -52,7 +54,7 @@ class GitFilesystem(Filesystem):
     def readlink(self, path: PurePath) -> PurePath:
         """Return the target of a symbolic link."""
         target = self.read_text(path)
-        return PurePath(target.split("/"))
+        return PurePath(*target.split("/"))
 
     def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
