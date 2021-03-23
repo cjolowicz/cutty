@@ -25,13 +25,12 @@ def splitpath(pathstr: str) -> tuple[str, ...]:
     """
     # TODO: Add string parsing to PurePath?
     # TODO: Add common validation function? (see cutty.domain.render.renderfiles)
-    import os.path
+    import os
 
-    separators = [sep for sep in (os.path.sep, os.path.altsep) if sep]
-    parts = tuple(part for part in pathstr.split("/") if part and part != ".")
+    parts = tuple(part for part in pathstr.split("/") if part and part != os.curdir)
 
     if any(
-        any(sep in part for sep in separators) or part == os.path.pardir
+        any(sep in part for sep in (os.sep, os.altsep) if sep) or part == os.pardir
         for part in parts
     ):
         raise jinja2.TemplateNotFound(pathstr)
