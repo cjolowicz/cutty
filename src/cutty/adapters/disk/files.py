@@ -1,4 +1,4 @@
-"""Filesystem implementation of the cutty.domain.files abstractions."""
+"""Disk-based implementation of cutty.domain.files abstractions."""
 import pathlib
 import tempfile
 from collections.abc import Iterator
@@ -9,8 +9,8 @@ from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
 
 
-class FilesystemFileStorage:
-    """Filesystem-based store for files."""
+class DiskFileStorage:
+    """Disk-based store for files."""
 
     def __init__(self, root: pathlib.Path) -> None:
         """Initialize."""
@@ -30,7 +30,7 @@ class FilesystemFileStorage:
 
     @classmethod
     @contextmanager
-    def temporary(cls) -> Iterator[FilesystemFileStorage]:
+    def temporary(cls) -> Iterator[DiskFileStorage]:
         """Return temporary storage."""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = pathlib.Path(tmpdir)

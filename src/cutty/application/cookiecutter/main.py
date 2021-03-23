@@ -2,7 +2,7 @@
 import pathlib
 
 from cutty.adapters.click.binders import prompt
-from cutty.adapters.filesystem.files import FilesystemFileStorage
+from cutty.adapters.disk.files import DiskFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
@@ -15,7 +15,7 @@ from cutty.filesystem.path import Path
 def main(directory: pathlib.Path) -> None:
     """Generate a project from a Cookiecutter template."""
     path = Path(filesystem=DiskFilesystem(directory))
-    storage = FilesystemFileStorage(pathlib.Path.cwd())
+    storage = DiskFileStorage(pathlib.Path.cwd())
     render(
         path,
         loadconfig=loadconfig,

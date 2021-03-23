@@ -1,11 +1,11 @@
-"""Unit tests for cutty.adapters.filesystem.files."""
+"""Unit tests for cutty.adapters.disk.files."""
 import os
 import pathlib
 import platform
 
 import pytest
 
-from cutty.adapters.filesystem.files import FilesystemFileStorage
+from cutty.adapters.disk.files import DiskFileStorage
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
@@ -17,7 +17,7 @@ def test_storage(tmp_path: pathlib.Path) -> None:
     blob = "# example\n"
     file = File(path, Mode.DEFAULT, blob)
 
-    storage = FilesystemFileStorage(tmp_path)
+    storage = DiskFileStorage(tmp_path)
     storage.store(file)
 
     assert blob == (tmp_path / "example" / "README.md").read_text()
@@ -33,7 +33,7 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     blob = "#!/usr/bin/env python"
     file = File(path, Mode.EXECUTABLE, blob)
 
-    storage = FilesystemFileStorage(tmp_path)
+    storage = DiskFileStorage(tmp_path)
     storage.store(file)
 
     assert os.access(tmp_path / "main.py", os.X_OK)
@@ -43,7 +43,7 @@ def test_temporary() -> None:
     """It creates temporary storage."""
     file = File(PurePath("file"), Mode.DEFAULT, "")
 
-    with FilesystemFileStorage.temporary() as storage:
+    with DiskFileStorage.temporary() as storage:
         storage.store(file)
         path = storage.resolve(file.path)
         assert path.exists()

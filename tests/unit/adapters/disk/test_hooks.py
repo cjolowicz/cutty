@@ -1,9 +1,9 @@
-"""Unit tests for cutty.adapters.filesystem.hooks."""
+"""Unit tests for cutty.adapters.disk.hooks."""
 import pathlib
 
 import pytest
 
-from cutty.adapters.filesystem.hooks import FilesystemHookExecutor
+from cutty.adapters.disk.hooks import DiskHookExecutor
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.domain.hooks import Hook
@@ -16,7 +16,7 @@ def test_executor(tmp_path: pathlib.Path, capfd: pytest.CaptureFixture[str]) -> 
     file = File(PurePath("hook.py"), Mode.EXECUTABLE, 'print("hello")\n')
     hook = Hook(file=file, event=PostGenerateProject)
 
-    executor = FilesystemHookExecutor(cwd=tmp_path)
+    executor = DiskHookExecutor(cwd=tmp_path)
     executor.execute(hook)
 
     captured = capfd.readouterr()
