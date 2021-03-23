@@ -7,14 +7,14 @@ from collections.abc import Iterator
 
 from cutty.adapters.disk.files import DiskFileStorage
 from cutty.compat.contextlib import contextmanager
-from cutty.domain.hooks import Hook
+from cutty.domain.files import File
 from cutty.filesystem.disk import DiskFilesystem
 from cutty.filesystem.path import Path
 
 
-def executehook(hook: Hook, project: Path) -> None:
+def executehook(hookfile: File, project: Path) -> None:
     """Disk-based hook executor."""
-    with store(hook) as path:
+    with store(hookfile) as path:
         run(path, resolve(project))
 
 
@@ -30,18 +30,17 @@ def resolve(path: Path) -> pathlib.Path:
 
 
 @contextmanager
-def store(hook: Hook) -> Iterator[pathlib.Path]:
+def store(hookfile: File) -> Iterator[pathlib.Path]:
     """Store the hook on disk."""
     with DiskFileStorage.temporary() as storage:
-        storage.store(hook.file)
-        yield storage.resolve(hook.file.path)
+        storage.store(hookfile)
+        yield storage.resolve(hookfile.path)
 
 
 def run(path: pathlib.Path, project: pathlib.Path) -> None:
     """Run the hook from disk."""
-    project.mkdir(parents=True, exist_ok=True)
-
     command = [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
     shell = platform.system() == "Windows"
 
+    project.mkdir(parents=True, exist_ok=True)
     subprocess.run(command, shell=shell, cwd=project, check=True)  # noqa: S602
