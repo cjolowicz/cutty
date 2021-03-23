@@ -20,31 +20,6 @@ from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 
 
-def loadpaths(path: Path, config: Config) -> Iterator[Path]:
-    """Load project files in a Cookiecutter template."""
-    for template_dir in path.iterdir():
-        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
-            return iter([template_dir])
-    else:
-        raise RuntimeError("template directory not found")  # pragma: no cover
-
-
-def loadhooks(path: Path, config: Config) -> Iterator[Hook]:
-    """Load hooks in a Cookiecutter template."""
-    hookdir = path / "hooks"
-    events = {
-        "pre_gen_project": PreGenerateProject,
-        "post_gen_project": PostGenerateProject,
-    }
-
-    if hookdir.is_dir():
-        for path in hookdir.iterdir():
-            if path.is_file() and not path.name.endswith("~"):
-                for name, event in events.items():
-                    if path.stem == name:
-                        yield Hook(path, event)
-
-
 def loadvalue(value: Any) -> Value:
     """Stringize scalars except None."""
     if isinstance(value, (bool, int, float)):
@@ -101,6 +76,31 @@ def loadconfig(path: Path) -> Config:
     )
 
     return Config(settings, bindings)
+
+
+def loadpaths(path: Path, config: Config) -> Iterator[Path]:
+    """Load project files in a Cookiecutter template."""
+    for template_dir in path.iterdir():
+        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
+            return iter([template_dir])
+    else:
+        raise RuntimeError("template directory not found")  # pragma: no cover
+
+
+def loadhooks(path: Path, config: Config) -> Iterator[Hook]:
+    """Load hooks in a Cookiecutter template."""
+    hookdir = path / "hooks"
+    events = {
+        "pre_gen_project": PreGenerateProject,
+        "post_gen_project": PostGenerateProject,
+    }
+
+    if hookdir.is_dir():
+        for path in hookdir.iterdir():
+            if path.is_file() and not path.name.endswith("~"):
+                for name, event in events.items():
+                    if path.stem == name:
+                        yield Hook(path, event)
 
 
 def loadrenderer(path: Path, config: Config) -> Renderer:
