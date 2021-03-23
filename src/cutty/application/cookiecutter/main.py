@@ -3,7 +3,9 @@ import pathlib
 
 from cutty.adapters.click.binders import prompt
 from cutty.adapters.disk.files import DiskFileStorage
+from cutty.adapters.disk.hooks import executehook
 from cutty.application.cookiecutter.loader import loadconfig
+from cutty.application.cookiecutter.loader import loadhooks
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.domain.binders import renderbindwith
@@ -21,6 +23,8 @@ def main(directory: pathlib.Path) -> None:
         loadconfig=loadconfig,
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
+        loadhooks=loadhooks,
         renderbind=renderbindwith(prompt),
         storefile=storage.store,
+        executehook=executehook,
     )
