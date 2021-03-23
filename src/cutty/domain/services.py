@@ -12,8 +12,8 @@ from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
 
 
-PathLoader = Callable[[Path], Iterator[Path]]
 TemplateConfigLoader = Callable[[Path], TemplateConfig]
+PathLoader = Callable[[Path], Iterator[Path]]
 RendererLoader = Callable[[Path, Sequence[Binding]], Renderer]
 
 
