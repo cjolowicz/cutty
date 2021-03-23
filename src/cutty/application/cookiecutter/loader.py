@@ -7,7 +7,7 @@ from typing import Any
 
 from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
-from cutty.domain.config import TemplateConfig
+from cutty.domain.config import Config
 from cutty.domain.files import File
 from cutty.domain.render import Renderer
 from cutty.domain.render import RenderFunction
@@ -17,7 +17,7 @@ from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 
 
-def loadpaths(path: Path, config: TemplateConfig) -> Iterator[Path]:
+def loadpaths(path: Path, config: Config) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
@@ -60,7 +60,7 @@ def loadvariable(name: str, value: Value) -> Variable:
     )
 
 
-def loadconfig(path: Path) -> TemplateConfig:
+def loadconfig(path: Path) -> Config:
     """Load the configurations for a Cookiecutter template."""
     text = (path / "cookiecutter.json").read_text()
     data = json.loads(text)
@@ -81,10 +81,10 @@ def loadconfig(path: Path) -> TemplateConfig:
         if not name.startswith("_")
     )
 
-    return TemplateConfig(settings, bindings)
+    return Config(settings, bindings)
 
 
-def loadrenderer(path: Path, config: TemplateConfig) -> Renderer:
+def loadrenderer(path: Path, config: Config) -> Renderer:
     """Create renderer."""
     for setting in config.settings:
         if setting.name == "_extensions":
