@@ -10,7 +10,7 @@ from nox_poetry import session
 
 
 package = "cutty"
-python_versions = ["3.10"]
+python_versions = ["3.9"]
 nox.options.sessions = (
     "pre-commit",
     "safety",
