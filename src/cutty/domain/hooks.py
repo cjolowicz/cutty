@@ -1,6 +1,5 @@
 """Hooks."""
 from collections.abc import Callable
-from collections.abc import Iterable
 from dataclasses import dataclass
 
 from cutty.domain.files import File
@@ -34,25 +33,16 @@ class Hook:
 HookExecutor = Callable[[Hook, Path], None]
 
 
-class HookManager:
-    """Hook manager."""
+def registerhook(hook: Hook, executehook: HookExecutor, bus: Bus) -> None:
+    """Subscribe the hook to its event."""
+    if hook.event is PreGenerateProject:
 
-    def __init__(self, hooks: Iterable[Hook], executehook: HookExecutor) -> None:
-        """Initialize."""
-        self.hooks = tuple(hooks)
-        self.executehook = executehook
+        @bus.events.subscribe
+        def _(event: PreGenerateProject) -> None:
+            executehook(hook, event.project)
 
-    def subscribe(self, bus: Bus) -> None:
-        """Subscribe the hooks."""
-        for hook in self.hooks:
-            if hook.event is PreGenerateProject:
+    elif hook.event is PostGenerateProject:
 
-                @bus.events.subscribe
-                def _(event: PreGenerateProject) -> None:
-                    self.executehook(hook, event.project)
-
-            elif hook.event is PostGenerateProject:
-
-                @bus.events.subscribe
-                def _(event: PostGenerateProject) -> None:
-                    self.executehook(hook, event.project)
+        @bus.events.subscribe
+        def _(event: PostGenerateProject) -> None:
+            executehook(hook, event.project)
