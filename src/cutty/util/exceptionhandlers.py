@@ -97,6 +97,8 @@ associative, this makes exception handlers with composition a simple monoid_.
 
 .. _monoid: https://en.wikipedia.org/wiki/Monoid
 """
+from __future__ import annotations
+
 import contextlib
 from collections.abc import Callable
 from types import TracebackType
