@@ -9,19 +9,19 @@ from cutty.adapters.disk.files import DiskFileStorage
 from cutty.compat.contextlib import contextmanager
 from cutty.domain.hooks import Hook
 from cutty.domain.hooks import HookExecutor
+from cutty.filesystem.disk import DiskFilesystem
+from cutty.filesystem.path import Path
 
 
 class DiskHookExecutor(HookExecutor):
     """Disk-based hook executor."""
 
-    def __init__(self, *, cwd: pathlib.Path) -> None:
-        """Initialize."""
-        self.cwd = cwd
-
-    def execute(self, hook: Hook) -> None:
+    def execute(self, hook: Hook, project: Path) -> None:
         """Execute the hook."""
+        filesystem = project._filesystem
+        assert isinstance(filesystem, DiskFilesystem)  # noqa: S101
         with self.store(hook) as path:
-            self.run(path)
+            self.run(path, filesystem.resolve(project))
 
     @contextmanager
     def store(self, hook: Hook) -> Iterator[pathlib.Path]:
@@ -30,13 +30,13 @@ class DiskHookExecutor(HookExecutor):
             storage.store(hook.file)
             yield storage.resolve(hook.file.path)
 
-    def run(self, path: pathlib.Path) -> None:
+    def run(self, path: pathlib.Path, project: pathlib.Path) -> None:
         """Run the hook from disk."""
-        self.cwd.mkdir(parents=True, exist_ok=True)
+        project.mkdir(parents=True, exist_ok=True)
 
         command = (
             [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
         )
         shell = platform.system() == "Windows"
 
-        subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
+        subprocess.run(command, shell=shell, cwd=project, check=True)  # noqa: S602
