@@ -39,9 +39,10 @@ def loadhooks(path: Path, config: Config) -> Iterator[Hook]:
 
     if hookdir.is_dir():
         for path in hookdir.iterdir():
-            for name, event in events.items():
-                if path.is_file() and path.stem == name and not path.name.endswith("~"):
-                    yield Hook(path, event)
+            if path.is_file() and not path.name.endswith("~"):
+                for name, event in events.items():
+                    if path.stem == name:
+                        yield Hook(path, event)
 
 
 def loadvalue(value: Any) -> Value:
