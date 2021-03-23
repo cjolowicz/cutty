@@ -1,4 +1,6 @@
 """Rendering with Jinja."""
+from __future__ import annotations
+
 import contextlib
 import itertools
 from collections.abc import Callable

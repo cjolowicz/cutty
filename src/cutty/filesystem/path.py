@@ -1,4 +1,6 @@
 """Filesystem path."""
+from __future__ import annotations
+
 from collections.abc import Iterator
 
 from cutty.filesystem.base import Access
