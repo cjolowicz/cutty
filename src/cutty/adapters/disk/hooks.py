@@ -1,18 +1,18 @@
-"""Filesystem implementation of the cutty.domain.hooks abstractions."""
+"""Disk-based implementation of cutty.domain.hooks abstractions."""
 import pathlib
 import platform
 import subprocess  # noqa: S404
 import sys
 from collections.abc import Iterator
 
-from cutty.adapters.filesystem.files import FilesystemFileStorage
+from cutty.adapters.disk.files import DiskFileStorage
 from cutty.compat.contextlib import contextmanager
 from cutty.domain.hooks import Hook
 from cutty.domain.hooks import HookExecutor
 
 
-class FilesystemHookExecutor(HookExecutor):
-    """Filesystem-based hook executor."""
+class DiskHookExecutor(HookExecutor):
+    """Disk-based hook executor."""
 
     def __init__(self, *, cwd: pathlib.Path) -> None:
         """Initialize."""
@@ -25,13 +25,13 @@ class FilesystemHookExecutor(HookExecutor):
 
     @contextmanager
     def store(self, hook: Hook) -> Iterator[pathlib.Path]:
-        """Store the hook in the filesystem."""
-        with FilesystemFileStorage.temporary() as storage:
+        """Store the hook on disk."""
+        with DiskFileStorage.temporary() as storage:
             storage.store(hook.file)
             yield storage.resolve(hook.file.path)
 
     def run(self, path: pathlib.Path) -> None:
-        """Run the hook from the filesystem."""
+        """Run the hook from disk."""
         self.cwd.mkdir(parents=True, exist_ok=True)
 
         command = (
