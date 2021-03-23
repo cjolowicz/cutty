@@ -1,5 +1,5 @@
 """Hooks."""
-import abc
+from collections.abc import Callable
 from collections.abc import Iterable
 from dataclasses import dataclass
 
@@ -31,21 +31,16 @@ class Hook:
     event: type[Event]
 
 
-class HookExecutor(abc.ABC):
-    """Something that can execute a hook."""
-
-    @abc.abstractmethod
-    def execute(self, hook: Hook, project: Path) -> None:
-        """Execute the hook."""
+HookExecutor = Callable[[Hook, Path], None]
 
 
 class HookManager:
     """Hook manager."""
 
-    def __init__(self, hooks: Iterable[Hook], executor: HookExecutor) -> None:
+    def __init__(self, hooks: Iterable[Hook], executehook: HookExecutor) -> None:
         """Initialize."""
         self.hooks = tuple(hooks)
-        self.executor = executor
+        self.executehook = executehook
 
     def subscribe(self, bus: Bus) -> None:
         """Subscribe the hooks."""
@@ -54,10 +49,10 @@ class HookManager:
 
                 @bus.events.subscribe
                 def _(event: PreGenerateProject) -> None:
-                    self.executor.execute(hook, event.project)
+                    self.executehook(hook, event.project)
 
             elif hook.event is PostGenerateProject:
 
                 @bus.events.subscribe
                 def _(event: PostGenerateProject) -> None:
-                    self.executor.execute(hook, event.project)
+                    self.executehook(hook, event.project)
