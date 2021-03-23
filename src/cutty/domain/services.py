@@ -1,6 +1,7 @@
 """Domain services."""
 from collections.abc import Callable
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 from cutty.domain.binders import RenderBinder
 from cutty.domain.config import Config
@@ -10,6 +11,7 @@ from cutty.domain.hooks import HookExecutor
 from cutty.domain.hooks import registerhook
 from cutty.domain.render import Renderer
 from cutty.domain.render import renderfiles
+from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 from cutty.util.bus import Bus
 
@@ -36,8 +38,21 @@ def render(
     render = loadrenderer(path, config)
     paths = loadpaths(path, config)
     hooks = loadhooks(path, config)
-    bindings = renderbind(render, config.variables)
+
+    _render(renderbind, render, config.variables, hooks, executehook, paths, storefile)
+
+
+def _render(
+    renderbind: RenderBinder,
+    render: Renderer,
+    variables: Sequence[Variable],
+    hooks: Iterator[Hook],
+    executehook: HookExecutor,
+    paths: Iterator[Path],
+    storefile: FileStorage,
+) -> None:
     bus = Bus()
+    bindings = renderbind(render, variables)
 
     for hook in hooks:
         registerhook(hook, render, bindings, executehook, bus)
