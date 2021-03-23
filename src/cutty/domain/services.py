@@ -27,7 +27,8 @@ def render(
     """Render the template at the given path."""
     config = loadconfig(path)
     render = loadrenderer(path, config)
-    bindings = renderbind(render, config.variables)
     paths = loadpaths(path, config)
+
+    bindings = renderbind(render, config.variables)
     for file in renderfiles(paths, render, bindings):
         storefile(file)
