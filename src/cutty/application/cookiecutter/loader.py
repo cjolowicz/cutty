@@ -103,30 +103,22 @@ def loadhooks(path: Path, config: Config) -> Iterator[Hook]:
                         yield Hook(path, event)
 
 
+def asstringlist(settings: Sequence[Binding], name: str) -> list[str]:
+    """Return a setting as a list of strings."""
+    for setting in settings:
+        if setting.name == name:
+            assert isinstance(setting.value, list) and all(  # noqa: S101
+                isinstance(item, str) for item in setting.value
+            )
+            return setting.value
+
+    return []
+
+
 def loadrenderer(path: Path, config: Config) -> Renderer:
     """Create renderer."""
-    for setting in config.settings:
-        if setting.name == "_extensions":
-            extensions = setting.value
-            break
-    else:
-        extensions = []
-
-    assert isinstance(extensions, list) and all(  # noqa: S101
-        isinstance(item, str) for item in extensions
-    )
-
-    for setting in config.settings:
-        if setting.name == "_copy_without_render":
-            copy_without_render = setting.value
-            break
-    else:
-        copy_without_render = []
-
-    assert isinstance(copy_without_render, list) and all(  # noqa: S101
-        isinstance(item, str) for item in copy_without_render
-    )
-
+    extensions = asstringlist(config.settings, "_extensions")
+    copy_without_render = asstringlist(config.settings, "_copy_without_render")
     jinja = JinjaRenderer.create(
         searchpath=[path],
         context_prefix="cookiecutter",
@@ -146,8 +138,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         path = render(file.path, bindings)
 
         if any(
-            fnmatch.fnmatch(pattern, str(file.path))
-            for pattern in copy_without_render  # type: ignore[union-attr]
+            fnmatch.fnmatch(pattern, str(file.path)) for pattern in copy_without_render
         ):
             return File(path, file.mode, file.blob)
 
