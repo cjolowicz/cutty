@@ -4,16 +4,23 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from cutty.domain.files import File
+from cutty.filesystem.path import Path
 from cutty.util.bus import Bus
 from cutty.util.bus import Event
 
 
+@dataclass
 class PreGenerateProject(Event):
     """This event is published before the project is generated."""
 
+    project: Path
 
+
+@dataclass
 class PostGenerateProject(Event):
     """This event is published after the project is generated."""
+
+    project: Path
 
 
 @dataclass
@@ -28,7 +35,7 @@ class HookExecutor(abc.ABC):
     """Something that can execute a hook."""
 
     @abc.abstractmethod
-    def execute(self, hook: Hook) -> None:
+    def execute(self, hook: Hook, project: Path) -> None:
         """Execute the hook."""
 
 
@@ -47,10 +54,10 @@ class HookManager:
 
                 @bus.events.subscribe
                 def _(event: PreGenerateProject) -> None:
-                    self.executor.execute(hook)
+                    self.executor.execute(hook, event.project)
 
             elif hook.event is PostGenerateProject:
 
                 @bus.events.subscribe
                 def _(event: PostGenerateProject) -> None:
-                    self.executor.execute(hook)
+                    self.executor.execute(hook, event.project)
