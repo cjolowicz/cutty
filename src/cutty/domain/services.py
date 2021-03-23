@@ -8,6 +8,7 @@ from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
 from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
+from cutty.util.bus import Bus
 
 
 ConfigLoader = Callable[[Path], Config]
@@ -28,7 +29,8 @@ def render(
     config = loadconfig(path)
     render = loadrenderer(path, config)
     paths = loadpaths(path, config)
-
     bindings = renderbind(render, config.variables)
-    for file in renderfiles(paths, render, bindings):
+    bus = Bus()
+
+    for file in renderfiles(paths, render, bindings, bus):
         storefile(file)
