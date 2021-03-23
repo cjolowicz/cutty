@@ -13,7 +13,7 @@ from cutty.filesystem.path import Path
 
 
 TemplateConfigLoader = Callable[[Path], TemplateConfig]
-PathLoader = Callable[[Path], Iterator[Path]]
+PathLoader = Callable[[Path, TemplateConfig], Iterator[Path]]
 RendererLoader = Callable[[Path, Sequence[Binding]], Renderer]
 
 
@@ -30,6 +30,6 @@ def render(
     config = loadconfig(path)
     render = loadrenderer(path, config.settings)
     bindings = renderbind(render, config.variables)
-    paths = loadpaths(path)
+    paths = loadpaths(path, config)
     for file in renderfiles(paths, render, bindings):
         storefile(file)

@@ -17,7 +17,7 @@ from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 
 
-def loadpaths(path: Path) -> Iterator[Path]:
+def loadpaths(path: Path, config: TemplateConfig) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
