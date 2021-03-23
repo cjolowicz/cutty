@@ -10,7 +10,7 @@ from cutty.domain.hooks import Hook
 from cutty.domain.hooks import HookExecutor
 from cutty.domain.hooks import registerhook
 from cutty.domain.render import Renderer
-from cutty.domain.render import renderfiles
+from cutty.domain.renderfiles import renderfiles
 from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
 from cutty.util.bus import Bus
