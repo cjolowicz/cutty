@@ -6,7 +6,7 @@ from cutty.domain.variables import Variable
 
 
 @dataclass
-class TemplateConfig:
+class Config:
     """Template configuration."""
 
     settings: tuple[Binding, ...]

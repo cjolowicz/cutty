@@ -3,23 +3,23 @@ from collections.abc import Callable
 from collections.abc import Iterator
 
 from cutty.domain.binders import RenderBinder
-from cutty.domain.config import TemplateConfig
+from cutty.domain.config import Config
 from cutty.domain.files import FileStorage
 from cutty.domain.render import Renderer
 from cutty.domain.render import renderfiles
 from cutty.filesystem.path import Path
 
 
-TemplateConfigLoader = Callable[[Path], TemplateConfig]
-PathLoader = Callable[[Path, TemplateConfig], Iterator[Path]]
-RendererLoader = Callable[[Path, TemplateConfig], Renderer]
+ConfigLoader = Callable[[Path], Config]
+PathLoader = Callable[[Path, Config], Iterator[Path]]
+RendererLoader = Callable[[Path, Config], Renderer]
 
 
 def render(
     path: Path,
     *,
     renderbind: RenderBinder,
-    loadconfig: TemplateConfigLoader,
+    loadconfig: ConfigLoader,
     loadrenderer: RendererLoader,
     loadpaths: PathLoader,
     storefile: FileStorage
