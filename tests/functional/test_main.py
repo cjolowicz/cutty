@@ -2,6 +2,7 @@
 from collections.abc import Iterator
 from pathlib import Path
 
+import pygit2
 import pytest
 from click.testing import CliRunner
 
@@ -22,11 +23,30 @@ def test_main_help(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
 
-def test_main_cookiecutter(runner: CliRunner, template_directory: Path) -> None:
+@pytest.fixture
+def repository(template_directory: Path) -> Path:
+    """Fixture for a template repository."""
+    repository = pygit2.init_repository(template_directory)
+    signature = pygit2.Signature("you", "you@example.com")
+    repository.index.add("cookiecutter.json")
+    repository.index.add("{{ cookiecutter.project }}/README.md")
+    tree = repository.index.write_tree()
+    repository.create_commit(
+        "HEAD",
+        signature,
+        signature,
+        "Initial",
+        tree,
+        [],
+    )
+    return template_directory
+
+
+def test_main_cookiecutter(runner: CliRunner, repository: Path) -> None:
     """It generates a project."""
     runner.invoke(
         __main__.main,
-        [f"{template_directory}"],
+        [str(repository)],
         input="foobar\n\n\n",
         catch_exceptions=False,
     )
