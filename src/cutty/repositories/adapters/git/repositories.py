@@ -11,9 +11,9 @@ from cutty.repositories.domain.repositories import Repository
 
 
 class GitRepository(Repository):
-    """Git repository provider."""
+    """Git repository."""
 
-    name: str = "git"
+    type: str = "git"
     schemes = {"file", "ftp", "ftps", "git", "http", "https", "ssh"}
 
     @property

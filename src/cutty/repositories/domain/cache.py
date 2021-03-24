@@ -1,6 +1,7 @@
 """Repository cache."""
 import pathlib
 from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Optional
 
 from yarl import URL
@@ -18,12 +19,12 @@ class Cache:
         self.backend = Backend(path)
         self.providers = tuple(providers)
 
-    def getprovider(self, url: URL, names: Iterable[str]) -> type[Repository]:
-        """Return a repository provider that matches the URL and names."""
+    def getprovider(self, url: URL, types: Sequence[str] = ()) -> type[Repository]:
+        """Return a repository type for the given URL and type names."""
         return next(
             provider
             for provider in self.providers
-            if (not names or provider.name in names) and provider.matches(url)
+            if (not types or provider.type in types) and provider.matches(url)
         )
 
     def get(
@@ -35,10 +36,10 @@ class Cache:
         wantupdate: bool = True,
     ) -> Path:
         """Load a tree from the cache."""
-        provider = self.getprovider(url, providers)
-        entry = self.backend.get(url, provider.name)
+        provider = self.getprovider(url, set(providers))
+        entry = self.backend.get(url, provider.type)
 
-        if entry.provider != provider.name:
+        if entry.provider != provider.type:
             # The repository was previously downloaded using a different
             # provider.
             provider = self.getprovider(url, [entry.provider])
