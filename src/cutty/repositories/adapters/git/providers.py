@@ -41,6 +41,11 @@ class GitProvider(Provider):
         """
         return not url.scheme or url.scheme in self.schemes
 
+    def exists(self, url: URL, path: pathlib.Path) -> bool:
+        """Return True if the repository exists."""
+        path = getrepositorypath(url, path)
+        return path.exists()
+
     def download(self, url: URL, path: pathlib.Path) -> None:
         """Download the repository to the given path.
 
