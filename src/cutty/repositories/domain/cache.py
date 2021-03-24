@@ -1,7 +1,7 @@
 """Repository cache."""
 import pathlib
+from collections.abc import Container
 from collections.abc import Iterable
-from collections.abc import Sequence
 from typing import Optional
 
 from yarl import URL
@@ -19,7 +19,7 @@ class Cache:
         self.backend = Backend(path)
         self.providers = tuple(providers)
 
-    def getprovider(self, url: URL, types: Sequence[str] = ()) -> type[Repository]:
+    def getprovider(self, url: URL, types: Container[str] = ()) -> type[Repository]:
         """Return a repository type for the given URL and type names."""
         return next(
             provider
