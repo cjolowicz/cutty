@@ -31,7 +31,7 @@ class GitFilesystem(Filesystem):
         tree = self.resolve(path)
         assert isinstance(tree, pygit2.Tree)  # noqa: S101
         for entry in tree:
-            yield PurePath(path / entry.name)
+            yield path / entry.name
 
     def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
