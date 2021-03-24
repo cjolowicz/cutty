@@ -1,4 +1,4 @@
-"""Repository providers."""
+"""Repositories."""
 from __future__ import annotations
 
 import abc
@@ -11,8 +11,8 @@ from yarl import URL
 from cutty.filesystem.path import Path
 
 
-class Provider(abc.ABC):
-    """Abstract base class for a repository provider."""
+class Repository(abc.ABC):
+    """Abstract base class for a repository."""
 
     name: str
 
