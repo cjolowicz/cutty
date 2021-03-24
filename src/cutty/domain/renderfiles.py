@@ -2,7 +2,6 @@
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
-from typing import Optional
 
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
@@ -17,39 +16,39 @@ class InvalidPathComponent(Exception):
     """The rendered path has an invalid component."""
 
 
-def withevents(paths: Iterable[Path], bus: Optional[Bus]) -> Iterator[Path]:
+def withevents(files: Iterator[File], bus: Bus) -> Iterator[File]:
     """Publish the PreGenerateProject and PostGenerateProject events."""
-    if bus is None:
-        yield from paths
-    else:
-        paths = iter(paths)
-        project = next(paths)
-        bus.events.publish(PreGenerateProject(project))
+    first = next(files)
+    project = first.path.parents[-1]
 
-        yield project
-        yield from paths
+    bus.events.publish(PreGenerateProject(project))
 
-        bus.events.publish(PostGenerateProject(project))
+    yield first
+    yield from files
+
+    bus.events.publish(PostGenerateProject(project))
 
 
 def renderfiles(
-    paths: Iterable[Path],
-    render: Renderer,
-    bindings: Sequence[Binding],
-    bus: Optional[Bus] = None,
+    paths: Iterable[Path], render: Renderer, bindings: Sequence[Binding], bus: Bus
 ) -> Iterator[File]:
     """Render the files."""
-    for path in withevents(paths, bus):
-        name = render(path, bindings).name
-        if not name:
-            continue
 
-        if "/" in name or "\\" in name or name in (".", ".."):
-            raise InvalidPathComponent(str(path), name)
+    def _renderfiles(paths: Iterable[Path]) -> Iterator[File]:
+        for path in paths:
+            name = render(path, bindings).name
+            if not name:
+                continue
 
-        if path.is_file():
-            yield render(File.load(path), bindings)
-        elif path.is_dir():
-            yield from renderfiles(path.iterdir(), render, bindings)
-        else:  # pragma: no cover
-            raise RuntimeError(f"{path}: not a regular file or directory")
+            if "/" in name or "\\" in name or name in (".", ".."):
+                raise InvalidPathComponent(str(path), name)
+
+            if path.is_file():
+                yield render(File.load(path), bindings)
+            elif path.is_dir():
+                yield from _renderfiles(path.iterdir())
+            else:  # pragma: no cover
+                raise RuntimeError(f"{path}: not a regular file or directory")
+
+    files = _renderfiles(paths)
+    return withevents(files, bus)
