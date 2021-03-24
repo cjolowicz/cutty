@@ -1,17 +1,15 @@
 """Command-line interface."""
-from pathlib import Path
-
 import click
 
 import cutty.application.cookiecutter.main
 
 
 @click.command()
-@click.argument("directory")
+@click.argument("url")
 @click.version_option()
-def main(directory: str) -> None:
+def main(url: str) -> None:
     """cutty."""
-    cutty.application.cookiecutter.main.main(Path(directory))
+    cutty.application.cookiecutter.main.main(url)
 
 
 if __name__ == "__main__":
