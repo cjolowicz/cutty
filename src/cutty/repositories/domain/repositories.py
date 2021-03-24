@@ -14,7 +14,7 @@ from cutty.filesystem.path import Path
 class Repository(abc.ABC):
     """Abstract base class for a repository."""
 
-    name: str
+    type: str
 
     def __init__(self, url: URL, path: pathlib.Path) -> None:
         """Initialize."""
