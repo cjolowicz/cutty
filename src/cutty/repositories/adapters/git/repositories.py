@@ -60,7 +60,7 @@ class GitRepository(Repository):
             return repository.remotes.create(name, url, "+refs/*:refs/*")
 
         pygit2.clone_repository(
-            self.url, self.repositorypath, bare=True, remote=_createremote
+            str(self.url), self.repositorypath, bare=True, remote=_createremote
         )
 
     def update(self) -> None:
