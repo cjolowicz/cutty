@@ -1,4 +1,4 @@
-"""Git-based repository provider."""
+"""Git repository."""
 import pathlib
 from typing import Optional
 
@@ -7,10 +7,10 @@ from yarl import URL
 
 from cutty.filesystem.git import GitFilesystem
 from cutty.filesystem.path import Path
-from cutty.repositories.domain.providers import Provider
+from cutty.repositories.domain.repositories import Repository
 
 
-class GitProvider(Provider):
+class GitRepository(Repository):
     """Git repository provider."""
 
     name: str = "git"
