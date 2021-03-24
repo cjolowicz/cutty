@@ -82,7 +82,7 @@ class Backend:
             entry = Entry.load(path)
             entry.touch(path)
         else:
-            path.parent.mkdir(parents=True)
+            path.mkdir(parents=True)
             entry = Entry(path, url, provider)
             entry.dump(path)
 
