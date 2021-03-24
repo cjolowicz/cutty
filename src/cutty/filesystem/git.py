@@ -24,7 +24,10 @@ class GitFilesystem(Filesystem):
 
     def is_dir(self, path: PurePath) -> bool:
         """Return True if this is a directory."""
-        return isinstance(self.resolve(path), pygit2.Tree)
+        try:
+            return isinstance(self.resolve(path), pygit2.Tree)
+        except KeyError:
+            return False
 
     def iterdir(self, path: PurePath) -> Iterator[PurePath]:
         """Iterate over the files in this directory."""
@@ -35,7 +38,10 @@ class GitFilesystem(Filesystem):
 
     def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
-        return isinstance(self.resolve(path), pygit2.Blob)
+        try:
+            return isinstance(self.resolve(path), pygit2.Blob)
+        except KeyError:
+            return False
 
     def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
@@ -46,7 +52,11 @@ class GitFilesystem(Filesystem):
 
     def is_symlink(self, path: PurePath) -> bool:
         """Return True if this is a symbolic link."""
-        blob = self.resolve(path)
+        try:
+            blob = self.resolve(path)
+        except KeyError:
+            return False
+
         return (
             isinstance(blob, pygit2.Blob) and blob.filemode == pygit2.GIT_FILEMODE_LINK
         )
