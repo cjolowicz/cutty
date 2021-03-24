@@ -23,10 +23,10 @@ class GitRepository(Repository):
         return self.path / f"{name}.git"
 
     @classmethod
-    def matches(cls, url: URL) -> bool:
-        """Return True if the provider handles the given URL.
+    def supports(cls, url: URL) -> bool:
+        """Return True if the implementation supports the given URL.
 
-        This provider handles the following URLs (see git-clone(1)):
+        This implementation handles the following URLs (see git-clone(1)):
 
           - /path/to/repo.git/
           - file:///path/to/repo.git/

@@ -23,8 +23,8 @@ class Repository(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def matches(cls, url: URL) -> bool:
-        """Return True if the provider handles the given URL."""
+    def supports(cls, url: URL) -> bool:
+        """Return True if the implementation supports the given URL."""
 
     @abc.abstractmethod
     def exists(self) -> bool:
