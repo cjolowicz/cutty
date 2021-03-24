@@ -7,18 +7,18 @@ from yarl import URL
 
 from cutty.filesystem.path import Path
 from cutty.repositories.domain.backends import Backend
-from cutty.repositories.domain.providers import Provider
+from cutty.repositories.domain.repositories import Repository
 
 
 class Cache:
     """Repository cache."""
 
-    def __init__(self, path: pathlib.Path, providers: Iterable[type[Provider]]):
+    def __init__(self, path: pathlib.Path, providers: Iterable[type[Repository]]):
         """Initialize."""
         self.backend = Backend(path)
         self.providers = tuple(providers)
 
-    def getprovider(self, url: URL, names: Iterable[str]) -> type[Provider]:
+    def getprovider(self, url: URL, names: Iterable[str]) -> type[Repository]:
         """Return a repository provider that matches the URL and names."""
         return next(
             provider
