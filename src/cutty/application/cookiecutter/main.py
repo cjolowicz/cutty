@@ -1,6 +1,8 @@
 """Main entry point for the Cookiecutter compatibility layer."""
 import pathlib
 
+from yarl import URL
+
 from cutty.adapters.click.binders import prompt
 from cutty.adapters.disk.files import DiskFileStorage
 from cutty.adapters.disk.hooks import executehook
@@ -10,14 +12,15 @@ from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.domain.binders import renderbindwith
 from cutty.domain.services import render
-from cutty.filesystem.disk import DiskFilesystem
-from cutty.filesystem.path import Path
+from cutty.repositories.adapters.git.repositories import GitRepository
+from cutty.repositories.domain.cache import Cache
 
 
-def main(directory: pathlib.Path) -> None:
+def main(url: str) -> None:
     """Generate a project from a Cookiecutter template."""
-    path = Path(filesystem=DiskFilesystem(directory))
+    cache = Cache(pathlib.Path("/tmp/cutty/cache"), providers=[GitRepository])
     storage = DiskFileStorage(pathlib.Path.cwd())
+    path = cache.get(URL(url))
     render(
         path,
         loadconfig=loadconfig,
