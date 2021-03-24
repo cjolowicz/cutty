@@ -6,24 +6,24 @@ Reference
     :backlinks: none
 
 
+cutty.domain.values
+-------------------
+
+.. automodule:: cutty.domain.values
+   :members:
+
+
+cutty.domain.bindings
+---------------------
+
+.. automodule:: cutty.domain.bindings
+   :members:
+
+
 cutty.domain.variables
 ----------------------
 
 .. automodule:: cutty.domain.variables
-   :members:
-
-
-cutty.domain.varspecs
----------------------
-
-.. automodule:: cutty.domain.varspecs
-   :members:
-
-
-cutty.domain.prompts
---------------------
-
-.. automodule:: cutty.domain.prompts
    :members:
 
 
@@ -41,6 +41,13 @@ cutty.domain.render
    :members:
 
 
+cutty.domain.binders
+--------------------
+
+.. automodule:: cutty.domain.binders
+   :members:
+
+
 cutty.domain.hooks
 ------------------
 
@@ -48,10 +55,17 @@ cutty.domain.hooks
    :members:
 
 
-cutty.domain.templates
-----------------------
+cutty.domain.renderfiles
+------------------------
 
-.. automodule:: cutty.domain.templates
+.. automodule:: cutty.domain.renderfiles
+   :members:
+
+
+cutty.domain.services
+---------------------
+
+.. automodule:: cutty.domain.services
    :members:
 
 
@@ -69,24 +83,24 @@ cutty.adapters.jinja.render
    :members:
 
 
-cutty.adapters.click.prompts
+cutty.adapters.click.binders
 ----------------------------
 
-.. automodule:: cutty.adapters.click.prompts
+.. automodule:: cutty.adapters.click.binders
    :members:
 
 
-cutty.adapters.filesystem.files
--------------------------------
+cutty.adapters.disk.files
+-------------------------
 
-.. automodule:: cutty.adapters.filesystem.files
+.. automodule:: cutty.adapters.disk.files
    :members:
 
 
-cutty.adapters.filesystem.hooks
--------------------------------
+cutty.adapters.disk.hooks
+-------------------------
 
-.. automodule:: cutty.adapters.filesystem.hooks
+.. automodule:: cutty.adapters.disk.hooks
    :members:
 
 
@@ -150,6 +164,34 @@ cutty.filesystem.disk
 ---------------------
 
 .. automodule:: cutty.filesystem.disk
+   :members:
+
+
+cutty.repositories.domain.repositories
+--------------------------------------
+
+.. automodule:: cutty.repositories.domain.repositories
+   :members:
+
+
+cutty.repositories.domain.backends
+----------------------------------
+
+.. automodule:: cutty.repositories.domain.backends
+   :members:
+
+
+cutty.repositories.domain.cache
+-------------------------------
+
+.. automodule:: cutty.repositories.domain.cache
+   :members:
+
+
+cutty.repositories.adapters.git.repositories
+--------------------------------------------
+
+.. automodule:: cutty.repositories.adapters.git.repositories
    :members:
 
 
