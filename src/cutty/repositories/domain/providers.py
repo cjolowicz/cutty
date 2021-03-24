@@ -19,6 +19,10 @@ class Provider(abc.ABC):
         """Return True if the provider handles the given URL."""
 
     @abc.abstractmethod
+    def exists(self, url: URL, path: pathlib.Path) -> bool:
+        """Return True if the repository exists."""
+
+    @abc.abstractmethod
     def download(self, url: URL, path: pathlib.Path) -> None:
         """Download the repository to the given path."""
 
