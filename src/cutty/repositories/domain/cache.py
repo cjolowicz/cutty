@@ -24,7 +24,7 @@ class Cache:
         return next(
             provider
             for provider in self.providers
-            if (not types or provider.type in types) and provider.matches(url)
+            if (not types or provider.type in types) and provider.supports(url)
         )
 
     def get(
@@ -40,8 +40,7 @@ class Cache:
         entry = self.backend.get(url, provider.type)
 
         if entry.provider != provider.type:
-            # The repository was previously downloaded using a different
-            # provider.
+            # The repository was downloaded using a different provider.
             provider = self.getprovider(url, [entry.provider])
 
         repository = provider(url, entry.path)
