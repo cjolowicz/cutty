@@ -1,8 +1,11 @@
 """Filesystem-agnostic path."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import overload
 from typing import TypeVar
+from typing import Union
 
 
 PurePathT = TypeVar("PurePathT", bound="PurePath")
@@ -51,7 +54,46 @@ class PurePath:
         path = PurePath(*self.parts[:-1])
         return self._copy(path)
 
+    @property
+    def parents(self: PurePathT) -> Sequence[PurePathT]:
+        """Return the ancestors of the path."""
+        return Parents(self)
+
     def joinpath(self: PurePathT, *parts: str) -> PurePathT:
         """Return a path with the parts appended."""
         path = PurePath(*self.parts, *parts)
         return self._copy(path)
+
+
+class Parents(Sequence[PurePathT]):
+    """Sequence-like access to the logical ancestors of a path."""
+
+    def __init__(self, path: PurePathT) -> None:
+        """Initialize."""
+        self.path = path
+
+    def __len__(self) -> int:
+        """Return the number of parents."""
+        return len(self.path.parts)
+
+    @overload
+    def __getitem__(self, index: int) -> PurePathT:
+        """Return the nth parent."""
+
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[PurePathT]:
+        """Return the parents indicated by the slice."""
+
+    def __getitem__(
+        self, index: Union[int, slice]
+    ) -> Union[PurePathT, Sequence[PurePathT]]:
+        """Return the nth parent."""
+        if isinstance(index, slice):
+            indices = index.indices(len(self))
+            return tuple(self[index] for index in range(*indices))
+
+        if index >= len(self) or index < -len(self):
+            raise IndexError(index)
+
+        parts = self.path.parts[: -(index + 1)]
+        return self.path._copy(PurePath(*parts))
