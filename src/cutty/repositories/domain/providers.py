@@ -28,5 +28,5 @@ class Provider(abc.ABC):
         self.download(url, path)
 
     @abc.abstractmethod
-    def resolve(self, path: pathlib.Path, revision: Optional[str]) -> Path:
+    def resolve(self, url: URL, path: pathlib.Path, revision: Optional[str]) -> Path:
         """Return a filesystem tree for the given revision."""
