@@ -10,19 +10,20 @@ from cutty.filesystem.path import Path
 from cutty.repositories.domain.providers import Provider
 
 
-def getrepositorypath(url: URL, path: pathlib.Path) -> pathlib.Path:
-    """Return the directory where the repository is stored."""
-    name = pathlib.PurePosixPath(url.path).stem
-    return path / f"{name}.git"
-
-
 class GitProvider(Provider):
     """Git repository provider."""
 
     name: str = "git"
     schemes = {"file", "ftp", "ftps", "git", "http", "https", "ssh"}
 
-    def matches(self, url: URL) -> bool:
+    @property
+    def repositorypath(self) -> pathlib.Path:
+        """Return the directory where the repository is stored."""
+        name = pathlib.PurePosixPath(self.url.path).stem
+        return self.path / f"{name}.git"
+
+    @classmethod
+    def matches(cls, url: URL) -> bool:
         """Return True if the provider handles the given URL.
 
         This provider handles the following URLs (see git-clone(1)):
@@ -39,14 +40,13 @@ class GitProvider(Provider):
 
           - [user@]host.xz:path/to/repo.git/
         """
-        return not url.scheme or url.scheme in self.schemes
+        return not url.scheme or url.scheme in cls.schemes
 
-    def exists(self, url: URL, path: pathlib.Path) -> bool:
+    def exists(self) -> bool:
         """Return True if the repository exists."""
-        path = getrepositorypath(url, path)
-        return path.exists()
+        return self.repositorypath.exists()
 
-    def download(self, url: URL, path: pathlib.Path) -> None:
+    def download(self) -> None:
         """Download the repository to the given path.
 
         This function clones the URL to a bare repository, and configures
@@ -59,25 +59,24 @@ class GitProvider(Provider):
             repository.config[f"remote.{name}.mirror"] = True
             return repository.remotes.create(name, url, "+refs/*:refs/*")
 
-        path = getrepositorypath(url, path)
-        pygit2.clone_repository(url, path, bare=True, remote=_createremote)
+        pygit2.clone_repository(
+            self.url, self.repositorypath, bare=True, remote=_createremote
+        )
 
-    def update(self, url: URL, path: pathlib.Path) -> None:
+    def update(self) -> None:
         """Update the repository at the given path.
 
         This function fetches the remote and prunes stale branches.
         """
-        path = getrepositorypath(url, path)
-        repository = pygit2.Repository(path)
+        repository = pygit2.Repository(self.repositorypath)
         for remote in repository.remotes:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
-    def resolve(self, url: URL, path: pathlib.Path, revision: Optional[str]) -> Path:
+    def resolve(self, revision: Optional[str]) -> Path:
         """Return a filesystem tree for the given revision.
 
         This function returns the root of a Git filesystem for the given
         revision. If ``revision`` is None, HEAD is used instead.
         """
-        path = getrepositorypath(url, path)
-        filesystem = GitFilesystem(path, *filter(None, [revision]))
+        filesystem = GitFilesystem(self.repositorypath, *filter(None, [revision]))
         return Path(filesystem=filesystem)

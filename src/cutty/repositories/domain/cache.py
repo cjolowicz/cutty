@@ -13,10 +13,18 @@ from cutty.repositories.domain.providers import Provider
 class Cache:
     """Repository cache."""
 
-    def __init__(self, path: pathlib.Path, providers: Iterable[Provider]):
+    def __init__(self, path: pathlib.Path, providers: Iterable[type[Provider]]):
         """Initialize."""
         self.backend = Backend(path)
         self.providers = tuple(providers)
+
+    def getprovider(self, url: URL, names: Iterable[str]) -> type[Provider]:
+        """Return a repository provider that matches the URL and names."""
+        return next(
+            provider
+            for provider in self.providers
+            if (not names or provider.name in names) and provider.matches(url)
+        )
 
     def get(
         self,
@@ -27,25 +35,19 @@ class Cache:
         wantupdate: bool = True,
     ) -> Path:
         """Load a tree from the cache."""
-        provider = next(
-            provider
-            for provider in self.providers
-            if (not providers or provider.name in providers) and provider.matches(url)
-        )
+        provider = self.getprovider(url, providers)
         entry = self.backend.get(url, provider.name)
 
         if entry.provider != provider.name:
             # The repository was previously downloaded using a different
             # provider.
-            provider = next(
-                provider
-                for provider in self.providers
-                if provider.name == entry.provider and provider.matches(url)
-            )
+            provider = self.getprovider(url, [entry.provider])
 
-        if not provider.exists(url, entry.path):
-            provider.download(url, entry.path)
+        repository = provider(url, entry.path)
+
+        if not repository.exists():
+            repository.download()
         elif wantupdate:
-            provider.update(url, entry.path)
+            repository.update()
 
-        return provider.resolve(url, entry.path, revision)
+        return repository.resolve(revision)
