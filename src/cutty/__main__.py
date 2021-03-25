@@ -1,4 +1,5 @@
 """Command-line interface."""
+import pathlib
 from typing import Optional
 
 import click
@@ -19,11 +20,26 @@ import cutty.application.cookiecutter.main
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
+@click.option(
+    "-o",
+    "--output-dir",
+    metavar="DIR",
+    type=click.Path(file_okay=False, dir_okay=True),
+    help="Parent directory of the generated project.",
+)
 @click.version_option()
-def main(url: str, interactive: bool, revision: Optional[str]) -> None:
+def main(
+    url: str,
+    interactive: bool,
+    revision: Optional[str],
+    output_dir: Optional[str],
+) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
-        url, interactive=interactive, revision=revision
+        url,
+        interactive=interactive,
+        revision=revision,
+        output_dir=pathlib.Path(output_dir) if output_dir is not None else output_dir,
     )
 
 
