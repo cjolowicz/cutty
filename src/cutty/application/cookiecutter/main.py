@@ -1,6 +1,7 @@
 """Main entry point for the Cookiecutter compatibility layer."""
 import functools
 import pathlib
+from typing import Optional
 
 import appdirs
 from yarl import URL
@@ -17,14 +18,19 @@ from cutty.repositories.adapters.git.repositories import GitRepository
 from cutty.repositories.domain.cache import Cache
 
 
-def main(url: str, *, interactive: bool = True) -> None:
+def main(
+    url: str,
+    *,
+    interactive: bool = True,
+    revision: Optional[str] = None,
+) -> None:
     """Generate a project from a Cookiecutter template."""
     cache = Cache(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
         providers=[GitRepository],
     )
     storage = CookiecutterFileStorage(pathlib.Path.cwd())
-    path = cache.get(URL(url))
+    path = cache.get(URL(url), revision=revision)
     render(
         path,
         loadconfig=functools.partial(loadconfig, url),
