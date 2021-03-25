@@ -10,6 +10,25 @@ from yarl import URL
 from cutty.filesystem.domain.path import Path
 
 
+class LocalRepository(abc.ABC):
+    """Abstract base class for a local repository."""
+
+    type: str
+
+    def __init__(self, path: pathlib.Path) -> None:
+        """Initialize."""
+        self.path = path
+
+    @classmethod
+    @abc.abstractmethod
+    def supports(cls, path: pathlib.Path) -> bool:
+        """Return True if the implementation supports the given path."""
+
+    @abc.abstractmethod
+    def resolve(self, revision: Optional[str]) -> Path:
+        """Return a filesystem tree for the given revision."""
+
+
 class Repository(abc.ABC):
     """Abstract base class for a repository."""
 
