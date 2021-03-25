@@ -21,21 +21,21 @@ def bind(variable: Variable, value: Value) -> Binding:
 
 def binddefault(variable: Variable) -> Binding:
     """Bind a variable to its default value."""
-    return Binding(variable.name, variable.default)
+    return bind(variable, variable.default)
 
 
 def renderbind(
-    render: Renderer, bind: Binder, variables: Sequence[Variable]
+    render: Renderer, binder: Binder, variables: Sequence[Variable]
 ) -> Sequence[Binding]:
     """Successively render and bind variables."""
     bindings: list[Binding] = []
     for variable in variables:
         variable = render(variable, bindings)
-        binding = bind(variable)
+        binding = binder(variable)
         bindings.append(binding)
     return bindings
 
 
-def renderbindwith(bind: Binder) -> RenderBinder:
+def renderbindwith(binder: Binder) -> RenderBinder:
     """Render and bind variables using the given binder."""
-    return lambda render, variables: renderbind(render, bind, variables)
+    return lambda render, variables: renderbind(render, binder, variables)
