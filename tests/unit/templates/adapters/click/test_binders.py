@@ -1,16 +1,16 @@
-"""Unit tests for cutty.adapters.click.binders."""
+"""Unit tests for cutty.templates.adapters.click.binders."""
 from collections.abc import Callable
 from io import StringIO
 
 import pytest
 
-from cutty.adapters.click.binders import choiceprompt
-from cutty.adapters.click.binders import prompt
-from cutty.domain.binders import renderbindwith
-from cutty.domain.bindings import Binding
-from cutty.domain.render import Renderer
-from cutty.domain.values import ValueType
-from cutty.domain.variables import GenericVariable
+from cutty.templates.adapters.click.binders import choiceprompt
+from cutty.templates.adapters.click.binders import prompt
+from cutty.templates.domain.binders import renderbindwith
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.values import ValueType
+from cutty.templates.domain.variables import GenericVariable
 
 
 PatchStandardInput = Callable[[str], None]

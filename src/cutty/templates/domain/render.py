@@ -10,11 +10,11 @@ from typing import overload
 from typing import TypeVar
 from typing import Union
 
-from cutty.domain.bindings import Binding
-from cutty.domain.files import File
-from cutty.domain.variables import GenericVariable
-from cutty.domain.variables import Variable
 from cutty.filesystem.pure import PurePath
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.files import File
+from cutty.templates.domain.variables import GenericVariable
+from cutty.templates.domain.variables import Variable
 
 
 T = TypeVar("T")

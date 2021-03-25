@@ -3,10 +3,10 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
 
-from cutty.domain.bindings import Binding
-from cutty.domain.files import File
-from cutty.domain.render import Renderer
 from cutty.filesystem.path import Path
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.files import File
+from cutty.templates.domain.render import Renderer
 
 
 class InvalidPathComponent(Exception):

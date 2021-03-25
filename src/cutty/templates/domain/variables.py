@@ -2,10 +2,10 @@
 from dataclasses import dataclass
 from typing import Generic
 
-from cutty.domain.values import getvaluetype
-from cutty.domain.values import Value
-from cutty.domain.values import ValueT_co
-from cutty.domain.values import ValueType
+from cutty.templates.domain.values import getvaluetype
+from cutty.templates.domain.values import Value
+from cutty.templates.domain.values import ValueT_co
+from cutty.templates.domain.values import ValueType
 
 
 @dataclass(frozen=True)

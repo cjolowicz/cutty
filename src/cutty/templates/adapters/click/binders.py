@@ -4,12 +4,12 @@ from typing import Optional
 
 import click
 
-from cutty.domain.binders import bind
-from cutty.domain.binders import binddefault
-from cutty.domain.bindings import Binding
-from cutty.domain.values import Value
-from cutty.domain.values import ValueType
-from cutty.domain.variables import Variable
+from cutty.templates.domain.binders import bind
+from cutty.templates.domain.binders import binddefault
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.values import Value
+from cutty.templates.domain.values import ValueType
+from cutty.templates.domain.variables import Variable
 
 
 def textprompt(variable: Variable) -> Binding:
