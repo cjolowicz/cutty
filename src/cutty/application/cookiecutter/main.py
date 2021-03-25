@@ -14,8 +14,8 @@ from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.filesystem.adapters.disk import DiskFilesystem
 from cutty.filesystem.adapters.git import GitFilesystem
 from cutty.filesystem.domain.path import Path
-from cutty.repositories.adapters.git.repositories import GitRepository
-from cutty.repositories.adapters.git.repositories import LocalGitRepository
+from cutty.repositories.adapters.git import GitRepository
+from cutty.repositories.adapters.git import LocalGitRepository
 from cutty.repositories.domain.cache import Cache
 from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import binddefault
