@@ -23,13 +23,16 @@ def main(
     *,
     interactive: bool = True,
     revision: Optional[str] = None,
+    output_dir: Optional[pathlib.Path] = None,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cache = Cache(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
         providers=[GitRepository],
     )
-    storage = CookiecutterFileStorage(pathlib.Path.cwd())
+    storage = CookiecutterFileStorage(
+        pathlib.Path.cwd() if output_dir is None else output_dir
+    )
     path = cache.get(URL(url), revision=revision)
     render(
         path,
