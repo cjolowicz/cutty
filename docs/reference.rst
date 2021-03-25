@@ -132,38 +132,38 @@ cutty.util.typeguard_ignore
    :members:
 
 
-cutty.filesystem.pure
----------------------
+cutty.filesystem.domain.pure
+----------------------------
 
-.. automodule:: cutty.filesystem.pure
+.. automodule:: cutty.filesystem.domain.pure
    :members:
 
 
-cutty.filesystem.base
----------------------
+cutty.filesystem.domain.base
+----------------------------
 
-.. automodule:: cutty.filesystem.base
+.. automodule:: cutty.filesystem.domain.base
    :members:
 
 
-cutty.filesystem.path
----------------------
+cutty.filesystem.domain.path
+----------------------------
 
-.. automodule:: cutty.filesystem.path
+.. automodule:: cutty.filesystem.domain.path
    :members:
 
 
-cutty.filesystem.dict
----------------------
+cutty.filesystem.adapters.dict
+------------------------------
 
-.. automodule:: cutty.filesystem.dict
+.. automodule:: cutty.filesystem.adapters.dict
    :members:
 
 
-cutty.filesystem.disk
----------------------
+cutty.filesystem.adapters.disk
+------------------------------
 
-.. automodule:: cutty.filesystem.disk
+.. automodule:: cutty.filesystem.adapters.disk
    :members:
 
 

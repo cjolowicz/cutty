@@ -3,8 +3,8 @@ import pathlib
 
 import pytest
 
-from cutty.filesystem.disk import DiskFilesystem
-from cutty.filesystem.path import Path
+from cutty.filesystem.adapters.disk import DiskFilesystem
+from cutty.filesystem.domain.path import Path
 from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer

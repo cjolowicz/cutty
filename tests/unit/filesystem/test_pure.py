@@ -1,7 +1,7 @@
-"""Unit tests for cutty.filesystem.pure."""
+"""Unit tests for cutty.filesystem.domain.pure."""
 import pytest
 
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.domain.pure import PurePath
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,11 @@
-"""Unit tests for cutty.filesystem.dict."""
+"""Unit tests for cutty.filesystem.adapters.dict."""
 import pytest
 
-from cutty.filesystem.base import Access
-from cutty.filesystem.base import Filesystem
-from cutty.filesystem.dict import DictFilesystem
-from cutty.filesystem.path import Path
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.adapters.dict import DictFilesystem
+from cutty.filesystem.domain.base import Access
+from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.path import Path
+from cutty.filesystem.domain.pure import PurePath
 
 
 @pytest.fixture
