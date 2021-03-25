@@ -10,7 +10,7 @@ python-versions = "*"
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1036,7 +1036,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "41f002f5c0d5d8b9fc2d221393303bb3fc5f501b79b8677afef9e03ca9bd9589"
+content-hash = "a89341d50147fc53d2a07eba4d961f02cb8e85c71122837f6bb4085da8fb3c37"
 
 [metadata.files]
 alabaster = [
