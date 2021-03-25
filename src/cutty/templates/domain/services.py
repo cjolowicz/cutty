@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from collections.abc import Iterator
 
-from cutty.filesystem.path import Path
+from cutty.filesystem.domain.path import Path
 from cutty.templates.domain.binders import RenderBinder
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import FileStorage

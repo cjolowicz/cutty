@@ -9,7 +9,7 @@ from typing import Optional
 
 import jinja2
 
-from cutty.filesystem.path import Path
+from cutty.filesystem.domain.path import Path
 from cutty.templates.adapters.jinja import extensions
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import RenderFunction
