@@ -1,5 +1,6 @@
 """Command-line interface."""
 import pathlib
+from typing import Iterator
 from typing import Optional
 
 import click
@@ -7,8 +8,28 @@ import click
 import cutty.application.cookiecutter.main
 
 
+def extra_context_callback(
+    context: click.Context, parameter: click.Parameter, args: tuple[str]
+) -> dict[str, str]:
+    """Callback for the EXTRA_CONTEXT argument."""
+
+    def _generate() -> Iterator[tuple[str, str]]:
+        for arg in args:
+            try:
+                key, value = arg.split("=", 1)
+                yield key, value
+            except ValueError:
+                raise click.BadParameter(
+                    "EXTRA_CONTEXT should contain items of the form key=value; "
+                    f"'{arg}' doesn't match that form"
+                )
+
+    return dict(_generate())
+
+
 @click.command()
 @click.argument("url")
+@click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
     "--no-input",
     is_flag=True,
@@ -53,6 +74,7 @@ import cutty.application.cookiecutter.main
 @click.version_option()
 def main(
     url: str,
+    extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
     output_dir: Optional[str],
@@ -63,6 +85,7 @@ def main(
     """cutty."""
     cutty.application.cookiecutter.main.main(
         url,
+        extra_context=extra_context,
         no_input=no_input,
         checkout=checkout,
         output_dir=pathlib.Path(output_dir) if output_dir is not None else None,
