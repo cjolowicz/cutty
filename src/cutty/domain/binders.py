@@ -4,11 +4,19 @@ from collections.abc import Sequence
 
 from cutty.domain.bindings import Binding
 from cutty.domain.render import Renderer
+from cutty.domain.values import Value
+from cutty.domain.variables import validate
 from cutty.domain.variables import Variable
 
 
 Binder = Callable[[Variable], Binding]
 RenderBinder = Callable[[Renderer, Sequence[Variable]], Sequence[Binding]]
+
+
+def bind(variable: Variable, value: Value) -> Binding:
+    """Bind a variable to a value."""
+    validate(value, variable)
+    return Binding(variable.name, value)
 
 
 def binddefault(variable: Variable) -> Binding:
