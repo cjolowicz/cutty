@@ -6,7 +6,6 @@ from types import MappingProxyType
 from typing import Optional
 
 import appdirs
-from yarl import URL
 
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
@@ -51,7 +50,7 @@ def main(
     templatedir = pathlib.Path(template)
 
     if not templatedir.is_dir():
-        path = cache.get(URL(template), revision=checkout)
+        path = cache.get(template, revision=checkout)
     elif templatedir.suffix == ".git" or (templatedir / ".git").is_dir():
         path = Path(filesystem=GitFilesystem(templatedir, *filter(None, [checkout])))
     else:
