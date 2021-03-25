@@ -53,7 +53,7 @@ def main(
     if not templatedir.is_dir():
         path = cache.get(URL(template), revision=checkout)
     elif templatedir.suffix == ".git" or (templatedir / ".git").is_dir():
-        path = Path(filesystem=GitFilesystem(templatedir))
+        path = Path(filesystem=GitFilesystem(templatedir, *filter(None, [checkout])))
     else:
         path = Path(filesystem=DiskFilesystem(templatedir))
 
