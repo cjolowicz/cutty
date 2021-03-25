@@ -22,7 +22,7 @@ def render(
     loadconfig: ConfigLoader,
     loadrenderer: RendererLoader,
     loadpaths: PathLoader,
-    storefile: FileStorage,
+    storefiles: FileStorage,
 ) -> None:
     """Render the template at the given path."""
     config = loadconfig(path)
@@ -30,6 +30,6 @@ def render(
     paths = loadpaths(path, config)
 
     bindings = renderbind(render, config.variables)
+    files = renderfiles(paths, render, bindings)
 
-    for file in renderfiles(paths, render, bindings):
-        storefile(file)
+    storefiles(files)

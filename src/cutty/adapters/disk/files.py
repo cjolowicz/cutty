@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pathlib
+from collections.abc import Iterable
 
 from cutty.domain.files import File
 from cutty.domain.files import Mode
@@ -15,7 +16,12 @@ class DiskFileStorage:
         """Initialize."""
         self.root = root
 
-    def store(self, file: File) -> None:
+    def store(self, files: Iterable[File]) -> None:
+        """Commit the files to storage."""
+        for file in files:
+            self.storefile(file)
+
+    def storefile(self, file: File) -> None:
         """Commit a file to storage."""
         path = self.resolve(file.path)
         path.parent.mkdir(parents=True, exist_ok=True)
