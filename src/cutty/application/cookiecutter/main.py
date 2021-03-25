@@ -21,7 +21,7 @@ from cutty.repositories.domain.cache import Cache
 def main(
     url: str,
     *,
-    interactive: bool = True,
+    no_input: bool = False,
     checkout: Optional[str] = None,
     output_dir: Optional[pathlib.Path] = None,
 ) -> None:
@@ -39,6 +39,6 @@ def main(
         loadconfig=functools.partial(loadconfig, url),
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
-        renderbind=renderbindwith(prompt if interactive else binddefault),
+        renderbind=renderbindwith(binddefault if no_input else prompt),
         storefiles=storage.store,
     )
