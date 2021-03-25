@@ -146,10 +146,10 @@ cutty.repositories.domain.repositories
    :members:
 
 
-cutty.repositories.domain.backends
-----------------------------------
+cutty.repositories.domain.cache
+-------------------------------
 
-.. automodule:: cutty.repositories.domain.backends
+.. automodule:: cutty.repositories.domain.cache
    :members:
 
 
