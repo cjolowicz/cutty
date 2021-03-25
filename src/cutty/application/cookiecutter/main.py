@@ -11,9 +11,6 @@ from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
-from cutty.filesystem.adapters.disk import DiskFilesystem
-from cutty.filesystem.adapters.git import GitFilesystem
-from cutty.filesystem.domain.path import Path
 from cutty.repositories.adapters.directory import LocalDirectoryRepository
 from cutty.repositories.adapters.git import GitRepository
 from cutty.repositories.adapters.git import LocalGitRepository
@@ -50,14 +47,7 @@ def main(
         skip_if_file_exists=skip_if_file_exists,
     )
 
-    templatedir = pathlib.Path(template)
-
-    if not templatedir.is_dir():
-        path = cache.get(template, revision=checkout)
-    elif templatedir.suffix == ".git" or (templatedir / ".git").is_dir():
-        path = Path(filesystem=GitFilesystem(templatedir, *filter(None, [checkout])))
-    else:
-        path = Path(filesystem=DiskFilesystem(templatedir))
+    path = cache.get(template, revision=checkout)
 
     if directory is not None:
         path = path.joinpath(*directory.parts)
