@@ -1,12 +1,12 @@
-"""Disk-based implementation of cutty.domain.files abstractions."""
+"""Disk-based implementation of cutty.templates.domain.files abstractions."""
 from __future__ import annotations
 
 import pathlib
 from collections.abc import Iterable
 
-from cutty.domain.files import File
-from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
+from cutty.templates.domain.files import File
+from cutty.templates.domain.files import Mode
 
 
 class DiskFileStorage:

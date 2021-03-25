@@ -11,9 +11,9 @@ from collections.abc import Iterator
 from collections.abc import Mapping
 from typing import Optional
 
-from cutty.adapters.disk.files import DiskFileStorage
 from cutty.compat.contextlib import contextmanager
-from cutty.domain.files import File
+from cutty.templates.adapters.disk.files import DiskFileStorage
+from cutty.templates.domain.files import File
 
 
 class CookiecutterFileStorage(DiskFileStorage):

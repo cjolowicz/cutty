@@ -1,9 +1,9 @@
 """Unit test fixtures for cutty."""
 import pytest
 
-from cutty.domain.render import Renderer
-from cutty.domain.values import ValueType
-from cutty.domain.variables import GenericVariable
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.values import ValueType
+from cutty.templates.domain.variables import GenericVariable
 from cutty.util.bus import Bus
 
 

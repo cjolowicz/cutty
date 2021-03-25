@@ -6,101 +6,101 @@ Reference
     :backlinks: none
 
 
-cutty.domain.values
--------------------
+cutty.templates.domain.values
+-----------------------------
 
-.. automodule:: cutty.domain.values
+.. automodule:: cutty.templates.domain.values
    :members:
 
 
-cutty.domain.bindings
----------------------
-
-.. automodule:: cutty.domain.bindings
-   :members:
-
-
-cutty.domain.variables
-----------------------
-
-.. automodule:: cutty.domain.variables
-   :members:
-
-
-cutty.domain.files
-------------------
-
-.. automodule:: cutty.domain.files
-   :members:
-
-
-cutty.domain.render
--------------------
-
-.. automodule:: cutty.domain.render
-   :members:
-
-
-cutty.domain.binders
---------------------
-
-.. automodule:: cutty.domain.binders
-   :members:
-
-
-cutty.domain.hooks
-------------------
-
-.. automodule:: cutty.domain.hooks
-   :members:
-
-
-cutty.domain.renderfiles
-------------------------
-
-.. automodule:: cutty.domain.renderfiles
-   :members:
-
-
-cutty.domain.services
----------------------
-
-.. automodule:: cutty.domain.services
-   :members:
-
-
-cutty.adapters.jinja.extensions
+cutty.templates.domain.bindings
 -------------------------------
 
-.. automodule:: cutty.adapters.jinja.extensions
+.. automodule:: cutty.templates.domain.bindings
    :members:
 
 
-cutty.adapters.jinja.render
----------------------------
+cutty.templates.domain.variables
+--------------------------------
 
-.. automodule:: cutty.adapters.jinja.render
+.. automodule:: cutty.templates.domain.variables
    :members:
 
 
-cutty.adapters.click.binders
+cutty.templates.domain.files
 ----------------------------
 
-.. automodule:: cutty.adapters.click.binders
+.. automodule:: cutty.templates.domain.files
    :members:
 
 
-cutty.adapters.disk.files
--------------------------
+cutty.templates.domain.render
+-----------------------------
 
-.. automodule:: cutty.adapters.disk.files
+.. automodule:: cutty.templates.domain.render
    :members:
 
 
-cutty.adapters.disk.hooks
--------------------------
+cutty.templates.domain.binders
+------------------------------
 
-.. automodule:: cutty.adapters.disk.hooks
+.. automodule:: cutty.templates.domain.binders
+   :members:
+
+
+cutty.templates.domain.hooks
+----------------------------
+
+.. automodule:: cutty.templates.domain.hooks
+   :members:
+
+
+cutty.templates.domain.renderfiles
+----------------------------------
+
+.. automodule:: cutty.templates.domain.renderfiles
+   :members:
+
+
+cutty.templates.domain.services
+-------------------------------
+
+.. automodule:: cutty.templates.domain.services
+   :members:
+
+
+cutty.templates.adapters.jinja.extensions
+-----------------------------------------
+
+.. automodule:: cutty.templates.adapters.jinja.extensions
+   :members:
+
+
+cutty.templates.adapters.jinja.render
+-------------------------------------
+
+.. automodule:: cutty.templates.adapters.jinja.render
+   :members:
+
+
+cutty.templates.adapters.click.binders
+--------------------------------------
+
+.. automodule:: cutty.templates.adapters.click.binders
+   :members:
+
+
+cutty.templates.adapters.disk.files
+-----------------------------------
+
+.. automodule:: cutty.templates.adapters.disk.files
+   :members:
+
+
+cutty.templates.adapters.disk.hooks
+-----------------------------------
+
+.. automodule:: cutty.templates.adapters.disk.hooks
    :members:
 
 

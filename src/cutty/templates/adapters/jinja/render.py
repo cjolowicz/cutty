@@ -9,11 +9,11 @@ from typing import Optional
 
 import jinja2
 
-from cutty.adapters.jinja import extensions
-from cutty.domain.bindings import Binding
-from cutty.domain.render import RenderFunction
-from cutty.domain.render import T
 from cutty.filesystem.path import Path
+from cutty.templates.adapters.jinja import extensions
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.render import RenderFunction
+from cutty.templates.domain.render import T
 
 
 def splitpath(pathstr: str) -> tuple[str, ...]:
@@ -24,7 +24,8 @@ def splitpath(pathstr: str) -> tuple[str, ...]:
     source: jinja2.loaders.split_template_path
     """
     # TODO: Add string parsing to PurePath?
-    # TODO: Add common validation function? (see cutty.domain.render.renderfiles)
+    # TODO: Add common validation function?
+    # (see cutty.templates.domain.render.renderfiles)
     import os
 
     parts = tuple(part for part in pathstr.split("/") if part and part != os.curdir)

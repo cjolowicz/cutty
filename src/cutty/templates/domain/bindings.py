@@ -2,8 +2,8 @@
 from dataclasses import dataclass
 from typing import Generic
 
-from cutty.domain.values import Value
-from cutty.domain.values import ValueT_co
+from cutty.templates.domain.values import Value
+from cutty.templates.domain.values import ValueT_co
 
 
 @dataclass(frozen=True)
