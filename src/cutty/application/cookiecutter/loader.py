@@ -51,7 +51,7 @@ def loadvariable(name: str, value: Value) -> Variable:
     )
 
 
-def loadconfig(path: Path) -> Config:
+def loadconfig(template: str, path: Path) -> Config:
     """Load the configurations for a Cookiecutter template."""
     text = (path / "cookiecutter.json").read_text()
     data = json.loads(text)
@@ -59,6 +59,8 @@ def loadconfig(path: Path) -> Config:
     assert isinstance(data, dict) and all(  # noqa: S101
         isinstance(name, str) for name in data
     )
+
+    data.setdefault("_template", template)
 
     settings = tuple(
         Binding(name, loadvalue(value))
