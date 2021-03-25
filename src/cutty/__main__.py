@@ -16,7 +16,8 @@ import cutty.application.cookiecutter.main
     help="Prompt for template variables.",
 )
 @click.option(
-    "--revision",
+    "-c",
+    "--checkout",
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
@@ -31,14 +32,14 @@ import cutty.application.cookiecutter.main
 def main(
     url: str,
     interactive: bool,
-    revision: Optional[str],
+    checkout: Optional[str],
     output_dir: Optional[str],
 ) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
         url,
         interactive=interactive,
-        revision=revision,
+        checkout=checkout,
         output_dir=pathlib.Path(output_dir) if output_dir is not None else output_dir,
     )
 
