@@ -31,6 +31,3 @@ def renderbind(
 def renderbindwith(bind: Binder) -> RenderBinder:
     """Render and bind variables using the given binder."""
     return lambda render, variables: renderbind(render, bind, variables)
-
-
-renderbinddefault = renderbindwith(binddefault)
