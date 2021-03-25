@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-from cutty.filesystem.base import Access
-from cutty.filesystem.base import Filesystem
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.domain.base import Access
+from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.pure import PurePath
 from cutty.util.typeguard_ignore import typeguard_ignore
 
 

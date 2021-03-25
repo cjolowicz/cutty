@@ -5,8 +5,8 @@ from typing import Optional
 import pygit2
 from yarl import URL
 
-from cutty.filesystem.git import GitFilesystem
-from cutty.filesystem.path import Path
+from cutty.filesystem.adapters.git import GitFilesystem
+from cutty.filesystem.domain.path import Path
 from cutty.repositories.domain.repositories import Repository
 
 

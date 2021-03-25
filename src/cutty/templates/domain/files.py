@@ -6,9 +6,9 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from cutty.filesystem.base import Access
-from cutty.filesystem.path import Path
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.domain.base import Access
+from cutty.filesystem.domain.path import Path
+from cutty.filesystem.domain.pure import PurePath
 
 
 class Mode(enum.Flag):

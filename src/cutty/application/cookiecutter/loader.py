@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.filesystem.path import Path
+from cutty.filesystem.domain.path import Path
 from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config

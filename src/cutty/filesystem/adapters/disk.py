@@ -3,9 +3,9 @@ import os
 import pathlib
 from collections.abc import Iterator
 
-from cutty.filesystem.base import Access
-from cutty.filesystem.base import Filesystem
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.domain.base import Access
+from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.pure import PurePath
 
 
 def _fromaccess(access: Access) -> int:

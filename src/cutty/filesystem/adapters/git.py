@@ -6,9 +6,9 @@ from collections.abc import Iterator
 
 import pygit2
 
-from cutty.filesystem.base import Access
-from cutty.filesystem.base import Filesystem
-from cutty.filesystem.pure import PurePath
+from cutty.filesystem.domain.base import Access
+from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.pure import PurePath
 
 
 class GitFilesystem(Filesystem):
