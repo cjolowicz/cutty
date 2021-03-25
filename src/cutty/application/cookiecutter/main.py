@@ -1,4 +1,5 @@
 """Main entry point for the Cookiecutter compatibility layer."""
+import functools
 import pathlib
 
 import appdirs
@@ -25,7 +26,7 @@ def main(url: str) -> None:
     path = cache.get(URL(url))
     render(
         path,
-        loadconfig=loadconfig,
+        loadconfig=functools.partial(loadconfig, url),
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
         renderbind=renderbindwith(prompt),
