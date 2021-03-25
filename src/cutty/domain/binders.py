@@ -24,6 +24,21 @@ def binddefault(variable: Variable) -> Binding:
     return bind(variable, variable.default)
 
 
+def override(binder: Binder, bindings: Sequence[Binding]) -> Binder:
+    """Only use the binder if the binding does not yet exist."""
+    mapping = {binding.name: binding.value for binding in bindings}
+
+    def _binder(variable: Variable) -> Binding:
+        try:
+            value = mapping[variable.name]
+        except KeyError:
+            return binder(variable)
+
+        return bind(variable, value)
+
+    return _binder
+
+
 def renderbind(
     render: Renderer, binder: Binder, variables: Sequence[Variable]
 ) -> Sequence[Binding]:
