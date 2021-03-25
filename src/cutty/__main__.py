@@ -28,7 +28,7 @@ def extra_context_callback(
 
 
 @click.command()
-@click.argument("url")
+@click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
     "--no-input",
@@ -73,7 +73,7 @@ def extra_context_callback(
 )
 @click.version_option()
 def main(
-    url: str,
+    template: str,
     extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
@@ -84,7 +84,7 @@ def main(
 ) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
-        url,
+        template,
         extra_context=extra_context,
         no_input=no_input,
         checkout=checkout,
