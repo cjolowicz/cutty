@@ -8,18 +8,18 @@ from typing import Optional
 import appdirs
 from yarl import URL
 
-from cutty.adapters.click.binders import prompt
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
-from cutty.domain.binders import binddefault
-from cutty.domain.binders import override
-from cutty.domain.binders import renderbindwith
-from cutty.domain.bindings import Binding
-from cutty.domain.services import render
 from cutty.repositories.adapters.git.repositories import GitRepository
 from cutty.repositories.domain.cache import Cache
+from cutty.templates.adapters.click.binders import prompt
+from cutty.templates.domain.binders import binddefault
+from cutty.templates.domain.binders import override
+from cutty.templates.domain.binders import renderbindwith
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.services import render
 
 
 def main(

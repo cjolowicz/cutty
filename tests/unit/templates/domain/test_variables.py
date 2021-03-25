@@ -1,8 +1,8 @@
-"""Unit tests for cutty.domain.variables."""
-from cutty.domain.binders import binddefault
-from cutty.domain.binders import renderbindwith
-from cutty.domain.render import Renderer
-from cutty.domain.variables import GenericVariable
+"""Unit tests for cutty.templates.domain.variables."""
+from cutty.templates.domain.binders import binddefault
+from cutty.templates.domain.binders import renderbindwith
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.variables import GenericVariable
 
 
 def test_render(variable: GenericVariable[str], render: Renderer) -> None:

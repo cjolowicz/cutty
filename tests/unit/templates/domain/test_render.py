@@ -1,9 +1,9 @@
-"""Unit tests for cutty.domain.render."""
+"""Unit tests for cutty.templates.domain.render."""
 import pytest
 
-from cutty.domain.bindings import Binding
-from cutty.domain.render import Renderer
 from cutty.filesystem.pure import PurePath
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.render import Renderer
 
 
 @pytest.mark.parametrize(

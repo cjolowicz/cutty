@@ -1,8 +1,8 @@
 """Unit tests for the bindings module."""
 import pytest
 
-from cutty.domain.bindings import Binding
-from cutty.domain.values import Value
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.values import Value
 
 
 @pytest.mark.parametrize(

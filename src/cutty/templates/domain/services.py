@@ -2,12 +2,12 @@
 from collections.abc import Callable
 from collections.abc import Iterator
 
-from cutty.domain.binders import RenderBinder
-from cutty.domain.config import Config
-from cutty.domain.files import FileStorage
-from cutty.domain.render import Renderer
-from cutty.domain.renderfiles import renderfiles
 from cutty.filesystem.path import Path
+from cutty.templates.domain.binders import RenderBinder
+from cutty.templates.domain.config import Config
+from cutty.templates.domain.files import FileStorage
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.renderfiles import renderfiles
 
 
 ConfigLoader = Callable[[Path], Config]

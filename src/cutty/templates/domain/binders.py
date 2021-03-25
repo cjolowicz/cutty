@@ -2,11 +2,11 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 
-from cutty.domain.bindings import Binding
-from cutty.domain.render import Renderer
-from cutty.domain.values import Value
-from cutty.domain.variables import validate
-from cutty.domain.variables import Variable
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.values import Value
+from cutty.templates.domain.variables import validate
+from cutty.templates.domain.variables import Variable
 
 
 Binder = Callable[[Variable], Binding]

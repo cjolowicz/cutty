@@ -5,16 +5,16 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.adapters.jinja.render import JinjaRenderer
-from cutty.domain.bindings import Binding
-from cutty.domain.config import Config
-from cutty.domain.files import File
-from cutty.domain.render import Renderer
-from cutty.domain.render import RenderFunction
-from cutty.domain.values import getvaluetype
-from cutty.domain.values import Value
-from cutty.domain.variables import Variable
 from cutty.filesystem.path import Path
+from cutty.templates.adapters.jinja.render import JinjaRenderer
+from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.config import Config
+from cutty.templates.domain.files import File
+from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.render import RenderFunction
+from cutty.templates.domain.values import getvaluetype
+from cutty.templates.domain.values import Value
+from cutty.templates.domain.variables import Variable
 
 
 def loadvalue(value: Any) -> Value:

@@ -1,11 +1,11 @@
-"""Unit tests for cutty.adapters.jinja.extensions."""
+"""Unit tests for cutty.templates.adapters.jinja.extensions."""
 import string
 from collections.abc import Callable
 
 import jinja2.ext
 import pytest
 
-from cutty.adapters.jinja import extensions
+from cutty.templates.adapters.jinja import extensions
 
 
 @pytest.mark.parametrize(
