@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import abc
 import pathlib
-import shutil
 from typing import Optional
 
 from yarl import URL
@@ -34,10 +33,9 @@ class Repository(abc.ABC):
     def download(self) -> None:
         """Download the repository to the given path."""
 
+    @abc.abstractmethod
     def update(self) -> None:
         """Update the repository at the given path."""
-        shutil.rmtree(self.path)
-        self.download()
 
     @abc.abstractmethod
     def resolve(self, revision: Optional[str]) -> Path:
