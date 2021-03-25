@@ -41,6 +41,7 @@ def main(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
         providers=[GitRepository],
     )
+
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         overwrite_if_exists=overwrite_if_exists,
