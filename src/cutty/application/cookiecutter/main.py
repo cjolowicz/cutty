@@ -15,6 +15,7 @@ from cutty.filesystem.adapters.disk import DiskFilesystem
 from cutty.filesystem.adapters.git import GitFilesystem
 from cutty.filesystem.domain.path import Path
 from cutty.repositories.adapters.git.repositories import GitRepository
+from cutty.repositories.adapters.git.repositories import LocalGitRepository
 from cutty.repositories.domain.cache import Cache
 from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import binddefault
@@ -38,7 +39,8 @@ def main(
     """Generate a project from a Cookiecutter template."""
     cache = Cache(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
-        providers=[GitRepository],
+        remote=[GitRepository],
+        local=[LocalGitRepository],
     )
 
     storage = CookiecutterFileStorage(
