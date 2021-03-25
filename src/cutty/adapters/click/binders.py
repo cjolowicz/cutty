@@ -4,6 +4,7 @@ from typing import Optional
 
 import click
 
+from cutty.domain.binders import bind
 from cutty.domain.binders import binddefault
 from cutty.domain.bindings import Binding
 from cutty.domain.values import Value
@@ -18,7 +19,7 @@ def textprompt(variable: Variable) -> Binding:
         variable.name,
         default=variable.default,  # type: ignore[arg-type]
     )
-    return Binding(variable.name, value)
+    return bind(variable, value)
 
 
 def choiceprompt(variable: Variable) -> Binding:
@@ -41,7 +42,7 @@ def choiceprompt(variable: Variable) -> Binding:
         show_choices=False,
     )
 
-    return Binding(variable.name, choices[choice])
+    return bind(variable, choices[choice])
 
 
 def jsonprompt(variable: Variable) -> Binding:
@@ -56,7 +57,7 @@ def jsonprompt(variable: Variable) -> Binding:
     if value == "default":
         return binddefault(variable)
 
-    return Binding(variable.name, value)
+    return bind(variable, value)
 
 
 def _load_json_dict(value: Optional[str]) -> dict[str, Value]:
