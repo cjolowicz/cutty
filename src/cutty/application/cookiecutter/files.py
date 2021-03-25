@@ -20,11 +20,16 @@ class CookiecutterFileStorage(DiskFileStorage):
     """Disk-based file store with pre and post hooks."""
 
     def __init__(
-        self, path: pathlib.Path, *, overwrite_if_exists: bool = False
+        self,
+        path: pathlib.Path,
+        *,
+        overwrite_if_exists: bool = False,
+        skip_if_file_exists: bool = False,
     ) -> None:
         """Initialize."""
         super().__init__(path)
         self.overwrite_if_exists = overwrite_if_exists
+        self.skip_if_file_exists = skip_if_file_exists
 
     @classmethod
     @contextmanager
@@ -50,7 +55,9 @@ class CookiecutterFileStorage(DiskFileStorage):
                     raise FileExistsError(f"{project} already exists")
                 self.executehook(hooks, "pre_gen_project", project)
 
-            self.storefile(file, self.resolve(file.path))
+            path = self.resolve(file.path)
+            if not (self.skip_if_file_exists and path.exists()):
+                self.storefile(file, path)
 
         if project is not None:
             self.executehook(hooks, "post_gen_project", project)

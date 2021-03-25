@@ -26,6 +26,7 @@ def main(
     output_dir: Optional[pathlib.Path] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
     overwrite_if_exists: bool = False,
+    skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cache = Cache(
@@ -35,6 +36,7 @@ def main(
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
     )
     path = cache.get(URL(url), revision=checkout)
 
