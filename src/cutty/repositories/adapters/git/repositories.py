@@ -7,7 +7,33 @@ from yarl import URL
 
 from cutty.filesystem.adapters.git import GitFilesystem
 from cutty.filesystem.domain.path import Path
+from cutty.repositories.domain.repositories import LocalRepository
 from cutty.repositories.domain.repositories import Repository
+
+
+def resolve(path: pathlib.Path, revision: Optional[str]) -> Path:
+    """Return a filesystem tree for the given revision.
+
+    This function returns the root of a Git filesystem for the given
+    revision. If ``revision`` is None, HEAD is used instead.
+    """
+    filesystem = GitFilesystem(path, *filter(None, [revision]))
+    return Path(filesystem=filesystem)
+
+
+class LocalGitRepository(LocalRepository):
+    """Local git repository."""
+
+    type: str = "git-local"
+
+    @classmethod
+    def supports(cls, path: pathlib.Path) -> bool:
+        """Return True if the implementation supports the given path."""
+        return pygit2.discover_repository(path) is not None
+
+    def resolve(self, revision: Optional[str]) -> Path:
+        """Return a filesystem tree for the given revision."""
+        return resolve(self.path, revision)
 
 
 class GitRepository(Repository):
@@ -78,5 +104,4 @@ class GitRepository(Repository):
         This function returns the root of a Git filesystem for the given
         revision. If ``revision`` is None, HEAD is used instead.
         """
-        filesystem = GitFilesystem(self.repositorypath, *filter(None, [revision]))
-        return Path(filesystem=filesystem)
+        return resolve(self.repositorypath, revision)
