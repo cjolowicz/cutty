@@ -153,10 +153,10 @@ cutty.repositories.domain.backends
    :members:
 
 
-cutty.repositories.domain.cache
--------------------------------
+cutty.repositories.domain.loader
+--------------------------------
 
-.. automodule:: cutty.repositories.domain.cache
+.. automodule:: cutty.repositories.domain.loader
    :members:
 
 

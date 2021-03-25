@@ -14,7 +14,7 @@ from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.repositories.adapters.directory import LocalDirectoryRepository
 from cutty.repositories.adapters.git import GitRepository
 from cutty.repositories.adapters.git import LocalGitRepository
-from cutty.repositories.domain.cache import Cache
+from cutty.repositories.domain.loader import RepositoryLoader
 from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
@@ -35,7 +35,7 @@ def main(
     skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    cache = Cache(
+    loader = RepositoryLoader(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
         remote=[GitRepository],
         local=[LocalGitRepository, LocalDirectoryRepository],
@@ -47,7 +47,7 @@ def main(
         skip_if_file_exists=skip_if_file_exists,
     )
 
-    path = cache.get(template, revision=checkout)
+    path = loader.get(template, revision=checkout)
 
     if directory is not None:
         path = path.joinpath(*directory.parts)

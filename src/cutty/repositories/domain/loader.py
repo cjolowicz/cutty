@@ -1,4 +1,4 @@
-"""Repository cache."""
+"""Repository loader."""
 import contextlib
 import pathlib
 from collections.abc import Container
@@ -13,8 +13,8 @@ from cutty.repositories.domain.repositories import LocalRepository
 from cutty.repositories.domain.repositories import Repository
 
 
-class Cache:
-    """Repository cache."""
+class RepositoryLoader:
+    """Repository loader."""
 
     def __init__(
         self,
