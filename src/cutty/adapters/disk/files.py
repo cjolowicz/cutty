@@ -2,10 +2,7 @@
 from __future__ import annotations
 
 import pathlib
-import tempfile
-from collections.abc import Iterator
 
-from cutty.compat.contextlib import contextmanager
 from cutty.domain.files import File
 from cutty.domain.files import Mode
 from cutty.filesystem.pure import PurePath
@@ -29,11 +26,3 @@ class DiskFileStorage:
     def resolve(self, path: PurePath) -> pathlib.Path:
         """Resolve the path to a filesystem location."""
         return self.root.joinpath(*path.parts)
-
-    @classmethod
-    @contextmanager
-    def temporary(cls) -> Iterator[DiskFileStorage]:
-        """Return temporary storage."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = pathlib.Path(tmpdir)
-            yield cls(path)

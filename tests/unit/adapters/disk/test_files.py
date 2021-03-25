@@ -37,15 +37,3 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     storage.store(file)
 
     assert os.access(tmp_path / "main.py", os.X_OK)
-
-
-def test_temporary() -> None:
-    """It creates temporary storage."""
-    file = File(PurePath("file"), Mode.DEFAULT, "")
-
-    with DiskFileStorage.temporary() as storage:
-        storage.store(file)
-        path = storage.resolve(file.path)
-        assert path.exists()
-
-    assert not path.exists()
