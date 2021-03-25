@@ -48,11 +48,10 @@ def main(
     if directory is not None:
         path = path.joinpath(*directory.parts)
 
-    binder = binddefault if no_input else prompt
-    if extra_context:
-        binder = override(
-            binder, [Binding(key, value) for key, value in extra_context.items()]
-        )
+    binder = override(
+        binddefault if no_input else prompt,
+        [Binding(key, value) for key, value in extra_context.items()],
+    )
 
     render(
         path,
