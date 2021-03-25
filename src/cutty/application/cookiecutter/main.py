@@ -12,6 +12,9 @@ from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
+from cutty.filesystem.adapters.disk import DiskFilesystem
+from cutty.filesystem.adapters.git import GitFilesystem
+from cutty.filesystem.domain.path import Path
 from cutty.repositories.adapters.git.repositories import GitRepository
 from cutty.repositories.domain.cache import Cache
 from cutty.templates.adapters.click.binders import prompt
@@ -23,7 +26,7 @@ from cutty.templates.domain.services import render
 
 
 def main(
-    url: str,
+    template: str,
     *,
     extra_context: Mapping[str, str] = MappingProxyType({}),
     no_input: bool = False,
@@ -43,7 +46,15 @@ def main(
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
     )
-    path = cache.get(URL(url), revision=checkout)
+
+    templatedir = pathlib.Path(template)
+
+    if not templatedir.is_dir():
+        path = cache.get(URL(template), revision=checkout)
+    elif templatedir.suffix == ".git" or (templatedir / ".git").is_dir():
+        path = Path(filesystem=GitFilesystem(templatedir))
+    else:
+        path = Path(filesystem=DiskFilesystem(templatedir))
 
     if directory is not None:
         path = path.joinpath(*directory.parts)
@@ -55,7 +66,7 @@ def main(
 
     render(
         path,
-        loadconfig=functools.partial(loadconfig, url),
+        loadconfig=functools.partial(loadconfig, template),
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
         renderbind=renderbindwith(binder),
