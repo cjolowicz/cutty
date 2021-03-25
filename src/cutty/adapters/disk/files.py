@@ -19,11 +19,11 @@ class DiskFileStorage:
     def store(self, files: Iterable[File]) -> None:
         """Commit the files to storage."""
         for file in files:
-            self.storefile(file)
+            path = self.resolve(file.path)
+            self.storefile(file, path)
 
-    def storefile(self, file: File) -> None:
+    def storefile(self, file: File, path: pathlib.Path) -> None:
         """Commit a file to storage."""
-        path = self.resolve(file.path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(file.blob)
         if file.mode & Mode.EXECUTABLE:

@@ -50,7 +50,7 @@ class CookiecutterFileStorage(DiskFileStorage):
                     raise FileExistsError(f"{project} already exists")
                 self.executehook(hooks, "pre_gen_project", project)
 
-            super().storefile(file)
+            self.storefile(file, self.resolve(file.path))
 
         if project is not None:
             self.executehook(hooks, "post_gen_project", project)
@@ -69,8 +69,9 @@ class CookiecutterFileStorage(DiskFileStorage):
     def storehook(cls, hookfile: File) -> Iterator[pathlib.Path]:
         """Store the hook on disk."""
         with cls.temporary() as storage:
-            storage.storefile(hookfile)
-            yield storage.resolve(hookfile.path)
+            path = storage.resolve(hookfile.path)
+            storage.storefile(hookfile, path)
+            yield path
 
 
 def runhook(path: pathlib.Path, project: pathlib.Path) -> None:
