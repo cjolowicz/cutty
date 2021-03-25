@@ -19,9 +19,12 @@ from cutty.domain.files import File
 class CookiecutterFileStorage(DiskFileStorage):
     """Disk-based file store with pre and post hooks."""
 
-    def __init__(self, path: pathlib.Path) -> None:
+    def __init__(
+        self, path: pathlib.Path, *, overwrite_if_exists: bool = False
+    ) -> None:
         """Initialize."""
         super().__init__(path)
+        self.overwrite_if_exists = overwrite_if_exists
 
     @classmethod
     @contextmanager
@@ -43,6 +46,8 @@ class CookiecutterFileStorage(DiskFileStorage):
 
             if project is None:
                 project = self.resolve(file.path.parents[-2])
+                if not self.overwrite_if_exists and project.exists():
+                    raise FileExistsError(f"{project} already exists")
                 self.executehook(hooks, "pre_gen_project", project)
 
             super().storefile(file)
