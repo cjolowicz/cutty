@@ -18,7 +18,7 @@ def test_storage(tmp_path: pathlib.Path) -> None:
     file = File(path, Mode.DEFAULT, blob)
 
     storage = DiskFileStorage(tmp_path)
-    storage.store(file)
+    storage.store([file])
 
     assert blob == (tmp_path / "example" / "README.md").read_text()
 
@@ -34,6 +34,6 @@ def test_executable(tmp_path: pathlib.Path) -> None:
     file = File(path, Mode.EXECUTABLE, blob)
 
     storage = DiskFileStorage(tmp_path)
-    storage.store(file)
+    storage.store([file])
 
     assert os.access(tmp_path / "main.py", os.X_OK)

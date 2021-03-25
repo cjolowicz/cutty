@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import enum
 from collections.abc import Callable
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from cutty.filesystem.base import Access
@@ -33,4 +34,4 @@ class File:
         return cls(path, mode, blob)
 
 
-FileStorage = Callable[[File], None]
+FileStorage = Callable[[Iterable[File]], None]
