@@ -25,5 +25,5 @@ def main(url: str) -> None:
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
         renderbind=renderbindwith(prompt),
-        storefile=storage.store,
+        storefiles=storage.store,
     )
