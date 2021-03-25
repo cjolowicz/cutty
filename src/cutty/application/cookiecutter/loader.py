@@ -9,9 +9,6 @@ from cutty.adapters.jinja.render import JinjaRenderer
 from cutty.domain.bindings import Binding
 from cutty.domain.config import Config
 from cutty.domain.files import File
-from cutty.domain.hooks import Hook
-from cutty.domain.hooks import PostGenerateProject
-from cutty.domain.hooks import PreGenerateProject
 from cutty.domain.render import Renderer
 from cutty.domain.render import RenderFunction
 from cutty.domain.values import getvaluetype
@@ -85,22 +82,6 @@ def loadpaths(path: Path, config: Config) -> Iterator[Path]:
             return iter([template_dir])
     else:
         raise RuntimeError("template directory not found")  # pragma: no cover
-
-
-def loadhooks(path: Path, config: Config) -> Iterator[Hook]:
-    """Load hooks in a Cookiecutter template."""
-    hookdir = path / "hooks"
-    events = {
-        "pre_gen_project": PreGenerateProject,
-        "post_gen_project": PostGenerateProject,
-    }
-
-    if hookdir.is_dir():
-        for path in hookdir.iterdir():
-            if path.is_file() and not path.name.endswith("~"):
-                for name, event in events.items():
-                    if path.stem == name:
-                        yield Hook(path, event)
 
 
 def asstringlist(settings: Sequence[Binding], name: str) -> list[str]:
