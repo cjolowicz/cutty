@@ -18,13 +18,13 @@ class RepositoryLoader:
 
     def __init__(
         self,
-        path: pathlib.Path,
         *,
+        cachedir: pathlib.Path,
         local: Iterable[type[LocalRepository]],
         remote: Iterable[type[Repository]],
     ):
         """Initialize."""
-        self.cache = RepositoryCache(path)
+        self.cache = RepositoryCache(cachedir)
         self.localproviders = tuple(local)
         self.remoteproviders = tuple(remote)
 

@@ -36,7 +36,7 @@ def main(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     loader = RepositoryLoader(
-        pathlib.Path(appdirs.user_cache_dir("cutty")),
+        cachedir=pathlib.Path(appdirs.user_cache_dir("cutty")),
         remote=[GitRepository],
         local=[LocalGitRepository, LocalDirectoryRepository],
     )
