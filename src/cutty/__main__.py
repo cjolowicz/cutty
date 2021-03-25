@@ -10,10 +10,10 @@ import cutty.application.cookiecutter.main
 @click.command()
 @click.argument("url")
 @click.option(
-    "--interactive / --no-interactive",
-    default=True,
-    show_default=True,
-    help="Prompt for template variables.",
+    "--no-input",
+    is_flag=True,
+    default=False,
+    help="Do not prompt for template variables.",
 )
 @click.option(
     "-c",
@@ -31,14 +31,14 @@ import cutty.application.cookiecutter.main
 @click.version_option()
 def main(
     url: str,
-    interactive: bool,
+    no_input: bool,
     checkout: Optional[str],
     output_dir: Optional[str],
 ) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
         url,
-        interactive=interactive,
+        no_input=no_input,
         checkout=checkout,
         output_dir=pathlib.Path(output_dir) if output_dir is not None else output_dir,
     )
