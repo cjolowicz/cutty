@@ -43,6 +43,13 @@ import cutty.application.cookiecutter.main
     default=False,
     help="Overwrite the contents of the output directory if it already exists.",
 )
+@click.option(
+    "-s",
+    "--skip-if-file-exists",
+    is_flag=True,
+    default=False,
+    help="Skip the files in the corresponding directories if they already exist.",
+)
 @click.version_option()
 def main(
     url: str,
@@ -51,6 +58,7 @@ def main(
     output_dir: Optional[str],
     directory: Optional[str],
     overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
 ) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
@@ -60,6 +68,7 @@ def main(
         output_dir=pathlib.Path(output_dir) if output_dir is not None else None,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
     )
 
 
