@@ -97,41 +97,6 @@ cutty.templates.adapters.disk.files
    :members:
 
 
-cutty.templates.adapters.disk.hooks
------------------------------------
-
-.. automodule:: cutty.templates.adapters.disk.hooks
-   :members:
-
-
-cutty.util.exceptionhandlers
-----------------------------
-
-.. automodule:: cutty.util.exceptionhandlers
-   :members:
-
-
-cutty.util.reraise
-------------------
-
-.. automodule:: cutty.util.reraise
-   :members:
-
-
-cutty.util.bus
---------------
-
-.. automodule:: cutty.util.bus
-   :members:
-
-
-cutty.util.typeguard_ignore
----------------------------
-
-.. automodule:: cutty.util.typeguard_ignore
-   :members:
-
-
 cutty.filesystem.domain.pure
 ----------------------------
 
@@ -167,6 +132,13 @@ cutty.filesystem.adapters.disk
    :members:
 
 
+cutty.filesystem.adapters.git
+-----------------------------
+
+.. automodule:: cutty.filesystem.adapters.git
+   :members:
+
+
 cutty.repositories.domain.repositories
 --------------------------------------
 
@@ -199,6 +171,41 @@ cutty.compat.contextlib
 -----------------------
 
 .. automodule:: cutty.compat.contextlib
+   :members:
+
+
+cutty.util.exceptionhandlers
+----------------------------
+
+.. automodule:: cutty.util.exceptionhandlers
+   :members:
+
+
+cutty.util.reraise
+------------------
+
+.. automodule:: cutty.util.reraise
+   :members:
+
+
+cutty.util.bus
+--------------
+
+.. automodule:: cutty.util.bus
+   :members:
+
+
+cutty.util.typeguard_ignore
+---------------------------
+
+.. automodule:: cutty.util.typeguard_ignore
+   :members:
+
+
+cutty.application.cookiecutter.files
+------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.files
    :members:
 
 
