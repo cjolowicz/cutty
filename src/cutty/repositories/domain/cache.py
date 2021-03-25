@@ -1,4 +1,4 @@
-"""Repository backends."""
+"""Repository cache."""
 from __future__ import annotations
 
 import datetime
@@ -16,7 +16,7 @@ from yarl import URL
 
 @dataclass
 class Entry:
-    """Backend entry."""
+    """Repository cache entry."""
 
     path: pathlib.Path
     url: URL
@@ -63,7 +63,7 @@ def hashurl(url: URL) -> str:
     return hashlib.blake2b(data).hexdigest()
 
 
-class Backend:
+class RepositoryCache:
     """Storage backend for repositories."""
 
     def __init__(self, path: pathlib.Path) -> None:

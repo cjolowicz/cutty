@@ -8,7 +8,7 @@ from typing import Optional
 from yarl import URL
 
 from cutty.filesystem.domain.path import Path
-from cutty.repositories.domain.backends import Backend
+from cutty.repositories.domain.cache import RepositoryCache
 from cutty.repositories.domain.repositories import LocalRepository
 from cutty.repositories.domain.repositories import Repository
 
@@ -24,7 +24,7 @@ class RepositoryLoader:
         remote: Iterable[type[Repository]],
     ):
         """Initialize."""
-        self.backend = Backend(path)
+        self.cache = RepositoryCache(path)
         self.localproviders = tuple(local)
         self.remoteproviders = tuple(remote)
 
@@ -81,7 +81,7 @@ class RepositoryLoader:
         wantupdate: bool = True,
     ) -> Path:
         """Load a tree from the cache."""
-        entry = self.backend.get(url)
+        entry = self.cache.get(url)
 
         if entry is not None:
             providers = {entry.provider}
@@ -93,7 +93,7 @@ class RepositoryLoader:
         )
 
         if entry is None:
-            entry = self.backend.allocate(url, provider.type)
+            entry = self.cache.allocate(url, provider.type)
 
         repository = provider(url, entry.path)
 
