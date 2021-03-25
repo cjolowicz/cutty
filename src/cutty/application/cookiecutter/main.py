@@ -14,6 +14,7 @@ from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.filesystem.adapters.disk import DiskFilesystem
 from cutty.filesystem.adapters.git import GitFilesystem
 from cutty.filesystem.domain.path import Path
+from cutty.repositories.adapters.directory import LocalDirectoryRepository
 from cutty.repositories.adapters.git import GitRepository
 from cutty.repositories.adapters.git import LocalGitRepository
 from cutty.repositories.domain.cache import Cache
@@ -40,7 +41,7 @@ def main(
     cache = Cache(
         pathlib.Path(appdirs.user_cache_dir("cutty")),
         remote=[GitRepository],
-        local=[LocalGitRepository],
+        local=[LocalGitRepository, LocalDirectoryRepository],
     )
 
     storage = CookiecutterFileStorage(
