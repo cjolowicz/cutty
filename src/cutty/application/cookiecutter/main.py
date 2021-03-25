@@ -22,7 +22,7 @@ def main(
     url: str,
     *,
     interactive: bool = True,
-    revision: Optional[str] = None,
+    checkout: Optional[str] = None,
     output_dir: Optional[pathlib.Path] = None,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
@@ -33,7 +33,7 @@ def main(
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir
     )
-    path = cache.get(URL(url), revision=revision)
+    path = cache.get(URL(url), revision=checkout)
     render(
         path,
         loadconfig=functools.partial(loadconfig, url),
