@@ -42,7 +42,7 @@ class CookiecutterFileStorage(DiskFileStorage):
                 continue
 
             if project is None:
-                project = self.resolve(file.path.parents[-1])
+                project = self.resolve(file.path.parents[-2])
                 self.executehook(hooks, "pre_gen_project", project)
 
             super().storefile(file)
