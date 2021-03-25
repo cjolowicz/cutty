@@ -24,6 +24,7 @@ def main(
     no_input: bool = False,
     checkout: Optional[str] = None,
     output_dir: Optional[pathlib.Path] = None,
+    directory: Optional[pathlib.PurePosixPath] = None,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cache = Cache(
@@ -34,6 +35,10 @@ def main(
         pathlib.Path.cwd() if output_dir is None else output_dir
     )
     path = cache.get(URL(url), revision=checkout)
+
+    if directory is not None:
+        path = path.joinpath(*directory.parts)
+
     render(
         path,
         loadconfig=functools.partial(loadconfig, url),
