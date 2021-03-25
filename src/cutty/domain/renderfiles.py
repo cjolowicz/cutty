@@ -5,32 +5,16 @@ from collections.abc import Sequence
 
 from cutty.domain.bindings import Binding
 from cutty.domain.files import File
-from cutty.domain.hooks import PostGenerateProject
-from cutty.domain.hooks import PreGenerateProject
 from cutty.domain.render import Renderer
 from cutty.filesystem.path import Path
-from cutty.util.bus import Bus
 
 
 class InvalidPathComponent(Exception):
     """The rendered path has an invalid component."""
 
 
-def withevents(files: Iterator[File], bus: Bus) -> Iterator[File]:
-    """Publish the PreGenerateProject and PostGenerateProject events."""
-    first = next(files)
-    project = first.path.parents[-1]
-
-    bus.events.publish(PreGenerateProject(project))
-
-    yield first
-    yield from files
-
-    bus.events.publish(PostGenerateProject(project))
-
-
 def renderfiles(
-    paths: Iterable[Path], render: Renderer, bindings: Sequence[Binding], bus: Bus
+    paths: Iterable[Path], render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
     """Render the files."""
 
@@ -50,5 +34,4 @@ def renderfiles(
             else:  # pragma: no cover
                 raise RuntimeError(f"{path}: not a regular file or directory")
 
-    files = _renderfiles(paths)
-    return withevents(files, bus)
+    return _renderfiles(paths)
