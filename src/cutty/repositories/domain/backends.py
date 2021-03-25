@@ -9,6 +9,7 @@ import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Iterator
+from typing import Optional
 
 from yarl import URL
 
@@ -75,17 +76,23 @@ class Backend:
         hash = hashurl(url)
         return self.path / "entries" / hash[:2] / hash
 
-    def get(self, url: URL, provider: str) -> Entry:
+    def get(self, url: URL) -> Optional[Entry]:
         """Retrieve storage for a repository."""
         path = self._getentrypath(url)
-        if path.exists():
-            entry = Entry.load(path)
-            entry.touch(path)
-        else:
-            path.mkdir(parents=True)
-            entry = Entry(path, url, provider)
-            entry.dump(path)
+        if not path.exists():
+            return None
 
+        entry = Entry.load(path)
+        entry.touch(path)
+        return entry
+
+    def allocate(self, url: URL, provider: str) -> Entry:
+        """Allocate storage for a repository."""
+        path = self._getentrypath(url)
+        path.mkdir(parents=True)
+
+        entry = Entry(path, url, provider)
+        entry.dump(path)
         return entry
 
     def list(self) -> Iterator[Entry]:
