@@ -28,19 +28,29 @@ import cutty.application.cookiecutter.main
     type=click.Path(file_okay=False, dir_okay=True),
     help="Parent directory of the generated project.",
 )
+@click.option(
+    "--directory",
+    metavar="DIR",
+    help=(
+        "Directory within the template repository that contains the "
+        "cookiecutter.json file."
+    ),
+)
 @click.version_option()
 def main(
     url: str,
     no_input: bool,
     checkout: Optional[str],
     output_dir: Optional[str],
+    directory: Optional[str],
 ) -> None:
     """cutty."""
     cutty.application.cookiecutter.main.main(
         url,
         no_input=no_input,
         checkout=checkout,
-        output_dir=pathlib.Path(output_dir) if output_dir is not None else output_dir,
+        output_dir=pathlib.Path(output_dir) if output_dir is not None else None,
+        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
 
 
