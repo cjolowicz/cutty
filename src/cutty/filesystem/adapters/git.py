@@ -6,8 +6,8 @@ from collections.abc import Iterator
 
 import pygit2
 
-from cutty.filesystem.domain.base import Access
-from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.filesystem import Access
+from cutty.filesystem.domain.filesystem import Filesystem
 from cutty.filesystem.domain.pure import PurePath
 
 
