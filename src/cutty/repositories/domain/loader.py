@@ -7,7 +7,7 @@ from typing import Optional
 
 from yarl import URL
 
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.cache import RepositoryCache
 from cutty.repositories.domain.repositories import LocalRepository
 from cutty.repositories.domain.repositories import Repository

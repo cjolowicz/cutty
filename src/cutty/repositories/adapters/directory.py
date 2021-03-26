@@ -2,8 +2,8 @@
 import pathlib
 from typing import Optional
 
-from cutty.filesystem.adapters.disk import DiskFilesystem
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.adapters.disk import DiskFilesystem
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.repositories import LocalRepository
 
 

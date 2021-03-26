@@ -2,8 +2,8 @@
 
 Usage:
 
->>> from cutty.filesystem.adapters.dict import DictFilesystem
->>> from cutty.filesystem.domain.path import Path
+>>> from cutty.filesystems.adapters.dict import DictFilesystem
+>>> from cutty.filesystems.domain.path import Path
 >>> filesystem = DictFilesystem({})
 >>> path = Path(filesystem=filesystem)
 >>> assert path.exists()
