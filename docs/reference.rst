@@ -97,45 +97,45 @@ cutty.templates.adapters.disk.files
    :members:
 
 
-cutty.filesystem.domain.purepath
---------------------------------
+cutty.filesystems.domain.purepath
+---------------------------------
 
-.. automodule:: cutty.filesystem.domain.purepath
+.. automodule:: cutty.filesystems.domain.purepath
    :members:
 
 
-cutty.filesystem.domain.filesystem
-----------------------------------
+cutty.filesystems.domain.filesystem
+-----------------------------------
 
-.. automodule:: cutty.filesystem.domain.filesystem
+.. automodule:: cutty.filesystems.domain.filesystem
    :members:
 
 
-cutty.filesystem.domain.path
-----------------------------
-
-.. automodule:: cutty.filesystem.domain.path
-   :members:
-
-
-cutty.filesystem.adapters.dict
-------------------------------
-
-.. automodule:: cutty.filesystem.adapters.dict
-   :members:
-
-
-cutty.filesystem.adapters.disk
-------------------------------
-
-.. automodule:: cutty.filesystem.adapters.disk
-   :members:
-
-
-cutty.filesystem.adapters.git
+cutty.filesystems.domain.path
 -----------------------------
 
-.. automodule:: cutty.filesystem.adapters.git
+.. automodule:: cutty.filesystems.domain.path
+   :members:
+
+
+cutty.filesystems.adapters.dict
+-------------------------------
+
+.. automodule:: cutty.filesystems.adapters.dict
+   :members:
+
+
+cutty.filesystems.adapters.disk
+-------------------------------
+
+.. automodule:: cutty.filesystems.adapters.disk
+   :members:
+
+
+cutty.filesystems.adapters.git
+------------------------------
+
+.. automodule:: cutty.filesystems.adapters.git
    :members:
 
 

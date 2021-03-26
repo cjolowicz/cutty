@@ -7,7 +7,7 @@ from typing import Optional
 
 from yarl import URL
 
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.domain.path import Path
 
 
 class LocalRepository(abc.ABC):

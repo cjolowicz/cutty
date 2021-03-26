@@ -5,7 +5,7 @@ import platform
 
 import pytest
 
-from cutty.filesystem.domain.purepath import PurePath
+from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.disk.files import DiskFileStorage
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
