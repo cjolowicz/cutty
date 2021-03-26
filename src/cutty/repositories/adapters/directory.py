@@ -3,7 +3,6 @@ import pathlib
 from typing import Optional
 
 from cutty.filesystems.adapters.disk import DiskFilesystem
-from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.repositories import LocalRepository
 
 
@@ -17,10 +16,10 @@ class LocalDirectoryRepository(LocalRepository):
         """Return True if the implementation supports the given path."""
         return path.is_dir()
 
-    def resolve(self, revision: Optional[str]) -> Path:
+    def resolve(self, revision: Optional[str]) -> DiskFilesystem:
         """Return a filesystem tree for the given revision."""
         if revision is not None:
             raise RuntimeError(
                 f"{self.type} repository does not support revisions, got {revision}"
             )
-        return Path(filesystem=DiskFilesystem(self.path))
+        return DiskFilesystem(self.path)
