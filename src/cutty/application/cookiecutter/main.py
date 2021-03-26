@@ -14,6 +14,7 @@ from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.repositories.adapters.directory import LocalDirectoryRepository
 from cutty.repositories.adapters.git import GitRepository
 from cutty.repositories.adapters.git import LocalGitRepository
+from cutty.repositories.adapters.zip import LocalZipRepository
 from cutty.repositories.domain.loader import RepositoryLoader
 from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import binddefault
@@ -38,7 +39,7 @@ def main(
     loader = RepositoryLoader(
         cachedir=pathlib.Path(appdirs.user_cache_dir("cutty")),
         remote=[GitRepository],
-        local=[LocalGitRepository, LocalDirectoryRepository],
+        local=[LocalGitRepository, LocalZipRepository, LocalDirectoryRepository],
     )
 
     storage = CookiecutterFileStorage(
