@@ -48,13 +48,6 @@ cutty.templates.domain.binders
    :members:
 
 
-cutty.templates.domain.hooks
-----------------------------
-
-.. automodule:: cutty.templates.domain.hooks
-   :members:
-
-
 cutty.templates.domain.renderfiles
 ----------------------------------
 
@@ -139,6 +132,13 @@ cutty.filesystems.adapters.git
    :members:
 
 
+cutty.filesystems.adapters.zip
+------------------------------
+
+.. automodule:: cutty.filesystems.adapters.zip
+   :members:
+
+
 cutty.repositories.domain.repositories
 --------------------------------------
 
@@ -160,10 +160,31 @@ cutty.repositories.domain.loader
    :members:
 
 
-cutty.repositories.adapters.git.repositories
---------------------------------------------
+cutty.repositories.adapters.directory
+-------------------------------------
 
-.. automodule:: cutty.repositories.adapters.git.repositories
+.. automodule:: cutty.repositories.adapters.directory
+   :members:
+
+
+cutty.repositories.adapters.zip
+-------------------------------
+
+.. automodule:: cutty.repositories.adapters.zip
+   :members:
+
+
+cutty.repositories.adapters.git
+-------------------------------
+
+.. automodule:: cutty.repositories.adapters.git
+   :members:
+
+
+cutty.repositories.adapters.mercurial
+-------------------------------------
+
+.. automodule:: cutty.repositories.adapters.mercurial
    :members:
 
 
