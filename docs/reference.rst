@@ -104,10 +104,10 @@ cutty.filesystem.domain.pure
    :members:
 
 
-cutty.filesystem.domain.base
-----------------------------
+cutty.filesystem.domain.filesystem
+----------------------------------
 
-.. automodule:: cutty.filesystem.domain.base
+.. automodule:: cutty.filesystem.domain.filesystem
    :members:
 
 
