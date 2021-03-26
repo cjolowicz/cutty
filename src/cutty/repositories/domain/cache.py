@@ -15,8 +15,8 @@ from yarl import URL
 
 
 @dataclass
-class Entry:
-    """Repository cache entry."""
+class CacheRecord:
+    """Record describing the storage entry for a repository."""
 
     path: pathlib.Path
     url: URL
@@ -26,8 +26,8 @@ class Entry:
     )
 
     @classmethod
-    def load(cls, path: pathlib.Path) -> Entry:
-        """Deserialize a JSON file to an Entry instance."""
+    def load(cls, path: pathlib.Path) -> CacheRecord:
+        """Deserialize a JSON file to a CacheRecord instance."""
         text = (path / "entry.json").read_text()
         data = json.loads(text)
         return cls(
@@ -71,39 +71,39 @@ class RepositoryCache:
         self.path = path
         self.path.mkdir(parents=True, exist_ok=True)
 
-    def _getentrypath(self, url: URL) -> pathlib.Path:
-        """Return the path to the entry."""
+    def _getrepositorypath(self, url: URL) -> pathlib.Path:
+        """Return the path to the repository."""
         hash = hashurl(url)
         return self.path / "entries" / hash[:2] / hash
 
-    def get(self, url: URL) -> Optional[Entry]:
+    def get(self, url: URL) -> Optional[CacheRecord]:
         """Retrieve storage for a repository."""
-        path = self._getentrypath(url)
+        path = self._getrepositorypath(url)
         if not path.exists():
             return None
 
-        entry = Entry.load(path)
-        entry.touch(path)
-        return entry
+        record = CacheRecord.load(path)
+        record.touch(path)
+        return record
 
-    def allocate(self, url: URL, provider: str) -> Entry:
+    def allocate(self, url: URL, provider: str) -> CacheRecord:
         """Allocate storage for a repository."""
-        path = self._getentrypath(url)
+        path = self._getrepositorypath(url)
         path.mkdir(parents=True)
 
-        entry = Entry(path, url, provider)
-        entry.dump(path)
-        return entry
+        record = CacheRecord(path, url, provider)
+        record.dump(path)
+        return record
 
-    def list(self) -> Iterator[Entry]:
+    def list(self) -> Iterator[CacheRecord]:
         """Return the list of storage entries."""
         root = self.path / "entries"
         for directory in root.iterdir():
             for path in directory.iterdir():
-                yield Entry.load(path)
+                yield CacheRecord.load(path)
 
     def clean(self, cutoff: datetime.datetime) -> None:
         """Remove storage entries older than the given timestamp."""
-        for entry in self.list():
-            if entry.updated < cutoff:
-                shutil.rmtree(entry.path)
+        for record in self.list():
+            if record.updated < cutoff:
+                shutil.rmtree(record.path)

@@ -82,10 +82,10 @@ class RepositoryLoader:
         wantupdate: bool = True,
     ) -> Path:
         """Load a tree from the cache."""
-        entry = self.cache.get(url)
+        record = self.cache.get(url)
 
-        if entry is not None:
-            providers = {entry.provider}
+        if record is not None:
+            providers = {record.provider}
 
         provider = next(
             provider
@@ -93,10 +93,10 @@ class RepositoryLoader:
             if (not providers or provider.type in providers) and provider.supports(url)
         )
 
-        if entry is None:
-            entry = self.cache.allocate(url, provider.type)
+        if record is None:
+            record = self.cache.allocate(url, provider.type)
 
-        repository = provider(url, entry.path)
+        repository = provider(url, record.path)
 
         if not repository.exists():
             repository.download()
