@@ -5,9 +5,11 @@ import urllib.request
 from typing import Optional
 
 import httpx
+from yarl import URL
 
 from cutty.filesystems.adapters.zip import ZipFilesystem
 from cutty.repositories.domain.repositories import LocalRepository
+from cutty.repositories.domain.repositories import Repository
 
 
 class LocalZipRepository(LocalRepository):
@@ -43,10 +45,11 @@ def download(url: URL, path: pathlib.Path) -> None:
 
     elif url.scheme == "ftp":
         with urllib.request.urlopen(str(url)) as response:  # noqa: S310
-            if 400 <= response.status <= 599:
-                raise RuntimeError(f"download failed: {url}: {response.status}")
+            status: int = response.status  # type: ignore[attr-defined]
+            if 400 <= status <= 599:
+                raise RuntimeError(f"download failed: {url}: {status}")
             with path.open(mode="wb") as io:
-                shutil.copyfileobj(response, io)
+                shutil.copyfileobj(response, io)  # type: ignore[arg-type]
 
 
 class ZipRepository(Repository):
@@ -81,7 +84,7 @@ class ZipRepository(Repository):
         self.repositorypath.unlink()
         self.download()
 
-    def resolve(self, revision: Optional[str]) -> Filesystem:
+    def resolve(self, revision: Optional[str]) -> ZipFilesystem:
         """Return a filesystem for the given revision."""
         if revision is not None:
             raise RuntimeError(
