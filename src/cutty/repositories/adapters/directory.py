@@ -15,7 +15,7 @@ class LocalDirectoryRepository(LocalRepository):
     @classmethod
     def supports(cls, path: pathlib.Path) -> bool:
         """Return True if the implementation supports the given path."""
-        return path.exists()
+        return path.is_dir()
 
     def resolve(self, revision: Optional[str]) -> Path:
         """Return a filesystem tree for the given revision."""
