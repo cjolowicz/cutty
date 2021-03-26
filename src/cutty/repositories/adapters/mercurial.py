@@ -80,6 +80,7 @@ class MercurialRepository(Repository):
         a disk filesystem rooted in the working directory. If ``revision`` is
         None, the default branch is used instead.
         """
-        options = ["--rev", revision] if revision is not None else []
-        self.run("update", *options, cwd=self.repositorypath)
+        if revision is None:
+            revision = "default"
+        self.run("update", "--rev", revision, cwd=self.repositorypath)
         return DiskFilesystem(self.repositorypath)
