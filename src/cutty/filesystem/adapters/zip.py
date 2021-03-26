@@ -1,11 +1,27 @@
 """Filesystem implementation for ZIP archives using zipfile."""
 import pathlib
+import stat
 import zipfile
 from collections.abc import Iterator
 
 from cutty.filesystem.domain.base import Access
 from cutty.filesystem.domain.base import Filesystem
 from cutty.filesystem.domain.pure import PurePath
+
+
+def _fromaccess(access: Access) -> int:
+    mapping = {
+        Access.READ: stat.S_IRUSR,
+        Access.WRITE: stat.S_IWUSR,
+        Access.EXECUTE: stat.S_IXUSR,
+    }
+    return sum(mapping[flag] for flag in Access if flag in access)
+
+
+def _getfilemode(zippath: zipfile.ZipPath) -> int:
+    info: zipfile.ZipInfo
+    info = zippath.root.getinfo(zippath.at)  # type: ignore[attr-defined]
+    return info.external_attr >> 16
 
 
 class ZipFilesystem(Filesystem):
@@ -47,13 +63,9 @@ class ZipFilesystem(Filesystem):
 
     def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
-        import stat
-
-        if Access.EXECUTE in mode:
-            name = self.resolve(path).at  # type: ignore[attr-defined]
-            info: zipfile.ZipInfo
-            info = self._root.root.getinfo(name)  # type: ignore[attr-defined]
-            filemode = info.external_attr >> 16
-            return bool(filemode & stat.S_IXUSR)
-
-        return False
+        zippath = self.resolve(path)
+        return (
+            bool(_getfilemode(zippath) & _fromaccess(mode))
+            if mode
+            else zippath.exists()
+        )
