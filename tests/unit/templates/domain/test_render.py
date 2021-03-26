@@ -1,7 +1,7 @@
 """Unit tests for cutty.templates.domain.render."""
 import pytest
 
-from cutty.filesystem.domain.purepath import PurePath
+from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
 

@@ -2,8 +2,8 @@
 import pathlib
 from typing import Optional
 
-from cutty.filesystem.adapters.zip import ZipFilesystem
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.adapters.zip import ZipFilesystem
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.repositories import LocalRepository
 
 

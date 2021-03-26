@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
 
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer

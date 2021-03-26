@@ -3,9 +3,9 @@ import pathlib
 
 import pytest
 
-from cutty.filesystem.adapters.disk import DiskFilesystem
-from cutty.filesystem.domain.filesystem import Filesystem
-from cutty.filesystem.domain.path import Path
+from cutty.filesystems.adapters.disk import DiskFilesystem
+from cutty.filesystems.domain.filesystem import Filesystem
+from cutty.filesystems.domain.path import Path
 
 
 @pytest.fixture

@@ -1,1 +1,1 @@
-"""Unit tests for cutty.filesystem.adapters."""
+"""Unit tests for cutty.filesystems.adapters."""
