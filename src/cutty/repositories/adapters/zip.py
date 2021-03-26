@@ -1,4 +1,7 @@
 """Repository based on a zip archive."""
+import pathlib
+from typing import Optional
+
 from cutty.filesystem.adapters.zip import ZipFilesystem
 from cutty.filesystem.domain.path import Path
 from cutty.repositories.domain.repositories import LocalRepository
