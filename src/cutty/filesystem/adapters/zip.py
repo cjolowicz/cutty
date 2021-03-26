@@ -18,7 +18,7 @@ def _fromaccess(access: Access) -> int:
     return sum(mapping[flag] for flag in Access if flag in access)
 
 
-def _getfilemode(zippath: zipfile.ZipPath) -> int:
+def _getfilemode(zippath: zipfile.Path) -> int:
     info: zipfile.ZipInfo
     info = zippath.root.getinfo(zippath.at)  # type: ignore[attr-defined]
     return info.external_attr >> 16
