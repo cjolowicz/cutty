@@ -2,8 +2,8 @@
 import pytest
 
 from cutty.filesystem.adapters.dict import DictFilesystem
-from cutty.filesystem.domain.base import Access
-from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.filesystem import Access
+from cutty.filesystem.domain.filesystem import Filesystem
 from cutty.filesystem.domain.path import Path
 from cutty.filesystem.domain.pure import PurePath
 

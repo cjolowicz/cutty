@@ -4,7 +4,7 @@ import pathlib
 import pytest
 
 from cutty.filesystem.adapters.disk import DiskFilesystem
-from cutty.filesystem.domain.base import Filesystem
+from cutty.filesystem.domain.filesystem import Filesystem
 from cutty.filesystem.domain.path import Path
 
 
