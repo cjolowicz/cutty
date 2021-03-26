@@ -15,6 +15,7 @@ from cutty.repositories.adapters.directory import LocalDirectoryRepository
 from cutty.repositories.adapters.git import GitRepository
 from cutty.repositories.adapters.git import LocalGitRepository
 from cutty.repositories.adapters.zip import LocalZipRepository
+from cutty.repositories.adapters.zip import ZipRepository
 from cutty.repositories.domain.loader import RepositoryLoader
 from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import binddefault
@@ -38,7 +39,7 @@ def main(
     """Generate a project from a Cookiecutter template."""
     loader = RepositoryLoader(
         cachedir=pathlib.Path(appdirs.user_cache_dir("cutty")),
-        remote=[GitRepository],
+        remote=[GitRepository, ZipRepository],
         local=[LocalGitRepository, LocalZipRepository, LocalDirectoryRepository],
     )
 
