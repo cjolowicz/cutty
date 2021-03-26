@@ -14,7 +14,10 @@ def _fromaccess(access: Access) -> int:
         Access.WRITE: os.W_OK,
         Access.EXECUTE: os.X_OK,
     }
-    return sum(mapping[flag] for flag in Access if flag in access)
+    return sum(
+        [mapping[flag] for flag in Access if flag and flag in access],
+        start=os.F_OK,
+    )
 
 
 class DiskFilesystem(Filesystem):
