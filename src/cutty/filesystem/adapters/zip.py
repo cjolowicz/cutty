@@ -15,7 +15,7 @@ def _fromaccess(access: Access) -> int:
         Access.WRITE: stat.S_IWUSR,
         Access.EXECUTE: stat.S_IXUSR,
     }
-    return sum(mapping[flag] for flag in Access if flag in access)
+    return sum([mapping[flag] for flag in Access if flag and flag in access])
 
 
 def _getfilemode(zippath: zipfile.Path) -> int:
@@ -64,7 +64,7 @@ class ZipFilesystem(Filesystem):
     def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
         zippath = self.resolve(path)
-        return (
+        return zippath.exists() and (
             bool(_getfilemode(zippath) & _fromaccess(mode))
             if mode
             else zippath.exists()
