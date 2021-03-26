@@ -5,7 +5,7 @@ from cutty.filesystem.adapters.dict import DictFilesystem
 from cutty.filesystem.domain.filesystem import Access
 from cutty.filesystem.domain.filesystem import Filesystem
 from cutty.filesystem.domain.path import Path
-from cutty.filesystem.domain.pure import PurePath
+from cutty.filesystem.domain.purepath import PurePath
 
 
 @pytest.fixture

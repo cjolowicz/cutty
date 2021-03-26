@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from cutty.filesystem.domain.filesystem import Access
 from cutty.filesystem.domain.path import Path
-from cutty.filesystem.domain.pure import PurePath
+from cutty.filesystem.domain.purepath import PurePath
 
 
 class Mode(enum.Flag):
