@@ -97,10 +97,10 @@ cutty.templates.adapters.disk.files
    :members:
 
 
-cutty.filesystem.domain.pure
-----------------------------
+cutty.filesystem.domain.purepath
+--------------------------------
 
-.. automodule:: cutty.filesystem.domain.pure
+.. automodule:: cutty.filesystem.domain.purepath
    :members:
 
 

@@ -3,7 +3,7 @@ import abc
 import enum
 from collections.abc import Iterator
 
-from cutty.filesystem.domain.pure import PurePath
+from cutty.filesystem.domain.purepath import PurePath
 
 
 class Access(enum.Flag):

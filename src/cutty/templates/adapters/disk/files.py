@@ -4,7 +4,7 @@ from __future__ import annotations
 import pathlib
 from collections.abc import Iterable
 
-from cutty.filesystem.domain.pure import PurePath
+from cutty.filesystem.domain.purepath import PurePath
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
 

@@ -5,7 +5,7 @@ from collections.abc import Iterator
 
 from cutty.filesystem.domain.filesystem import Access
 from cutty.filesystem.domain.filesystem import Filesystem
-from cutty.filesystem.domain.pure import PurePath
+from cutty.filesystem.domain.purepath import PurePath
 from cutty.util.typeguard_ignore import typeguard_ignore
 
 
