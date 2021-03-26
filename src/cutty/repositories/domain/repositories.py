@@ -7,7 +7,7 @@ from typing import Optional
 
 from yarl import URL
 
-from cutty.filesystems.domain.path import Path
+from cutty.filesystems.domain.filesystem import Filesystem
 
 
 class LocalRepository(abc.ABC):
@@ -25,8 +25,8 @@ class LocalRepository(abc.ABC):
         """Return True if the implementation supports the given path."""
 
     @abc.abstractmethod
-    def resolve(self, revision: Optional[str]) -> Path:
-        """Return a filesystem tree for the given revision."""
+    def resolve(self, revision: Optional[str]) -> Filesystem:
+        """Return a filesystem for the given revision."""
 
 
 class Repository(abc.ABC):
@@ -57,5 +57,5 @@ class Repository(abc.ABC):
         """Update the repository at the given path."""
 
     @abc.abstractmethod
-    def resolve(self, revision: Optional[str]) -> Path:
-        """Return a filesystem tree for the given revision."""
+    def resolve(self, revision: Optional[str]) -> Filesystem:
+        """Return a filesystem for the given revision."""

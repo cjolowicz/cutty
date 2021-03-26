@@ -70,7 +70,8 @@ class RepositoryLoader:
         )
 
         repository = provider(path)
-        return repository.resolve(revision)
+        filesystem = repository.resolve(revision)
+        return Path(filesystem=filesystem)
 
     def getremote(
         self,
@@ -102,4 +103,5 @@ class RepositoryLoader:
         elif wantupdate:
             repository.update()
 
-        return repository.resolve(revision)
+        filesystem = repository.resolve(revision)
+        return Path(filesystem=filesystem)
