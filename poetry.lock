@@ -368,6 +368,34 @@ brotli = ["brotlipy (>=0.7.0,<0.8.0)"]
 http2 = ["h2 (>=3.0.0,<4.0.0)"]
 
 [[package]]
+name = "hypothesis"
+version = "6.8.2"
+description = "A library for property-based testing"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+attrs = ">=19.2.0"
+sortedcontainers = ">=2.1.0,<3.0.0"
+
+[package.extras]
+all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=0.25)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "importlib-resources (>=3.3.0)", "importlib-metadata", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
+cli = ["click (>=7.0)", "black (>=19.10b0)"]
+codemods = ["libcst (>=0.3.16)"]
+dateutil = ["python-dateutil (>=1.4)"]
+django = ["pytz (>=2014.1)", "django (>=2.2)"]
+dpcontracts = ["dpcontracts (>=0.4)"]
+ghostwriter = ["black (>=19.10b0)"]
+lark = ["lark-parser (>=0.6.5)"]
+numpy = ["numpy (>=1.9.0)"]
+pandas = ["pandas (>=0.25)"]
+pytest = ["pytest (>=4.6)"]
+pytz = ["pytz (>=2014.1)"]
+redis = ["redis (>=3.0.0)"]
+zoneinfo = ["importlib-resources (>=3.3.0)", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
+
+[[package]]
 name = "identify"
 version = "1.4.21"
 description = "File identification library for Python"
@@ -828,6 +856,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "sortedcontainers"
+version = "2.3.0"
+description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "sphinx"
 version = "3.5.1"
 description = "Python documentation generator"
@@ -1099,7 +1135,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d7e8f8f2aa055e0326be049acf5ac2921852877a53a8d7134d506684aadd4e87"
+content-hash = "513a561520ec7b71a30f69003bfcf30820f066c75215dc6286ecc189cc196fb8"
 
 [metadata.files]
 alabaster = [
@@ -1315,6 +1351,10 @@ httpcore = [
 httpx = [
     {file = "httpx-0.17.1-py3-none-any.whl", hash = "sha256:d379653bd457e8257eb0df99cb94557e4aac441b7ba948e333be969298cac272"},
     {file = "httpx-0.17.1.tar.gz", hash = "sha256:cc2a55188e4b25272d2bcd46379d300f632045de4377682aa98a8a6069d55967"},
+]
+hypothesis = [
+    {file = "hypothesis-6.8.2-py3-none-any.whl", hash = "sha256:ef56e7ffad9f88faece3b2d9f839244188a558bea0e4f5ec455d7748ac4b1334"},
+    {file = "hypothesis-6.8.2.tar.gz", hash = "sha256:284f0c24e3470f7688f223417ad8624e4ae75afe402919942ded6506c8bdf6fb"},
 ]
 identify = [
     {file = "identify-1.4.21-py2.py3-none-any.whl", hash = "sha256:dac33eff90d57164e289fb20bf4e131baef080947ee9bf45efcd0da8d19064bf"},
@@ -1649,6 +1689,10 @@ sniffio = [
 snowballstemmer = [
     {file = "snowballstemmer-2.0.0-py2.py3-none-any.whl", hash = "sha256:209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0"},
     {file = "snowballstemmer-2.0.0.tar.gz", hash = "sha256:df3bac3df4c2c01363f3dd2cfa78cce2840a79b9f1c2d2de9ce8d31683992f52"},
+]
+sortedcontainers = [
+    {file = "sortedcontainers-2.3.0-py2.py3-none-any.whl", hash = "sha256:37257a32add0a3ee490bb170b599e93095eed89a55da91fa9f48753ea12fd73f"},
+    {file = "sortedcontainers-2.3.0.tar.gz", hash = "sha256:59cc937650cf60d677c16775597c89a960658a09cf7c1a668f86e1e4464b10a1"},
 ]
 sphinx = [
     {file = "Sphinx-3.5.1-py3-none-any.whl", hash = "sha256:e90161222e4d80ce5fc811ace7c6787a226b4f5951545f7f42acf97277bfc35c"},
