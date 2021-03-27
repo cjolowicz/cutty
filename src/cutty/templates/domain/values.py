@@ -26,7 +26,7 @@ def getvaluetype(value: Any) -> ValueType:
     mapping = {
         type(None): ValueType.NULL,
         bool: ValueType.BOOLEAN,
-        float: ValueType.NUMBER,
+        (int, float): ValueType.NUMBER,
         str: ValueType.STRING,
         list: ValueType.ARRAY,
         dict: ValueType.OBJECT,
