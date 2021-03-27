@@ -26,6 +26,16 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.services import render
 
 
+def splitproviders(template: str) -> tuple[str, list[str]]:
+    """Split providers from template URL."""
+    for provider in ("git", "hg"):
+        prefix = f"{provider}+"
+        if template.startswith(prefix):
+            return template.removeprefix(prefix), [provider]
+
+    return template, []
+
+
 def main(
     template: str,
     *,
@@ -50,7 +60,8 @@ def main(
         skip_if_file_exists=skip_if_file_exists,
     )
 
-    path = loader.get(template, revision=checkout)
+    template, providers = splitproviders(template)
+    path = loader.get(template, revision=checkout, providers=providers)
 
     if directory is not None:
         path = path.joinpath(*directory.parts)
