@@ -8,7 +8,6 @@ from cutty.templates.domain.values import Value
 @pytest.mark.parametrize(
     "name,value",
     [
-        ("optional", None),
         ("generate_cli", True),
         ("year", 2021),
         ("pi", 3.14),

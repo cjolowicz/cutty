@@ -14,15 +14,16 @@ from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderFunction
 from cutty.templates.domain.values import getvaluetype
 from cutty.templates.domain.values import Value
+from cutty.templates.domain.values import ValueType
 from cutty.templates.domain.variables import Variable
 
 
 def loadvalue(value: Any) -> Value:
-    """Stringize scalars except None."""
+    """Stringize scalars."""
     if isinstance(value, (bool, int, float)):
         return str(value)
 
-    if isinstance(value, (type(None), str, list, dict)):
+    if isinstance(value, (str, list, dict)):
         return value
 
     raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
@@ -41,10 +42,11 @@ def loadvariable(name: str, value: Value) -> Variable:
             interactive=True,
         )
 
+    valuetype = ValueType.STRING if value is None else getvaluetype(value)
     return Variable(
         name=name,
         description=name,
-        type=getvaluetype(value),
+        type=valuetype,
         default=value,
         choices=(),
         interactive=True,
