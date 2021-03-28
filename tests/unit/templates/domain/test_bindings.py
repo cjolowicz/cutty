@@ -8,9 +8,6 @@ from cutty.templates.domain.values import Value
 @pytest.mark.parametrize(
     "name,value",
     [
-        ("generate_cli", True),
-        ("year", 2021),
-        ("pi", 3.14),
         ("project", "example"),
         ("licenses", ["MIT", "GPLv3"]),
         ("metadata", {"name": "example"}),
