@@ -29,19 +29,21 @@ def loadvalue(value: Any) -> Value:
     raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
 
 
-def loadvariable(name: str, value: Value) -> Variable:
+def loadvariable(name: str, value: Any) -> Variable:
     """Load a variable."""
     if isinstance(value, list):
-        [valuetype] = set(getvaluetype(choice) for choice in value)
+        choices = tuple(loadvalue(choice) for choice in value)
+        [valuetype] = set(getvaluetype(choice) for choice in choices)
         return Variable(
             name=name,
             description=name,
             type=valuetype,
-            default=value[0],
-            choices=tuple(value),
+            default=choices[0],
+            choices=choices,
             interactive=True,
         )
 
+    value = loadvalue(value)
     valuetype = ValueType.STRING if value is None else getvaluetype(value)
     return Variable(
         name=name,
@@ -64,19 +66,17 @@ def loadconfig(template: str, path: Path) -> Config:
 
     data.setdefault("_template", template)
 
-    settings = tuple(
-        Binding(name, loadvalue(value))
-        for name, value in data.items()
-        if name.startswith("_")
+    settings = dict(
+        (name, value) for name, value in data.items() if name.startswith("_")
     )
 
-    bindings = tuple(
-        loadvariable(name, loadvalue(value))
+    variables = tuple(
+        loadvariable(name, value)
         for name, value in data.items()
         if not name.startswith("_")
     )
 
-    return Config(settings, bindings)
+    return Config(settings, variables)
 
 
 def loadpaths(path: Path, config: Config) -> Iterator[Path]:
@@ -99,16 +99,13 @@ def loadhooks(path: Path) -> Iterator[Path]:
                 yield path
 
 
-def asstringlist(settings: Sequence[Binding], name: str) -> list[str]:
+def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
     """Return a setting as a list of strings."""
-    for setting in settings:
-        if setting.name == name:
-            assert isinstance(setting.value, list) and all(  # noqa: S101
-                isinstance(item, str) for item in setting.value
-            )
-            return setting.value
-
-    return []
+    value = settings.get(name, [])
+    assert isinstance(value, list) and all(  # noqa: S101
+        isinstance(item, str) for item in value
+    )
+    return value
 
 
 def loadrenderer(path: Path, config: Config) -> Renderer:
@@ -118,7 +115,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
     jinja = JinjaRenderer.create(
         searchpath=[path],
         context_prefix="cookiecutter",
-        extra_bindings=config.settings,
+        extra_context=config.settings,
         extra_extensions=extensions,
     )
 

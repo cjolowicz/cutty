@@ -1,7 +1,7 @@
 """Configuration."""
 from dataclasses import dataclass
+from typing import Any
 
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.variables import Variable
 
 
@@ -9,5 +9,5 @@ from cutty.templates.domain.variables import Variable
 class Config:
     """Template configuration."""
 
-    settings: tuple[Binding, ...]
+    settings: dict[str, Any]
     variables: tuple[Variable, ...]
