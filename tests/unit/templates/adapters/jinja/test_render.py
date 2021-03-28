@@ -30,13 +30,13 @@ def cookiecutter_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
 
 def test_render(jinja_render: Renderer) -> None:
     """It renders a Jinja template."""
-    variable = Binding("value", 42)
+    variable = Binding("value", "teapot")
     text = jinja_render("{{ value }}", [variable])
-    assert text == "42"
+    assert text == "teapot"
 
 
 def test_render_with_context_prefix(cookiecutter_render: Renderer) -> None:
     """It renders a Jinja template with a context prefix."""
-    variable = Binding("value", 42)
+    variable = Binding("value", "teapot")
     text = cookiecutter_render("{{ cookiecutter.value }}", [variable])
-    assert text == "42"
+    assert text == "teapot"
