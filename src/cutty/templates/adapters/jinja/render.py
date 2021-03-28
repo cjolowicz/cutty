@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import contextlib
-import itertools
 from collections.abc import Callable
 from collections.abc import Iterable
+from typing import Any
 from typing import Optional
 
 import jinja2
@@ -68,7 +68,7 @@ class JinjaRenderer:
         *,
         searchpath: Iterable[Path],
         context_prefix: Optional[str] = None,
-        extra_bindings: Iterable[Binding] = (),
+        extra_context: Optional[dict[str, Any]] = None,
         extra_extensions: Iterable[str] = (),
     ) -> JinjaRenderer:
         """Create a renderer using Jinja."""
@@ -81,7 +81,7 @@ class JinjaRenderer:
         return cls(
             environment,
             context_prefix=context_prefix,
-            extra_bindings=extra_bindings,
+            extra_context=extra_context,
         )
 
     def __init__(
@@ -89,22 +89,20 @@ class JinjaRenderer:
         environment: jinja2.Environment,
         *,
         context_prefix: Optional[str] = None,
-        extra_bindings: Iterable[Binding] = (),
+        extra_context: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize."""
         self.environment = environment
         self.context_prefix = context_prefix
-        self.extra_bindings = tuple(extra_bindings)
+        self.extra_context = extra_context or {}
 
     def __call__(
         self, text: str, bindings: Iterable[Binding], render: RenderFunction[T]
     ) -> str:
         """Render the text."""
         template = self.environment.from_string(text)
-        context = {
-            variable.name: variable.value
-            for variable in itertools.chain(self.extra_bindings, bindings)
-        }
+        context = {binding.name: binding.value for binding in bindings}
+        context.update(self.extra_context)
 
         if self.context_prefix is not None:
             context = {self.context_prefix: context}
