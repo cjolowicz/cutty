@@ -23,7 +23,7 @@ def loadvalue(value: Any) -> Value:
     if isinstance(value, (bool, int, float)):
         return str(value)
 
-    if isinstance(value, (str, list, dict)):
+    if isinstance(value, (str, dict)):
         return value
 
     raise RuntimeError(f"unsupported value type {type(value)}")  # pragma: no cover
