@@ -5,7 +5,7 @@ from typing import TypeVar
 from typing import Union
 
 
-Value = Union[None, bool, int, float, str, list, dict]
+Value = Union[bool, int, float, str, list, dict]
 ValueT = TypeVar("ValueT", bound=Value)
 ValueT_co = TypeVar("ValueT_co", bound=Value, covariant=True)
 
@@ -13,7 +13,6 @@ ValueT_co = TypeVar("ValueT_co", bound=Value, covariant=True)
 class ValueType(str, Enum):
     """The kinds of values a template variable can hold."""
 
-    NULL = "null"
     BOOLEAN = "boolean"
     NUMBER = "number"
     STRING = "string"
@@ -24,9 +23,9 @@ class ValueType(str, Enum):
 def getvaluetype(value: Any) -> ValueType:
     """Return the appropriate value type for the value."""
     mapping = {
-        type(None): ValueType.NULL,
         bool: ValueType.BOOLEAN,
-        (int, float): ValueType.NUMBER,
+        int: ValueType.NUMBER,
+        float: ValueType.NUMBER,
         str: ValueType.STRING,
         list: ValueType.ARRAY,
         dict: ValueType.OBJECT,

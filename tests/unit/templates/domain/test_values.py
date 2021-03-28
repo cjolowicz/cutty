@@ -10,12 +10,7 @@ from cutty.templates.domain.values import getvaluetype
 from cutty.templates.domain.values import ValueType
 
 
-Scalar = Union[None, bool, int, float, str]
-
-
-def test_getvaluetype_null() -> None:
-    """It is NULL."""
-    assert getvaluetype(None) is ValueType.NULL
+Scalar = Union[bool, int, float, str]
 
 
 @given(value=infer)
