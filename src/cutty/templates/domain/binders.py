@@ -1,10 +1,10 @@
 """Binding variables."""
 from collections.abc import Callable
 from collections.abc import Sequence
+from typing import Any
 
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.values import Value
 from cutty.templates.domain.variables import validate
 from cutty.templates.domain.variables import Variable
 
@@ -13,7 +13,7 @@ Binder = Callable[[Variable], Binding]
 RenderBinder = Callable[[Renderer, Sequence[Variable]], Sequence[Binding]]
 
 
-def bind(variable: Variable, value: Value) -> Binding:
+def bind(variable: Variable, value: Any) -> Binding:
     """Bind a variable to a value."""
     validate(value, variable)
     return Binding(variable.name, value)
