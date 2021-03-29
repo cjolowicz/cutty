@@ -1,8 +1,9 @@
 """Unit tests for the bindings module."""
+from typing import Any
+
 import pytest
 
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.values import Value
 
 
 @pytest.mark.parametrize(
@@ -13,7 +14,7 @@ from cutty.templates.domain.values import Value
         ("metadata", {"name": "example"}),
     ],
 )
-def test_binding(name: str, value: Value) -> None:
+def test_binding(name: str, value: Any) -> None:
     """It contains a name and value."""
     binding = Binding(name, value)
     assert binding.name == name

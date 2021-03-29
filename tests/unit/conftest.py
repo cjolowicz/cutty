@@ -2,7 +2,6 @@
 import pytest
 
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.values import ValueType
 from cutty.templates.domain.variables import GenericVariable
 from cutty.util.bus import Bus
 
@@ -31,7 +30,7 @@ def variable() -> GenericVariable[str]:
     return GenericVariable(
         name="project",
         description="The name of the project",
-        type=ValueType.STRING,
+        type=str,
         default="example",
         choices=(),
         interactive=True,

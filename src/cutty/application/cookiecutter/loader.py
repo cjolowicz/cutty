@@ -12,13 +12,10 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderFunction
-from cutty.templates.domain.values import getvaluetype
-from cutty.templates.domain.values import Value
-from cutty.templates.domain.values import ValueType
 from cutty.templates.domain.variables import Variable
 
 
-def loadvalue(value: Any) -> Value:
+def loadvalue(value: Any) -> Any:
     """Stringize scalars."""
     if isinstance(value, (bool, int, float)):
         return str(value)
@@ -33,7 +30,7 @@ def loadvariable(name: str, value: Any) -> Variable:
     """Load a variable."""
     if isinstance(value, list):
         choices = tuple(loadvalue(choice) for choice in value)
-        [valuetype] = set(getvaluetype(choice) for choice in choices)
+        [valuetype] = set(type(choice) for choice in choices)
         return Variable(
             name=name,
             description=name,
@@ -44,11 +41,10 @@ def loadvariable(name: str, value: Any) -> Variable:
         )
 
     value = loadvalue(value)
-    valuetype = ValueType.STRING if value is None else getvaluetype(value)
     return Variable(
         name=name,
         description=name,
-        type=valuetype,
+        type=type(value),
         default=value,
         choices=(),
         interactive=True,

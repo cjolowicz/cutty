@@ -1,5 +1,6 @@
 """Console prompts implemented using the click package."""
 import json
+from typing import Any
 from typing import Optional
 
 import click
@@ -7,17 +8,15 @@ import click
 from cutty.templates.domain.binders import bind
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.values import Value
-from cutty.templates.domain.values import ValueType
 from cutty.templates.domain.variables import Variable
 
 
 def textprompt(variable: Variable) -> Binding:
     """Prompt for name and return the entered value or given default."""
     # typeshed incorrectly requires Optional[str] for `default`
-    value: Value = click.prompt(
+    value = click.prompt(
         variable.name,
-        default=variable.default,  # type: ignore[arg-type]
+        default=variable.default,
     )
     return bind(variable, value)
 
@@ -47,7 +46,7 @@ def choiceprompt(variable: Variable) -> Binding:
 
 def jsonprompt(variable: Variable) -> Binding:
     """Prompt to provide a dictionary of data."""
-    value: Value = click.prompt(
+    value = click.prompt(
         variable.name,
         default="default",
         type=click.STRING,
@@ -60,12 +59,12 @@ def jsonprompt(variable: Variable) -> Binding:
     return bind(variable, value)
 
 
-def _load_json_dict(value: Optional[str]) -> dict[str, Value]:
+def _load_json_dict(value: Optional[str]) -> dict[str, Any]:
     """Load entered value as a JSON dict."""
     assert value is not None  # noqa: S101
 
     try:
-        result: Value = json.loads(value)
+        result = json.loads(value)
     except Exception as error:
         raise click.UsageError(f"unable to decode to JSON: {error}")
 
@@ -83,7 +82,7 @@ def prompt(variable: Variable) -> Binding:
     if variable.choices:
         return choiceprompt(variable)
 
-    if variable.type is ValueType.OBJECT:
+    if issubclass(variable.type, dict):
         return jsonprompt(variable)
 
     return textprompt(variable)

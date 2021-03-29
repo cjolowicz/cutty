@@ -9,7 +9,6 @@ from cutty.templates.adapters.click.binders import prompt
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.values import ValueType
 from cutty.templates.domain.variables import GenericVariable
 
 
@@ -31,7 +30,7 @@ def test_noop_prompt(render: Renderer) -> None:
     variable = GenericVariable(
         name="project",
         description="The name of the project",
-        type=ValueType.STRING,
+        type=str,
         default="example",
         choices=(),
         interactive=False,
@@ -67,7 +66,7 @@ def test_choices_prompt(
     variable = GenericVariable(
         name="project",
         description="The name of the project",
-        type=ValueType.STRING,
+        type=str,
         default="example",
         choices=("example", "awesome-project"),
         interactive=True,
@@ -97,7 +96,7 @@ def test_json_prompt(
     variable = GenericVariable(
         name="metadata",
         description="metadata",
-        type=ValueType.OBJECT,
+        type=dict,
         default={"name": "example"},
         choices=(),
         interactive=True,
@@ -118,7 +117,7 @@ def test_json_prompt_empty(
     variable = GenericVariable(
         name="metadata",
         description="metadata",
-        type=ValueType.OBJECT,
+        type=dict,
         default={"name": "example"},
         choices=(),
         interactive=True,
@@ -139,7 +138,7 @@ def test_json_prompt_invalid(
     variable = GenericVariable(
         name="metadata",
         description="metadata",
-        type=ValueType.OBJECT,
+        type=dict,
         default={"name": "example"},
         choices=(),
         interactive=True,
