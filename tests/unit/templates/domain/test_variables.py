@@ -5,11 +5,6 @@ from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import GenericVariable
 
 
-def test_render(variable: GenericVariable[str], render: Renderer) -> None:
-    """It renders the variable."""
-    assert variable == render(variable, [])
-
-
 def test_renderbind_with_binddefault(
     variable: GenericVariable[str], render: Renderer
 ) -> None:
