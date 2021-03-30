@@ -6,13 +6,6 @@ Reference
     :backlinks: none
 
 
-cutty.templates.domain.values
------------------------------
-
-.. automodule:: cutty.templates.domain.values
-   :members:
-
-
 cutty.templates.domain.bindings
 -------------------------------
 
