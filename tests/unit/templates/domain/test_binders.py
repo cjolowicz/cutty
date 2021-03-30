@@ -1,4 +1,4 @@
-"""Unit tests for cutty.templates.domain.variables."""
+"""Unit tests for cutty.templates.domain.binders."""
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.render import Renderer
