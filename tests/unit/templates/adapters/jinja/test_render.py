@@ -5,9 +5,25 @@ import pytest
 
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
+from cutty.templates.adapters.jinja.render import import_object
 from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
+
+
+@pytest.mark.parametrize(
+    "import_path",
+    [
+        "json",
+        "os.path",
+        "xml.sax",
+        "xml.sax.saxutils:escape",
+        "xml.sax.saxutils.escape",
+    ],
+)
+def test_import_object(import_path: str) -> None:
+    """It imports the object."""
+    assert import_object(import_path)
 
 
 @pytest.fixture
