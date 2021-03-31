@@ -5,6 +5,7 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import Any
 
+from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.domain.bindings import Binding
@@ -106,13 +107,15 @@ def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
 
 def loadrenderer(path: Path, config: Config) -> Renderer:
     """Create renderer."""
-    extensions = asstringlist(config.settings, "_extensions")
     copy_without_render = asstringlist(config.settings, "_copy_without_render")
+    extensions = DEFAULT_EXTENSIONS[:]
+    extensions.extend(asstringlist(config.settings, "_extensions"))
+
     jinja = JinjaRenderer.create(
         searchpath=[path],
         context_prefix="cookiecutter",
         extra_context=config.settings,
-        extra_extensions=extensions,
+        extensions=extensions,
     )
 
     render = Renderer.create()
