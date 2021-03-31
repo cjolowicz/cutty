@@ -1,42 +1,13 @@
-"""Unit tests for cutty.templates.adapters.jinja.extensions."""
+"""Unit tests for cutty.application.cookiecutter.extensions."""
 import string
 from collections.abc import Callable
 
 import jinja2.ext
 import pytest
 
-from cutty.templates.adapters.jinja import extensions
-
-
-@pytest.mark.parametrize(
-    "import_path",
-    [
-        "json",
-        "os.path",
-        "xml.sax",
-        "xml.sax.saxutils:escape",
-        "xml.sax.saxutils.escape",
-    ],
-)
-def test_import_object(import_path: str) -> None:
-    """It imports the object."""
-    assert extensions.import_object(import_path)
-
-
-def test_load_default() -> None:
-    """It returns something."""
-    assert extensions.load()
-
-
-def test_load_extra() -> None:
-    """It returns something."""
-    assert extensions.load(extra=["jinja2_time.TimeExtension"])
-
-
-def test_load_type_error() -> None:
-    """It raises an error."""
-    with pytest.raises(extensions.TemplateExtensionTypeError):
-        extensions.load(extra=["os.path"])
+from cutty.application.cookiecutter.extensions import JsonifyExtension
+from cutty.application.cookiecutter.extensions import RandomStringExtension
+from cutty.application.cookiecutter.extensions import SlugifyExtension
 
 
 CreateTemplate = Callable[..., jinja2.Template]
@@ -62,7 +33,7 @@ def test_jsonify_extension(create_template: CreateTemplate) -> None:
     """It serializes a value to JSON."""
     template = create_template(
         "{{ value | jsonify }}",
-        extensions=[extensions.JsonifyExtension],
+        extensions=[JsonifyExtension],
     )
     assert template.render(value=42) == "42"
 
@@ -75,7 +46,7 @@ def test_random_string_extension(
     """It creates a random string."""
     template = create_template(
         "{{ random_ascii_string(%d, %s) }}" % (length, punctuation),
-        extensions=[extensions.RandomStringExtension],
+        extensions=[RandomStringExtension],
     )
     text = template.render()
     assert len(text) == length and all(
@@ -87,6 +58,6 @@ def test_slugify_extension(create_template: CreateTemplate) -> None:
     """It slugifies the string."""
     template = create_template(
         "{{ value | slugify }}",
-        extensions=[extensions.SlugifyExtension],
+        extensions=[SlugifyExtension],
     )
     assert template.render(value="path/to/file") == "path-to-file"
