@@ -12,7 +12,6 @@ from cutty.templates.domain.variables import GenericVariable
 @pytest.mark.parametrize(
     "template,expected",
     [
-        (None, None),
         (PurePath("src", "{x}"), PurePath("src", "teapot")),
         (
             File(PurePath("{x}"), Mode.DEFAULT, "{x}"),
@@ -20,11 +19,20 @@ from cutty.templates.domain.variables import GenericVariable
         ),
     ],
 )
-def test_render(render: Renderer, template: object, expected: object) -> None:
+def test_render_valid(render: Renderer, template: object, expected: object) -> None:
     """It renders the template as expected."""
     binding = Binding("x", "teapot")
 
     assert expected == render(template, [binding])
+
+
+@pytest.mark.parametrize("template", [None])
+def test_render_invalid(render: Renderer, template: object) -> None:
+    """It raises NotImplementedError."""
+    binding = Binding("x", "teapot")
+
+    with pytest.raises(NotImplementedError):
+        render(template, [binding])
 
 
 def test_render_variable(render: Renderer, variable: GenericVariable[str]) -> None:

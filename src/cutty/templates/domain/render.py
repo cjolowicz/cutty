@@ -78,7 +78,7 @@ class Renderer:
 
         @functools.singledispatch
         def _render(value: T, bindings: Sequence[Binding]) -> T:
-            return value
+            raise NotImplementedError(f"no renderer registered for {type(value)}")
 
         self._render = _render
 
