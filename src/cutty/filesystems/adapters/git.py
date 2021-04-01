@@ -20,13 +20,16 @@ class GitFilesystem(Filesystem):
 
     def resolve(self, path: PurePath) -> pygit2.Object:
         """Resolve the given path."""
-        return functools.reduce(operator.truediv, path.parts, self.tree)
+        try:
+            return functools.reduce(operator.truediv, path.parts, self.tree)
+        except KeyError:
+            raise FileNotFoundError(f"file not found: {path}")
 
     def is_dir(self, path: PurePath) -> bool:
         """Return True if this is a directory."""
         try:
             return isinstance(self.resolve(path), pygit2.Tree)
-        except KeyError:
+        except FileNotFoundError:
             return False
 
     def iterdir(self, path: PurePath) -> Iterator[PurePath]:
@@ -40,7 +43,7 @@ class GitFilesystem(Filesystem):
         """Return True if this is a regular file (or a symlink to one)."""
         try:
             return isinstance(self.resolve(path), pygit2.Blob)
-        except KeyError:
+        except FileNotFoundError:
             return False
 
     def read_text(self, path: PurePath) -> str:
@@ -54,7 +57,7 @@ class GitFilesystem(Filesystem):
         """Return True if this is a symbolic link."""
         try:
             blob = self.resolve(path)
-        except KeyError:
+        except FileNotFoundError:
             return False
 
         return (
@@ -68,7 +71,12 @@ class GitFilesystem(Filesystem):
 
     def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
-        return (
-            Access.EXECUTE not in mode
-            or self.resolve(path).filemode == pygit2.GIT_FILEMODE_BLOB_EXECUTABLE
-        )
+        try:
+            obj = self.resolve(path)
+        except FileNotFoundError:
+            return False
+        else:
+            return (
+                Access.EXECUTE not in mode
+                or obj.filemode == pygit2.GIT_FILEMODE_BLOB_EXECUTABLE
+            )
