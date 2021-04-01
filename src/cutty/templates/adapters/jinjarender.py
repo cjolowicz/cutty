@@ -13,8 +13,7 @@ import jinja2
 
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.render import RenderContinuation
-from cutty.templates.domain.render import RenderFunction
+from cutty.templates.domain.render import GenericRenderFunction
 from cutty.util.reraise import reraise
 
 
@@ -148,7 +147,7 @@ def createrenderer(
     context_prefix: Optional[str] = None,
     extra_context: Optional[dict[str, Any]] = None,
     extensions: Iterable[Union[str, type[jinja2.ext.Extension]]] = (),
-) -> RenderContinuation[str, Any]:
+) -> GenericRenderFunction[str]:
     """Create a renderer using Jinja."""
     extensions = [
         load_extension(extension) if isinstance(extension, str) else extension
@@ -162,13 +161,8 @@ def createrenderer(
         undefined=jinja2.StrictUndefined,
     )
 
-    render = _JinjaRenderer(
+    return _JinjaRenderer(
         environment,
         context_prefix=context_prefix,
         extra_context=extra_context,
     )
-
-    def _wrapper(text: str, bindings: Iterable[Binding], _: RenderFunction) -> str:
-        return render(text, bindings)
-
-    return _wrapper

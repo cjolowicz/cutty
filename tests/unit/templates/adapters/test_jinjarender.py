@@ -53,33 +53,33 @@ def test_load_extension_invalid(import_path: str) -> None:
         load_extension(import_path)
 
 
-def test_loader_valid(render: Renderer) -> None:
+def test_loader_valid() -> None:
     """It loads from the filesystem."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({"template": "{{ x }}"}))
     render_ = createrenderer(searchpath=[root])
     # Render it twice to trigger Jinja2's caching logic.
     for _ in range(2):
-        text = render_("{% include 'template' %}", [binding], render)
+        text = render_("{% include 'template' %}", [binding])
     assert text == "teapot"
 
 
-def test_loader_invalid(render: Renderer) -> None:
+def test_loader_invalid() -> None:
     """It raises an exception."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({"template": "{{ x }}", "dir": {}}))
     render_ = createrenderer(searchpath=[root])
     with pytest.raises(Exception):
-        render_("{% include 'dir/../template' %}", [binding], render)
+        render_("{% include 'dir/../template' %}", [binding])
 
 
-def test_loader_not_found(render: Renderer) -> None:
+def test_loader_not_found() -> None:
     """It raises an exception."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({}))
     render_ = createrenderer(searchpath=[root])
     with pytest.raises(Exception):
-        render_("{% include 'template' %}", [binding], render)
+        render_("{% include 'template' %}", [binding])
 
 
 @pytest.fixture

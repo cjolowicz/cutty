@@ -38,12 +38,3 @@ def test_render_invalid(render: Renderer, template: object) -> None:
 def test_render_variable(render: Renderer, variable: GenericVariable[str]) -> None:
     """It renders the variable."""
     assert variable == render(variable, [])
-
-
-def test_render_register_unannotated(render: Renderer) -> None:
-    """It raises an exception if the type is not provided."""
-    with pytest.raises(Exception):
-
-        @render.register
-        def render(value, bindings, render):  # type: ignore[no-untyped-def]
-            ...
