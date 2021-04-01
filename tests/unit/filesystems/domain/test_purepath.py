@@ -57,3 +57,16 @@ def test_name(path: PurePath, expected: str) -> None:
 def test_stem(path: PurePath, expected: str) -> None:
     """It returns the final component, minus its last suffix."""
     assert path.stem == expected
+
+
+def test_parents_getitem_slice() -> None:
+    """It returns the expected slice of parents."""
+    path = PurePath("usr", "share", "doc", "python3", "README.rst")
+    assert path.parents[0] == path.parent
+    assert path.parents[1] == path.parent.parent
+    assert path.parents[:2] == (path.parent, path.parent.parent)
+    assert path.parents[-2] == PurePath("usr")
+    assert path.parents[-1] == PurePath()
+    assert path.parents[-2:] == (PurePath("usr"), PurePath())
+    with pytest.raises(IndexError):
+        path.parents[len(path.parts)]
