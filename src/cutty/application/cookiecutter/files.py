@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
-from cutty.templates.adapters.disk.files import DiskFileStorage
+from cutty.templates.adapters.diskfilestorage import DiskFileStorage
 from cutty.templates.domain.files import File
 
 
