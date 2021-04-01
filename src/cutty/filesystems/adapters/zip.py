@@ -1,4 +1,6 @@
 """Filesystem implementation for ZIP archives using zipfile."""
+import functools
+import operator
 import pathlib
 import stat
 import zipfile
@@ -33,11 +35,17 @@ class ZipFilesystem(Filesystem):
 
     def resolve(self, path: PurePath) -> zipfile.Path:
         """Resolve the given path."""
-        return self._root.joinpath(*path.parts)
+        zippath = functools.reduce(operator.truediv, path.parts, self._root)
+        if not zippath.exists():
+            raise FileNotFoundError(f"no such file: {path}")
+        return zippath
 
     def is_dir(self, path: PurePath) -> bool:
         """Return True if this is a directory."""
-        return self.resolve(path).is_dir()
+        try:
+            return self.resolve(path).is_dir()
+        except FileNotFoundError:
+            return False
 
     def iterdir(self, path: PurePath) -> Iterator[PurePath]:
         """Iterate over the files in this directory."""
@@ -47,7 +55,10 @@ class ZipFilesystem(Filesystem):
 
     def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
-        return self.resolve(path).is_file()
+        try:
+            return self.resolve(path).is_file()
+        except FileNotFoundError:
+            return False
 
     def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
@@ -63,9 +74,9 @@ class ZipFilesystem(Filesystem):
 
     def access(self, path: PurePath, mode: Access) -> bool:
         """Return True if the user can access the path."""
-        zippath = self.resolve(path)
-        return zippath.exists() and (
-            bool(_getfilemode(zippath) & _fromaccess(mode))
-            if mode
-            else zippath.exists()
-        )
+        try:
+            zippath = self.resolve(path)
+        except FileNotFoundError:
+            return False
+        else:
+            return not mode or bool(_getfilemode(zippath) & _fromaccess(mode))
