@@ -14,7 +14,6 @@ import jinja2
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import RenderFunction
-from cutty.templates.domain.render import T
 from cutty.util.reraise import reraise
 
 
@@ -158,7 +157,7 @@ class JinjaRenderer:
         self.extra_context = extra_context or {}
 
     def __call__(
-        self, text: str, bindings: Iterable[Binding], render: RenderFunction[T]
+        self, text: str, bindings: Iterable[Binding], render: RenderFunction
     ) -> str:
         """Render the text."""
         template = self.environment.from_string(text)
