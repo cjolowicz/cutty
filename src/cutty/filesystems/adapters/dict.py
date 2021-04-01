@@ -18,6 +18,9 @@ class DictFilesystem(Filesystem):
 
     def lookup(self, path: PurePath) -> Any:
         """Return the filesystem node at the given path."""
+        # Remember the original path for error messages.
+        originalpath = path
+
         # Traversed filesystem nodes, starting at the root.
         nodes = [self.tree]
 
@@ -32,7 +35,10 @@ class DictFilesystem(Filesystem):
                         nodes.pop()
                     continue
 
-                node = nodes[-1][part]
+                try:
+                    node = nodes[-1][part]
+                except KeyError:
+                    raise FileNotFoundError(f"file not found: {originalpath}")
 
                 if isinstance(node, PurePath):
                     node = _lookup(node)
