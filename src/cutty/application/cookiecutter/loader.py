@@ -11,6 +11,7 @@ from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
+from cutty.templates.domain.render import GenericRenderFunction
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderFunction
 from cutty.templates.domain.render import T
@@ -124,7 +125,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
 
     @render.register(list)
     def _(
-        values: list[T], bindings: Sequence[Binding], render: RenderFunction[T]
+        values: list[T], bindings: Sequence[Binding], render: GenericRenderFunction[T]
     ) -> list[T]:
         return [render(value, bindings) for value in values]
 
@@ -132,7 +133,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
     def _(
         mapping: dict[str, T],
         bindings: Sequence[Binding],
-        render: RenderFunction[T],
+        render: GenericRenderFunction[T],
     ) -> dict[str, T]:
         return {
             render(key, bindings): render(value, bindings)
@@ -140,11 +141,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         }
 
     @render.register  # type: ignore[no-redef]
-    def _(
-        file: File,
-        bindings: Sequence[Binding],
-        render: RenderFunction[Any],
-    ) -> File:
+    def _(file: File, bindings: Sequence[Binding], render: RenderFunction) -> File:
         path = render(file.path, bindings)
 
         if any(
