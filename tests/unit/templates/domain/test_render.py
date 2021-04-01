@@ -13,8 +13,6 @@ from cutty.templates.domain.variables import GenericVariable
     "template,expected",
     [
         (None, None),
-        (["green-{x}"], ["green-teapot"]),
-        ({"key": "{x}"}, {"key": "teapot"}),
         (PurePath("src", "{x}"), PurePath("src", "teapot")),
         (
             File(PurePath("{x}"), Mode.DEFAULT, "{x}"),

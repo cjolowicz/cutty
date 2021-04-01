@@ -13,6 +13,7 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderFunction
+from cutty.templates.domain.render import T
 from cutty.templates.domain.variables import Variable
 
 
@@ -121,7 +122,24 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
     render = Renderer.create()
     render.register(str, jinja)
 
-    @render.register
+    @render.register(list)
+    def _(
+        values: list[T], bindings: Sequence[Binding], render: RenderFunction[T]
+    ) -> list[T]:
+        return [render(value, bindings) for value in values]
+
+    @render.register(dict)  # type: ignore[no-redef]
+    def _(
+        mapping: dict[str, T],
+        bindings: Sequence[Binding],
+        render: RenderFunction[T],
+    ) -> dict[str, T]:
+        return {
+            render(key, bindings): render(value, bindings)
+            for key, value in mapping.items()
+        }
+
+    @render.register  # type: ignore[no-redef]
     def _(
         file: File,
         bindings: Sequence[Binding],
