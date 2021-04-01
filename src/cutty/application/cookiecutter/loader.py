@@ -7,7 +7,7 @@ from typing import Any
 
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.jinja.render import JinjaRenderer
+from cutty.templates.adapters.jinja.render import createrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
@@ -113,7 +113,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
     extensions = DEFAULT_EXTENSIONS[:]
     extensions.extend(asstringlist(config.settings, "_extensions"))
 
-    jinja = JinjaRenderer.create(
+    jinja = createrenderer(
         searchpath=[path],
         context_prefix="cookiecutter",
         extra_context=config.settings,

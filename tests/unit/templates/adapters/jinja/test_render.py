@@ -7,8 +7,8 @@ import pytest
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
+from cutty.templates.adapters.jinja.render import createrenderer
 from cutty.templates.adapters.jinja.render import import_object
-from cutty.templates.adapters.jinja.render import JinjaRenderer
 from cutty.templates.adapters.jinja.render import load_extension
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
@@ -57,7 +57,7 @@ def test_loader_valid(render: Renderer) -> None:
     """It loads from the filesystem."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({"template": "{{ x }}"}))
-    render_ = JinjaRenderer.create(searchpath=[root])
+    render_ = createrenderer(searchpath=[root])
     # Render it twice to trigger Jinja2's caching logic.
     for _ in range(2):
         text = render_("{% include 'template' %}", [binding], render)
@@ -68,7 +68,7 @@ def test_loader_invalid(render: Renderer) -> None:
     """It raises an exception."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({"template": "{{ x }}", "dir": {}}))
-    render_ = JinjaRenderer.create(searchpath=[root])
+    render_ = createrenderer(searchpath=[root])
     with pytest.raises(Exception):
         render_("{% include 'dir/../template' %}", [binding], render)
 
@@ -77,7 +77,7 @@ def test_loader_not_found(render: Renderer) -> None:
     """It raises an exception."""
     binding = Binding("x", "teapot")
     root = Path(filesystem=DictFilesystem({}))
-    render_ = JinjaRenderer.create(searchpath=[root])
+    render_ = createrenderer(searchpath=[root])
     with pytest.raises(Exception):
         render_("{% include 'template' %}", [binding], render)
 
@@ -86,7 +86,7 @@ def test_loader_not_found(render: Renderer) -> None:
 def jinja_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
     """Fixture for a Jinja renderer."""
     root = Path(filesystem=DiskFilesystem(tmp_path))
-    render.register(str, JinjaRenderer.create(searchpath=[root]))
+    render.register(str, createrenderer(searchpath=[root]))
     return render
 
 
@@ -95,7 +95,7 @@ def cookiecutter_render(render: Renderer, tmp_path: pathlib.Path) -> Renderer:
     """Fixture for a Jinja renderer with a cookiecutter prefix."""
     root = Path(filesystem=DiskFilesystem(tmp_path))
     render.register(
-        str, JinjaRenderer.create(searchpath=[root], context_prefix="cookiecutter")
+        str, createrenderer(searchpath=[root], context_prefix="cookiecutter")
     )
     return render
 
