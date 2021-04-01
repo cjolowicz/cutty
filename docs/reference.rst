@@ -76,10 +76,10 @@ cutty.application.cookiecutter.prompts
    :members:
 
 
-cutty.templates.adapters.disk.files
------------------------------------
+cutty.templates.adapters.diskfilestorage
+----------------------------------------
 
-.. automodule:: cutty.templates.adapters.disk.files
+.. automodule:: cutty.templates.adapters.diskfilestorage
    :members:
 
 

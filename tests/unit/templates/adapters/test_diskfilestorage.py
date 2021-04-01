@@ -1,4 +1,4 @@
-"""Unit tests for cutty.templates.adapters.disk.files."""
+"""Unit tests for cutty.templates.adapters.diskfilestorage."""
 import os
 import pathlib
 import platform
@@ -6,7 +6,7 @@ import platform
 import pytest
 
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.templates.adapters.disk.files import DiskFileStorage
+from cutty.templates.adapters.diskfilestorage import DiskFileStorage
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
 
