@@ -2,14 +2,12 @@
 from __future__ import annotations
 
 import functools
+import inspect
 from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
-from typing import get_type_hints
-from typing import Optional
 from typing import overload
 from typing import TypeVar
-from typing import Union
 
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
@@ -37,7 +35,7 @@ def rendervariable(
     bindings: Sequence[Binding],
     render: RenderFunction,
 ) -> Variable:
-    """Render a variable."""
+    """Render a variable by rendering its default and choices."""
     return Variable(
         variable.name,
         variable.description,
@@ -53,7 +51,7 @@ def renderpath(
     bindings: Sequence[Binding],
     render: RenderFunction,
 ) -> PurePath:
-    """Render a path."""
+    """Render a path by rendering its parts."""
     return PurePath(*(render(part, bindings) for part in path.parts))
 
 
@@ -62,7 +60,7 @@ def renderfile(
     bindings: Sequence[Binding],
     render: RenderFunction,
 ) -> File:
-    """Render a file."""
+    """Render a file by rendering its path and contents."""
     return File(
         render(file.path, bindings),
         file.mode,
@@ -87,14 +85,14 @@ class Renderer:
         return self._render(value, bindings)
 
     @overload
-    def register(
-        self, __function: RenderContinuation[T, U]
-    ) -> RenderContinuation[T, U]:
-        """Overload for use as ``@render.register``."""
-
-    @overload
     def register(self, __cls: type[T]) -> RenderDecorator[T, U]:
         """Overload for use as ``@render.register(cls)``."""  # noqa: D402
+
+    @overload
+    def register(
+        self, __cls: type[T], __function: GenericRenderFunction[T]
+    ) -> GenericRenderFunction[T]:
+        """Overload for use as ``render.register(cls, function)``."""  # noqa: D402
 
     @overload
     def register(
@@ -102,24 +100,20 @@ class Renderer:
     ) -> RenderContinuation[T, U]:
         """Overload for use as ``render.register(cls, function)``."""  # noqa: D402
 
-    def register(
-        self,
-        cls: Union[type[T], RenderContinuation[T, U]],
-        function: Optional[RenderContinuation[T, U]] = None,
-    ) -> Union[RenderContinuation[T, U], RenderDecorator[T, U]]:
+    def register(self, cls, function=None):  # type: ignore[no-untyped-def]
         """Register a render continuation function."""
         if function is None:
-            if isinstance(cls, type):
-                return lambda function: self.register(cls, function)
+            return lambda function: self.register(cls, function)
 
-            function, cls = cls, next(
-                hint for key, hint in get_type_hints(cls).items() if key != "return"
-            )
+        if len(inspect.signature(function).parameters) == 2:
+            self._render.register(cls, function)
+            return function
 
-        @self._render.register(cls)
-        def _(value: T, bindings: Sequence[Binding]) -> T:
-            assert function is not None  # noqa: S101
-            return function(value, bindings, self)
+        def _callback(value: T, bindings: Sequence[Binding]) -> T:
+            value = function(value, bindings, self)
+            return value
+
+        self._render.register(cls, _callback)
 
         return function
 
