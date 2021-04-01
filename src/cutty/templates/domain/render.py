@@ -82,23 +82,6 @@ class Renderer:
         """Create a renderer with the default behavior."""
         render = cls()
 
-        @render.register(list)
-        def _(
-            values: list[T], bindings: Sequence[Binding], render: RenderFunction[T]
-        ) -> list[T]:
-            return [render(value, bindings) for value in values]
-
-        @render.register(dict)  # type: ignore[no-redef]
-        def _(
-            mapping: dict[str, T],
-            bindings: Sequence[Binding],
-            render: RenderFunction[T],
-        ) -> dict[str, T]:
-            return {
-                render(key, bindings): render(value, bindings)
-                for key, value in mapping.items()
-            }
-
         @render.register(GenericVariable)  # type: ignore[no-redef]
         def _(
             variable: Variable,
