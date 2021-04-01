@@ -4,6 +4,7 @@ from __future__ import annotations
 import functools
 from collections.abc import Callable
 from collections.abc import Sequence
+from typing import Any
 from typing import get_type_hints
 from typing import Optional
 from typing import overload
@@ -19,9 +20,54 @@ from cutty.templates.domain.variables import Variable
 
 T = TypeVar("T")
 U = TypeVar("U")
-RenderFunction = Callable[[T, Sequence[Binding]], T]
-RenderContinuation = Callable[[T, Sequence[Binding], RenderFunction[U]], T]
+
+GenericRenderFunction = Callable[[T, Sequence[Binding]], T]
+RenderFunction = GenericRenderFunction[Any]
+RenderContinuation = Callable[[T, Sequence[Binding], GenericRenderFunction[U]], T]
 RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
+
+
+# Use RenderFunction for the third argument instead of GenericRenderFunction[T],
+# because passing a generic render function does not work with mypy.
+# https://github.com/python/mypy/issues/1317
+
+
+def rendervariable(
+    variable: Variable,
+    bindings: Sequence[Binding],
+    render: RenderFunction,
+) -> Variable:
+    """Render a variable."""
+    return Variable(
+        variable.name,
+        variable.description,
+        variable.type,
+        render(variable.default, bindings),
+        tuple(render(choice, bindings) for choice in variable.choices),
+        variable.interactive,
+    )
+
+
+def renderpath(
+    path: PurePath,
+    bindings: Sequence[Binding],
+    render: RenderFunction,
+) -> PurePath:
+    """Render a path."""
+    return PurePath(*(render(part, bindings) for part in path.parts))
+
+
+def renderfile(
+    file: File,
+    bindings: Sequence[Binding],
+    render: RenderFunction,
+) -> File:
+    """Render a file."""
+    return File(
+        render(file.path, bindings),
+        file.mode,
+        render(file.blob, bindings),
+    )
 
 
 class Renderer:
@@ -82,39 +128,8 @@ class Renderer:
         """Create a renderer with the default behavior."""
         render = cls()
 
-        @render.register(GenericVariable)  # type: ignore[no-redef]
-        def _(
-            variable: Variable,
-            bindings: Sequence[Binding],
-            render: RenderFunction[T],
-        ) -> Variable:
-            return Variable(
-                variable.name,
-                variable.description,
-                variable.type,
-                render(variable.default, bindings),
-                tuple(render(choice, bindings) for choice in variable.choices),
-                variable.interactive,
-            )
-
-        @render.register  # type: ignore[no-redef]
-        def _(
-            path: PurePath,
-            bindings: Sequence[Binding],
-            render: RenderFunction[T],
-        ) -> PurePath:
-            return PurePath(*(render(part, bindings) for part in path.parts))
-
-        @render.register  # type: ignore[no-redef]
-        def _(
-            file: File,
-            bindings: Sequence[Binding],
-            render: RenderFunction[T],
-        ) -> File:
-            return File(
-                render(file.path, bindings),
-                file.mode,
-                render(file.blob, bindings),
-            )
+        render.register(GenericVariable, rendervariable)
+        render.register(PurePath, renderpath)
+        render.register(File, renderfile)
 
         return render
