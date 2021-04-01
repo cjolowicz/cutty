@@ -1,4 +1,6 @@
 """Unit tests for cutty.filesystems.adapters.dict."""
+from typing import Any
+
 import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
@@ -6,6 +8,65 @@ from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+
+
+def test_lookup_curdir() -> None:
+    """It returns the current directory."""
+    tree: dict[str, Any] = {}
+    filesystem = DictFilesystem(tree)
+    path = PurePath(".")
+    assert filesystem.lookup(path) is tree
+
+
+def test_lookup_pardir_normal() -> None:
+    """It returns the parent directory."""
+    tree: dict[str, Any] = {"dir": {"subdir": {}}}
+    filesystem = DictFilesystem(tree)
+    path = PurePath("dir", "subdir", "..")
+    assert filesystem.lookup(path) is tree["dir"]
+
+
+def test_lookup_pardir_root() -> None:
+    """It returns the root directory."""
+    tree: dict[str, Any] = {}
+    filesystem = DictFilesystem(tree)
+    path = PurePath("..")
+    assert filesystem.lookup(path) is tree
+
+
+def test_is_dir_notfound() -> None:
+    """It returns False."""
+    filesystem = DictFilesystem({})
+    path = PurePath("dir")
+    assert not filesystem.is_dir(path)
+
+
+def test_is_file_notfound() -> None:
+    """It returns False."""
+    filesystem = DictFilesystem({})
+    path = PurePath("file")
+    assert not filesystem.is_file(path)
+
+
+def test_is_symlink_notfound() -> None:
+    """It returns False."""
+    filesystem = DictFilesystem({})
+    path = PurePath("file")
+    assert not filesystem.is_symlink(path)
+
+
+def test_access_notfound() -> None:
+    """It returns False."""
+    filesystem = DictFilesystem({})
+    path = PurePath("file")
+    assert not filesystem.access(path, Access.DEFAULT)
+
+
+def test_access_exists() -> None:
+    """It returns True."""
+    filesystem = DictFilesystem({})
+    path = PurePath()
+    assert filesystem.access(path, Access.DEFAULT)
 
 
 @pytest.fixture
