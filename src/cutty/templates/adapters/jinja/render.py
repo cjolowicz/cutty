@@ -13,6 +13,7 @@ import jinja2
 
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.render import RenderContinuation
 from cutty.templates.domain.render import RenderFunction
 from cutty.util.reraise import reraise
 
@@ -114,35 +115,8 @@ class _FilesystemLoader(jinja2.BaseLoader):
         raise jinja2.TemplateNotFound(template)
 
 
-class JinjaRenderer:
+class _JinjaRenderer:
     """Wrapper for a Jinja environment."""
-
-    @classmethod
-    def create(
-        cls,
-        *,
-        searchpath: Iterable[Path],
-        context_prefix: Optional[str] = None,
-        extra_context: Optional[dict[str, Any]] = None,
-        extensions: Iterable[Union[str, type[jinja2.ext.Extension]]] = (),
-    ) -> JinjaRenderer:
-        """Create a renderer using Jinja."""
-        extensions = [
-            load_extension(extension) if isinstance(extension, str) else extension
-            for extension in extensions
-        ]
-
-        environment = jinja2.Environment(  # noqa: S701
-            loader=_FilesystemLoader(searchpath=searchpath),
-            extensions=extensions,
-            keep_trailing_newline=True,
-            undefined=jinja2.StrictUndefined,
-        )
-        return cls(
-            environment,
-            context_prefix=context_prefix,
-            extra_context=extra_context,
-        )
 
     def __init__(
         self,
@@ -156,9 +130,7 @@ class JinjaRenderer:
         self.context_prefix = context_prefix
         self.extra_context = extra_context or {}
 
-    def __call__(
-        self, text: str, bindings: Iterable[Binding], render: RenderFunction
-    ) -> str:
+    def __call__(self, text: str, bindings: Iterable[Binding]) -> str:
         """Render the text."""
         template = self.environment.from_string(text)
         context = {binding.name: binding.value for binding in bindings}
@@ -168,3 +140,35 @@ class JinjaRenderer:
             context = {self.context_prefix: context}
 
         return template.render(context)
+
+
+def createrenderer(
+    *,
+    searchpath: Iterable[Path],
+    context_prefix: Optional[str] = None,
+    extra_context: Optional[dict[str, Any]] = None,
+    extensions: Iterable[Union[str, type[jinja2.ext.Extension]]] = (),
+) -> RenderContinuation[str, Any]:
+    """Create a renderer using Jinja."""
+    extensions = [
+        load_extension(extension) if isinstance(extension, str) else extension
+        for extension in extensions
+    ]
+
+    environment = jinja2.Environment(  # noqa: S701
+        loader=_FilesystemLoader(searchpath=searchpath),
+        extensions=extensions,
+        keep_trailing_newline=True,
+        undefined=jinja2.StrictUndefined,
+    )
+
+    render = _JinjaRenderer(
+        environment,
+        context_prefix=context_prefix,
+        extra_context=extra_context,
+    )
+
+    def _wrapper(text: str, bindings: Iterable[Binding], _: RenderFunction) -> str:
+        return render(text, bindings)
+
+    return _wrapper
