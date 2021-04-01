@@ -33,7 +33,7 @@ class DictFilesystem(Filesystem):
                 if part == "..":
                     if len(nodes) > 1:
                         nodes.pop()
-                    continue
+                    continue  # pragma: no cover
 
                 try:
                     node = nodes[-1][part]
@@ -53,7 +53,7 @@ class DictFilesystem(Filesystem):
         """Return True if this is a directory."""
         try:
             entry = self.lookup(path)
-        except KeyError:
+        except FileNotFoundError:
             return False
         return isinstance(entry, dict)
 
@@ -68,7 +68,7 @@ class DictFilesystem(Filesystem):
         """Return True if this is a regular file (or a symlink to one)."""
         try:
             entry = self.lookup(path)
-        except KeyError:
+        except FileNotFoundError:
             return False
         return isinstance(entry, str)
 
@@ -82,7 +82,7 @@ class DictFilesystem(Filesystem):
         """Return True if this is a symbolic link."""
         try:
             entry = self.lookup(path.parent)[path.name]
-        except KeyError:
+        except (FileNotFoundError, KeyError):
             return False
         return isinstance(entry, PurePath)
 
@@ -97,7 +97,7 @@ class DictFilesystem(Filesystem):
         """Return True if the user can access the path."""
         try:
             self.lookup(path)
-        except KeyError:
+        except FileNotFoundError:
             return False
         if mode & Access.EXECUTE:
             return self.is_dir(path)
