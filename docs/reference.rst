@@ -69,10 +69,10 @@ cutty.templates.adapters.jinja.render
    :members:
 
 
-cutty.templates.adapters.click.binders
+cutty.application.cookiecutter.prompts
 --------------------------------------
 
-.. automodule:: cutty.templates.adapters.click.binders
+.. automodule:: cutty.application.cookiecutter.prompts
    :members:
 
 
