@@ -140,7 +140,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
             for key, value in mapping.items()
         }
 
-    @render.register  # type: ignore[no-redef]
+    @render.register(File)  # type: ignore[no-redef]
     def _(file: File, bindings: Sequence[Binding], render: RenderFunction) -> File:
         path = render(file.path, bindings)
 
