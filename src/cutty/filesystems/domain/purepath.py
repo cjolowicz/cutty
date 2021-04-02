@@ -21,9 +21,9 @@ class PurePath:
         """Initialize."""
         object.__setattr__(self, "parts", parts)
 
-    def _copy(self: PurePathT, path: PurePath) -> PurePathT:
-        """Create a copy of the given path."""
-        return self.__class__(*path.parts)
+    def _withparts(self: PurePathT, *parts: str) -> PurePathT:
+        """Create a path with the given parts."""
+        return self.__class__(*parts)
 
     def __str__(self) -> str:
         """Return a readable representation."""
@@ -48,11 +48,7 @@ class PurePath:
     @property
     def parent(self: PurePathT) -> PurePathT:
         """Return the parent of this path."""
-        if not self.parts:
-            return self
-
-        path = PurePath(*self.parts[:-1])
-        return self._copy(path)
+        return self._withparts(*self.parts[:-1]) if self.parts else self
 
     @property
     def parents(self: PurePathT) -> Sequence[PurePathT]:
@@ -61,8 +57,7 @@ class PurePath:
 
     def joinpath(self: PurePathT, *parts: str) -> PurePathT:
         """Return a path with the parts appended."""
-        path = PurePath(*self.parts, *parts)
-        return self._copy(path)
+        return self._withparts(*self.parts, *parts)
 
 
 class Parents(Sequence[PurePathT]):
@@ -96,4 +91,4 @@ class Parents(Sequence[PurePathT]):
             raise IndexError(index)
 
         parts = self.path.parts[: -(index + 1)]
-        return self.path._copy(PurePath(*parts))
+        return self.path._withparts(*parts)
