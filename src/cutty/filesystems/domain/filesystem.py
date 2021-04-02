@@ -23,7 +23,7 @@ class Filesystem(abc.ABC):
         """Return True if this is a directory."""
 
     @abc.abstractmethod
-    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
+    def iterdir(self, path: PurePath) -> Iterator[str]:
         """Iterate over the files in this directory."""
 
     @abc.abstractmethod

@@ -115,15 +115,14 @@ class NodeFilesystem(Filesystem):
         else:
             return node.is_dir()
 
-    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
+    def iterdir(self, path: PurePath) -> Iterator[str]:
         """Iterate over the files in this directory."""
         node = self.lookup(path)
 
         if not node.is_dir():
             raise NotADirectoryError(f"not a directory: {path}")
 
-        for entry in node.iterdir():
-            yield path / entry
+        yield from node.iterdir()
 
     def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
