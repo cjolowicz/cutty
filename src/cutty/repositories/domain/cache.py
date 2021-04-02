@@ -7,7 +7,6 @@ import json
 import pathlib
 import shutil
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Iterator
 from typing import Optional
 
@@ -21,9 +20,7 @@ class CacheRecord:
     path: pathlib.Path
     url: URL
     provider: str
-    updated: datetime.datetime = field(
-        default_factory=lambda: datetime.datetime.now(tz=datetime.timezone.utc)
-    )
+    updated: datetime.datetime
 
     @classmethod
     def load(cls, path: pathlib.Path) -> CacheRecord:
@@ -46,11 +43,6 @@ class CacheRecord:
         }
         text = json.dumps(data)
         (path / "entry.json").write_text(text)
-
-    def touch(self, path: pathlib.Path) -> None:
-        """Update the timestamp."""
-        self.updated = datetime.datetime.now(tz=datetime.timezone.utc)
-        self.dump(path)
 
 
 def hashurl(url: URL) -> str:
@@ -83,7 +75,9 @@ class RepositoryCache:
             return None
 
         record = CacheRecord.load(path)
-        record.touch(path)
+        record.updated = datetime.datetime.now(tz=datetime.timezone.utc)
+        record.dump(path)
+
         return record
 
     def allocate(self, url: URL, provider: str) -> CacheRecord:
@@ -91,8 +85,10 @@ class RepositoryCache:
         path = self._getrepositorypath(url)
         path.mkdir(parents=True)
 
-        record = CacheRecord(path, url, provider)
+        updated = datetime.datetime.now(tz=datetime.timezone.utc)
+        record = CacheRecord(path, url, provider, updated)
         record.dump(path)
+
         return record
 
     def list(self) -> Iterator[CacheRecord]:
