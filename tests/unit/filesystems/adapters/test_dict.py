@@ -12,26 +12,26 @@ from cutty.filesystems.domain.purepath import PurePath
 
 def test_lookup_curdir() -> None:
     """It returns the current directory."""
-    tree: dict[str, Any] = {}
-    filesystem = DictFilesystem(tree)
+    filesystem = DictFilesystem({"file": ""})
     path = PurePath(".")
-    assert filesystem.lookup(path) is tree
+    [path] = filesystem.iterdir(path)
+    assert path.name == "file"
 
 
 def test_lookup_pardir_normal() -> None:
     """It returns the parent directory."""
-    tree: dict[str, Any] = {"dir": {"subdir": {}}}
-    filesystem = DictFilesystem(tree)
-    path = PurePath("dir", "subdir", "..")
-    assert filesystem.lookup(path) is tree["dir"]
+    filesystem = DictFilesystem({"dir": {}})
+    path = PurePath("dir", "..")
+    [path] = filesystem.iterdir(path)
+    assert path.name == "dir"
 
 
 def test_lookup_pardir_root() -> None:
     """It returns the root directory."""
-    tree: dict[str, Any] = {}
-    filesystem = DictFilesystem(tree)
+    filesystem = DictFilesystem({"file": ""})
     path = PurePath("..")
-    assert filesystem.lookup(path) is tree
+    [path] = filesystem.iterdir(path)
+    assert path.name == "file"
 
 
 def test_is_dir_notfound() -> None:
@@ -69,16 +69,102 @@ def test_access_exists() -> None:
     assert filesystem.access(path, Access.DEFAULT)
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("file", "."),
+        PurePath("file", ".."),
+        PurePath("file", "file"),
+    ],
+    ids=str,
+)
+def test_read_text_not_a_directory(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"file": ""})
+    with pytest.raises(NotADirectoryError):
+        filesystem.read_text(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("dir"),
+        PurePath("."),
+        PurePath(".."),
+        PurePath("link"),
+    ],
+    ids=str,
+)
+def test_read_text_is_a_directory(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"dir": {}, "link": PurePath("dir")})
+    with pytest.raises(IsADirectoryError):
+        filesystem.read_text(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("link", "."),
+        PurePath("link", ".."),
+        PurePath("link", "file"),
+    ],
+    ids=str,
+)
+def test_readlink_not_a_directory(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"file": "", "link": PurePath("file")})
+    with pytest.raises(NotADirectoryError):
+        filesystem.readlink(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath(),
+        PurePath("."),
+        PurePath(".."),
+        PurePath("dir"),
+        PurePath("file"),
+    ],
+    ids=str,
+)
+def test_readlink_not_a_symlink(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"file": "", "dir": {}})
+    with pytest.raises(Exception):
+        filesystem.readlink(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("file"),
+        PurePath("link"),
+    ],
+    ids=str,
+)
+def test_iterdir_not_a_directory(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"file": "", "link": PurePath("file")})
+    with pytest.raises(NotADirectoryError):
+        next(filesystem.iterdir(path))
+
+
 @pytest.fixture
-def filesystem() -> Filesystem:
+def dictionary() -> dict[str, Any]:
+    """Fixture for the dictionary backing a filesystem."""
+    return {
+        "etc": {"passwd": "root:x:0:0:root:/root:/bin/sh"},
+        "root": {".profile": "# .profile\n"},
+        "home": {"root": PurePath("..", "root")},
+    }
+
+
+@pytest.fixture
+def filesystem(dictionary: dict[str, Any]) -> DictFilesystem:
     """Fixture for a filesystem."""
-    return DictFilesystem(
-        {
-            "etc": {"passwd": "root:x:0:0:root:/root:/bin/sh"},
-            "root": {".profile": "# .profile\n"},
-            "home": {"root": PurePath("..", "root")},
-        }
-    )
+    return DictFilesystem(dictionary)
 
 
 @pytest.fixture
@@ -87,10 +173,12 @@ def root(filesystem: Filesystem) -> Path:
     return Path(filesystem=filesystem)
 
 
-def test_hash(root: Path, filesystem: DictFilesystem) -> None:
+def test_hash(
+    root: Path, filesystem: DictFilesystem, dictionary: dict[str, Any]
+) -> None:
     """It returns a hash value."""
     a1 = root / "a"
-    a2 = Path(filesystem=DictFilesystem(filesystem.tree)) / "a"
+    a2 = Path(filesystem=DictFilesystem(dictionary)) / "a"
     assert hash(a1) != hash(a2)
 
 
@@ -134,10 +222,12 @@ def test_cmp_other_type(root: Path) -> None:
         a1 >= a2  # noqa: B015
 
 
-def test_cmp_other_filesystem(root: Path, filesystem: DictFilesystem) -> None:
+def test_cmp_other_filesystem(
+    root: Path, filesystem: DictFilesystem, dictionary: dict[str, Any]
+) -> None:
     """It compares the paths."""
     a1 = root / "a"
-    a2 = Path(filesystem=DictFilesystem(filesystem.tree)) / "a"
+    a2 = Path(filesystem=DictFilesystem(dictionary)) / "a"
 
     assert a1 != a2
     assert a1 != "teapot"
@@ -226,7 +316,7 @@ def test_readlink_good(root: Path) -> None:
 def test_readlink_bad(root: Path) -> None:
     """It raises if the path is not a symbolic link."""
     path = root / "etc"
-    with pytest.raises(ValueError):
+    with pytest.raises(IsADirectoryError):
         path.readlink()
 
 
