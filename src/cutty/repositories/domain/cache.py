@@ -35,7 +35,7 @@ class CacheRecord:
             datetime.datetime.fromisoformat(data["updated"]),
         )
 
-    def dump(self, path: pathlib.Path) -> None:
+    def dump(self) -> None:
         """Serialize the entry to a JSON file."""
         data = {
             "url": str(self.url),
@@ -43,7 +43,7 @@ class CacheRecord:
             "updated": self.updated.isoformat(),
         }
         text = json.dumps(data)
-        (path / "entry.json").write_text(text)
+        (self.path / "entry.json").write_text(text)
 
 
 def hashurl(url: URL) -> str:
@@ -81,7 +81,7 @@ class RepositoryCache:
 
         record = CacheRecord.load(path)
         record.updated = self.timer()
-        record.dump(path)
+        record.dump()
 
         return record
 
@@ -91,7 +91,7 @@ class RepositoryCache:
         path.mkdir(parents=True)
 
         record = CacheRecord(path, url, provider, self.timer())
-        record.dump(path)
+        record.dump()
 
         return record
 
