@@ -37,11 +37,11 @@ class DiskFilesystem(Filesystem):
         """Return True if this is a directory."""
         return self.resolve(path).is_dir()
 
-    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
+    def iterdir(self, path: PurePath) -> Iterator[str]:
         """Iterate over the files in this directory."""
         for child in self.resolve(path).iterdir():
             child = child.relative_to(self._root)
-            yield PurePath(*child.parts)
+            yield child.name
 
     def is_file(self, path: PurePath) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""

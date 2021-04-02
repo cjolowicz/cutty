@@ -29,8 +29,8 @@ class Path(PurePath):
 
     def iterdir(self) -> Iterator[Path]:
         """Iterate over the files in this directory."""
-        for path in self._filesystem.iterdir(self):
-            yield self._copy(path)
+        for entry in self._filesystem.iterdir(self):
+            yield self / entry
 
     def is_file(self) -> bool:
         """Return True if this is a regular file (or a symlink to one)."""
