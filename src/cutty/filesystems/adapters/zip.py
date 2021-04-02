@@ -1,13 +1,12 @@
 """Filesystem implementation for ZIP archives using zipfile."""
-import functools
-import operator
 import pathlib
 import stat
 import zipfile
 from collections.abc import Iterator
 
 from cutty.filesystems.domain.filesystem import Access
-from cutty.filesystems.domain.filesystem import Filesystem
+from cutty.filesystems.domain.nodefs import FilesystemNode
+from cutty.filesystems.domain.nodefs import NodeFilesystem
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -26,57 +25,56 @@ def _getfilemode(zippath: zipfile.Path) -> int:
     return info.external_attr >> 16
 
 
-class ZipFilesystem(Filesystem):
+class ZipFilesystemNode(FilesystemNode):
+    """A node in a ZIP filesystem."""
+
+    def __init__(self, node: zipfile.Path) -> None:
+        """Initialize."""
+        self.node = node
+
+    def is_dir(self) -> bool:
+        """Return True if the node is a directory."""
+        return self.node.is_dir()
+
+    def is_file(self) -> bool:
+        """Return True if the node is a regular file."""
+        return self.node.is_file()
+
+    def is_symlink(self) -> bool:
+        """Return True if the node is a symbolic link."""
+        return False
+
+    def read_text(self) -> str:
+        """Return the file contents."""
+        return self.node.read_text()
+
+    def readlink(self) -> PurePath:
+        """Return the link target."""
+        raise NotImplementedError()  # pragma: no cover
+
+    def iterdir(self) -> Iterator[str]:
+        """Iterate over the directory entries."""
+        for entry in self.node.iterdir():
+            yield entry.name
+
+    def __truediv__(self, entry: str) -> FilesystemNode:
+        """Return the given directory entry."""
+        node = self.node / entry
+
+        if not node.exists():
+            raise FileNotFoundError()
+
+        return ZipFilesystemNode(node)
+
+    def access(self, mode: Access) -> bool:
+        """Return True if the user can access the node."""
+        return not mode or bool(_getfilemode(self.node) & _fromaccess(mode))
+
+
+class ZipFilesystem(NodeFilesystem):
     """ZIP filesystem."""
 
     def __init__(self, path: pathlib.Path) -> None:
         """Inititalize."""
-        self._root = zipfile.Path(path)
-
-    def resolve(self, path: PurePath) -> zipfile.Path:
-        """Resolve the given path."""
-        zippath = functools.reduce(operator.truediv, path.parts, self._root)
-        if not zippath.exists():
-            raise FileNotFoundError(f"no such file: {path}")
-        return zippath
-
-    def is_dir(self, path: PurePath) -> bool:
-        """Return True if this is a directory."""
-        try:
-            return self.resolve(path).is_dir()
-        except FileNotFoundError:
-            return False
-
-    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
-        """Iterate over the files in this directory."""
-        for child in self.resolve(path).iterdir():
-            parts = pathlib.PurePosixPath(child.at).parts  # type: ignore[attr-defined]
-            yield PurePath(*parts)
-
-    def is_file(self, path: PurePath) -> bool:
-        """Return True if this is a regular file (or a symlink to one)."""
-        try:
-            return self.resolve(path).is_file()
-        except FileNotFoundError:
-            return False
-
-    def read_text(self, path: PurePath) -> str:
-        """Return the contents of this file."""
-        return self.resolve(path).read_text()
-
-    def is_symlink(self, path: PurePath) -> bool:
-        """Return True if this is a symbolic link."""
-        return False
-
-    def readlink(self, path: PurePath) -> PurePath:
-        """Return the target of a symbolic link."""
-        raise ValueError(f"{path} is not a symlink")
-
-    def access(self, path: PurePath, mode: Access) -> bool:
-        """Return True if the user can access the path."""
-        try:
-            zippath = self.resolve(path)
-        except FileNotFoundError:
-            return False
-        else:
-            return not mode or bool(_getfilemode(zippath) & _fromaccess(mode))
+        node = zipfile.Path(path)
+        self.root = ZipFilesystemNode(node)
