@@ -1,106 +1,76 @@
 """Git-based filesystem using libgit2."""
-import functools
-import operator
 import pathlib
 from collections.abc import Iterator
 
 import pygit2
 
 from cutty.filesystems.domain.filesystem import Access
-from cutty.filesystems.domain.filesystem import Filesystem
+from cutty.filesystems.domain.nodefs import FilesystemNode
+from cutty.filesystems.domain.nodefs import NodeFilesystem
 from cutty.filesystems.domain.purepath import PurePath
 
 
-class GitFilesystem(Filesystem):
+class GitFilesystemNode(FilesystemNode):
+    """A node in a git filesystem."""
+
+    def __init__(self, node: pygit2.Object) -> None:
+        """Initialize."""
+        self.node = node
+
+    def is_dir(self) -> bool:
+        """Return True if the node is a directory."""
+        return isinstance(self.node, pygit2.Tree)
+
+    def is_file(self) -> bool:
+        """Return True if the node is a regular file."""
+        return (
+            isinstance(self.node, pygit2.Blob)
+            and self.node.filemode != pygit2.GIT_FILEMODE_LINK
+        )
+
+    def is_symlink(self) -> bool:
+        """Return True if the node is a symbolic link."""
+        return (
+            isinstance(self.node, pygit2.Blob)
+            and self.node.filemode == pygit2.GIT_FILEMODE_LINK
+        )
+
+    def read_text(self) -> str:
+        """Return the file contents."""
+        text: str = self.node.data.decode()
+        return text
+
+    def readlink(self) -> PurePath:
+        """Return the link target."""
+        target: str = self.node.data.decode(errors="surrogateescape")
+        parts = pathlib.PurePosixPath(target).parts
+        return PurePath(*parts)
+
+    def iterdir(self) -> Iterator[str]:
+        """Iterate over the directory entries."""
+        for entry in self.node:
+            yield entry.name
+
+    def __truediv__(self, entry: str) -> FilesystemNode:
+        """Return the given directory entry."""
+        try:
+            return GitFilesystemNode(self.node / entry)
+        except KeyError:
+            raise FileNotFoundError()
+
+    def access(self, mode: Access) -> bool:
+        """Return True if the user can access the node."""
+        return (
+            Access.EXECUTE not in mode
+            or self.node.filemode == pygit2.GIT_FILEMODE_BLOB_EXECUTABLE
+        )
+
+
+class GitFilesystem(NodeFilesystem):
     """Git-based filesystem."""
 
     def __init__(self, repository: pathlib.Path, ref: str = "HEAD") -> None:
         """Inititalize."""
-        self.tree = pygit2.Repository(repository).revparse_single(ref).peel(pygit2.Tree)
-
-    def resolve(self, path: PurePath) -> pygit2.Object:
-        """Resolve the given path."""
-        try:
-            return functools.reduce(operator.truediv, path.parts, self.tree)
-        except KeyError:
-            raise FileNotFoundError(f"file not found: {path}")
-
-    def is_dir(self, path: PurePath) -> bool:
-        """Return True if this is a directory."""
-        try:
-            tree = self.resolve(path)
-        except FileNotFoundError:
-            return False
-        else:
-            return isinstance(tree, pygit2.Tree)
-
-    def iterdir(self, path: PurePath) -> Iterator[PurePath]:
-        """Iterate over the files in this directory."""
-        tree = self.resolve(path)
-        if not isinstance(tree, pygit2.Tree):
-            raise NotADirectoryError(f"not a directory: {path}")
-
-        for entry in tree:
-            yield path / entry.name
-
-    def is_file(self, path: PurePath) -> bool:
-        """Return True if this is a regular file (or a symlink to one)."""
-        try:
-            blob = self.resolve(path)
-        except FileNotFoundError:
-            return False
-        else:
-            return isinstance(blob, pygit2.Blob)
-
-    def read_text(self, path: PurePath) -> str:
-        """Return the contents of this file."""
-        blob = self.resolve(path)
-        if isinstance(blob, pygit2.Tree):
-            raise IsADirectoryError(f"is a directory: {path}")
-
-        if not isinstance(blob, pygit2.Blob):  # pragma: no cover
-            raise RuntimeError(f"unexpected object type: {path} ({blob})")
-
-        text: str = blob.data.decode()
-        return text
-
-    def is_symlink(self, path: PurePath) -> bool:
-        """Return True if this is a symbolic link."""
-        try:
-            blob = self.resolve(path)
-        except FileNotFoundError:
-            return False
-        else:
-            return (
-                isinstance(blob, pygit2.Blob)
-                and blob.filemode == pygit2.GIT_FILEMODE_LINK
-            )
-
-    def readlink(self, path: PurePath) -> PurePath:
-        """Return the target of a symbolic link."""
-        blob = self.resolve(path)
-        if isinstance(blob, pygit2.Tree):
-            raise IsADirectoryError(f"is a directory: {path}")
-
-        if not (
-            isinstance(blob, pygit2.Blob) and blob.filemode == pygit2.GIT_FILEMODE_LINK
-        ):
-            raise RuntimeError(f"not a symlink: {path}")
-
-        target: str = blob.data.decode(errors="surrogateescape")
-
-        # TODO: Parse the path.
-        # TODO: Handle absolute paths in some way.
-        return PurePath(*target.split("/"))
-
-    def access(self, path: PurePath, mode: Access) -> bool:
-        """Return True if the user can access the path."""
-        try:
-            obj = self.resolve(path)
-        except FileNotFoundError:
-            return False
-        else:
-            return (
-                Access.EXECUTE not in mode
-                or obj.filemode == pygit2.GIT_FILEMODE_BLOB_EXECUTABLE
-            )
+        repo = pygit2.Repository(repository)
+        tree = repo.revparse_single(ref).peel(pygit2.Tree)
+        self.root = GitFilesystemNode(tree)
