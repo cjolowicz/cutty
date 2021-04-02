@@ -60,7 +60,8 @@ class DictFilesystem(Filesystem):
     def iterdir(self, path: PurePath) -> Iterator[PurePath]:
         """Iterate over the files in this directory."""
         entry = self.lookup(path)
-        assert isinstance(entry, dict)  # noqa: S101
+        if not isinstance(entry, dict):
+            raise NotADirectoryError(f"not a directory: {path}")
         for key in entry:
             yield path / key
 
@@ -75,6 +76,8 @@ class DictFilesystem(Filesystem):
     def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
         entry = self.lookup(path)
+        if isinstance(entry, dict):
+            raise IsADirectoryError(f"is a directory: {path}")
         assert isinstance(entry, str)  # noqa: S101
         return entry
 
