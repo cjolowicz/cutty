@@ -6,6 +6,7 @@ import hashlib
 import json
 import pathlib
 import shutil
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Iterator
 from typing import Optional
@@ -55,13 +56,17 @@ def hashurl(url: URL) -> str:
     return hashlib.blake2b(data).hexdigest()
 
 
+Timer = Callable[[], datetime.datetime]
+
+
 class RepositoryCache:
     """Storage backend for repositories."""
 
-    def __init__(self, path: pathlib.Path) -> None:
+    def __init__(self, path: pathlib.Path, *, timer: Timer) -> None:
         """Initialize."""
         self.path = path
         self.path.mkdir(parents=True, exist_ok=True)
+        self.timer = timer
 
     def _getrepositorypath(self, url: URL) -> pathlib.Path:
         """Return the path to the repository."""
@@ -75,18 +80,17 @@ class RepositoryCache:
             return None
 
         record = CacheRecord.load(path)
-        record.updated = datetime.datetime.now(tz=datetime.timezone.utc)
+        record.updated = self.timer()
         record.dump(path)
 
         return record
 
-    def allocate(self, url: URL, provider: str) -> CacheRecord:
+    def allocate(self, url: URL, *, provider: str) -> CacheRecord:
         """Allocate storage for a repository."""
         path = self._getrepositorypath(url)
         path.mkdir(parents=True)
 
-        updated = datetime.datetime.now(tz=datetime.timezone.utc)
-        record = CacheRecord(path, url, provider, updated)
+        record = CacheRecord(path, url, provider, self.timer())
         record.dump(path)
 
         return record

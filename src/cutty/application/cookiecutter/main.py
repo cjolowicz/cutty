@@ -1,4 +1,5 @@
 """Main entry point for the Cookiecutter compatibility layer."""
+import datetime
 import functools
 import pathlib
 from collections.abc import Mapping
@@ -52,6 +53,7 @@ def main(
         cachedir=pathlib.Path(appdirs.user_cache_dir("cutty")),
         remote=[ZipRepository, GitRepository, MercurialRepository],
         local=[LocalGitRepository, LocalZipRepository, LocalDirectoryRepository],
+        timer=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
     )
 
     storage = CookiecutterFileStorage(
