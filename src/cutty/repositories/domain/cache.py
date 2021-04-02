@@ -97,10 +97,11 @@ class RepositoryCache:
 
     def list(self) -> Iterator[CacheRecord]:
         """Return the list of storage entries."""
-        root = self.path / "entries"
-        for directory in root.iterdir():
-            for path in directory.iterdir():
-                yield CacheRecord.load(path)
+        entries = self.path / "entries"
+        if entries.exists():
+            for directory in entries.iterdir():
+                for path in directory.iterdir():
+                    yield CacheRecord.load(path)
 
     def clean(self, cutoff: datetime.datetime) -> None:
         """Remove storage entries older than the given timestamp."""
