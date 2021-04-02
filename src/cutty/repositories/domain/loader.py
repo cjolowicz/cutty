@@ -9,6 +9,7 @@ from yarl import URL
 
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.cache import RepositoryCache
+from cutty.repositories.domain.cache import Timer
 from cutty.repositories.domain.repositories import LocalRepository
 from cutty.repositories.domain.repositories import Repository
 
@@ -22,9 +23,10 @@ class RepositoryLoader:
         cachedir: pathlib.Path,
         local: Iterable[type[LocalRepository]],
         remote: Iterable[type[Repository]],
+        timer: Timer,
     ):
         """Initialize."""
-        self.cache = RepositoryCache(cachedir)
+        self.cache = RepositoryCache(cachedir, timer=timer)
         self.localproviders = tuple(local)
         self.remoteproviders = tuple(remote)
 
@@ -94,7 +96,7 @@ class RepositoryLoader:
         )
 
         if record is None:
-            record = self.cache.allocate(url, provider.type)
+            record = self.cache.allocate(url, provider=provider.type)
 
         repository = provider(url, record.path)
 
