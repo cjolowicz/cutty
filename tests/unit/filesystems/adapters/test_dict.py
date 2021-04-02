@@ -14,24 +14,24 @@ def test_lookup_curdir() -> None:
     """It returns the current directory."""
     filesystem = DictFilesystem({"file": ""})
     path = PurePath(".")
-    [path] = filesystem.iterdir(path)
-    assert path.name == "file"
+    [entry] = filesystem.iterdir(path)
+    assert entry == "file"
 
 
 def test_lookup_pardir_normal() -> None:
     """It returns the parent directory."""
     filesystem = DictFilesystem({"dir": {}})
     path = PurePath("dir", "..")
-    [path] = filesystem.iterdir(path)
-    assert path.name == "dir"
+    [entry] = filesystem.iterdir(path)
+    assert entry == "dir"
 
 
 def test_lookup_pardir_root() -> None:
     """It returns the root directory."""
     filesystem = DictFilesystem({"file": ""})
     path = PurePath("..")
-    [path] = filesystem.iterdir(path)
-    assert path.name == "file"
+    [entry] = filesystem.iterdir(path)
+    assert entry == "file"
 
 
 def test_is_dir_notfound() -> None:

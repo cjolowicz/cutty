@@ -132,7 +132,7 @@ def test_readlink(filesystem: ZipFilesystem) -> None:
 )
 def test_iterdir(filesystem: ZipFilesystem, path: PurePath, entries: set[str]) -> None:
     """It iterates over the directory entries."""
-    assert set(entry.name for entry in filesystem.iterdir(path)) == entries
+    assert set(filesystem.iterdir(path)) == entries
 
 
 def test_access(filesystem: ZipFilesystem) -> None:
