@@ -11,7 +11,7 @@ from typing import Union
 PurePathT = TypeVar("PurePathT", bound="PurePath")
 
 
-@dataclass
+@dataclass(frozen=True)
 class PurePath:
     """Location in a filesystem."""
 
