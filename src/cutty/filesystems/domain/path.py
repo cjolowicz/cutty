@@ -19,9 +19,9 @@ class Path(PurePath):
         super().__init__(*parts)
         object.__setattr__(self, "_filesystem", filesystem)
 
-    def _copy(self, path: PurePath) -> Path:
-        """Create a copy of the given path."""
-        return Path(*path.parts, filesystem=self._filesystem)
+    def _withparts(self, *parts: str) -> Path:
+        """Create a path with the given parts."""
+        return Path(*parts, filesystem=self._filesystem)
 
     def is_dir(self) -> bool:
         """Return True if this is a directory."""
