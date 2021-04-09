@@ -31,4 +31,9 @@ def asurl(path: pathlib.Path) -> URL:
 def parseurl(location: str) -> URL:
     """Construct a URL from a string."""
     path = pathlib.Path(location)
-    return asurl(path) if path.exists() else URL(location)
+    if not path.exists():
+        url = URL(location)
+        if url.scheme:
+            return url
+
+    return asurl(path)
