@@ -6,4 +6,4 @@ from yarl import URL
 
 def asurl(path: pathlib.Path) -> URL:
     """Convert filesystem path to URL."""
-    return URL(path.as_uri())
+    return URL(path.resolve().as_uri())
