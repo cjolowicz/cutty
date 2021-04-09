@@ -6,8 +6,38 @@ from pathlib import Path
 import pytest
 from yarl import URL
 
+from cutty.repositories2.domain.urls import aspath
 from cutty.repositories2.domain.urls import asurl
 from cutty.repositories2.domain.urls import parseurl
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("/"),
+        Path("relative"),
+        Path("a?b"),
+    ],
+)
+def test_asurl_aspath_roundtrip(path: Path) -> None:
+    """It returns the resolved path."""
+    assert aspath(asurl(path)) == path.resolve()
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        URL("http://example.com"),
+        URL("file:///path/to/dir#fragment"),
+        URL("file:///path/to/dir?query"),
+        URL("/path/to/dir#fragment"),
+        URL("/path/to/dir?query"),
+    ],
+)
+def test_aspath_invalid(url: URL) -> None:
+    """It raises an exception."""
+    with pytest.raises(ValueError):
+        aspath(url)
 
 
 @pytest.mark.parametrize(
