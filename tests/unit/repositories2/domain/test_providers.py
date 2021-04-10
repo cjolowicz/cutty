@@ -78,12 +78,6 @@ def test_provide_pass(providers: list[Provider]):
 defaultmount = unversioned_mounter(DiskFilesystem)
 
 
-@pytest.fixture
-def url() -> URL:
-    """Fixture for a URL."""
-    return URL("https://example.com/repository")
-
-
 def test_localprovider_not_local(url: URL):
     """It returns None if the location is not local."""
     provider = localprovider(match=lambda path: True, mount=defaultmount)

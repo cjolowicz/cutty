@@ -32,12 +32,6 @@ def fakefetcher() -> Fetcher:
     return fakefetcher
 
 
-@pytest.fixture
-def url() -> URL:
-    """Fixture with a URL."""
-    return URL("https://example.com/repository")
-
-
 def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the matcher."""
     path = fakefetcher(
