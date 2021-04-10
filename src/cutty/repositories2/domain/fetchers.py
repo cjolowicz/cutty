@@ -1,5 +1,4 @@
 """Fetching repositories from URLs."""
-import abc
 import enum
 import pathlib
 from collections.abc import Callable
@@ -21,58 +20,33 @@ class FetchMode(enum.Enum):
     NEVER = enum.auto()
 
 
-class Fetcher(abc.ABC):
-    """A fetcher retrieves a repository from a URL into storage."""
-
-    @abc.abstractmethod
-    def match(self, url: URL) -> bool:
-        """Return True if the fetcher supports the URL."""
-
-    @abc.abstractmethod
-    def fetch(
-        self,
-        url: URL,
-        storage: pathlib.Path,
-        revision: Optional[Revision] = None,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> pathlib.Path:
-        """Fetch the repository from the URL."""
-
-
+Fetcher = Callable[[URL, Store, Optional[Revision], FetchMode], Optional[pathlib.Path]]
 FetchFunction = Callable[[URL, pathlib.Path, Optional[Revision]], None]
 FetchDecorator = Callable[[FetchFunction], Fetcher]
 
 
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
-    """Decorator for creating a fetcher."""
+    """A fetcher retrieves a repository from a URL into storage."""
+    relativestore = store
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
-        class _Fetcher(Fetcher):
-            """A fetcher retrieves a repository from a URL into storage."""
+        def _fetcher(
+            url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+        ) -> Optional[pathlib.Path]:
+            if not match(url):
+                return None
 
-            def match(self, url: URL) -> bool:
-                """Return True if the fetcher supports the URL."""
-                return match(url)
+            destination = store(url) / relativestore(url)
 
-            def fetch(
-                self,
-                url: URL,
-                storage: pathlib.Path,
-                revision: Optional[Revision] = None,
-                mode: FetchMode = FetchMode.ALWAYS,
-            ) -> pathlib.Path:
-                """Fetch the repository from the URL."""
-                destination = storage / store(url)
+            if (
+                mode is FetchMode.ALWAYS
+                or mode is FetchMode.AUTO
+                and not destination.exists()
+            ):
+                fetch(url, destination, revision)
 
-                if (
-                    mode is FetchMode.ALWAYS
-                    or mode is FetchMode.AUTO
-                    and not destination.exists()
-                ):
-                    fetch(url, destination, revision)
+            return destination
 
-                return destination
-
-        return _Fetcher()
+        return _fetcher
 
     return _decorator
