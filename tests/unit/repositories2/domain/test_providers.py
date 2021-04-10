@@ -116,24 +116,6 @@ def test_localprovider_revision(tmp_path: pathlib.Path):
         provider(url, "v1.0.0")
 
 
-@pytest.fixture
-def providerstore(tmp_path: pathlib.Path) -> ProviderStore:
-    """Fixture for a simple provider store."""
-    path = tmp_path / "providerstore"
-    path.mkdir()
-
-    def _providerstore(providername: str):
-        return lambda url: path
-
-    return _providerstore
-
-
-@pytest.fixture
-def store(providerstore: ProviderStore) -> Store:
-    """Fixture for a simple store."""
-    return providerstore("default")
-
-
 def test_remoteproviderfactory_no_fetchers(store: Store):
     """It returns None if there are no fetchers."""
     providerfactory = remoteproviderfactory(fetch=[])
