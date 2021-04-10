@@ -9,6 +9,13 @@ from cutty.repositories2.domain.fetchers import Fetcher
 from cutty.repositories2.domain.fetchers import fetcher
 from cutty.repositories2.domain.fetchers import FetchMode
 from cutty.repositories2.domain.matchers import scheme
+from cutty.repositories2.domain.stores import Store
+
+
+@pytest.fixture
+def store(tmp_path: Path) -> Store:
+    """Fixture for a store."""
+    return lambda url: tmp_path
 
 
 @pytest.fixture
@@ -31,24 +38,27 @@ def url() -> URL:
     return URL("https://example.com/repository")
 
 
-def test_fetcher_match(fakefetcher: Fetcher, url: URL) -> None:
+def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the matcher."""
-    assert fakefetcher.match(url)
+    path = fakefetcher(
+        url.with_scheme("http"), store, revision=None, mode=FetchMode.ALWAYS
+    )
+    assert path is None
 
 
-def test_fetcher_fetch_always(fakefetcher: Fetcher, url: URL, tmp_path: Path) -> None:
+def test_fetcher_fetch_always(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the fetch function."""
-    destination = tmp_path / url.name
-    path = fakefetcher.fetch(url, destination.parent, None)
+    destination = store(url) / url.name
+    path = fakefetcher(url, store, revision=None, mode=FetchMode.ALWAYS)
 
     assert path == destination
     assert fakefetcher.calls == [(url, destination, None)]
 
 
-def test_fetcher_fetch_never(fakefetcher: Fetcher, url: URL, tmp_path: Path) -> None:
+def test_fetcher_fetch_never(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It returns the destination without fetching."""
-    destination = tmp_path / url.name
-    path = fakefetcher.fetch(url, destination.parent, None, FetchMode.NEVER)
+    destination = store(url) / url.name
+    path = fakefetcher(url, store, revision=None, mode=FetchMode.NEVER)
 
     assert path == destination
     assert not fakefetcher.calls
