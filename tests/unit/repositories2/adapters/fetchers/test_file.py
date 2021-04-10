@@ -1,0 +1,51 @@
+"""Unit tests for cutty.repositories2.adapters.fetchers.file."""
+from pathlib import Path
+
+import pytest
+from yarl import URL
+
+from cutty.repositories2.adapters.fetchers.file import filefetcher
+from cutty.repositories2.domain.fetchers import FetchMode
+from cutty.repositories2.domain.stores import Store
+from cutty.repositories2.domain.urls import asurl
+
+
+@pytest.fixture
+def repository(tmp_path: Path) -> Path:
+    """Fixture for a repository."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").write_text("Lorem")
+    return path
+
+
+defaults = dict(revision=None, mode=FetchMode.ALWAYS)
+
+
+def test_filefetcher_happy(repository: Path, store: Store):
+    """It copies the filesystem tree."""
+    url = asurl(repository)
+    path = filefetcher(url, store, **defaults)
+    text = (path / "marker").read_text()
+    assert text == "Lorem"
+
+
+def test_filefetcher_not_matched(store: Store, url: URL):
+    """It returns None if the URL does not use the file scheme."""
+    path = filefetcher(url, store, **defaults)
+    assert path is None
+
+
+def test_filefetcher_update(repository: Path, store: Store):
+    """It removes files from a previous fetch."""
+    url = asurl(repository)
+
+    # First fetch.
+    filefetcher(url, store, **defaults)
+
+    # Second fetch, without the marker file.
+    (repository / "marker").unlink()
+    path = filefetcher(url, store, **defaults)
+
+    # Check that the marker file is gone.
+    assert not (path / "marker").is_file()
