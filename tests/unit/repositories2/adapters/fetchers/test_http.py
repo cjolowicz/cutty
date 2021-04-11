@@ -1,4 +1,5 @@
 """Unit tests for cutty.repositories2.adapters.fetchers.http."""
+import os
 from collections.abc import Iterator
 from functools import partial
 from http.server import SimpleHTTPRequestHandler
@@ -29,7 +30,11 @@ def server(repository: Path) -> Iterator[URL]:
     handler = partial(SimpleHTTPRequestHandler, directory=repository.parent)
 
     with ThreadingHTTPServer(address, handler) as server:
-        thread = Thread(target=server.serve_forever, daemon=True)
+        target = partial(
+            server.serve_forever,
+            poll_interval=0.001 if os.environ.get("CI") else 0.000001,
+        )
+        thread = Thread(target=target, daemon=True)
         thread.start()
 
         host, port = server.server_address
