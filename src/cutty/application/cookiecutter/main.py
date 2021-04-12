@@ -13,11 +13,11 @@ from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.application.cookiecutter.prompts import prompt
-from cutty.repositories2.adapters.registry import defaultproviderregistry
-from cutty.repositories2.adapters.storage import asproviderstore
-from cutty.repositories2.adapters.storage import RepositoryStorage
-from cutty.repositories2.domain.providers import repositoryprovider
-from cutty.repositories2.domain.urls import parseurl
+from cutty.repositories.adapters.registry import defaultproviderregistry
+from cutty.repositories.adapters.storage import asproviderstore
+from cutty.repositories.adapters.storage import RepositoryStorage
+from cutty.repositories.domain.providers import repositoryprovider
+from cutty.repositories.domain.urls import parseurl
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
