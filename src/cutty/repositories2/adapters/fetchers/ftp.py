@@ -25,4 +25,4 @@ def ftpfetcher(
         # errors are raised as urllib.error.URLError.
 
         with destination.open(mode="wb") as io:
-            shutil.copyfileobj(response, io)  # type: ignore[arg-type]
+            shutil.copyfileobj(response, io)
