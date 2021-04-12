@@ -22,12 +22,20 @@ def repository(tmp_path: Path) -> Path:
 defaults = dict(revision=None, mode=FetchMode.ALWAYS)
 
 
-def test_filefetcher_happy(repository: Path, store: Store):
+def test_filefetcher_directory_happy(repository: Path, store: Store):
     """It copies the filesystem tree."""
     url = asurl(repository)
     path = filefetcher(url, store, **defaults)
     text = (path / "marker").read_text()
     assert text == "Lorem"
+
+
+def test_filefetcher_file_happy(repository: Path, store: Store):
+    """It copies the file."""
+    repository /= "marker"
+    url = asurl(repository)
+    path = filefetcher(url, store, **defaults)
+    assert path.read_text() == "Lorem"
 
 
 def test_filefetcher_not_matched(store: Store, url: URL):
@@ -36,7 +44,7 @@ def test_filefetcher_not_matched(store: Store, url: URL):
     assert path is None
 
 
-def test_filefetcher_update(repository: Path, store: Store):
+def test_filefetcher_directory_update(repository: Path, store: Store):
     """It removes files from a previous fetch."""
     url = asurl(repository)
 
@@ -49,3 +57,19 @@ def test_filefetcher_update(repository: Path, store: Store):
 
     # Check that the marker file is gone.
     assert not (path / "marker").is_file()
+
+
+def test_filefetcher_file_update(repository: Path, store: Store):
+    """It removes files from a previous fetch."""
+    repository /= "marker"
+    url = asurl(repository)
+
+    # First fetch.
+    filefetcher(url, store, **defaults)
+
+    # Second fetch, with modified marker file.
+    repository.write_text("Ipsum")
+    path = filefetcher(url, store, **defaults)
+
+    # Check that the marker file is updated.
+    assert path.read_text() == "Ipsum"

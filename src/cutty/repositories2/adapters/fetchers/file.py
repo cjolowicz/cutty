@@ -15,9 +15,15 @@ from cutty.repositories2.domain.urls import aspath
 def filefetcher(
     url: URL, destination: pathlib.Path, revision: Optional[Revision]
 ) -> None:
-    """Copy a file."""
-    if destination.exists():
+    """Copy a file or directory."""
+    if destination.is_dir():
         shutil.rmtree(destination)
+    elif destination.exists():
+        destination.unlink()
 
     source = aspath(url)
-    shutil.copytree(source, destination, symlinks=True)
+
+    if source.is_dir():
+        shutil.copytree(source, destination, symlinks=True)
+    else:
+        shutil.copy2(source, destination, follow_symlinks=False)
