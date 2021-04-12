@@ -132,52 +132,129 @@ cutty.filesystems.adapters.zip
    :members:
 
 
-cutty.repositories.domain.repositories
---------------------------------------
+cutty.repositories.domain.urls
+------------------------------
 
-.. automodule:: cutty.repositories.domain.repositories
+.. automodule:: cutty.repositories.domain.urls
    :members:
 
 
-cutty.repositories.domain.cache
--------------------------------
+cutty.repositories.domain.revisions
+-----------------------------------
 
-.. automodule:: cutty.repositories.domain.cache
+.. automodule:: cutty.repositories.domain.revisions
    :members:
 
 
-cutty.repositories.domain.loader
+cutty.repositories.domain.stores
 --------------------------------
 
-.. automodule:: cutty.repositories.domain.loader
+.. automodule:: cutty.repositories.domain.stores
    :members:
 
 
-cutty.repositories.adapters.directory
--------------------------------------
+cutty.repositories.domain.matchers
+----------------------------------
 
-.. automodule:: cutty.repositories.adapters.directory
+.. automodule:: cutty.repositories.domain.matchers
    :members:
 
 
-cutty.repositories.adapters.zip
--------------------------------
+cutty.repositories.domain.mounters
+----------------------------------
 
-.. automodule:: cutty.repositories.adapters.zip
+.. automodule:: cutty.repositories.domain.mounters
    :members:
 
 
-cutty.repositories.adapters.git
--------------------------------
+cutty.repositories.domain.fetchers
+----------------------------------
 
-.. automodule:: cutty.repositories.adapters.git
+.. automodule:: cutty.repositories.domain.fetchers
    :members:
 
 
-cutty.repositories.adapters.mercurial
--------------------------------------
+cutty.repositories.domain.providers
+-----------------------------------
 
-.. automodule:: cutty.repositories.adapters.mercurial
+.. automodule:: cutty.repositories.domain.providers
+   :members:
+
+
+cutty.repositories.adapters.fetchers.file
+-----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.fetchers.file
+   :members:
+
+
+cutty.repositories.adapters.fetchers.http
+-----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.fetchers.http
+   :members:
+
+
+cutty.repositories.adapters.fetchers.ftp
+----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.fetchers.ftp
+   :members:
+
+
+cutty.repositories.adapters.fetchers.git
+----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.fetchers.git
+   :members:
+
+
+cutty.repositories.adapters.fetchers.mercurial
+----------------------------------------------
+
+.. automodule:: cutty.repositories.adapters.fetchers.mercurial
+   :members:
+
+
+cutty.repositories.adapters.providers.disk
+------------------------------------------
+
+.. automodule:: cutty.repositories.adapters.providers.disk
+   :members:
+
+
+cutty.repositories.adapters.providers.git
+-----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.providers.git
+   :members:
+
+
+cutty.repositories.adapters.providers.mercurial
+-----------------------------------------------
+
+.. automodule:: cutty.repositories.adapters.providers.mercurial
+   :members:
+
+
+cutty.repositories.adapters.providers.zip
+-----------------------------------------
+
+.. automodule:: cutty.repositories.adapters.providers.zip
+   :members:
+
+
+cutty.repositories.adapters.registry
+------------------------------------
+
+.. automodule:: cutty.repositories.adapters.registry
+   :members:
+
+
+cutty.repositories.adapters.storage
+-----------------------------------
+
+.. automodule:: cutty.repositories.adapters.storage
    :members:
 
 
