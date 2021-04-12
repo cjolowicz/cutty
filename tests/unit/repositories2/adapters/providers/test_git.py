@@ -62,7 +62,7 @@ def test_localgitprovider_happy(
     url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It provides a repository from a local directory."""
-    filesystem = localgitprovider(url, revision=revision)
+    filesystem = localgitprovider(url, revision)
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 
@@ -70,7 +70,7 @@ def test_localgitprovider_happy(
 def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the path is not a git repository."""
     url = asurl(tmp_path)
-    filesystem = localgitprovider(url, revision=None)
+    filesystem = localgitprovider(url, None)
     assert filesystem is None
 
 
@@ -80,7 +80,7 @@ def test_gitproviderfactory_happy(
 ) -> None:
     """It fetches a git repository into storage."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = gitprovider(url, revision=revision)
+    filesystem = gitprovider(url, revision)
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 
@@ -89,5 +89,5 @@ def test_gitproviderfactory_not_matching(store: ProviderStore) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = gitprovider(url, revision=None)
+    filesystem = gitprovider(url, None)
     assert filesystem is None
