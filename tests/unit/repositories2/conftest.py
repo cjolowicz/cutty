@@ -15,18 +15,14 @@ def url() -> URL:
 
 
 @pytest.fixture
-def providerstore(tmp_path: pathlib.Path) -> ProviderStore:
-    """Fixture for a simple provider store."""
-    path = tmp_path / "providerstore"
+def store(tmp_path: pathlib.Path) -> Store:
+    """Fixture for a simple store."""
+    path = tmp_path / "store"
     path.mkdir()
-
-    def _providerstore(providername: str) -> Store:
-        return lambda url: path
-
-    return _providerstore
+    return lambda url: path
 
 
 @pytest.fixture
-def store(providerstore: ProviderStore) -> Store:
-    """Fixture for a simple store."""
-    return providerstore("default")
+def providerstore(store: Store) -> ProviderStore:
+    """Fixture for a simple provider store."""
+    return lambda providername: store
