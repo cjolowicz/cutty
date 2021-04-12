@@ -171,7 +171,7 @@ def _createproviders(
 ) -> Iterator[Provider]:
     """Create providers."""
     if providername is not None:
-        providerfactory = providerregistry.get(providername)
+        providerfactory = providerregistry[providername]
         yield _createprovider(providername, providerfactory, providerstore, fetchmode)
     else:
         for providername, providerfactory in providerregistry.items():
