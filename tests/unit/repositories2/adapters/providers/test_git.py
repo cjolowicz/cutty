@@ -10,7 +10,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories2.adapters.providers.git import gitproviderfactory
 from cutty.repositories2.adapters.providers.git import localgitprovider
 from cutty.repositories2.domain.fetchers import FetchMode
-from cutty.repositories2.domain.providers import ProviderStore
+from cutty.repositories2.domain.stores import Store
 from cutty.repositories2.domain.urls import asurl
 
 
@@ -78,7 +78,7 @@ def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_gitproviderfactory_happy(
-    store: ProviderStore, url: URL, revision: Optional[str], expected: str
+    store: Store, url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a git repository into storage."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
@@ -89,7 +89,7 @@ def test_gitproviderfactory_happy(
     assert text == expected
 
 
-def test_gitproviderfactory_not_matching(store: ProviderStore) -> None:
+def test_gitproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
