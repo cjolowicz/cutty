@@ -256,7 +256,7 @@ def test_registerproviders_override(store: Store) -> None:
     provider = providerfactory(store, FetchMode.ALWAYS)
 
     # Check that it's provider2 (the nullprovider returns None).
-    assert provider(URL(), revision=None) is not None
+    assert provider(URL(), None) is not None
 
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
