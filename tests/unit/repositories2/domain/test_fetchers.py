@@ -34,16 +34,14 @@ def fakefetcher() -> Fetcher:
 
 def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the matcher."""
-    path = fakefetcher(
-        url.with_scheme("http"), store, revision=None, mode=FetchMode.ALWAYS
-    )
+    path = fakefetcher(url.with_scheme("http"), store, None, FetchMode.ALWAYS)
     assert path is None
 
 
 def test_fetcher_fetch_always(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the fetch function."""
     destination = store(url) / url.name
-    path = fakefetcher(url, store, revision=None, mode=FetchMode.ALWAYS)
+    path = fakefetcher(url, store, None, FetchMode.ALWAYS)
 
     assert path == destination
     assert fakefetcher.calls == [(url, destination, None)]
@@ -52,7 +50,7 @@ def test_fetcher_fetch_always(fakefetcher: Fetcher, url: URL, store: Store) -> N
 def test_fetcher_fetch_never(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It returns the destination without fetching."""
     destination = store(url) / url.name
-    path = fakefetcher(url, store, revision=None, mode=FetchMode.NEVER)
+    path = fakefetcher(url, store, None, FetchMode.NEVER)
 
     assert path == destination
     assert not fakefetcher.calls
