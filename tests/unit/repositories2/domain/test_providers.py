@@ -102,6 +102,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     provider = localprovider(match=lambda path: True, mount=defaultmount)
     filesystem = provider(url, None)
 
+    assert filesystem is not None
     [entry] = filesystem.iterdir(PurePath())
     assert entry == "marker"
 
@@ -194,12 +195,14 @@ def test_remoteproviderfactory_mounter(
     data = {revision: {"marker": "Lorem"}}
     text = json.dumps(data)
     path = fetcher(url, store, revision, FetchMode.ALWAYS)
+    assert path is not None  # for type narrowing
     path.write_text(text)
 
     providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
     filesystem = provider(url, revision)
 
+    assert filesystem is not None
     assert filesystem.read_text(PurePath("marker")) == "Lorem"
 
 

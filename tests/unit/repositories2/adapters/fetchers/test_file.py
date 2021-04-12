@@ -23,8 +23,9 @@ def test_filefetcher_directory_happy(repository: Path, store: Store) -> None:
     """It copies the filesystem tree."""
     url = asurl(repository)
     path = filefetcher(url, store, None, FetchMode.ALWAYS)
-    text = (path / "marker").read_text()
-    assert text == "Lorem"
+
+    assert path is not None
+    assert (path / "marker").read_text() == "Lorem"
 
 
 def test_filefetcher_file_happy(repository: Path, store: Store) -> None:
@@ -32,6 +33,8 @@ def test_filefetcher_file_happy(repository: Path, store: Store) -> None:
     repository /= "marker"
     url = asurl(repository)
     path = filefetcher(url, store, None, FetchMode.ALWAYS)
+
+    assert path is not None
     assert path.read_text() == "Lorem"
 
 
@@ -53,6 +56,7 @@ def test_filefetcher_directory_update(repository: Path, store: Store) -> None:
     path = filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is gone.
+    assert path is not None
     assert not (path / "marker").is_file()
 
 
@@ -69,4 +73,5 @@ def test_filefetcher_file_update(repository: Path, store: Store) -> None:
     path = filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is updated.
+    assert path is not None
     assert path.read_text() == "Ipsum"
