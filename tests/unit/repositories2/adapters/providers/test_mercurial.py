@@ -74,6 +74,8 @@ def test_hgproviderfactory_happy(
     """It fetches a hg repository into storage."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
     filesystem = hgprovider(url, revision)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 

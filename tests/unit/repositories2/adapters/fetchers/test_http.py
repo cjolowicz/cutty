@@ -48,6 +48,7 @@ def server(repository: Path) -> Iterator[URL]:
 def test_httpfetcher_happy(server: URL, store: Store, repository: Path) -> None:
     """It downloads the file."""
     path = httpfetcher(server, store, None, FetchMode.ALWAYS)
+    assert path is not None
     assert path.read_text() == repository.read_text()
 
 
@@ -70,4 +71,5 @@ def test_httpfetcher_update(server: URL, store: Store, repository: Path) -> None
     repository.write_text("ipsum")
     path = httpfetcher(server, store, None, FetchMode.ALWAYS)
 
+    assert path is not None
     assert path.read_text() == repository.read_text()

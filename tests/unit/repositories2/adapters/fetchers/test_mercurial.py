@@ -62,9 +62,10 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
 def test_hgfetcher_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
     destination = hgfetcher(url, store, None, FetchMode.ALWAYS)
+    assert destination is not None
+
     path = Path("marker", filesystem=DiskFilesystem(destination))
-    text = path.read_text()
-    assert text == "Lorem"
+    assert path.read_text() == "Lorem"
 
 
 def test_hgfetcher_not_matched(store: Store) -> None:
@@ -94,6 +95,7 @@ def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
 
     # Second fetch.
     destination = hgfetcher(url, store, None, FetchMode.ALWAYS)
+    assert destination is not None
 
     # Check that the marker file is gone.
     path = Path("marker", filesystem=DiskFilesystem(destination))
