@@ -23,5 +23,5 @@ def test_defaultproviderregistry_providerfactories(store: ProviderStore) -> None
     url = URL("mailto:you@example.com")
     for providerfactory in defaultproviderregistry.values():
         provider = providerfactory(store, FetchMode)
-        filesystem = provider(url, revision=None)
+        filesystem = provider(url, None)
         assert filesystem is None

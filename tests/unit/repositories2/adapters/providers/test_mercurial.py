@@ -73,7 +73,7 @@ def test_hgproviderfactory_happy(
 ) -> None:
     """It fetches a hg repository into storage."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = hgprovider(url, revision=revision)
+    filesystem = hgprovider(url, revision)
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 
@@ -82,5 +82,5 @@ def test_hgproviderfactory_not_matching(store: ProviderStore) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = hgprovider(url, revision=None)
+    filesystem = hgprovider(url, None)
     assert filesystem is None
