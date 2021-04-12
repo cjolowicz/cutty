@@ -38,12 +38,9 @@ def url(tmp_path: pathlib.Path) -> URL:
     return asurl(path)
 
 
-defaults = dict(revision=None, mode=FetchMode.ALWAYS)
-
-
 def test_gitfetcher_happy(url: URL, store: Store) -> None:
     """It clones the git repository."""
-    destination = gitfetcher(url, store, **defaults)
+    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
     path = Path("marker", filesystem=GitFilesystem(destination))
     text = path.read_text()
     assert text == "Lorem"
@@ -52,14 +49,14 @@ def test_gitfetcher_happy(url: URL, store: Store) -> None:
 def test_gitfetcher_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = gitfetcher(url, store, **defaults)
+    path = gitfetcher(url, store, None, FetchMode.ALWAYS)
     assert path is None
 
 
 def test_gitfetcher_update(url: URL, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
-    gitfetcher(url, store, **defaults)
+    gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
     repository = pygit2.Repository(aspath(url))
@@ -76,7 +73,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     )
 
     # Second fetch.
-    destination = gitfetcher(url, store, **defaults)
+    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is gone.
     path = Path("marker", filesystem=GitFilesystem(destination))
