@@ -63,7 +63,7 @@ defaults = dict(revision=None, mode=FetchMode.ALWAYS)
 
 
 def test_hgfetcher_happy(url: URL, store: Store):
-    """It clones the hg repository."""
+    """It clones the Mercurial repository."""
     destination = hgfetcher(url, store, **defaults)
     path = Path("marker", filesystem=DiskFilesystem(destination))
     text = path.read_text()
