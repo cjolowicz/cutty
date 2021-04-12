@@ -17,7 +17,7 @@ def repository(tmp_path: Path) -> Path:
     return path
 
 
-def test_diskprovider_happy(repository: Path):
+def test_diskprovider_happy(repository: Path) -> None:
     """It provides a repository from a local directory."""
     url = asurl(repository)
     filesystem = diskprovider(url, revision=None)
@@ -25,7 +25,7 @@ def test_diskprovider_happy(repository: Path):
     assert text == "Lorem"
 
 
-def test_diskprovider_revision(repository: Path):
+def test_diskprovider_revision(repository: Path) -> None:
     """It raises an exception when passed a revision."""
     url = asurl(repository)
     with pytest.raises(Exception):

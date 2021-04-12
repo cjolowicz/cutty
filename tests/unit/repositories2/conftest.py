@@ -20,7 +20,7 @@ def providerstore(tmp_path: pathlib.Path) -> ProviderStore:
     path = tmp_path / "providerstore"
     path.mkdir()
 
-    def _providerstore(providername: str):
+    def _providerstore(providername: str) -> Store:
         return lambda url: path
 
     return _providerstore

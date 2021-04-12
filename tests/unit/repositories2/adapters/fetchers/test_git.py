@@ -41,7 +41,7 @@ def url(tmp_path: pathlib.Path) -> URL:
 defaults = dict(revision=None, mode=FetchMode.ALWAYS)
 
 
-def test_gitfetcher_happy(url: URL, store: Store):
+def test_gitfetcher_happy(url: URL, store: Store) -> None:
     """It clones the git repository."""
     destination = gitfetcher(url, store, **defaults)
     path = Path("marker", filesystem=GitFilesystem(destination))
@@ -49,14 +49,14 @@ def test_gitfetcher_happy(url: URL, store: Store):
     assert text == "Lorem"
 
 
-def test_gitfetcher_not_matched(store: Store):
+def test_gitfetcher_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
     path = gitfetcher(url, store, **defaults)
     assert path is None
 
 
-def test_gitfetcher_update(url: URL, store: Store):
+def test_gitfetcher_update(url: URL, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
     gitfetcher(url, store, **defaults)

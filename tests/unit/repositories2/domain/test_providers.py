@@ -53,7 +53,7 @@ def dictprovider(mapping: dict[str, Any] = MappingProxyType({})) -> Provider:
         [nullprovider, nullprovider],
     ],
 )
-def test_provide_fail(providers: list[Provider]):
+def test_provide_fail(providers: list[Provider]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
         provide(providers, URL(), None)
@@ -68,7 +68,7 @@ def test_provide_fail(providers: list[Provider]):
         [dictprovider({}), dictprovider({"marker": ""})],
     ],
 )
-def test_provide_pass(providers: list[Provider]):
+def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
     path = provide(providers, URL(), None)
     assert path.is_dir()
@@ -78,14 +78,14 @@ def test_provide_pass(providers: list[Provider]):
 defaultmount = unversioned_mounter(DiskFilesystem)
 
 
-def test_localprovider_not_local(url: URL):
+def test_localprovider_not_local(url: URL) -> None:
     """It returns None if the location is not local."""
     provider = localprovider(match=lambda path: True, mount=defaultmount)
 
     assert provider(url, None) is None
 
 
-def test_localprovider_not_matching(tmp_path: pathlib.Path):
+def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
     provider = localprovider(match=lambda path: False, mount=defaultmount)
@@ -93,7 +93,7 @@ def test_localprovider_not_matching(tmp_path: pathlib.Path):
     assert provider(url, None) is None
 
 
-def test_localprovider_path(tmp_path: pathlib.Path):
+def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     """It returns a filesystem for the repository."""
     repository = tmp_path / "repository"
     repository.mkdir()
@@ -107,7 +107,7 @@ def test_localprovider_path(tmp_path: pathlib.Path):
     assert entry == "marker"
 
 
-def test_localprovider_revision(tmp_path: pathlib.Path):
+def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
     provider = localprovider(match=lambda path: True, mount=defaultmount)
@@ -116,7 +116,7 @@ def test_localprovider_revision(tmp_path: pathlib.Path):
         provider(url, "v1.0.0")
 
 
-def test_remoteproviderfactory_no_fetchers(store: Store):
+def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = remoteproviderfactory(fetch=[])
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -130,7 +130,7 @@ def nullfetcher(
     return None
 
 
-def test_remoteproviderfactory_no_matching_fetchers(store: Store):
+def test_remoteproviderfactory_no_matching_fetchers(store: Store) -> None:
     """It returns None if all fetchers return None."""
     providerfactory = remoteproviderfactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -156,7 +156,7 @@ def fetcher() -> Fetcher:
     return _fetcher
 
 
-def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL):
+def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -> None:
     """It mounts a filesystem for the fetched repository."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -170,7 +170,9 @@ def nullmatcher(url: URL) -> bool:
     return False
 
 
-def test_remoteproviderfactory_not_matching(store: Store, fetcher: Fetcher, url: URL):
+def test_remoteproviderfactory_not_matching(
+    store: Store, fetcher: Fetcher, url: URL
+) -> None:
     """It returns None if the provider itself does not match."""
     providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -184,7 +186,9 @@ def jsonmounter(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
     return DictFilesystem(data[revision] if revision is not None else data)
 
 
-def test_remoteproviderfactory_mounter(store: Store, fetcher: Fetcher, url: URL):
+def test_remoteproviderfactory_mounter(
+    store: Store, fetcher: Fetcher, url: URL
+) -> None:
     """It uses the mounter to mount the filesystem."""
     revision = "v1.0.0"
     url = url.with_name(f"{url.name}.json")
@@ -200,12 +204,12 @@ def test_remoteproviderfactory_mounter(store: Store, fetcher: Fetcher, url: URL)
     assert filesystem.read_text(PurePath("marker")) == "Lorem"
 
 
-def test_registerproviderfactories_empty():
+def test_registerproviderfactories_empty() -> None:
     """It creates an empty registry."""
     assert not registerproviderfactories()
 
 
-def test_registerproviderfactories_add():
+def test_registerproviderfactories_add() -> None:
     """It adds entries."""
     providerfactory = constproviderfactory(nullprovider)
 
@@ -215,7 +219,7 @@ def test_registerproviderfactories_add():
     assert registry == registerproviderfactories(default=providerfactory)
 
 
-def test_registerproviderfactories_override():
+def test_registerproviderfactories_override() -> None:
     """It overrides existing entries."""
     providerfactory1 = constproviderfactory(nullprovider)
     providerfactory2 = constproviderfactory(dictprovider())
@@ -227,12 +231,12 @@ def test_registerproviderfactories_override():
     assert registry.get("default") is providerfactory2
 
 
-def test_registerproviders_empty():
+def test_registerproviders_empty() -> None:
     """It creates an empty registry."""
     assert not registerproviders()
 
 
-def test_registerproviders_add():
+def test_registerproviders_add() -> None:
     """It adds entries."""
     registry = registerproviders()
     registry = registerprovider(registry, "default", nullprovider)
@@ -240,7 +244,7 @@ def test_registerproviders_add():
     assert "default" in registry
 
 
-def test_registerproviders_override(store: Store):
+def test_registerproviders_override(store: Store) -> None:
     """It overrides existing entries."""
     provider1 = nullprovider
     provider2 = dictprovider()
@@ -256,7 +260,7 @@ def test_registerproviders_override(store: Store):
     assert provider(URL(), revision=None) is not None
 
 
-def test_repositoryprovider_none(providerstore: ProviderStore, url: URL):
+def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
     registry = registerproviderfactories()
     provider = repositoryprovider(registry, providerstore)
@@ -266,7 +270,7 @@ def test_repositoryprovider_none(providerstore: ProviderStore, url: URL):
 
 def test_repositoryprovider_happy(
     providerstore: ProviderStore, fetcher: Fetcher, url: URL
-):
+) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
@@ -277,7 +281,7 @@ def test_repositoryprovider_happy(
 
 def test_repositoryprovider_with_provider_specific_url(
     providerstore: ProviderStore, fetcher: Fetcher, url: URL
-):
+) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     registry = registerproviderfactories(
