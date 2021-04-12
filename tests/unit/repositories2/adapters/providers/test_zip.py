@@ -29,6 +29,8 @@ def url(tmp_path: Path) -> URL:
 def test_localzipprovider_happy(url: URL) -> None:
     """It provides a repository from a local directory."""
     filesystem = localzipprovider(url, None)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == "Lorem"
 
@@ -50,6 +52,8 @@ def test_zipproviderfactory_happy(store: ProviderStore, url: URL) -> None:
     """It fetches a zip repository into storage."""
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
     filesystem = zipprovider(url, None)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == "Lorem"
 

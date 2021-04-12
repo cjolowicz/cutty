@@ -21,6 +21,8 @@ def test_diskprovider_happy(repository: Path) -> None:
     """It provides a repository from a local directory."""
     url = asurl(repository)
     filesystem = diskprovider(url, None)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == "Lorem"
 

@@ -41,9 +41,10 @@ def url(tmp_path: pathlib.Path) -> URL:
 def test_gitfetcher_happy(url: URL, store: Store) -> None:
     """It clones the git repository."""
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    assert destination is not None
+
     path = Path("marker", filesystem=GitFilesystem(destination))
-    text = path.read_text()
-    assert text == "Lorem"
+    assert path.read_text() == "Lorem"
 
 
 def test_gitfetcher_not_matched(store: Store) -> None:
@@ -74,7 +75,9 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
 
     # Second fetch.
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    assert destination is not None
 
     # Check that the marker file is gone.
     path = Path("marker", filesystem=GitFilesystem(destination))
+    assert path is not None
     assert not (path / "marker").is_file()

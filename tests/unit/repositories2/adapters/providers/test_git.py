@@ -63,6 +63,8 @@ def test_localgitprovider_happy(
 ) -> None:
     """It provides a repository from a local directory."""
     filesystem = localgitprovider(url, revision)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 
@@ -81,6 +83,8 @@ def test_gitproviderfactory_happy(
     """It fetches a git repository into storage."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
     filesystem = gitprovider(url, revision)
+    assert filesystem is not None
+
     text = filesystem.read_text(PurePath("marker"))
     assert text == expected
 
