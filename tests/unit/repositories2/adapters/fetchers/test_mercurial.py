@@ -59,12 +59,9 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
     return asurl(path)
 
 
-defaults = dict(revision=None, mode=FetchMode.ALWAYS)
-
-
 def test_hgfetcher_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
-    destination = hgfetcher(url, store, **defaults)
+    destination = hgfetcher(url, store, None, FetchMode.ALWAYS)
     path = Path("marker", filesystem=DiskFilesystem(destination))
     text = path.read_text()
     assert text == "Lorem"
@@ -73,7 +70,7 @@ def test_hgfetcher_happy(url: URL, store: Store) -> None:
 def test_hgfetcher_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = hgfetcher(url, store, **defaults)
+    path = hgfetcher(url, store, None, FetchMode.ALWAYS)
     assert path is None
 
 
@@ -83,20 +80,20 @@ def test_hgfetcher_no_executable(
     """It raises an exception if the hg executable cannot be located."""
     monkeypatch.setattr("shutil.which", lambda _: None)
     with pytest.raises(Exception):
-        hgfetcher(url, store, **defaults)
+        hgfetcher(url, store, None, FetchMode.ALWAYS)
 
 
 def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
-    hgfetcher(url, store, **defaults)
+    hgfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
     hg("rm", "marker", cwd=aspath(url))
     hg("commit", "--message=Remove the marker file", cwd=aspath(url))
 
     # Second fetch.
-    destination = hgfetcher(url, store, **defaults)
+    destination = hgfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is gone.
     path = Path("marker", filesystem=DiskFilesystem(destination))

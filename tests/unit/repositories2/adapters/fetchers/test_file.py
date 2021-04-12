@@ -19,13 +19,10 @@ def repository(tmp_path: Path) -> Path:
     return path
 
 
-defaults = dict(revision=None, mode=FetchMode.ALWAYS)
-
-
 def test_filefetcher_directory_happy(repository: Path, store: Store) -> None:
     """It copies the filesystem tree."""
     url = asurl(repository)
-    path = filefetcher(url, store, **defaults)
+    path = filefetcher(url, store, None, FetchMode.ALWAYS)
     text = (path / "marker").read_text()
     assert text == "Lorem"
 
@@ -34,13 +31,13 @@ def test_filefetcher_file_happy(repository: Path, store: Store) -> None:
     """It copies the file."""
     repository /= "marker"
     url = asurl(repository)
-    path = filefetcher(url, store, **defaults)
+    path = filefetcher(url, store, None, FetchMode.ALWAYS)
     assert path.read_text() == "Lorem"
 
 
 def test_filefetcher_not_matched(store: Store, url: URL) -> None:
     """It returns None if the URL does not use the file scheme."""
-    path = filefetcher(url, store, **defaults)
+    path = filefetcher(url, store, None, FetchMode.ALWAYS)
     assert path is None
 
 
@@ -49,11 +46,11 @@ def test_filefetcher_directory_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher(url, store, **defaults)
+    filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Second fetch, without the marker file.
     (repository / "marker").unlink()
-    path = filefetcher(url, store, **defaults)
+    path = filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is gone.
     assert not (path / "marker").is_file()
@@ -65,11 +62,11 @@ def test_filefetcher_file_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher(url, store, **defaults)
+    filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Second fetch, with modified marker file.
     repository.write_text("Ipsum")
-    path = filefetcher(url, store, **defaults)
+    path = filefetcher(url, store, None, FetchMode.ALWAYS)
 
     # Check that the marker file is updated.
     assert path.read_text() == "Ipsum"
