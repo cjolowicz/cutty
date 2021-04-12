@@ -174,7 +174,7 @@ def test_storage_clean_something(
     assert second in records
 
 
-def test_asproviderstore_allocate(storage: RepositoryStorage):
+def test_asproviderstore_allocate(storage: RepositoryStorage) -> None:
     """It can be used as a provider store."""
     url = URL("https://example.com/repository.git")
     providerstore = asproviderstore(storage)
@@ -183,7 +183,7 @@ def test_asproviderstore_allocate(storage: RepositoryStorage):
     assert path.is_dir()
 
 
-def test_asproviderstore_get(storage: RepositoryStorage):
+def test_asproviderstore_get(storage: RepositoryStorage) -> None:
     """It retrieves existing records when used as a provider store."""
     url = URL("https://example.com/repository.git")
     providerstore = asproviderstore(storage)
