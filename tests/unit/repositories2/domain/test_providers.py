@@ -1,7 +1,6 @@
 """Unit tests for cutty.repositories2.domain.providers."""
 import json
 import pathlib
-from types import MappingProxyType
 from typing import Any
 from typing import Optional
 
@@ -36,11 +35,11 @@ def nullprovider(url: URL, revision: Optional[Revision]) -> Optional[Filesystem]
     return None
 
 
-def dictprovider(mapping: dict[str, Any] = MappingProxyType({})) -> Provider:
+def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
     def _dictprovider(url: URL, revision: Optional[Revision]) -> Optional[Filesystem]:
-        return DictFilesystem(mapping)
+        return DictFilesystem(mapping or {})
 
     return _dictprovider
 
