@@ -13,28 +13,16 @@ from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
 from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.application.cookiecutter.prompts import prompt
-from cutty.repositories.adapters.directory import LocalDirectoryRepository
-from cutty.repositories.adapters.git import GitRepository
-from cutty.repositories.adapters.git import LocalGitRepository
-from cutty.repositories.adapters.mercurial import MercurialRepository
-from cutty.repositories.adapters.zip import LocalZipRepository
-from cutty.repositories.adapters.zip import ZipRepository
-from cutty.repositories.domain.loader import RepositoryLoader
+from cutty.repositories2.adapters.registry import defaultproviderregistry
+from cutty.repositories2.adapters.storage import asproviderstore
+from cutty.repositories2.adapters.storage import RepositoryStorage
+from cutty.repositories2.domain.providers import repositoryprovider
+from cutty.repositories2.domain.urls import parseurl
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.services import render
-
-
-def splitproviders(template: str) -> tuple[str, list[str]]:
-    """Split providers from template URL."""
-    for provider in ("git", "hg"):
-        prefix = f"{provider}+"
-        if template.startswith(prefix):
-            return template.removeprefix(prefix), [provider]
-
-    return template, []
 
 
 def main(
@@ -49,11 +37,13 @@ def main(
     skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    loader = RepositoryLoader(
-        cachedir=pathlib.Path(appdirs.user_cache_dir("cutty")),
-        remote=[ZipRepository, GitRepository, MercurialRepository],
-        local=[LocalGitRepository, LocalZipRepository, LocalDirectoryRepository],
+    repositorystorage = RepositoryStorage(
+        pathlib.Path(appdirs.user_cache_dir("cutty")),
         timer=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
+    )
+
+    provider = repositoryprovider(
+        defaultproviderregistry, asproviderstore(repositorystorage)
     )
 
     storage = CookiecutterFileStorage(
@@ -62,8 +52,8 @@ def main(
         skip_if_file_exists=skip_if_file_exists,
     )
 
-    template, providers = splitproviders(template)
-    path = loader.get(template, revision=checkout, providers=providers)
+    url = parseurl(template)
+    path = provider(url, revision=checkout)
 
     if directory is not None:
         path = path.joinpath(*directory.parts)
