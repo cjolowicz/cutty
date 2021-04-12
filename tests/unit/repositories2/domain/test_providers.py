@@ -252,7 +252,7 @@ def test_registerproviders_override(store: Store) -> None:
     registry = registerprovider(registry, "default", provider1)
     registry = registerprovider(registry, "default", provider2)
 
-    providerfactory = registry.get("default")
+    providerfactory = registry["default"]
     provider = providerfactory(store, FetchMode.ALWAYS)
 
     # Check that it's provider2 (the nullprovider returns None).
