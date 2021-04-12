@@ -79,7 +79,7 @@ def test_hgproviderfactory_happy(
 
 
 def test_hgproviderfactory_not_matching(store: ProviderStore):
-    """It returns None if the URL scheme is not recorgnized."""
+    """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
     filesystem = hgprovider(url, revision=None)

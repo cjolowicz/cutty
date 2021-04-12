@@ -84,7 +84,7 @@ def test_gitproviderfactory_happy(
 
 
 def test_gitproviderfactory_not_matching(store: ProviderStore):
-    """It returns None if the URL scheme is not recorgnized."""
+    """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
     filesystem = gitprovider(url, revision=None)
