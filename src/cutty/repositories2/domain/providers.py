@@ -79,8 +79,7 @@ def remoteproviderfactory(
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
     fetch = tuple(fetch)
-    if mount is None:
-        mount = _defaultmount
+    _mount = mount if mount is not None else _defaultmount
 
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         def _remoteprovider(
@@ -90,7 +89,7 @@ def remoteproviderfactory(
                 for fetcher in fetch:
                     path = fetcher(url, store, revision, fetchmode)
                     if path is not None:
-                        return mount(path, revision)
+                        return _mount(path, revision)
 
             return None
 
