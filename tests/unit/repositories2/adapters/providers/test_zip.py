@@ -9,7 +9,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories2.adapters.providers.zip import localzipprovider
 from cutty.repositories2.adapters.providers.zip import zipproviderfactory
 from cutty.repositories2.domain.fetchers import FetchMode
-from cutty.repositories2.domain.providers import ProviderStore
+from cutty.repositories2.domain.stores import Store
 from cutty.repositories2.domain.urls import asurl
 
 
@@ -48,7 +48,7 @@ def test_localzipprovider_not_matching(tmp_path: Path) -> None:
     assert filesystem is None
 
 
-def test_zipproviderfactory_happy(store: ProviderStore, url: URL) -> None:
+def test_zipproviderfactory_happy(store: Store, url: URL) -> None:
     """It fetches a zip repository into storage."""
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
     filesystem = zipprovider(url, None)
@@ -58,7 +58,7 @@ def test_zipproviderfactory_happy(store: ProviderStore, url: URL) -> None:
     assert text == "Lorem"
 
 
-def test_zipproviderfactory_not_matching(store: ProviderStore) -> None:
+def test_zipproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
