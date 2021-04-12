@@ -26,27 +26,27 @@ def url(tmp_path: Path) -> URL:
     return asurl(archive)
 
 
-def test_localzipprovider_happy(url: URL):
+def test_localzipprovider_happy(url: URL) -> None:
     """It provides a repository from a local directory."""
     filesystem = localzipprovider(url, revision=None)
     text = filesystem.read_text(PurePath("marker"))
     assert text == "Lorem"
 
 
-def test_localzipprovider_revision(url: URL):
+def test_localzipprovider_revision(url: URL) -> None:
     """It raises an exception when passed a revision."""
     with pytest.raises(Exception):
         localzipprovider(url, revision="v1.0")
 
 
-def test_localzipprovider_not_matching(tmp_path: Path):
+def test_localzipprovider_not_matching(tmp_path: Path) -> None:
     """It returns None if the path is not a zip repository."""
     url = asurl(tmp_path)
     filesystem = localzipprovider(url, revision=None)
     assert filesystem is None
 
 
-def test_zipproviderfactory_happy(store: ProviderStore, url: URL):
+def test_zipproviderfactory_happy(store: ProviderStore, url: URL) -> None:
     """It fetches a zip repository into storage."""
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
     filesystem = zipprovider(url, revision=None)
@@ -54,7 +54,7 @@ def test_zipproviderfactory_happy(store: ProviderStore, url: URL):
     assert text == "Lorem"
 
 
-def test_zipproviderfactory_not_matching(store: ProviderStore):
+def test_zipproviderfactory_not_matching(store: ProviderStore) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
