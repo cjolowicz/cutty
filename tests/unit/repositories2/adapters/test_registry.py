@@ -3,7 +3,7 @@ from yarl import URL
 
 from cutty.repositories2.adapters.registry import defaultproviderregistry
 from cutty.repositories2.domain.fetchers import FetchMode
-from cutty.repositories2.domain.providers import ProviderStore
+from cutty.repositories2.domain.stores import Store
 
 
 def test_defaultproviderregistry_non_empty() -> None:
@@ -18,7 +18,7 @@ def test_defaultproviderregistry_strings() -> None:
     )
 
 
-def test_defaultproviderregistry_providerfactories(store: ProviderStore) -> None:
+def test_defaultproviderregistry_providerfactories(store: Store) -> None:
     """Its values are provider factories."""
     url = URL("mailto:you@example.com")
     for providerfactory in defaultproviderregistry.values():
