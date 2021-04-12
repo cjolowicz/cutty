@@ -112,7 +112,7 @@ def registerproviderfactory(
     providerfactory: ProviderFactory,
 ) -> ProviderRegistry:
     """Register a provider factory."""
-    return providerregistry | {providername: providerfactory}
+    return {**providerregistry, providername: providerfactory}
 
 
 def registerproviderfactories(
@@ -120,7 +120,7 @@ def registerproviderfactories(
     **providerfactories: ProviderFactory,
 ) -> ProviderRegistry:
     """Register provider factories."""
-    return providerregistry | providerfactories
+    return {**providerregistry, **providerfactories}
 
 
 def constproviderfactory(provider: Provider) -> ProviderFactory:
@@ -138,7 +138,7 @@ def registerprovider(
     provider: Provider,
 ) -> ProviderRegistry:
     """Register a provider factory."""
-    return providerregistry | {providername: constproviderfactory(provider)}
+    return {**providerregistry, providername: constproviderfactory(provider)}
 
 
 def registerproviders(
@@ -146,10 +146,11 @@ def registerproviders(
     **providers: Provider,
 ) -> ProviderRegistry:
     """Register provider factories."""
-    return providerregistry | {
+    providerfactories = {
         providername: constproviderfactory(provider)
         for providername, provider in providers.items()
     }
+    return {**providerregistry, **providerfactories}
 
 
 def _createprovider(
