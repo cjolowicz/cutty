@@ -1,5 +1,4 @@
 """Main entry point for the Cookiecutter compatibility layer."""
-import datetime
 import functools
 import pathlib
 from collections.abc import Mapping
@@ -37,11 +36,7 @@ def main(
     skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    repositorystorage = RepositoryStorage(
-        pathlib.Path(appdirs.user_cache_dir("cutty")),
-        timer=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
-    )
-
+    repositorystorage = RepositoryStorage(pathlib.Path(appdirs.user_cache_dir("cutty")))
     provider = repositoryprovider(
         defaultproviderregistry, asproviderstore(repositorystorage)
     )
