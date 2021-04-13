@@ -20,6 +20,9 @@ def loadpaths(path: Path, config: Config) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
-            return iter([*loadhooks(path), template_dir])
+            break
     else:
         raise RuntimeError("template directory not found")  # pragma: no cover
+
+    yield from loadhooks(path)
+    yield template_dir
