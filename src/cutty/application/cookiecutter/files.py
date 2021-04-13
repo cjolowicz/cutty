@@ -84,16 +84,6 @@ class CookiecutterFileStorage(DiskFileStorage):
             executehook(hooks, "post_gen_project", cwd=project)
 
 
-@contextmanager
-def temporarystorage(
-    filestorage: Callable[[pathlib.Path], DiskFileStorage]
-) -> Iterator[DiskFileStorage]:
-    """Return temporary storage."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        path = pathlib.Path(tmpdir)
-        yield filestorage(path)
-
-
 def executehook(hooks: Mapping[str, File], hook: str, *, cwd: pathlib.Path) -> None:
     """Execute the hook."""
     hookfile = hooks.get(hook)
@@ -109,6 +99,16 @@ def storehook(hookfile: File) -> Iterator[pathlib.Path]:
         path = storage.resolve(hookfile.path)
         storage.storefile(hookfile, path)
         yield path
+
+
+@contextmanager
+def temporarystorage(
+    filestorage: Callable[[pathlib.Path], DiskFileStorage]
+) -> Iterator[DiskFileStorage]:
+    """Return temporary storage."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = pathlib.Path(tmpdir)
+        yield filestorage(path)
 
 
 def runhook(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
