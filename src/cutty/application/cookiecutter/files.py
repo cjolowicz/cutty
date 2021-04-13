@@ -72,14 +72,16 @@ class CookiecutterFileStorage(DiskFileStorage):
                 project = self.resolve(file.path.parents[-2])
                 if not self.overwrite_if_exists and project.exists():
                     raise FileExistsError(f"{project} already exists")
-                executehook(hooks, "pre_gen_project", project)
+
+                project.mkdir(parents=True, exist_ok=True)
+                executehook(hooks, "pre_gen_project", cwd=project)
 
             path = self.resolve(file.path)
             if not (self.skip_if_file_exists and path.exists()):
                 self.storefile(file, path)
 
         if project is not None:
-            executehook(hooks, "post_gen_project", project)
+            executehook(hooks, "post_gen_project", cwd=project)
 
 
 @contextmanager
@@ -92,12 +94,12 @@ def temporarystorage(
         yield filestorage(path)
 
 
-def executehook(hooks: Mapping[str, File], hook: str, project: pathlib.Path) -> None:
+def executehook(hooks: Mapping[str, File], hook: str, *, cwd: pathlib.Path) -> None:
     """Execute the hook."""
     hookfile = hooks.get(hook)
     if hookfile is not None:
         with storehook(hookfile) as path:
-            runhook(path, project)
+            runhook(path, cwd=cwd)
 
 
 @contextmanager
@@ -109,10 +111,9 @@ def storehook(hookfile: File) -> Iterator[pathlib.Path]:
         yield path
 
 
-def runhook(path: pathlib.Path, project: pathlib.Path) -> None:
+def runhook(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
     """Run the hook."""
     command = [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
     shell = platform.system() == "Windows"
 
-    project.mkdir(parents=True, exist_ok=True)
-    subprocess.run(command, shell=shell, cwd=project, check=True)  # noqa: S602
+    subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
