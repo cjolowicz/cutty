@@ -62,7 +62,7 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         path = render(file.path, bindings)
 
         if any(
-            fnmatch.fnmatch(pattern, str(file.path)) for pattern in copy_without_render
+            fnmatch.fnmatch(str(file.path), pattern) for pattern in copy_without_render
         ):
             return File(path, file.mode, file.blob)
 
