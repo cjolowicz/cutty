@@ -6,6 +6,7 @@ import pytest
 from yarl import URL
 
 from cutty.repositories.adapters.storage import asproviderstore
+from cutty.repositories.adapters.storage import defaulttimer
 from cutty.repositories.adapters.storage import hashurl
 from cutty.repositories.adapters.storage import RepositoryStorage
 from cutty.repositories.adapters.storage import StorageRecord
@@ -44,6 +45,13 @@ def test_hashurl(url: URL) -> None:
     digest = hashurl(url)
     assert len(digest) > 32
     assert digest.isascii()
+
+
+def test_defaulttimer() -> None:
+    """It returns the current time in UTC."""
+    now = defaulttimer()
+    assert now.year >= 2021
+    assert now.tzinfo is datetime.timezone.utc
 
 
 class FakeTimer:

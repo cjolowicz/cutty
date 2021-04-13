@@ -62,10 +62,15 @@ def hashurl(url: URL) -> str:
 Timer = Callable[[], datetime.datetime]
 
 
+def defaulttimer() -> datetime.datetime:
+    """Return the current time in UTC."""
+    return datetime.datetime.now(tz=datetime.timezone.utc)
+
+
 class RepositoryStorage:
     """Storage backend for repositories."""
 
-    def __init__(self, path: pathlib.Path, *, timer: Timer) -> None:
+    def __init__(self, path: pathlib.Path, *, timer: Timer = defaulttimer) -> None:
         """Initialize."""
         self.path = path
         self.path.mkdir(parents=True, exist_ok=True)
