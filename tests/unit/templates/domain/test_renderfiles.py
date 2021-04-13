@@ -3,7 +3,6 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import Renderer
@@ -23,7 +22,7 @@ def test_renderfiles_default(render: Renderer, path: Path) -> None:
 
     [file] = renderfiles([path], render, [binding])
 
-    assert file.path == PurePath("teapot")
+    assert file.path.parts == ("teapot",)
     assert file.mode == Mode.DEFAULT
     assert file.blob == "teapot-blob"
 
