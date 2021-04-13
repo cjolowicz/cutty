@@ -54,9 +54,7 @@ def loadconfig(template: str, path: Path) -> Config:
 
     data.setdefault("_template", template)
 
-    settings = dict(
-        (name, value) for name, value in data.items() if name.startswith("_")
-    )
+    settings = {name: value for name, value in data.items() if name.startswith("_")}
 
     variables = tuple(
         loadvariable(name, value)
