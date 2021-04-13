@@ -62,10 +62,10 @@ cutty.templates.adapters.jinja.extensions
    :members:
 
 
-cutty.templates.adapters.jinjarender
+cutty.templates.adapters.jinja
 ------------------------------------
 
-.. automodule:: cutty.templates.adapters.jinjarender
+.. automodule:: cutty.templates.adapters.jinja
    :members:
 
 

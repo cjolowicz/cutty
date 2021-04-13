@@ -5,7 +5,7 @@ from typing import Any
 
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.jinjarender import createrenderer
+from cutty.templates.adapters.jinja import createrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
