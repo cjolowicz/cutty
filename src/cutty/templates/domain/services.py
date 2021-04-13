@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.binders import RenderBinder
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.files import FileStorage
+from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 
@@ -22,14 +22,11 @@ def render(
     loadconfig: ConfigLoader,
     loadrenderer: RendererLoader,
     loadpaths: PathLoader,
-    storefiles: FileStorage,
-) -> None:
+) -> Iterator[File]:
     """Render the template at the given path."""
     config = loadconfig(path)
     render = loadrenderer(path, config)
     paths = loadpaths(path, config)
 
     bindings = renderbind(render, config.variables)
-    files = renderfiles(paths, render, bindings)
-
-    storefiles(files)
+    return renderfiles(paths, render, bindings)

@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import enum
-from collections.abc import Callable
-from collections.abc import Iterable
 from dataclasses import dataclass
 
 from cutty.filesystems.domain.filesystem import Access
@@ -32,6 +30,3 @@ class File:
         blob = path.read_text()
         mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
         return cls(path, mode, blob)
-
-
-FileStorage = Callable[[Iterable[File]], None]

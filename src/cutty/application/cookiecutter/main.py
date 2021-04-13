@@ -63,11 +63,12 @@ def main(
         [Binding(key, value) for key, value in extra_context.items()],
     )
 
-    render(
+    files = render(
         path,
         loadconfig=functools.partial(loadconfig, template),
         loadrenderer=loadrenderer,
         loadpaths=loadpaths,
         renderbind=renderbindwith(binder),
-        storefiles=storage.store,
     )
+
+    storage.store(files)
