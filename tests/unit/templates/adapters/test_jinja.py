@@ -1,4 +1,4 @@
-"""Unit tests for cutty.templates.adapters.jinjarender."""
+"""Unit tests for cutty.templates.adapters.jinja."""
 import pathlib
 
 import jinja2
@@ -7,9 +7,9 @@ import pytest
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.jinjarender import createrenderer
-from cutty.templates.adapters.jinjarender import import_object
-from cutty.templates.adapters.jinjarender import load_extension
+from cutty.templates.adapters.jinja import createrenderer
+from cutty.templates.adapters.jinja import import_object
+from cutty.templates.adapters.jinja import load_extension
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
 
