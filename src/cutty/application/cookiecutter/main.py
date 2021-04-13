@@ -11,8 +11,8 @@ import appdirs
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.loader import loadconfig
 from cutty.application.cookiecutter.loader import loadpaths
-from cutty.application.cookiecutter.loader import loadrenderer
 from cutty.application.cookiecutter.prompts import prompt
+from cutty.application.cookiecutter.render import loadrenderer
 from cutty.repositories.adapters.registry import defaultproviderregistry
 from cutty.repositories.adapters.storage import asproviderstore
 from cutty.repositories.adapters.storage import RepositoryStorage
