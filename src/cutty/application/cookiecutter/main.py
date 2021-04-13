@@ -51,7 +51,7 @@ def main(
     path = provider(url, revision=checkout)
 
     if directory is not None:
-        path = path.joinpath(*directory.parts)
+        path = path.joinpath(*directory.parts)  # pragma: no cover
 
     binder = override(
         binddefault if no_input else prompt,
