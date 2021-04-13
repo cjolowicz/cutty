@@ -21,9 +21,10 @@ def gitfetcher(
     """Fetch a git repository."""
 
     def _createremote(
-        repository: pygit2.Repository, name: str, url: str
+        repository: pygit2.Repository, name: bytes, url: bytes
     ) -> pygit2.Remote:
-        repository.config[f"remote.{name}.mirror"] = True
+        name_ = name.decode()
+        repository.config[f"remote.{name_}.mirror"] = True
         return repository.remotes.create(name, url, "+refs/*:refs/*")
 
     if destination.exists():
