@@ -9,6 +9,7 @@ from typing import Any
 from typing import overload
 from typing import TypeVar
 
+from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.files import File
@@ -46,13 +47,25 @@ def rendervariable(
     )
 
 
-def renderpath(
+def renderpurepath(
     path: PurePath,
     bindings: Sequence[Binding],
     render: RenderFunction,
 ) -> PurePath:
     """Render a path by rendering its parts."""
     return PurePath(*(render(part, bindings) for part in path.parts))
+
+
+def renderpath(
+    path: Path,
+    bindings: Sequence[Binding],
+    render: RenderFunction,
+) -> Path:
+    """Render a path by rendering its parts."""
+    return Path(
+        *(render(part, bindings) for part in path.parts),
+        filesystem=path.filesystem,
+    )
 
 
 def renderfile(
@@ -123,7 +136,8 @@ class Renderer:
         render = cls()
 
         render.register(GenericVariable, rendervariable)
-        render.register(PurePath, renderpath)
+        render.register(PurePath, renderpurepath)
+        render.register(Path, renderpath)
         render.register(File, renderfile)
 
         return render
