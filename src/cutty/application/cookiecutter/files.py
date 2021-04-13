@@ -6,6 +6,7 @@ import platform
 import subprocess  # noqa: S404
 import sys
 import tempfile
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
@@ -57,14 +58,6 @@ class CookiecutterFileStorage(DiskFileStorage):
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
 
-    @classmethod
-    @contextmanager
-    def temporary(cls) -> Iterator[CookiecutterFileStorage]:
-        """Return temporary storage."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = pathlib.Path(tmpdir)
-            yield cls(path)
-
     def store(self, files: Iterable[File]) -> None:
         """Store the files on disk."""
         hooks = {}
@@ -79,32 +72,41 @@ class CookiecutterFileStorage(DiskFileStorage):
                 project = self.resolve(file.path.parents[-2])
                 if not self.overwrite_if_exists and project.exists():
                     raise FileExistsError(f"{project} already exists")
-                self.executehook(hooks, "pre_gen_project", project)
+                executehook(hooks, "pre_gen_project", project)
 
             path = self.resolve(file.path)
             if not (self.skip_if_file_exists and path.exists()):
                 self.storefile(file, path)
 
         if project is not None:
-            self.executehook(hooks, "post_gen_project", project)
+            executehook(hooks, "post_gen_project", project)
 
-    def executehook(
-        self, hooks: Mapping[str, File], hook: str, project: pathlib.Path
-    ) -> None:
-        """Execute the hook."""
-        hookfile = hooks.get(hook)
-        if hookfile is not None:
-            with self.storehook(hookfile) as path:
-                runhook(path, project)
 
-    @classmethod
-    @contextmanager
-    def storehook(cls, hookfile: File) -> Iterator[pathlib.Path]:
-        """Store the hook on disk."""
-        with cls.temporary() as storage:
-            path = storage.resolve(hookfile.path)
-            storage.storefile(hookfile, path)
-            yield path
+@contextmanager
+def temporarystorage(
+    filestorage: Callable[[pathlib.Path], DiskFileStorage]
+) -> Iterator[DiskFileStorage]:
+    """Return temporary storage."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = pathlib.Path(tmpdir)
+        yield filestorage(path)
+
+
+def executehook(hooks: Mapping[str, File], hook: str, project: pathlib.Path) -> None:
+    """Execute the hook."""
+    hookfile = hooks.get(hook)
+    if hookfile is not None:
+        with storehook(hookfile) as path:
+            runhook(path, project)
+
+
+@contextmanager
+def storehook(hookfile: File) -> Iterator[pathlib.Path]:
+    """Store the hook on disk."""
+    with temporarystorage(CookiecutterFileStorage) as storage:
+        path = storage.resolve(hookfile.path)
+        storage.storefile(hookfile, path)
+        yield path
 
 
 def runhook(path: pathlib.Path, project: pathlib.Path) -> None:
