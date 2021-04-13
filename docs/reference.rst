@@ -55,31 +55,10 @@ cutty.templates.domain.services
    :members:
 
 
-cutty.templates.adapters.jinja.extensions
------------------------------------------
-
-.. automodule:: cutty.templates.adapters.jinja.extensions
-   :members:
-
-
 cutty.templates.adapters.jinja
-------------------------------------
+------------------------------
 
 .. automodule:: cutty.templates.adapters.jinja
-   :members:
-
-
-cutty.application.cookiecutter.prompts
---------------------------------------
-
-.. automodule:: cutty.application.cookiecutter.prompts
-   :members:
-
-
-cutty.templates.adapters.diskfilestorage
-----------------------------------------
-
-.. automodule:: cutty.templates.adapters.diskfilestorage
    :members:
 
 
@@ -94,6 +73,13 @@ cutty.filesystems.domain.filesystem
 -----------------------------------
 
 .. automodule:: cutty.filesystems.domain.filesystem
+   :members:
+
+
+cutty.filesystems.domain.nodefs
+-------------------------------
+
+.. automodule:: cutty.filesystems.domain.nodefs
    :members:
 
 
@@ -300,10 +286,38 @@ cutty.application.cookiecutter.files
    :members:
 
 
-cutty.application.cookiecutter.loader
+cutty.application.cookiecutter.config
 -------------------------------------
 
-.. automodule:: cutty.application.cookiecutter.loader
+.. automodule:: cutty.application.cookiecutter.config
+   :members:
+
+
+cutty.application.cookiecutter.extensions
+-----------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.extensions
+   :members:
+
+
+cutty.application.cookiecutter.render
+-------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.render
+   :members:
+
+
+cutty.application.cookiecutter.paths
+------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.paths
+   :members:
+
+
+cutty.application.cookiecutter.prompts
+--------------------------------------
+
+.. automodule:: cutty.application.cookiecutter.prompts
    :members:
 
 
