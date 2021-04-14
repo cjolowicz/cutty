@@ -1,5 +1,6 @@
 """Unit tests for cutty.repositories.domain.urls."""
 import os
+import platform
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -52,6 +53,19 @@ def test_aspath_invalid(url: URL) -> None:
     """It raises an exception."""
     with pytest.raises(ValueError):
         aspath(url)
+
+
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows only")
+@pytest.mark.parametrize(
+    ("url", "expected"),
+    [
+        (URL("file:///C:/dir/file"), Path(r"C:\dir\file")),
+        (URL("file://host/share/file"), Path(r"\\host\share\file")),
+    ],
+)
+def test_aspath_windows(url: URL, expected: Path) -> None:
+    """It translates drive letters and hosts."""
+    assert aspath(url) == expected
 
 
 @pytest.mark.parametrize(
