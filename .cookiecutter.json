@@ -4,6 +4,7 @@
   "email": "mail@claudiojolowicz.com",
   "friendly_name": "cutty",
   "github_user": "cjolowicz",
+  "license": "MIT",
   "package_name": "cutty",
   "project_name": "cutty",
   "version": "0.0.0"
