@@ -4,6 +4,7 @@ from __future__ import annotations
 import functools
 import inspect
 import itertools
+import re
 import shutil
 import subprocess  # noqa: S404
 import sys
@@ -19,8 +20,6 @@ from typing import MutableMapping
 from typing import Optional
 from typing import TypeVar
 from urllib.parse import urlparse
-
-import packaging.version
 
 from . import exceptions
 from .compat import cached_property
@@ -57,6 +56,48 @@ class Error(Exception):
         return f"git {self.command}: {self.message}"
 
 
+VERSION_PATTERN = re.compile(
+    r"""
+    (?P<major>\d+)\.
+    (?P<minor>\d+)
+    (\.(?P<patch>\d+))?
+    """,
+    re.VERBOSE,
+)
+
+
+@dataclass(frozen=True, order=True)
+class Version:
+    """Simplistic representation of git versions."""
+
+    major: int
+    minor: int
+    patch: int
+    _text: Optional[str] = field(default=None, compare=False)
+
+    @classmethod
+    def parse(cls, text: str) -> Version:
+        """Extract major.minor[.patch] from the start of the text."""
+        match = VERSION_PATTERN.match(text)
+
+        if match is None:
+            raise ValueError(f"invalid version {text!r}")
+
+        parts = match.groupdict(default="0")
+
+        return cls(
+            int(parts["major"]), int(parts["minor"]), int(parts["patch"]), _text=text
+        )
+
+    def __str__(self) -> str:
+        """Return the original representation."""
+        return (
+            self._text
+            if self._text is not None
+            else f"{self.major}.{self.minor}.{self.patch}"
+        )
+
+
 @dataclass
 class Git:
     """Git program."""
@@ -71,14 +112,15 @@ class Git:
         return None if path is None else cls(Path(path))
 
     @cached_property
-    def version(self) -> str:
+    def version(self) -> Version:
         """Return the git version."""
-        output = self.run("--version").stdout.strip()
-        return removeprefix(output, "git version ")
+        text = self.run("--version").stdout.strip()
+        text = removeprefix(text, "git version ")
+        return Version.parse(text)
 
     def check_version(self, version: str) -> bool:
         """Return True if Git has at least the given version."""
-        return packaging.version.parse(version) <= packaging.version.parse(self.version)
+        return Version.parse(version) <= self.version
 
     def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
