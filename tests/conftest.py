@@ -1,6 +1,7 @@
 """Common fixtures."""
 import os
 import pathlib
+import platform
 from textwrap import dedent
 
 import pytest
@@ -44,3 +45,9 @@ def template_directory(tmp_path: pathlib.Path) -> pathlib.Path:
     )
 
     return tmp_path
+
+
+@pytest.fixture(autouse=platform.system() == "Windows")
+def set_storage_digest_size(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Avoid errors due to excessively long paths on Windows."""
+    monkeypatch.setattr("cutty.repositories.adapters.storage.DIGEST_SIZE", 3)
