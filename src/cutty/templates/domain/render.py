@@ -99,19 +99,19 @@ class Renderer:
 
     @overload
     def register(self, __cls: type[T]) -> RenderDecorator[T, U]:
-        """Overload for use as ``@render.register(cls)``."""  # noqa: D402
+        ...
 
     @overload
     def register(
         self, __cls: type[T], __function: GenericRenderFunction[T]
     ) -> GenericRenderFunction[T]:
-        """Overload for use as ``render.register(cls, function)``."""  # noqa: D402
+        ...
 
     @overload
     def register(
         self, __cls: type[T], __function: RenderContinuation[T, U]
     ) -> RenderContinuation[T, U]:
-        """Overload for use as ``render.register(cls, function)``."""  # noqa: D402
+        ...
 
     def register(self, cls, function=None):  # type: ignore[no-untyped-def]
         """Register a render continuation function."""
