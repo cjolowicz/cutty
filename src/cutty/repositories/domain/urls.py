@@ -20,7 +20,15 @@ def aspath(url: URL) -> pathlib.Path:
     ):
         raise ValueError(f"not a path: {url}")
 
-    return pathlib.Path(f"//{url.host}{url.path}" if url.host else url.path)
+    if platform.system() == "Windows":
+        if url.host:
+            return pathlib.Path(f"//{url.host}{url.path}")
+
+        path = pathlib.Path(url.path[1:])
+        if path.drive:
+            return path
+
+    return pathlib.Path(url.path)
 
 
 def asurl(path: pathlib.Path) -> URL:
