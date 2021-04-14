@@ -118,9 +118,10 @@ class Git:
         text = removeprefix(text, "git version ")
         return Version.parse(text)
 
-    def check_version(self, version: str) -> bool:
+    def check_version(self, minimum: str) -> bool:
         """Return True if Git has at least the given version."""
-        return Version.parse(version) <= self.version
+        version: Version = self.version  # mypy workaround for Python 3.7
+        return Version.parse(minimum) <= version
 
     def run(self, *args: StrPath, cwd: Optional[Path] = None) -> CompletedProcess:
         """Invoke git."""
