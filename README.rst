@@ -55,10 +55,16 @@ You can install *Cutty* via pip_ from PyPI_:
    $ pip install cutty
 
 
-Usage
------
+.. basic-usage
+
+Basic usage
+-----------
 
 * TODO
+
+.. end-basic-usage
+
+Complete instructions can be found at `cutty.readthedocs.io`_.
 
 
 Contributing
@@ -95,5 +101,6 @@ This project was generated from `@cjolowicz`_'s `Hypermodern Python Cookiecutter
 .. _Hypermodern Python Cookiecutter: https://github.com/cjolowicz/cookiecutter-hypermodern-python
 .. _file an issue: https://github.com/cjolowicz/cutty/issues
 .. _pip: https://pip.pypa.io/
+.. _cutty.readthedocs.io: https://cutty.readthedocs.io
 .. github-only
 .. _Contributor Guide: CONTRIBUTING.rst

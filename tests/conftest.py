@@ -1,4 +1,5 @@
 """Test fixtures."""
+import platform
 from pathlib import Path
 from textwrap import dedent
 from typing import Iterator
@@ -7,14 +8,15 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from click.testing import CliRunner
 
-from cutty import cache
-from cutty import git
+from cutty.core import git
+from cutty.core import locations
+from cutty.core.cache import Cache
 
 
 @pytest.fixture(scope="session", autouse=True)
 def git_author() -> None:
     """Provide author information to git commit."""
-    git.env.update(
+    git._global.git.env.update(
         {
             "GIT_AUTHOR_NAME": "Example Author",
             "GIT_AUTHOR_EMAIL": "example.author@example.com",
@@ -35,10 +37,17 @@ def repository(tmp_path: Path) -> git.Repository:
 @pytest.fixture
 def user_cache_dir(monkeypatch: MonkeyPatch, tmp_path: Path) -> Path:
     """Replace the application cache directory by a temporary directory."""
-    path = tmp_path / ".cache" / cache.appname
+    path = tmp_path / ".cache" / locations.cache.name
     path.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr("appdirs.user_cache_dir", lambda *args, **kwargs: path)
     return path
+
+
+@pytest.fixture
+def cache(tmp_path: Path) -> Cache:
+    """Return a temporary application cache."""
+    path = tmp_path / ".cache" / locations.cache.name
+    return Cache(path)
 
 
 @pytest.fixture
@@ -71,32 +80,14 @@ def template(repository: git.Repository) -> git.Repository:
     )
     (repository.path / "cookiecutter.json").write_text(dedent(cookiecutter_json))
 
-    repository.git("add", ".")
-    repository.git("commit", "--message=Initial commit")
-    repository.git("tag", "v1.0.0")
+    repository.add(".")
+    repository.commit(message="Initial commit")
+    repository.tag("v1.0.0")
 
     return repository
 
 
-@pytest.fixture
-def cookiecutters_dir(tmp_path: Path) -> Path:
-    """A temporary directory for cookiecutters."""
-    return tmp_path / "cookiecutters_dir"
-
-
-@pytest.fixture
-def replay_dir(tmp_path: Path) -> Path:
-    """A temporary directory for replay data."""
-    return tmp_path / "replay_dir"
-
-
-@pytest.fixture
-def user_config_file(tmp_path: Path, cookiecutters_dir: Path, replay_dir: Path) -> Path:
-    """Configure cookiecutter to write to temporary directories."""
-    path = tmp_path / ".cookiecutterrc"
-    config = f"""\
-    cookiecutters_dir: {cookiecutters_dir}
-    replay_dir: {replay_dir}
-    """
-    path.write_text(dedent(config))
-    return path
+@pytest.fixture(autouse=platform.system() == "Windows")
+def reduce_digest_size(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Avoid errors due to overly long filenames on Windows."""
+    monkeypatch.setattr("cutty.core.cache.DIGEST_SIZE", 3)
