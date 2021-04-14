@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python",
-  "commit": "7319abb8e2c0c10d43bd17be23b7239bf7daf6cb",
+  "commit": "445a61161c267da9134afd4d1f3323af63f9df77",
   "context": {
     "cookiecutter": {
       "project_name": "cutty",
@@ -10,8 +10,10 @@
       "email": "mail@claudiojolowicz.com",
       "github_user": "cjolowicz",
       "version": "0.0.0",
+      "license": "MIT",
       "_template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python"
     }
   },
-  "directory": null
+  "directory": null,
+  "checkout": null
 }
