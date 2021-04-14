@@ -36,7 +36,7 @@ def test_storagerecord_roundtrip(record: StorageRecord) -> None:
     [
         URL("https://example.com/repository.git"),
         URL("file:///tmp/repository.git"),
-        URL("/tmp/repository.git"),
+        URL("/home/user/repository.git"),
     ],
     ids=str,
 )
