@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import json
 import pathlib
+import platform
 import shutil
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -50,13 +51,18 @@ class StorageRecord:
         (self.path / "config.json").write_text(text)
 
 
+# Windows does not properly support files and directories longer than
+# 260 characters. Use a smaller digest size on this platform.
+DIGEST_SIZE: int = 64 if platform.system() != "Windows" else 32
+
+
 def hashurl(url: URL) -> str:
     """Return the hashsum for the given URL.
 
-    Creates a 128-character digest using the BLAKE2b hash algorithm.
+    Creates a digest using the BLAKE2b hash algorithm.
     """
     data = str(url).encode()
-    return hashlib.blake2b(data).hexdigest()
+    return hashlib.blake2b(data, digest_size=DIGEST_SIZE).hexdigest()
 
 
 Timer = Callable[[], datetime.datetime]
@@ -78,8 +84,8 @@ class RepositoryStorage:
 
     def _getrepositorypath(self, url: URL, *, provider: ProviderName) -> pathlib.Path:
         """Return the path to the repository."""
-        hash = hashurl(url)
-        return self.path / "repositories" / provider / hash[:2] / hash
+        h = hashurl(url)
+        return self.path / "repositories" / provider / h[:2] / h[2:]
 
     def get(self, url: URL, *, provider: ProviderName) -> Optional[StorageRecord]:
         """Retrieve storage for a repository."""
