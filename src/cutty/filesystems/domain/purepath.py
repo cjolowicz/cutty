@@ -72,12 +72,12 @@ class Parents(Sequence[PurePathT]):
         return len(self.path.parts)
 
     @overload
-    def __getitem__(self, index: int) -> PurePathT:
-        """Return the nth parent."""
+    def __getitem__(self, index: int) -> PurePathT:  # noqa: D105
+        ...
 
     @overload
-    def __getitem__(self, index: slice) -> Sequence[PurePathT]:
-        """Return the parents indicated by the slice."""
+    def __getitem__(self, index: slice) -> Sequence[PurePathT]:  # noqa: D105
+        ...
 
     def __getitem__(
         self, index: Union[int, slice]
