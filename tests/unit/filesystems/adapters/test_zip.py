@@ -1,4 +1,5 @@
 """Unit tests for cutty.filesystems.adapters.zip."""
+import platform
 import shutil
 from pathlib import Path
 
@@ -135,6 +136,19 @@ def test_iterdir(filesystem: ZipFilesystem, path: PurePath, entries: set[str]) -
     assert set(filesystem.iterdir(path)) == entries
 
 
-def test_access(filesystem: ZipFilesystem) -> None:
+@pytest.mark.skipif(
+    platform.system() == "Windows", reason="Windows has no executable filemode"
+)
+def test_access_executable(filesystem: ZipFilesystem) -> None:
     """It returns True if the file can be accessed."""
     assert filesystem.access(PurePath("dir", "script.py"), Access.EXECUTE)
+
+
+def test_access_exists(filesystem: ZipFilesystem) -> None:
+    """It returns True if the file can be accessed."""
+    assert filesystem.access(PurePath("dir", "script.py"), Access.DEFAULT)
+
+
+def test_access_not_exists(filesystem: ZipFilesystem) -> None:
+    """It returns False if the file cannot be accessed."""
+    assert not filesystem.access(PurePath("bogus"), Access.DEFAULT)
