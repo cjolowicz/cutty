@@ -1,12 +1,11 @@
 cutty
 =====
 
-|PyPI| |Python Version| |License|
+|PyPI| |Python Version| |License| |Read the Docs| |Tests| |Codecov|
 
-|Read the Docs| |Tests| |Codecov|
-
-|pre-commit| |Black|
-
+.. |Status| image:: https://badgen.net/badge/status/alpha/d8624d
+   :target: https://badgen.net/badge/status/alpha/d8624d
+   :alt: Project Status
 .. |PyPI| image:: https://img.shields.io/pypi/v/cutty.svg
    :target: https://pypi.org/project/cutty/
    :alt: PyPI
@@ -25,24 +24,15 @@ cutty
 .. |Codecov| image:: https://codecov.io/gh/cjolowicz/cutty/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/cjolowicz/cutty
    :alt: Codecov
-.. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
-   :target: https://github.com/pre-commit/pre-commit
-   :alt: pre-commit
-.. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
-   :alt: Black
 
 
-Features
---------
-
-* TODO
+An experimental Cookiecutter clone :construction:
 
 
 Requirements
 ------------
 
-* TODO
+* Python 3.9
 
 
 Installation
