@@ -1,4 +1,5 @@
 """Test fixtures."""
+import platform
 from pathlib import Path
 from textwrap import dedent
 from typing import Iterator
@@ -84,3 +85,9 @@ def template(repository: git.Repository) -> git.Repository:
     repository.tag("v1.0.0")
 
     return repository
+
+
+@pytest.fixture(autouse=platform.system() == "Windows")
+def reduce_digest_size(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Avoid errors due to overly long filenames on Windows."""
+    monkeypatch.setattr("cutty.core.cache.DIGEST_SIZE", 3)

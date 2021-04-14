@@ -15,8 +15,11 @@ from .versions import Version
 logger = logging.getLogger(__name__)
 
 
+DIGEST_SIZE = hashlib.blake2b.MAX_DIGEST_SIZE
+
+
 def _hash(value: str) -> str:
-    return hashlib.blake2b(value.encode()).hexdigest()
+    return hashlib.blake2b(value.encode(), digest_size=DIGEST_SIZE).hexdigest()
 
 
 def _load_repository(location: str, path: Path) -> git.Repository:
