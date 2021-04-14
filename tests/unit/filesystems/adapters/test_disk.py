@@ -11,7 +11,9 @@ from cutty.filesystems.domain.path import Path
 @pytest.fixture
 def filesystem(tmp_path: pathlib.Path) -> DiskFilesystem:
     """Return a disk filesystem."""
-    return DiskFilesystem(tmp_path)
+    path = tmp_path / "diskfilesystem"
+    path.mkdir()
+    return DiskFilesystem(path)
 
 
 @pytest.fixture
