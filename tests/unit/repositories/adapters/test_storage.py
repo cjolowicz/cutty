@@ -43,8 +43,7 @@ def test_storagerecord_roundtrip(record: StorageRecord) -> None:
 def test_hashurl(url: URL) -> None:
     """It creates an ASCII digest."""
     digest = hashurl(url)
-    assert len(digest) > 32
-    assert digest.isascii()
+    assert digest and digest.isascii()
 
 
 def test_defaulttimer() -> None:
