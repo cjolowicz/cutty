@@ -10,6 +10,7 @@ from yarl import URL
 from cutty.repositories.domain.urls import aspath
 from cutty.repositories.domain.urls import asurl
 from cutty.repositories.domain.urls import parseurl
+from cutty.repositories.domain.urls import realpath
 
 
 @pytest.fixture(autouse=True)
@@ -34,8 +35,8 @@ def temporary_working_directory(tmp_path: Path) -> Iterator[Path]:
     ids=str,
 )
 def test_asurl_aspath_roundtrip(path: Path) -> None:
-    """It returns the resolved path."""
-    assert aspath(asurl(path)) == path.resolve()
+    """It returns the canonical path."""
+    assert aspath(asurl(path)) == realpath(path)
 
 
 @pytest.mark.parametrize(
@@ -90,8 +91,8 @@ def test_asurl_valid(path: Path, expected: URL) -> None:
     ids=str,
 )
 def test_asurl_roundtrip(path: Path) -> None:
-    """The path part of the URL contains the resolved path."""
-    assert path.resolve() == Path(asurl(path).path)
+    """The path part of the URL contains the canonical path."""
+    assert realpath(path) == Path(asurl(path).path)
 
 
 @pytest.mark.parametrize(
@@ -143,7 +144,7 @@ def test_parseurl_path_is_url(name: str) -> None:
     url = parseurl(name)
 
     assert url.scheme == "file"
-    assert Path(url.path) == path.resolve()
+    assert Path(url.path) == realpath(path)
 
 
 @pytest.mark.parametrize(
@@ -158,4 +159,4 @@ def test_parseurl_no_scheme(name: str) -> None:
     url = parseurl(name)
 
     assert url.scheme == "file"
-    assert Path(url.path) == Path(name).resolve()
+    assert Path(url.path) == realpath(Path(name))
