@@ -1,4 +1,5 @@
 """Utilities for URLs and paths."""
+import os.path
 import pathlib
 import platform
 
@@ -31,9 +32,18 @@ def aspath(url: URL) -> pathlib.Path:
     return pathlib.Path(url.path)
 
 
+def realpath(path: pathlib.Path) -> pathlib.Path:
+    """Return the canonical path of the specified filename."""
+    return pathlib.Path(os.path.realpath(path))
+
+
 def asurl(path: pathlib.Path) -> URL:
     """Convert filesystem path to URL."""
-    return URL(path.resolve().as_uri())
+    # Get an absolute path but avoid Path.resolve.
+    # https://bugs.python.org/issue38671
+    path = realpath(path)
+
+    return URL(path.as_uri())
 
 
 def parseurl(location: str) -> URL:
