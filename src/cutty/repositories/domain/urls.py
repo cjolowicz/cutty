@@ -49,7 +49,13 @@ def asurl(path: pathlib.Path) -> URL:
 def parseurl(location: str) -> URL:
     """Construct a URL from a string."""
     path = pathlib.Path(location)
-    if not path.exists():
+
+    try:
+        exists = path.exists()
+    except OSError:
+        exists = False  # illegal filename on Windows
+
+    if not exists:
         url = URL(location)
         if url.scheme:
             return url
