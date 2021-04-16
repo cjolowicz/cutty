@@ -140,15 +140,20 @@ def test_iterdir(filesystem: ZipFilesystem, path: PurePath, entries: set[str]) -
     platform.system() == "Windows", reason="Windows has no executable filemode"
 )
 def test_access_executable(filesystem: ZipFilesystem) -> None:
-    """It returns True if the file can be accessed."""
+    """It returns True if the file can be executed."""
     assert filesystem.access(PurePath("dir", "script.py"), Access.EXECUTE)
 
 
+def test_access_read(filesystem: ZipFilesystem) -> None:
+    """It returns True if the file can be read."""
+    assert filesystem.access(PurePath("file"), Access.READ)
+
+
 def test_access_exists(filesystem: ZipFilesystem) -> None:
-    """It returns True if the file can be accessed."""
-    assert filesystem.access(PurePath("dir", "script.py"), Access.DEFAULT)
+    """It returns True if the file exists."""
+    assert filesystem.access(PurePath("file"), Access.DEFAULT)
 
 
 def test_access_not_exists(filesystem: ZipFilesystem) -> None:
-    """It returns False if the file cannot be accessed."""
+    """It returns False if the file does not exist."""
     assert not filesystem.access(PurePath("bogus"), Access.DEFAULT)
