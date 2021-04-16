@@ -13,6 +13,10 @@ from cutty.repositories.domain.urls import parseurl
 from cutty.repositories.domain.urls import realpath
 
 
+onlywindows = pytest.mark.skipif(platform.system() != "Windows", reason="Windows only")
+skipwindows = pytest.mark.skipif(platform.system() == "Windows", reason="POSIX only")
+
+
 @pytest.fixture(autouse=True)
 def temporary_working_directory(tmp_path: Path) -> Iterator[Path]:
     """Change the working directory to a temporary location."""
@@ -28,9 +32,10 @@ def temporary_working_directory(tmp_path: Path) -> Iterator[Path]:
 @pytest.mark.parametrize(
     "path",
     [
+        Path(),
         Path("/"),
         Path("relative"),
-        Path("a?b"),
+        pytest.param(Path("a?b"), marks=skipwindows),
     ],
     ids=str,
 )
@@ -56,12 +61,13 @@ def test_aspath_invalid(url: URL) -> None:
         aspath(url)
 
 
-@pytest.mark.skipif(platform.system() != "Windows", reason="Windows only")
+@onlywindows
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
-        (URL("file:///C:/dir/file"), Path(r"C:\dir\file")),
-        (URL("file://host/share/file"), Path(r"\\host\share\file")),
+        (URL("file:///dir/file"), Path("\\dir\\file")),
+        (URL("file:///C:/dir/file"), Path("C:\\dir\\file")),
+        (URL("file://host/share/file"), Path("\\\\host\\share\\file")),
     ],
 )
 def test_aspath_windows(url: URL, expected: Path) -> None:
@@ -72,8 +78,14 @@ def test_aspath_windows(url: URL, expected: Path) -> None:
 @pytest.mark.parametrize(
     "path,expected",
     [
-        (Path("/"), URL("file:///")),
-        (Path("/path/to/dir"), URL("file:///path/to/dir")),
+        pytest.param(Path("/"), URL("file:///"), marks=skipwindows),
+        pytest.param(Path("C:\\"), URL("file:///C:/"), marks=onlywindows),
+        pytest.param(
+            Path("/path/to/dir"), URL("file:///path/to/dir"), marks=skipwindows
+        ),
+        pytest.param(
+            Path("C:\\path\\to\\dir"), URL("file:///C:/path/to/dir"), marks=onlywindows
+        ),
     ],
     ids=str,
 )
@@ -83,24 +95,12 @@ def test_asurl_valid(path: Path, expected: URL) -> None:
 
 
 @pytest.mark.parametrize(
-    "path",
-    [
-        Path(),
-        Path("relative"),
-    ],
-    ids=str,
-)
-def test_asurl_roundtrip(path: Path) -> None:
-    """The path part of the URL contains the canonical path."""
-    assert realpath(path) == Path(asurl(path).path)
-
-
-@pytest.mark.parametrize(
     "location,expected",
     [
-        ("/", URL("file:///")),
+        pytest.param("/", URL("file:///"), marks=skipwindows),
+        pytest.param("C:\\", URL("file:///C:/"), marks=onlywindows),
         ("https://example.com/repository", URL("https://example.com/repository")),
-        ("a:b", URL("a:b")),
+        pytest.param("a:b", URL("a:b"), marks=skipwindows),
     ],
     ids=str,
 )
@@ -112,10 +112,10 @@ def test_parseurl_normal(location: str, expected: URL) -> None:
 @pytest.mark.parametrize(
     "name",
     [
-        "a:b",
-        "a?b",
+        pytest.param("a:b", marks=skipwindows),
+        pytest.param("a?b", marks=skipwindows),
         "a#b",
-        "data:,",
+        pytest.param("data:,", marks=skipwindows),
     ],
 )
 def test_parseurl_path_with_special_characters(tmp_path: Path, name: str) -> None:
@@ -129,12 +129,8 @@ def test_parseurl_path_with_special_characters(tmp_path: Path, name: str) -> Non
     assert url.name == name
 
 
-@pytest.mark.parametrize(
-    "name",
-    [
-        "http://example.com",
-    ],
-)
+@skipwindows
+@pytest.mark.parametrize("name", ["http://example.com"])
 def test_parseurl_path_is_url(name: str) -> None:
     """It parses an existing path that is indistinguishable from a URL."""
     path = Path(name)
@@ -151,7 +147,7 @@ def test_parseurl_path_is_url(name: str) -> None:
     "name",
     [
         "a#b",
-        "a?b",
+        pytest.param("a?b", marks=skipwindows),
     ],
 )
 def test_parseurl_no_scheme(name: str) -> None:
@@ -159,4 +155,4 @@ def test_parseurl_no_scheme(name: str) -> None:
     url = parseurl(name)
 
     assert url.scheme == "file"
-    assert Path(url.path) == realpath(Path(name))
+    assert aspath(url) == realpath(Path(name))
