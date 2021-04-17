@@ -22,6 +22,7 @@ pygit2 = "^1.5.0"
 yarl = "^1.6.3"
 appdirs = "^1.4.4"
 httpx = "^0.17.1"
+binaryornot = "^0.4.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
