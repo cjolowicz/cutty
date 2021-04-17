@@ -1,5 +1,6 @@
 """Unit tests for cutty.repositories.adapters.fetchers.git."""
 import pathlib
+from textwrap import dedent
 
 import pygit2
 import pytest
@@ -81,3 +82,34 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     path = Path("marker", filesystem=GitFilesystem(destination))
     assert path is not None
     assert not (path / "marker").is_file()
+
+
+@pytest.fixture
+def custom_default_branch(tmp_path: pathlib.Path) -> str:
+    """Fixture simulating custom ``init.defaultBranch`` in git config."""
+    text = """
+    [init]
+        defaultBranch = teapot
+    """
+
+    gitconfig = tmp_path / "home" / ".gitconfig"
+    gitconfig.parent.mkdir()
+    gitconfig.write_text(dedent(text))
+
+    pygit2.option(
+        pygit2.GIT_OPT_SET_SEARCH_PATH,
+        pygit2.GIT_CONFIG_LEVEL_GLOBAL,
+        str(gitconfig.parent),
+    )
+
+    return "teapot"
+
+
+def test_broken_head_after_clone(
+    url: URL, store: Store, custom_default_branch: str
+) -> None:
+    """It works around a bug in libgit2 resulting in a broken HEAD reference."""
+    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    repository = pygit2.Repository(destination)
+    head = repository.references["HEAD"]
+    assert head.target != f"refs/heads/{custom_default_branch}"
