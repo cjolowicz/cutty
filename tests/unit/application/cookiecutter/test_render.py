@@ -39,7 +39,7 @@ def test_copy_without_render() -> None:
     path = PurePath("{{ cookiecutter.project }}", "README.norender")
     path2 = PurePath("example", "README.norender")
 
-    file = File(path, Mode.DEFAULT, "{{ do not render }}")
+    file = File(path, Mode.DEFAULT, b"{{ do not render }}")
     file2 = File(path2, file.mode, file.blob)
 
     assert render(file, [Binding("project", "example")]) == file2

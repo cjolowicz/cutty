@@ -16,7 +16,7 @@ from cutty.templates.domain.files import Mode
 def file() -> File:
     """Fixture for a regular file."""
     path = PurePath("example", "README.md")
-    blob = "# example\n"
+    blob = b"# example\n"
     return File(path, Mode.DEFAULT, blob)
 
 
@@ -24,7 +24,7 @@ def file() -> File:
 def executable() -> File:
     """Fixture for an executable file."""
     path = PurePath("example", "main.py")
-    blob = "#!/usr/bin/env python"
+    blob = b"#!/usr/bin/env python"
     return File(path, Mode.EXECUTABLE, blob)
 
 
@@ -32,7 +32,7 @@ def executable() -> File:
 def hook() -> File:
     """Fixture for a hook."""
     path = PurePath("hooks", "post_gen_project.py")
-    blob = "print(end='', file=open('marker', mode='w'))"
+    blob = b"print(end='', file=open('marker', mode='w'))"
     return File(path, Mode.EXECUTABLE, blob)
 
 
@@ -48,7 +48,7 @@ def test_storage(tmp_path: pathlib.Path, file: File) -> None:
     storage.store([file])
 
     path = storage.resolve(file.path)
-    assert file.blob == path.read_text()
+    assert file.blob == path.read_bytes()
 
 
 @pytest.mark.skipif(

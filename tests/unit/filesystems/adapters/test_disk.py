@@ -49,6 +49,13 @@ def test_read_text(root: Path, filesystem: DiskFilesystem) -> None:
     assert (root / "filename").read_text() == "Lorem"
 
 
+def test_read_bytes(root: Path, filesystem: DiskFilesystem) -> None:
+    """It returns the file contents."""
+    data = bytes.fromhex("deadbeef")
+    (filesystem.resolve(root) / "filename").write_bytes(data)
+    assert (root / "filename").read_bytes() == data
+
+
 def test_is_symlink(root: Path, filesystem: DiskFilesystem) -> None:
     """It returns True if the path is a symlink."""
     (filesystem.resolve(root) / "filename").symlink_to("target")

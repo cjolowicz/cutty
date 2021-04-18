@@ -22,11 +22,11 @@ class File:
 
     path: PurePath
     mode: Mode
-    blob: str
+    blob: bytes
 
     @classmethod
     def load(cls, path: Path) -> File:
         """Load file from path."""
-        blob = path.read_text()
+        blob = path.read_bytes()
         mode = Mode.EXECUTABLE if path.access(Access.EXECUTE) else Mode.DEFAULT
         return cls(path, mode, blob)

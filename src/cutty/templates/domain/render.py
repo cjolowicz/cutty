@@ -77,7 +77,7 @@ def renderfile(
     return File(
         render(file.path, bindings),
         file.mode,
-        render(file.blob, bindings),
+        render(file.blob.decode(), bindings).encode(),
     )
 
 
