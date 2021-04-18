@@ -113,3 +113,24 @@ def test_broken_head_after_clone(
     repository = pygit2.Repository(destination)
     head = repository.references["HEAD"]
     assert head.target != f"refs/heads/{custom_default_branch}"
+
+
+def test_broken_head_after_clone_unexpected_branch(
+    tmp_path: pathlib.Path, store: Store, custom_default_branch: str
+) -> None:
+    """It crashes if the default branch is not master or main."""
+    path = tmp_path / "repository"
+    path.mkdir()
+
+    repository = pygit2.init_repository(path, initial_head="refs/heads/whoops")
+    repository.create_commit(
+        "HEAD",
+        signature,
+        signature,
+        "Initial",
+        repository.index.write_tree(),
+        [],
+    )
+
+    with pytest.raises(KeyError):
+        gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)
