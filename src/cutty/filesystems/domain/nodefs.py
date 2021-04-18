@@ -26,6 +26,10 @@ class FilesystemNode(abc.ABC):
         """Return True if the node is a symbolic link."""
 
     @abc.abstractmethod
+    def read_bytes(self) -> bytes:
+        """Return the file contents."""
+
+    @abc.abstractmethod
     def read_text(self) -> str:
         """Return the file contents."""
 
@@ -132,6 +136,15 @@ class NodeFilesystem(Filesystem):
             return False
         else:
             return node.is_file()
+
+    def read_bytes(self, path: PurePath) -> bytes:
+        """Return the contents of this file."""
+        node = self.lookup(path)
+
+        if node.is_dir():
+            raise IsADirectoryError(f"is a directory: {path}")
+
+        return node.read_bytes()
 
     def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""

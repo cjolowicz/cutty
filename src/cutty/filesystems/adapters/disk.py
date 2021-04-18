@@ -47,6 +47,10 @@ class DiskFilesystem(Filesystem):
         """Return True if this is a regular file (or a symlink to one)."""
         return self.resolve(path).is_file()
 
+    def read_bytes(self, path: PurePath) -> bytes:
+        """Return the contents of this file."""
+        return self.resolve(path).read_bytes()
+
     def read_text(self, path: PurePath) -> str:
         """Return the contents of this file."""
         return self.resolve(path).read_text()

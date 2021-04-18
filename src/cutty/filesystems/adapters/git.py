@@ -35,10 +35,14 @@ class GitFilesystemNode(FilesystemNode):
             and self.node.filemode == pygit2.GIT_FILEMODE_LINK
         )
 
+    def read_bytes(self) -> bytes:
+        """Return the file contents."""
+        data: bytes = self.node.data
+        return data
+
     def read_text(self) -> str:
         """Return the file contents."""
-        text: str = self.node.data.decode()
-        return text
+        return self.read_bytes().decode()
 
     def readlink(self) -> PurePath:
         """Return the link target."""

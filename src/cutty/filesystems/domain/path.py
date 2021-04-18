@@ -36,6 +36,10 @@ class Path(PurePath):
         """Return True if this is a regular file (or a symlink to one)."""
         return self.filesystem.is_file(self)
 
+    def read_bytes(self) -> bytes:
+        """Return the contents of this file."""
+        return self.filesystem.read_bytes(self)
+
     def read_text(self) -> str:
         """Return the contents of this file."""
         return self.filesystem.read_text(self)
