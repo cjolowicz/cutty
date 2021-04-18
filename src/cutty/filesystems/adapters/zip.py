@@ -44,6 +44,10 @@ class ZipFilesystemNode(FilesystemNode):
         """Return True if the node is a symbolic link."""
         return False
 
+    def read_bytes(self) -> bytes:
+        """Return the file contents."""
+        return self.node.read_bytes()
+
     def read_text(self) -> str:
         """Return the file contents."""
         return self.node.read_text()

@@ -28,6 +28,10 @@ class DictFilesystemNode(FilesystemNode):
         """Return True if the node is a symbolic link."""
         return isinstance(self.node, PurePath)
 
+    def read_bytes(self) -> bytes:
+        """Return the file contents."""
+        return self.read_text().encode()
+
     def read_text(self) -> str:
         """Return the file contents."""
         return cast(str, self.node)
