@@ -24,7 +24,7 @@ def test_renderfiles_default(render: Renderer, path: Path) -> None:
 
     assert file.path.parts == ("teapot",)
     assert file.mode == Mode.DEFAULT
-    assert file.blob == "teapot-blob"
+    assert file.blob == b"teapot-blob"
 
 
 def test_renderfiles_empty_path(render: Renderer, path: Path) -> None:

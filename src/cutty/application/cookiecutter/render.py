@@ -66,6 +66,6 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         ):
             return File(path, file.mode, file.blob)
 
-        return File(path, file.mode, render(file.blob, bindings))
+        return File(path, file.mode, render(file.blob.decode(), bindings).encode())
 
     return render

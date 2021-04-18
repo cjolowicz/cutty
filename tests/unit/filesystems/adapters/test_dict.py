@@ -105,6 +105,23 @@ def test_read_text_is_a_directory(path: PurePath) -> None:
 @pytest.mark.parametrize(
     "path",
     [
+        PurePath("dir"),
+        PurePath("."),
+        PurePath(".."),
+        PurePath("link"),
+    ],
+    ids=str,
+)
+def test_read_bytes_is_a_directory(path: PurePath) -> None:
+    """It raises an exception."""
+    filesystem = DictFilesystem({"dir": {}, "link": PurePath("dir")})
+    with pytest.raises(IsADirectoryError):
+        filesystem.read_bytes(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
         PurePath("link", "."),
         PurePath("link", ".."),
         PurePath("link", "file"),

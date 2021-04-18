@@ -14,8 +14,8 @@ from cutty.templates.domain.variables import GenericVariable
     [
         (PurePath("src", "{x}"), PurePath("src", "teapot")),
         (
-            File(PurePath("{x}"), Mode.DEFAULT, "{x}"),
-            File(PurePath("teapot"), Mode.DEFAULT, "teapot"),
+            File(PurePath("{x}"), Mode.DEFAULT, b"{x}"),
+            File(PurePath("teapot"), Mode.DEFAULT, b"teapot"),
         ),
     ],
 )

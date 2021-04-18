@@ -108,6 +108,11 @@ def test_is_file_false(filesystem: ZipFilesystem, path: PurePath) -> None:
     assert not filesystem.is_file(path)
 
 
+def test_read_bytes(filesystem: ZipFilesystem) -> None:
+    """It returns the file contents."""
+    assert filesystem.read_bytes(PurePath("file")) == b"lorem ipsum dolor\n"
+
+
 def test_read_text(filesystem: ZipFilesystem) -> None:
     """It returns the file contents."""
     assert filesystem.read_text(PurePath("file")) == "lorem ipsum dolor\n"
