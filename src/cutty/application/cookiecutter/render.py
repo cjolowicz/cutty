@@ -69,10 +69,11 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
     def _(file: File, bindings: Sequence[Binding], render: RenderFunction) -> File:
         path = render(file.path, bindings)
 
-        if any(
-            fnmatch.fnmatch(str(file.path), pattern) for pattern in copy_without_render
-        ):
-            return File(path, file.mode, file.blob)
+        ancestors = [file.path, *file.path.parents[:-1]]
+        for ancestor in reversed(ancestors):
+            for pattern in copy_without_render:
+                if fnmatch.fnmatch(str(ancestor), pattern):
+                    return File(path, file.mode, file.blob)
 
         if is_binary(file.blob):
             return File(path, file.mode, file.blob)
