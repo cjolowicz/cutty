@@ -3,6 +3,8 @@ import fnmatch
 from collections.abc import Sequence
 from typing import Any
 
+from binaryornot.helpers import is_binary_string
+
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.jinja import createrenderer
@@ -13,6 +15,12 @@ from cutty.templates.domain.render import GenericRenderFunction
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderFunction
 from cutty.templates.domain.render import T
+
+
+def is_binary(blob: bytes) -> bool:
+    """Return True if the blob contains binary data."""
+    result: bool = is_binary_string(blob[:1024])
+    return result
 
 
 def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
@@ -64,6 +72,9 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         if any(
             fnmatch.fnmatch(str(file.path), pattern) for pattern in copy_without_render
         ):
+            return File(path, file.mode, file.blob)
+
+        if is_binary(file.blob):
             return File(path, file.mode, file.blob)
 
         return File(path, file.mode, render(file.blob.decode(), bindings).encode())
