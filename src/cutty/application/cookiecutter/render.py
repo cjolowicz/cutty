@@ -78,6 +78,8 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         if is_binary(file.blob):
             return File(path, file.mode, file.blob)
 
-        return File(path, file.mode, render(file.blob.decode(), bindings).encode())
+        text = file.blob.decode()
+        text = render(text, bindings)
+        return File(path, file.mode, text.encode())
 
     return render
