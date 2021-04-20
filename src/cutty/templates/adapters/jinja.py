@@ -114,7 +114,7 @@ class _FilesystemLoader(jinja2.BaseLoader):
         raise jinja2.TemplateNotFound(template)
 
 
-def createrenderer(
+def createjinjarenderer(
     *,
     searchpath: Iterable[Path],
     context_prefix: Optional[str] = None,
