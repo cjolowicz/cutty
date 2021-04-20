@@ -7,7 +7,7 @@ import pytest
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.jinja import createrenderer as createjinjarenderer
+from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.adapters.jinja import import_object
 from cutty.templates.adapters.jinja import load_extension
 from cutty.templates.domain.bindings import Binding

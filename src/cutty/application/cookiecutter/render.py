@@ -7,7 +7,7 @@ from binaryornot.helpers import is_binary_string
 
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.jinja import createrenderer
+from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
@@ -71,7 +71,7 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:
         text = render(text, bindings)
         return File(path, file.mode, text.encode())
 
-    rendertext = createrenderer(
+    rendertext = createjinjarenderer(
         searchpath=[path],
         context_prefix="cookiecutter",
         extra_context=config.settings,
