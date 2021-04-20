@@ -108,11 +108,10 @@ def renderfile(
     render: Renderer,
 ) -> File:
     """Render a file by rendering its path and contents."""
-    return File(
-        render(file.path, bindings),
-        file.mode,
-        render(file.blob.decode(), bindings).encode(),
-    )
+    path = render(file.path, bindings)
+    text = file.blob.decode()
+    text = render(text, bindings)
+    return File(path, file.mode, text.encode())
 
 
 defaultrenderregistry: RenderRegistry = {
