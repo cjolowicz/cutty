@@ -16,9 +16,9 @@ def filesystem(tmp_path: Path) -> ZipFilesystem:
     path = tmp_path / "archive"
     path.mkdir()
 
-    (path / "file").write_text("lorem ipsum dolor\n")
+    (path / "file").write_bytes(b"lorem ipsum dolor\n")
     (path / "dir").mkdir()
-    (path / "dir" / "script.py").write_text("#!/usr/bin/env python\n")
+    (path / "dir" / "script.py").write_bytes(b"#!/usr/bin/env python\n")
     (path / "dir" / "script.py").chmod(0o755)
     (path / "dir" / "subdir").mkdir()
     (path / "dir" / "subdir" / ".keep").touch()
