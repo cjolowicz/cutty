@@ -11,9 +11,9 @@ from cutty.templates.adapters.jinja import createrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
-from cutty.templates.domain.render import GenericRenderFunction
+from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.render import RenderFunction
+from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.render import T
 
 
@@ -32,41 +32,30 @@ def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
     return value
 
 
-def loadrenderer(path: Path, config: Config) -> Renderer:
-    """Create renderer."""
+def renderlist(
+    values: list[T], bindings: Sequence[Binding], render: Renderer
+) -> list[T]:
+    """Render a list."""
+    return [render(value, bindings) for value in values]
+
+
+def renderdict(
+    mapping: dict[str, T], bindings: Sequence[Binding], render: Renderer
+) -> dict[str, T]:
+    """Render a dictionary."""
+    return {
+        render(key, bindings): render(value, bindings) for key, value in mapping.items()
+    }
+
+
+def registerrenderers(path: Path, config: Config) -> RenderRegistry:
+    """Register render functions."""
     copy_without_render = asstringlist(config.settings, "_copy_without_render")
     extensions = DEFAULT_EXTENSIONS[:]
     extensions.extend(asstringlist(config.settings, "_extensions"))
 
-    jinja = createrenderer(
-        searchpath=[path],
-        context_prefix="cookiecutter",
-        extra_context=config.settings,
-        extensions=extensions,
-    )
-
-    render = Renderer.create()
-    render.register(str, jinja)
-
-    @render.register(list)
-    def _(
-        values: list[T], bindings: Sequence[Binding], render: GenericRenderFunction[T]
-    ) -> list[T]:
-        return [render(value, bindings) for value in values]
-
-    @render.register(dict)  # type: ignore[no-redef]
-    def _(
-        mapping: dict[str, T],
-        bindings: Sequence[Binding],
-        render: GenericRenderFunction[T],
-    ) -> dict[str, T]:
-        return {
-            render(key, bindings): render(value, bindings)
-            for key, value in mapping.items()
-        }
-
-    @render.register(File)  # type: ignore[no-redef]
-    def _(file: File, bindings: Sequence[Binding], render: RenderFunction) -> File:
+    def renderfile(file: File, bindings: Sequence[Binding], render: Renderer) -> File:
+        """Render a file."""
         path = render(file.path, bindings)
 
         ancestors = [file.path, *file.path.parents[:-1]]
@@ -82,4 +71,16 @@ def loadrenderer(path: Path, config: Config) -> Renderer:
         text = render(text, bindings)
         return File(path, file.mode, text.encode())
 
-    return render
+    rendertext = createrenderer(
+        searchpath=[path],
+        context_prefix="cookiecutter",
+        extra_context=config.settings,
+        extensions=extensions,
+    )
+
+    return {
+        str: asrendercontinuation(rendertext),
+        list: renderlist,
+        dict: renderdict,
+        File: renderfile,
+    }
