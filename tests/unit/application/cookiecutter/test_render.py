@@ -54,3 +54,14 @@ def test_copy_without_render(createrenderer: Callable[..., Renderer]) -> None:
     file2 = File(path2, file1.mode, file1.blob)
 
     assert render(file1, [Binding("project", "example")]) == file2
+
+
+def test_binary(render: Renderer) -> None:
+    """It does not render binary files."""
+    path1 = PurePath("{{ cookiecutter.project }}", "README")
+    path2 = PurePath("example", "README")
+
+    file1 = File(path1, Mode.DEFAULT, b"\0{{ binary files are not rendered }}")
+    file2 = File(path2, file1.mode, file1.blob)
+
+    assert render(file1, [Binding("project", "example")]) == file2
