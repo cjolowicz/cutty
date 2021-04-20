@@ -114,33 +114,6 @@ class _FilesystemLoader(jinja2.BaseLoader):
         raise jinja2.TemplateNotFound(template)
 
 
-class _JinjaRenderer:
-    """Wrapper for a Jinja environment."""
-
-    def __init__(
-        self,
-        environment: jinja2.Environment,
-        *,
-        context_prefix: Optional[str] = None,
-        extra_context: Optional[dict[str, Any]] = None,
-    ) -> None:
-        """Initialize."""
-        self.environment = environment
-        self.context_prefix = context_prefix
-        self.extra_context = extra_context or {}
-
-    def __call__(self, text: str, bindings: Iterable[Binding]) -> str:
-        """Render the text."""
-        template = self.environment.from_string(text)
-        context = {binding.name: binding.value for binding in bindings}
-        context.update(self.extra_context)
-
-        if self.context_prefix is not None:
-            context = {self.context_prefix: context}
-
-        return template.render(context)
-
-
 def createrenderer(
     *,
     searchpath: Iterable[Path],
@@ -161,8 +134,17 @@ def createrenderer(
         undefined=jinja2.StrictUndefined,
     )
 
-    return _JinjaRenderer(
-        environment,
-        context_prefix=context_prefix,
-        extra_context=extra_context,
-    )
+    def rendertext(text: str, bindings: Iterable[Binding]) -> str:
+        """Render the text using Jinja."""
+        template = environment.from_string(text)
+        context = {binding.name: binding.value for binding in bindings}
+
+        if extra_context is not None:
+            context.update(extra_context)
+
+        if context_prefix is not None:
+            context = {context_prefix: context}
+
+        return template.render(context)
+
+    return rendertext
