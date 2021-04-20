@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from cutty.application.cookiecutter.render import loadrenderer
+from cutty.application.cookiecutter.render import registerrenderers
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
@@ -12,25 +12,28 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
+from cutty.templates.domain.render import createrenderer
+from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 
 
 @pytest.fixture
-def createrenderer() -> Callable[..., Renderer]:
+def rendererfactory() -> Callable[..., Renderer]:
     """Fixture for a renderer factory."""
 
     def _create(**settings: Any) -> Renderer:
         searchpath = Path(filesystem=DictFilesystem({}))
         config = Config(settings, ())
-        return loadrenderer(searchpath, config)
+        renderregistry = registerrenderers(searchpath, config)
+        return createrenderer({**defaultrenderregistry, **renderregistry})
 
     return _create
 
 
 @pytest.fixture
-def render(createrenderer: Callable[..., Renderer]) -> Renderer:
+def render(rendererfactory: Callable[..., Renderer]) -> Renderer:
     """Fixture for a renderer."""
-    return createrenderer()
+    return rendererfactory()
 
 
 def test_render_list_empty(render: Renderer) -> None:
@@ -43,9 +46,9 @@ def test_render_dict_empty(render: Renderer) -> None:
     assert render({}, []) == {}
 
 
-def test_copy_without_render(createrenderer: Callable[..., Renderer]) -> None:
+def test_copy_without_render(rendererfactory: Callable[..., Renderer]) -> None:
     """It does not render files matching 'copy_without_render' patterns."""
-    render = createrenderer(_copy_without_render=["*.norender"])
+    render = rendererfactory(_copy_without_render=["*.norender"])
 
     path1 = PurePath("{{ cookiecutter.project }}", "README.norender")
     path2 = PurePath("example", "README.norender")

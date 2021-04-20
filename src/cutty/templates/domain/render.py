@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import functools
-import inspect
 from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
-from typing import overload
+from typing import Mapping
 from typing import TypeVar
 
 from cutty.filesystems.domain.path import Path
@@ -18,23 +17,58 @@ from cutty.templates.domain.variables import Variable
 
 
 T = TypeVar("T")
-U = TypeVar("U")
 
-GenericRenderFunction = Callable[[T, Sequence[Binding]], T]
-RenderFunction = GenericRenderFunction[Any]
-RenderContinuation = Callable[[T, Sequence[Binding], GenericRenderFunction[U]], T]
-RenderDecorator = Callable[[RenderContinuation[T, U]], RenderContinuation[T, U]]
+GenericRenderer = Callable[[T, Sequence[Binding]], T]
+Renderer = GenericRenderer[Any]
+GenericRenderContinuation = Callable[[T, Sequence[Binding], Renderer], T]
+RenderContinuation = GenericRenderContinuation[Any]
+RenderRegistry = Mapping[type[Any], RenderContinuation]
 
 
-# Use RenderFunction for the third argument instead of GenericRenderFunction[T],
-# because passing a generic render function does not work with mypy.
-# https://github.com/python/mypy/issues/1317
+def bindrendercontinuation(
+    rendercontinuation: GenericRenderContinuation[T], render: Renderer
+) -> GenericRenderer[T]:
+    """Bind the third argument of a render continuation."""
+
+    def _wrapper(value: T, bindings: Sequence[Binding]) -> T:
+        value = rendercontinuation(value, bindings, render)
+        return value
+
+    return _wrapper
+
+
+def createrenderer(renderregistry: RenderRegistry) -> Renderer:
+    """Create a renderer."""
+
+    @functools.singledispatch
+    def _dispatch(value: T, bindings: Sequence[Binding]) -> T:
+        raise NotImplementedError(f"no renderer registered for {type(value)}")
+
+    for rendertype, rendercontinuation in renderregistry.items():
+        renderfunction = bindrendercontinuation(rendercontinuation, _dispatch)
+        _dispatch.register(rendertype, renderfunction)
+
+    return _dispatch
+
+
+def asrendercontinuation(
+    renderfunction: GenericRenderer[T],
+) -> GenericRenderContinuation[T]:
+    """Return a render continuation that ignores the third argument."""
+    # Use Renderer instead of GenericRenderer[T], because passing a
+    # generic render function does not work with mypy.
+    # https://github.com/python/mypy/issues/1317
+
+    def _wrapper(value: T, bindings: Sequence[Binding], render: Renderer) -> T:
+        return renderfunction(value, bindings)
+
+    return _wrapper
 
 
 def rendervariable(
     variable: Variable,
     bindings: Sequence[Binding],
-    render: RenderFunction,
+    render: Renderer,
 ) -> Variable:
     """Render a variable by rendering its default and choices."""
     return Variable(
@@ -50,7 +84,7 @@ def rendervariable(
 def renderpurepath(
     path: PurePath,
     bindings: Sequence[Binding],
-    render: RenderFunction,
+    render: Renderer,
 ) -> PurePath:
     """Render a path by rendering its parts."""
     return PurePath(*(render(part, bindings) for part in path.parts))
@@ -59,7 +93,7 @@ def renderpurepath(
 def renderpath(
     path: Path,
     bindings: Sequence[Binding],
-    render: RenderFunction,
+    render: Renderer,
 ) -> Path:
     """Render a path by rendering its parts."""
     return Path(
@@ -71,7 +105,7 @@ def renderpath(
 def renderfile(
     file: File,
     bindings: Sequence[Binding],
-    render: RenderFunction,
+    render: Renderer,
 ) -> File:
     """Render a file by rendering its path and contents."""
     return File(
@@ -81,63 +115,9 @@ def renderfile(
     )
 
 
-class Renderer:
-    """Render."""
-
-    def __init__(self) -> None:
-        """Initialize."""
-
-        @functools.singledispatch
-        def _render(value: T, bindings: Sequence[Binding]) -> T:
-            raise NotImplementedError(f"no renderer registered for {type(value)}")
-
-        self._render = _render
-
-    def __call__(self, value: T, bindings: Sequence[Binding]) -> T:
-        """Render."""
-        return self._render(value, bindings)
-
-    @overload
-    def register(self, __cls: type[T]) -> RenderDecorator[T, U]:
-        ...
-
-    @overload
-    def register(
-        self, __cls: type[T], __function: GenericRenderFunction[T]
-    ) -> GenericRenderFunction[T]:
-        ...
-
-    @overload
-    def register(
-        self, __cls: type[T], __function: RenderContinuation[T, U]
-    ) -> RenderContinuation[T, U]:
-        ...
-
-    def register(self, cls, function=None):  # type: ignore[no-untyped-def]
-        """Register a render continuation function."""
-        if function is None:
-            return lambda function: self.register(cls, function)
-
-        if len(inspect.signature(function).parameters) == 2:
-            self._render.register(cls, function)
-            return function
-
-        def _callback(value: T, bindings: Sequence[Binding]) -> T:
-            value = function(value, bindings, self)
-            return value
-
-        self._render.register(cls, _callback)
-
-        return function
-
-    @classmethod
-    def create(cls) -> Renderer:
-        """Create a renderer with the default behavior."""
-        render = cls()
-
-        render.register(GenericVariable, rendervariable)
-        render.register(PurePath, renderpurepath)
-        render.register(Path, renderpath)
-        render.register(File, renderfile)
-
-        return render
+defaultrenderregistry: RenderRegistry = {
+    GenericVariable: rendervariable,
+    PurePath: renderpurepath,
+    Path: renderpath,
+    File: renderfile,
+}

@@ -1,6 +1,8 @@
 """Unit test fixtures for cutty."""
 import pytest
 
+from cutty.templates.domain.render import createrenderer
+from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import GenericVariable
 from cutty.util.bus import Bus
@@ -15,13 +17,11 @@ def bus() -> Bus:
 @pytest.fixture
 def render() -> Renderer:
     """Fixture with a renderer based on ``str.format``."""
-    render = Renderer.create()
 
-    @render.register(str)
-    def _(value, bindings, _):  # type: ignore[no-untyped-def]
+    def rendertext(value, bindings, _):  # type: ignore[no-untyped-def]
         return value.format_map({binding.name: binding.value for binding in bindings})
 
-    return render
+    return createrenderer({**defaultrenderregistry, str: rendertext})
 
 
 @pytest.fixture
