@@ -5,7 +5,7 @@ from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.config import Config
 
 
-def loadhooks(path: Path) -> Iterator[Path]:
+def iterhooks(path: Path) -> Iterator[Path]:
     """Load hooks in a Cookiecutter template."""
     hookdir = path / "hooks"
     hooks = {"pre_gen_project", "post_gen_project"}
@@ -16,7 +16,7 @@ def loadhooks(path: Path) -> Iterator[Path]:
                 yield path
 
 
-def loadpaths(path: Path, config: Config) -> Iterator[Path]:
+def iterpaths(path: Path, config: Config) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
@@ -24,5 +24,5 @@ def loadpaths(path: Path, config: Config) -> Iterator[Path]:
     else:
         raise RuntimeError("template directory not found")  # pragma: no cover
 
-    yield from loadhooks(path)
+    yield from iterhooks(path)
     yield template_dir

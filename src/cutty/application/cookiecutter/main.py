@@ -9,7 +9,7 @@ import appdirs
 
 from cutty.application.cookiecutter.config import loadconfig
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
-from cutty.application.cookiecutter.paths import loadpaths
+from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
 from cutty.repositories.adapters.registry import defaultproviderregistry
@@ -62,7 +62,7 @@ def main(
         path,
         loadconfig=functools.partial(loadconfig, template),
         registerrenderers=registerrenderers,
-        loadpaths=loadpaths,
+        iterpaths=iterpaths,
         renderbind=renderbindwith(binder),
     )
 
