@@ -13,7 +13,7 @@ from cutty.templates.domain.renderfiles import renderfiles
 
 
 ConfigLoader = Callable[[Path], Config]
-PathLoader = Callable[[Path, Config], Iterator[Path]]
+PathIterator = Callable[[Path, Config], Iterator[Path]]
 RendererRegistrar = Callable[[Path, Config], RenderRegistry]
 
 
@@ -23,13 +23,13 @@ def render(
     renderbind: RenderingBinder,
     loadconfig: ConfigLoader,
     registerrenderers: RendererRegistrar,
-    loadpaths: PathLoader,
+    iterpaths: PathIterator,
 ) -> Iterator[File]:
     """Render the template at the given path."""
     config = loadconfig(path)
     renderregistry = registerrenderers(path, config)
     render = createrenderer({**defaultrenderregistry, **renderregistry})
-    paths = loadpaths(path, config)
+    paths = iterpaths(path, config)
 
     bindings = renderbind(render, config.variables)
     return renderfiles(paths, render, bindings)
