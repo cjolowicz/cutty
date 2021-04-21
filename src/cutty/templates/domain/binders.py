@@ -10,7 +10,7 @@ from cutty.templates.domain.variables import Variable
 
 
 Binder = Callable[[Variable], Binding]
-RenderBinder = Callable[[Renderer, Sequence[Variable]], Sequence[Binding]]
+RenderingBinder = Callable[[Renderer, Sequence[Variable]], Sequence[Binding]]
 
 
 def bind(variable: Variable, value: Any) -> Binding:
@@ -54,6 +54,6 @@ def renderbind(
     return bindings
 
 
-def renderbindwith(binder: Binder) -> RenderBinder:
+def renderbindwith(binder: Binder) -> RenderingBinder:
     """Render and bind variables using the given binder."""
     return lambda render, variables: renderbind(render, binder, variables)
