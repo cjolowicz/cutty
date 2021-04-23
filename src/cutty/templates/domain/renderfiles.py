@@ -1,7 +1,9 @@
 """Rendering files."""
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
+from typing import Optional
 
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
@@ -9,8 +11,26 @@ from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer
 
 
-class InvalidPathComponent(Exception):
-    """The rendered path has an invalid component."""
+Matcher = Callable[[Path], bool]
+
+
+def loadfiles(
+    paths: Iterable[Path],
+    *,
+    match: Optional[Matcher] = None,
+) -> Iterator[File]:
+    """Load files from paths, recursively."""
+    for path in paths:
+        if match is not None and not match(path):
+            continue
+
+        if path.is_file():
+            yield File.load(path)
+        elif path.is_dir():
+            yield from loadfiles(path.iterdir(), match=match)
+        else:  # pragma: no cover
+            message = "broken link" if path.is_symlink() else "special file"
+            raise RuntimeError(f"{path}: {message}")
 
 
 def renderfiles(
@@ -18,20 +38,16 @@ def renderfiles(
 ) -> Iterator[File]:
     """Render the files."""
 
-    def _renderfiles(paths: Iterable[Path]) -> Iterator[File]:
-        for path in paths:
-            name = render(path, bindings).name
-            if not name:
-                continue
+    def _match(path: Path) -> bool:
+        path = render(path, bindings)
+        for part in path.parts:
+            if not part:
+                return False
 
-            if "/" in name or "\\" in name or name in (".", ".."):
-                raise InvalidPathComponent(str(path), name)
+            if "/" in part or "\\" in part or part in (".", ".."):
+                raise RuntimeError(f"{path}: invalid path component {part!r}")
 
-            if path.is_file():
-                yield render(File.load(path), bindings)
-            elif path.is_dir():
-                yield from _renderfiles(path.iterdir())
-            else:  # pragma: no cover
-                raise RuntimeError(f"{path}: not a regular file or directory")
+        return True
 
-    return _renderfiles(paths)
+    for file in loadfiles(paths, match=_match):
+        yield render(file, bindings)
