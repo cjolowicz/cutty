@@ -15,12 +15,7 @@ from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.render import T
-
-
-def is_binary(blob: bytes) -> bool:
-    """Return True if the blob contains binary data."""
-    result: bool = is_binary_string(blob[:1024])
-    return result
+from cutty.templates.domain.generate import PathMatcher
 
 
 def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
@@ -48,28 +43,29 @@ def renderdict(
     }
 
 
+def iscopyonly(config: Config) -> PathMatcher:
+    """Return a matcher checking the ``_copy_without_render`` setting."""
+    copy_without_render = asstringlist(config.settings, "_copy_without_render")
+
+    def _match(path: Path) -> bool:
+        return any(
+            fnmatch.fnmatch(str(path), pattern) for pattern in copy_without_render
+        )
+
+    return _match
+
+
+def isbinary(path: Path) -> bool:
+    """Return True if the file is binary."""
+    blob = path.read_bytes()
+    result: bool = is_binary_string(blob[:1024])
+    return result
+
+
 def registerrenderers(path: Path, config: Config) -> RenderRegistry:
     """Register render functions."""
-    copy_without_render = asstringlist(config.settings, "_copy_without_render")
     extensions = DEFAULT_EXTENSIONS[:]
     extensions.extend(asstringlist(config.settings, "_extensions"))
-
-    def renderfile(file: File, bindings: Sequence[Binding], render: Renderer) -> File:
-        """Render a file."""
-        path = render(file.path, bindings)
-
-        ancestors = [file.path, *file.path.parents[:-1]]
-        for ancestor in reversed(ancestors):
-            for pattern in copy_without_render:
-                if fnmatch.fnmatch(str(ancestor), pattern):
-                    return File(path, file.mode, file.blob)
-
-        if is_binary(file.blob):
-            return File(path, file.mode, file.blob)
-
-        text = file.blob.decode()
-        text = render(text, bindings)
-        return File(path, file.mode, text.encode())
 
     rendertext = createjinjarenderer(
         searchpath=[path],
@@ -82,5 +78,4 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:
         str: asrendercontinuation(rendertext),
         list: renderlist,
         dict: renderdict,
-        File: renderfile,
     }

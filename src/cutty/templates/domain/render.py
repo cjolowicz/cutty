@@ -1,6 +1,4 @@
 """Rendering."""
-from __future__ import annotations
-
 import functools
 from collections.abc import Callable
 from collections.abc import Sequence
@@ -8,10 +6,7 @@ from typing import Any
 from typing import Mapping
 from typing import TypeVar
 
-from cutty.filesystems.domain.path import Path
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import File
 from cutty.templates.domain.variables import GenericVariable
 from cutty.templates.domain.variables import Variable
 
@@ -55,7 +50,7 @@ def asrendercontinuation(
     renderfunction: GenericRenderer[T],
 ) -> GenericRenderContinuation[T]:
     """Return a render continuation that ignores the third argument."""
-    # Use Renderer instead of GenericRenderer[T], because passing a
+    # Use Renderer instead of GenericRenderer[U], because passing a
     # generic render function does not work with mypy.
     # https://github.com/python/mypy/issues/1317
 
@@ -81,42 +76,4 @@ def rendervariable(
     )
 
 
-def renderpurepath(
-    path: PurePath,
-    bindings: Sequence[Binding],
-    render: Renderer,
-) -> PurePath:
-    """Render a path by rendering its parts."""
-    return PurePath(*(render(part, bindings) for part in path.parts))
-
-
-def renderpath(
-    path: Path,
-    bindings: Sequence[Binding],
-    render: Renderer,
-) -> Path:
-    """Render a path by rendering its parts."""
-    return Path(
-        *(render(part, bindings) for part in path.parts),
-        filesystem=path.filesystem,
-    )
-
-
-def renderfile(
-    file: File,
-    bindings: Sequence[Binding],
-    render: Renderer,
-) -> File:
-    """Render a file by rendering its path and contents."""
-    path = render(file.path, bindings)
-    text = file.blob.decode()
-    text = render(text, bindings)
-    return File(path, file.mode, text.encode())
-
-
-defaultrenderregistry: RenderRegistry = {
-    GenericVariable: rendervariable,
-    PurePath: renderpurepath,
-    Path: renderpath,
-    File: renderfile,
-}
+defaultrenderregistry: RenderRegistry = {GenericVariable: rendervariable}
