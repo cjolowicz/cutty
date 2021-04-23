@@ -23,6 +23,7 @@ yarl = "^1.6.3"
 appdirs = "^1.4.4"
 httpx = "^0.17.1"
 binaryornot = "^0.4.4"
+pluggy = "^0.13.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
