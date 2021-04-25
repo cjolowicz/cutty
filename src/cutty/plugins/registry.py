@@ -22,13 +22,14 @@ class PluginRegistry:
     def __init__(self, name: str) -> None:
         """Initialize."""
         self.manager = pluggy.PluginManager(name)
-        self.marker = pluggy.HookspecMarker(name)
+        self.markspec = pluggy.HookspecMarker(name)
+        self.markimpl = pluggy.HookimplMarker(name)
 
-    def bindhook(self, hook: HookT) -> HookT:
+    def bind(self, hook: HookT, *, firstresult: bool = False) -> HookT:
         """Bind a hook to the registry."""
         name = hook.__name__
         namespace = SimpleNamespace()
-        setattr(namespace, name, self.marker(hook, firstresult=True))
+        setattr(namespace, name, self.markspec(hook, firstresult=firstresult))
         self.manager.add_hookspecs(namespace)
 
         @functools.wraps(hook)
@@ -39,29 +40,16 @@ class PluginRegistry:
 
         return cast(HookT, dispatch)
 
-    def registerplugin(self, module: str) -> AbstractContextManager[object]:
-        """Register a plugin."""
-        plugin = importlib.import_module(module)
-
-        self.manager.register(plugin)
+    def implement(
+        self, implementation: HookT, *, trylast: bool = False
+    ) -> AbstractContextManager[object]:
+        """Register a hook implementation."""
+        name = implementation.__name__
+        namespace = SimpleNamespace()
+        setattr(namespace, name, self.markimpl(implementation, trylast=trylast))
+        self.manager.register(namespace)
         self.manager.check_pending()
 
         unregister = ExitStack()
-        unregister.callback(self.manager.unregister, plugin)
+        unregister.callback(self.manager.unregister, namespace)
         return unregister
-
-    def registerplugins(self, plugins: Iterable[str]) -> AbstractContextManager[object]:
-        """Register plugins."""
-        with ExitStack() as stack:
-            for plugin in plugins:
-                context = self.registerplugin(plugin)
-                stack.enter_context(context)
-
-            unregister = stack.pop_all()
-
-        return unregister
-
-    def registerentrypoints(self) -> None:
-        """Register plugins installed in the environment."""
-        if self.manager.load_setuptools_entrypoints("cutty"):
-            self.manager.check_pending()  # pragma: no cover

@@ -12,7 +12,8 @@ from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
 from cutty.plugins.registry import PluginRegistry
 from cutty.repositories.adapters.registry import defaultproviderregistry
-from cutty.repositories.domain.hooks import providerstore
+from cutty.repositories.adapters.plugin import getrepositorystorageimpl
+from cutty.repositories.domain.hooks import getrepositorystorage
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.urls import parseurl
 from cutty.templates.domain.binders import binddefault
@@ -34,14 +35,14 @@ def main(
     skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    pluginregistry = PluginRegistry("cutty")
-    createproviderstore = pluginregistry.bindhook(providerstore)
-    pluginregistry.registerplugins(["cutty.repositories.adapters.plugin"])
-    pluginregistry.registerentrypoints()
+    hooks = PluginRegistry("cutty")
+    getrepositorystorage = hooks.bind(getrepositorystorage, firstresult=True)
+    hooks.implement(getrepositorystorageimpl("cutty"), trylast=True)
 
-    theproviderstore = createproviderstore()
-    assert theproviderstore is not None  # noqa: S101
-    provider = repositoryprovider(defaultproviderregistry, theproviderstore)
+    provider = repositoryprovider(
+        defaultproviderregistry,
+        lambda provider: lambda url: getrepositorystorage(provider, str(url)),
+    )
 
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
