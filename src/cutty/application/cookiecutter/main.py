@@ -11,9 +11,7 @@ from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
 from cutty.plugins.adapters.pluggy import PluggyRegistry
-from cutty.repositories.adapters.hooks import getproviderregistry
-from cutty.repositories.adapters.hooks import getproviderstore
-from cutty.repositories.domain.providers import repositoryprovider
+from cutty.repositories.adapters.hooks import getrepositoryprovider
 from cutty.repositories.domain.urls import parseurl
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
@@ -35,9 +33,7 @@ def main(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     hooks = PluggyRegistry("cutty")
-    providerstore = getproviderstore(hooks, projectname="cutty")
-    providerregistry = getproviderregistry(hooks)
-    provider = repositoryprovider(providerregistry, providerstore)
+    provider = getrepositoryprovider(hooks, projectname="cutty")
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         overwrite_if_exists=overwrite_if_exists,
