@@ -12,6 +12,7 @@ from cutty.plugins.domain.hooks import FirstResultHook
 from cutty.plugins.domain.hooks import Hook
 from cutty.plugins.domain.hooks import R
 from cutty.plugins.domain.registry import Registry
+from cutty.util.typeguard_ignore import typeguard_ignore
 
 
 class _Namespace(SimpleNamespace):
@@ -56,6 +57,7 @@ class PluggyRegistry(Registry):
 
         return dispatch
 
+    @typeguard_ignore
     def register(self, implementation: F) -> None:
         """Register the hook implementation."""
         hook = implementation._hook  # type: ignore[attr-defined]
