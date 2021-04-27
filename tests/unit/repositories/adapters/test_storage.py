@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 from yarl import URL
 
-from cutty.repositories.adapters.storage import asproviderstore
 from cutty.repositories.adapters.storage import defaulttimer
 from cutty.repositories.adapters.storage import hashurl
 from cutty.repositories.adapters.storage import RepositoryStorage
@@ -179,22 +178,3 @@ def test_storage_clean_something(
 
     assert first not in records
     assert second in records
-
-
-def test_asproviderstore_allocate(storage: RepositoryStorage) -> None:
-    """It can be used as a provider store."""
-    url = URL("https://example.com/repository.git")
-    providerstore = asproviderstore(storage)
-    store = providerstore("git")
-    path = store(url)
-    assert path.is_dir()
-
-
-def test_asproviderstore_get(storage: RepositoryStorage) -> None:
-    """It retrieves existing records when used as a provider store."""
-    url = URL("https://example.com/repository.git")
-    providerstore = asproviderstore(storage)
-    store = providerstore("git")
-    path1 = store(url)
-    path2 = store(url)
-    assert path1 == path2
