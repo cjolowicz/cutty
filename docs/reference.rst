@@ -244,6 +244,13 @@ cutty.repositories.adapters.storage
    :members:
 
 
+cutty.repositories.adapters.hooks
+---------------------------------
+
+.. automodule:: cutty.repositories.adapters.hooks
+   :members:
+
+
 cutty.compat.contextlib
 -----------------------
 
@@ -276,6 +283,34 @@ cutty.util.typeguard_ignore
 ---------------------------
 
 .. automodule:: cutty.util.typeguard_ignore
+   :members:
+
+
+cutty.plugins.domain.hooks
+--------------------------
+
+.. automodule:: cutty.plugins.domain.hooks
+   :members:
+
+
+cutty.plugins.domain.registry
+-----------------------------
+
+.. automodule:: cutty.plugins.domain.registry
+   :members:
+
+
+cutty.plugins.adapters.fake
+---------------------------
+
+.. automodule:: cutty.plugins.adapters.fake
+   :members:
+
+
+cutty.plugins.adapters.pluggy
+-----------------------------
+
+.. automodule:: cutty.plugins.adapters.pluggy
    :members:
 
 
