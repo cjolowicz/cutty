@@ -7,6 +7,8 @@ from typing import Optional
 from typing import overload
 from typing import TypeVar
 
+from cutty.util.typeguard_ignore import typeguard_ignore
+
 
 R = TypeVar("R")
 F = TypeVar("F", bound=Callable[..., Any])
@@ -18,6 +20,7 @@ class Hook(Generic[F]):
     Hooks can have zero, one, or many implementations.
     """
 
+    @typeguard_ignore
     def __init__(self, function: F) -> None:
         """Initialize."""
         self.function = function
@@ -68,6 +71,7 @@ def hook(
 def implements(hook: Hook[F]) -> Callable[[F], F]:
     """Decorator factory for implementing hooks."""
 
+    @typeguard_ignore
     def decorator(function: F) -> F:
         """Decorator for the hook implementation."""
         function._hook = hook  # type: ignore[attr-defined]
