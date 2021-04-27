@@ -14,6 +14,8 @@ from cutty.repositories.adapters.registry import defaultproviderregistry
 from cutty.repositories.adapters.storage import RepositoryStorage
 from cutty.repositories.domain.providers import ProviderRegistry
 from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.providers import RepositoryProvider
+from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.stores import Store
 
 
@@ -87,3 +89,10 @@ def getproviderregistry(registry: Registry) -> ProviderRegistry:
     # we supply by default, such as `git` and `hg`.
 
     return ChainMap(*registries)
+
+
+def getrepositoryprovider(registry: Registry, projectname: str) -> RepositoryProvider:
+    """Return a hook-based repository provider."""
+    providerstore = getproviderstore(registry, projectname)
+    providerregistry = getproviderregistry(registry)
+    return repositoryprovider(providerregistry, providerstore)
