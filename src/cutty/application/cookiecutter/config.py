@@ -1,8 +1,12 @@
 """Cookiecutter loader."""
 import json
 from typing import Any
+from typing import Optional
 
 from cutty.filesystems.domain.path import Path
+from cutty.plugins.domain.hooks import implements
+from cutty.plugins.domain.registry import Registry
+from cutty.templates.adapters.hooks import loadtemplateconfig
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.variables import Variable
 
@@ -43,23 +47,28 @@ def loadvariable(name: str, value: Any) -> Variable:
     )
 
 
-def loadconfig(template: str, path: Path) -> Config:
-    """Load the configurations for a Cookiecutter template."""
-    text = (path / "cookiecutter.json").read_text()
-    data = json.loads(text)
+def registerconfigloader(registry: Registry, template: str) -> None:
+    """Register a loader for Cookiecutter template configurations."""
 
-    assert isinstance(data, dict) and all(  # noqa: S101
-        isinstance(name, str) for name in data
-    )
+    @registry.register
+    @implements(loadtemplateconfig)
+    def loadtemplateconfig_impl(path: Path) -> Optional[Config]:
+        """Load the configuration for a Cookiecutter template."""
+        text = (path / "cookiecutter.json").read_text()
+        data = json.loads(text)
 
-    data.setdefault("_template", template)
+        assert isinstance(data, dict) and all(  # noqa: S101
+            isinstance(name, str) for name in data
+        )
 
-    settings = {name: value for name, value in data.items() if name.startswith("_")}
+        data.setdefault("_template", template)
 
-    variables = tuple(
-        loadvariable(name, value)
-        for name, value in data.items()
-        if not name.startswith("_")
-    )
+        settings = {name: value for name, value in data.items() if name.startswith("_")}
 
-    return Config(settings, variables)
+        variables = tuple(
+            loadvariable(name, value)
+            for name, value in data.items()
+            if not name.startswith("_")
+        )
+
+        return Config(settings, variables)

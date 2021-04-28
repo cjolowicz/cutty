@@ -1,11 +1,10 @@
 """Main entry point for the Cookiecutter compatibility layer."""
-import functools
 import pathlib
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
 
-from cutty.application.cookiecutter.config import loadconfig
+from cutty.application.cookiecutter.config import registerconfigloader
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
@@ -13,6 +12,7 @@ from cutty.application.cookiecutter.render import registerrenderers
 from cutty.plugins.adapters.pluggy import PluggyRegistry
 from cutty.repositories.adapters.hooks import getrepositoryprovider
 from cutty.repositories.domain.urls import parseurl
+from cutty.templates.adapters.hooks import getconfigloader
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
@@ -34,6 +34,10 @@ def main(
     """Generate a project from a Cookiecutter template."""
     hooks = PluggyRegistry("cutty")
     provider = getrepositoryprovider(hooks, projectname="cutty")
+    loadconfig = getconfigloader(hooks)
+
+    registerconfigloader(hooks, template)
+
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         overwrite_if_exists=overwrite_if_exists,
@@ -53,7 +57,7 @@ def main(
 
     files = render(
         path,
-        loadconfig=functools.partial(loadconfig, template),
+        loadconfig=loadconfig,
         registerrenderers=registerrenderers,
         iterpaths=iterpaths,
         renderbind=renderbindwith(binder),
