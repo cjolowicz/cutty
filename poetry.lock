@@ -380,7 +380,7 @@ http2 = ["h2 (>=3.0.0,<4.0.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.10.0"
+version = "6.10.1"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -391,7 +391,7 @@ attrs = ">=19.2.0"
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=0.25)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "importlib-resources (>=3.3.0)", "importlib-metadata", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
+all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=0.25)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "importlib-resources (>=3.3.0)", "importlib-metadata (>=3.6)", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
 cli = ["click (>=7.0)", "black (>=19.10b0)", "rich (>=9.0.0)"]
 codemods = ["libcst (>=0.3.16)"]
 dateutil = ["python-dateutil (>=1.4)"]
@@ -1170,7 +1170,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "19ca0966af21adbd45e320fe90e5116c30172beffc352cbd559595a93fa3c44e"
+content-hash = "7227282a38673b03eafd263fcda33af659d7169c86e8496264ac2f5770f15556"
 
 [metadata.files]
 alabaster = [
@@ -1394,8 +1394,8 @@ httpx = [
     {file = "httpx-0.18.0.tar.gz", hash = "sha256:46cfb242ae6b85c3f21f7774cb42a465acdf73741e49f6746ab481f16d0e0590"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.10.0-py3-none-any.whl", hash = "sha256:1a00a4e3ef40041b2c072deab9c71e307bc5354bb4a102ef22ae8c23fa8b3970"},
-    {file = "hypothesis-6.10.0.tar.gz", hash = "sha256:9f8c130b1278d30cb3cc64e3a4aacb88c4906155772beed90ce33e06794e1ee0"},
+    {file = "hypothesis-6.10.1-py3-none-any.whl", hash = "sha256:1d65f58d82d1cbd35b6441bda3bb11cb1adc879d6b2af191aea388fa412171b1"},
+    {file = "hypothesis-6.10.1.tar.gz", hash = "sha256:586b6c46e90878c2546743afbed348bca51e1f30e3461fa701fad58c2c47c650"},
 ]
 identify = [
     {file = "identify-2.2.3-py2.py3-none-any.whl", hash = "sha256:398cb92a7599da0b433c65301a1b62b9b1f4bb8248719b84736af6c0b22289d6"},
