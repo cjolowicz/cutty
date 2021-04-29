@@ -7,6 +7,9 @@ from binaryornot.helpers import is_binary_string
 
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filesystems.domain.path import Path
+from cutty.plugins.domain.hooks import implements
+from cutty.plugins.domain.registry import Registry
+from cutty.templates.adapters.hooks import getrenderers
 from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
@@ -48,7 +51,8 @@ def renderdict(
     }
 
 
-def registerrenderers(path: Path, config: Config) -> RenderRegistry:
+@implements(getrenderers)
+def getrenderers_impl(path: Path, config: Config) -> RenderRegistry:
     """Register render functions."""
     copy_without_render = asstringlist(config.settings, "_copy_without_render")
     extensions = DEFAULT_EXTENSIONS[:]
@@ -84,3 +88,8 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:
         dict: renderdict,
         File: renderfile,
     }
+
+
+def registerrenderers(registry: Registry) -> None:
+    """Register render functions."""
+    registry.register(getrenderers_impl)
