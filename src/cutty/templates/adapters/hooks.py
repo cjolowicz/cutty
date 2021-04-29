@@ -1,11 +1,16 @@
 """Hooks for rendering templates."""
+from collections import ChainMap
 from typing import Optional
 
 from cutty.filesystems.domain.path import Path
 from cutty.plugins.domain.hooks import hook
+from cutty.plugins.domain.hooks import implements
 from cutty.plugins.domain.registry import Registry
 from cutty.templates.domain.config import Config
+from cutty.templates.domain.render import defaultrenderregistry
+from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.services import ConfigLoader
+from cutty.templates.domain.services import RendererRegistrar
 
 
 @hook(firstresult=True)
@@ -23,3 +28,26 @@ def getconfigloader(registry: Registry) -> ConfigLoader:
         return result
 
     return _configloader
+
+
+@hook
+def getrenderers(path: Path, config: Config) -> RenderRegistry:
+    """Return renderers."""
+
+
+@implements(getrenderers)
+def getrenderers_impl(path: Path, config: Config) -> RenderRegistry:
+    """Return the default renderers."""
+    return defaultrenderregistry
+
+
+def getrendererregistrar(registry: Registry) -> RendererRegistrar:
+    """Return a registrar for renderers."""
+    dispatch = registry.bind(getrenderers)
+    registry.register(getrenderers_impl)
+
+    def _wrapper(path: Path, config: Config) -> RenderRegistry:
+        registries: list[RenderRegistry] = dispatch(path, config)
+        return ChainMap(*registries)
+
+    return _wrapper
