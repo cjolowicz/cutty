@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cutty"
-version = "0.2.0"
+version = "0.2.1"
 description = "Cutty"
 authors = ["Claudio Jolowicz <mail@claudiojolowicz.com>"]
 license = "MIT"
