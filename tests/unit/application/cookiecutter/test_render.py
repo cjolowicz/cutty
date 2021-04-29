@@ -8,12 +8,13 @@ from cutty.application.cookiecutter.render import registerrenderers
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.plugins.adapters.fake import FakeRegistry
+from cutty.templates.adapters.hooks import getrendererregistrar
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 
 
@@ -22,10 +23,13 @@ def rendererfactory() -> Callable[..., Renderer]:
     """Fixture for a renderer factory."""
 
     def _create(**settings: Any) -> Renderer:
+        hooks = FakeRegistry()
+        getrenderers = getrendererregistrar(hooks)
+        registerrenderers(hooks)
         searchpath = Path(filesystem=DictFilesystem({}))
         config = Config(settings, ())
-        renderregistry = registerrenderers(searchpath, config)
-        return createrenderer({**defaultrenderregistry, **renderregistry})
+        renderregistry = getrenderers(searchpath, config)
+        return createrenderer(renderregistry)
 
     return _create
 
