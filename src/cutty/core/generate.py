@@ -54,7 +54,12 @@ class Generator:
 
     def _render(self, source: Path, output_dir: Path) -> None:
         with exceptions.PathRenderError(source):
-            target = output_dir / self.renderer.render(source.name)
+            name = self.renderer.render(source.name)
+
+        if not name:
+            return
+
+        target = output_dir / name
 
         # If the target exists at this point, we are in overwrite mode. Remove
         # existing files and symlinks, but do not recursively remove directory
