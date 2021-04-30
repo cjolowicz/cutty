@@ -2,6 +2,9 @@
 from collections.abc import Iterator
 
 from cutty.filesystems.domain.path import Path
+from cutty.plugins.domain.hooks import implements
+from cutty.plugins.domain.registry import Registry
+from cutty.templates.adapters.hooks import getpaths
 from cutty.templates.domain.config import Config
 
 
@@ -16,8 +19,9 @@ def iterhooks(path: Path) -> Iterator[Path]:
                 yield path
 
 
-def iterpaths(path: Path, config: Config) -> Iterator[Path]:
-    """Load project files in a Cookiecutter template."""
+@implements(getpaths)
+def getpaths_impl(path: Path, config: Config) -> Iterator[Path]:
+    """Iterate over the files and directories to be rendered."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
             break
@@ -26,3 +30,8 @@ def iterpaths(path: Path, config: Config) -> Iterator[Path]:
 
     yield from iterhooks(path)
     yield template_dir
+
+
+def registerpathiterable(registry: Registry) -> None:
+    """Register path iterable."""
+    registry.register(getpaths_impl)

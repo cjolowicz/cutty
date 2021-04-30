@@ -6,7 +6,7 @@ from typing import Optional
 
 from cutty.application.cookiecutter.config import registerconfigloader
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
-from cutty.application.cookiecutter.paths import iterpaths
+from cutty.application.cookiecutter.paths import registerpathiterable
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import (
     registerrenderers as registercookiecutterrenderers,
@@ -15,6 +15,7 @@ from cutty.plugins.adapters.pluggy import PluggyRegistry
 from cutty.repositories.adapters.hooks import getrepositoryprovider
 from cutty.repositories.domain.urls import parseurl
 from cutty.templates.adapters.hooks import getconfigloader
+from cutty.templates.adapters.hooks import getpathiterable
 from cutty.templates.adapters.hooks import getrendererregistrar
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
@@ -39,9 +40,11 @@ def main(
     provider = getrepositoryprovider(hooks, projectname="cutty")
     loadconfig = getconfigloader(hooks)
     registerrenderers = getrendererregistrar(hooks)
+    getpaths = getpathiterable(hooks)
 
     registerconfigloader(hooks, template)
     registercookiecutterrenderers(hooks)
+    registerpathiterable(hooks)
 
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
@@ -64,7 +67,7 @@ def main(
         path,
         loadconfig=loadconfig,
         registerrenderers=registerrenderers,
-        iterpaths=iterpaths,
+        getpaths=getpaths,
         renderbind=renderbindwith(binder),
     )
 

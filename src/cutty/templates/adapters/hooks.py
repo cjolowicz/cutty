@@ -1,5 +1,7 @@
 """Hooks for rendering templates."""
 from collections import ChainMap
+from collections.abc import Iterable
+from itertools import chain
 from typing import Optional
 
 from cutty.filesystems.domain.path import Path
@@ -10,6 +12,7 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.services import ConfigLoader
+from cutty.templates.domain.services import PathIterable
 from cutty.templates.domain.services import RendererRegistrar
 
 
@@ -49,5 +52,21 @@ def getrendererregistrar(registry: Registry) -> RendererRegistrar:
     def _wrapper(path: Path, config: Config) -> RenderRegistry:
         registries: list[RenderRegistry] = dispatch(path, config)
         return ChainMap(*registries)
+
+    return _wrapper
+
+
+@hook
+def getpaths(path: Path, config: Config) -> Iterable[Path]:
+    """Iterate over the files and directories to be rendered."""
+
+
+def getpathiterable(registry: Registry) -> PathIterable:
+    """Return a path iterable."""
+    dispatch = registry.bind(getpaths)
+
+    def _wrapper(path: Path, config: Config) -> Iterable[Path]:
+        iterables: list[Iterable[Path]] = dispatch(path, config)
+        return chain(*iterables)
 
     return _wrapper
