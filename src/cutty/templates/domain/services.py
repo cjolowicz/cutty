@@ -7,7 +7,6 @@ from cutty.templates.domain.binders import RenderingBinder
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.files import File
 from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.renderfiles import renderfiles
 
@@ -28,7 +27,7 @@ def render(
     """Render the template at the given path."""
     config = loadconfig(path)
     renderregistry = registerrenderers(path, config)
-    render = createrenderer({**defaultrenderregistry, **renderregistry})
+    render = createrenderer(renderregistry)
     paths = getpaths(path, config)
 
     bindings = renderbind(render, config.variables)
