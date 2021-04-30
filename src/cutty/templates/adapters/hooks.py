@@ -9,11 +9,13 @@ from cutty.plugins.domain.hooks import hook
 from cutty.plugins.domain.hooks import implements
 from cutty.plugins.domain.registry import Registry
 from cutty.templates.domain.config import Config
+from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
+from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
 from cutty.templates.domain.services import ConfigLoader
 from cutty.templates.domain.services import PathIterable
-from cutty.templates.domain.services import RendererRegistrar
+from cutty.templates.domain.services import RendererFactory
 
 
 @hook(firstresult=True)
@@ -44,14 +46,15 @@ def getrenderers_impl(path: Path, config: Config) -> RenderRegistry:
     return defaultrenderregistry
 
 
-def getrendererregistrar(registry: Registry) -> RendererRegistrar:
-    """Return a registrar for renderers."""
+def getrendererfactory(registry: Registry) -> RendererFactory:
+    """Return a hook-based renderer factory."""
     dispatch = registry.bind(getrenderers)
     registry.register(getrenderers_impl)
 
-    def _wrapper(path: Path, config: Config) -> RenderRegistry:
-        registries: list[RenderRegistry] = dispatch(path, config)
-        return ChainMap(*registries)
+    def _wrapper(path: Path, config: Config) -> Renderer:
+        renderregistries: list[RenderRegistry] = dispatch(path, config)
+        renderregistry = ChainMap(*renderregistries)
+        return createrenderer(renderregistry)
 
     return _wrapper
 
