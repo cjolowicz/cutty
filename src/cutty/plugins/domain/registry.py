@@ -26,5 +26,5 @@ class Registry(abc.ABC):
         """Return a callable that dispatches to hook implementations."""
 
     @abc.abstractmethod
-    def register(self, implementation: F) -> None:
+    def register(self, implementation: F) -> F:
         """Register the hook implementation."""

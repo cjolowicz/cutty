@@ -58,7 +58,7 @@ class PluggyRegistry(Registry):
         return dispatch
 
     @typeguard_ignore
-    def register(self, implementation: F) -> None:
+    def register(self, implementation: F) -> F:
         """Register the hook implementation."""
         hook = implementation._hook  # type: ignore[attr-defined]
         hookname = hook.function.__name__
@@ -66,3 +66,4 @@ class PluggyRegistry(Registry):
         namespace = _Namespace()
         setattr(namespace, hookname, hookimpl)
         self.manager.register(namespace)
+        return implementation

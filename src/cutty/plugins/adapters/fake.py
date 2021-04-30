@@ -48,8 +48,9 @@ class FakeRegistry(Registry):
         return dispatch
 
     @typeguard_ignore
-    def register(self, implementation: F) -> None:
+    def register(self, implementation: F) -> F:
         """Register the hook implementation."""
         hook = implementation._hook  # type: ignore[attr-defined]
         implementations = self.implementations.setdefault(hook, [])
         implementations.insert(0, implementation)
+        return implementation
