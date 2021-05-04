@@ -5,25 +5,19 @@ from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.config import Config
 
 
-def test_iterpaths_hooks() -> None:
-    """It prepends hooks to the path sequence."""
+def test_iterpaths_template_directory() -> None:
+    """It returns the template directory."""
     config = Config({}, ())
-    filesystem = DictFilesystem(
-        {
-            "hooks": {"pre_gen_project.py": ""},
-            "{{ cookiecutter.project }}": {},
-        }
-    )
+    filesystem = DictFilesystem({"{{ cookiecutter.project }}": {}})
     path = Path(filesystem=filesystem)
     paths = iterpaths(path, config)
 
-    assert next(paths) == path / "hooks" / "pre_gen_project.py"
     assert next(paths) == path / "{{ cookiecutter.project }}"
     assert next(paths, None) is None
 
 
-def test_iterpaths_bogus_hooks() -> None:
-    """It ignores hooks with a backup extension."""
+def test_iterpaths_other_directories() -> None:
+    """It ignores other directories."""
     config = Config({}, ())
     filesystem = DictFilesystem(
         {
