@@ -6,10 +6,9 @@ import tempfile
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
-from collections.abc import Mapping
 from typing import Optional
 
-from cutty.application.cookiecutter.hooks import runhook
+from cutty.application.cookiecutter.hooks import executehook
 from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.files import File
@@ -72,22 +71,14 @@ class CookiecutterFileStorage(DiskFileStorage):
                     raise FileExistsError(f"{project} already exists")
 
                 project.mkdir(parents=True, exist_ok=True)
-                executehook(hooks, "pre_gen_project", cwd=project)
+                executehook(hooks, "pre_gen_project", cwd=project, storehook=storehook)
 
             path = self.resolve(file.path)
             if not (self.skip_if_file_exists and path.exists()):
                 self.storefile(file, path)
 
         if project is not None:
-            executehook(hooks, "post_gen_project", cwd=project)
-
-
-def executehook(hooks: Mapping[str, File], hook: str, *, cwd: pathlib.Path) -> None:
-    """Execute the hook."""
-    hookfile = hooks.get(hook)
-    if hookfile is not None:
-        with storehook(hookfile) as path:
-            runhook(path, cwd=cwd)
+            executehook(hooks, "post_gen_project", cwd=project, storehook=storehook)
 
 
 @contextmanager
