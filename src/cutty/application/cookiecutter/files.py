@@ -63,35 +63,36 @@ class CookiecutterFileStorage(DiskFileStorage):
         self,
         path: pathlib.Path,
         *,
+        hooks: Iterable[File] = (),
         overwrite_if_exists: bool = False,
         skip_if_file_exists: bool = False,
     ) -> None:
         """Initialize."""
         super().__init__(path)
+        self.hooks = {hook.path.stem: hook for hook in hooks}
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
 
     def store(self, files: Iterable[File]) -> None:
         """Store the files on disk."""
-        hooks = {}
         project: Optional[pathlib.Path] = None
 
         for file in files:
-            if file.path.parts[0] == "hooks":
-                hooks[file.path.stem] = file
-                continue
-
             if project is None:
                 project = self.resolve(file.path.parents[-2])
                 if not self.overwrite_if_exists and project.exists():
                     raise FileExistsError(f"{project} already exists")
 
                 project.mkdir(parents=True, exist_ok=True)
-                executehook(hooks, "pre_gen_project", cwd=project, storehook=storehook)
+                executehook(
+                    self.hooks, "pre_gen_project", cwd=project, storehook=storehook
+                )
 
             path = self.resolve(file.path)
             if not (self.skip_if_file_exists and path.exists()):
                 self.storefile(file, path)
 
         if project is not None:
-            executehook(hooks, "post_gen_project", cwd=project, storehook=storehook)
+            executehook(
+                self.hooks, "post_gen_project", cwd=project, storehook=storehook
+            )

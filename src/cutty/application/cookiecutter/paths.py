@@ -1,7 +1,6 @@
 """Paths in Cookiecutter templates."""
 from collections.abc import Iterator
 
-from cutty.application.cookiecutter.hooks import iterhooks
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.config import Config
 
@@ -14,5 +13,4 @@ def iterpaths(path: Path, config: Config) -> Iterator[Path]:
     else:
         raise RuntimeError("template directory not found")  # pragma: no cover
 
-    yield from iterhooks(path)
     yield template_dir
