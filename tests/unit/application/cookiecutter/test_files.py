@@ -42,6 +42,12 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     return CookiecutterFileStorage(tmp_path)
 
 
+@pytest.fixture
+def storagewithhook(tmp_path: pathlib.Path, hook: File) -> DiskFileStorage:
+    """Fixture for a storage with hooks."""
+    return CookiecutterFileStorage(tmp_path, hooks=[hook])
+
+
 def test_storage(tmp_path: pathlib.Path, file: File) -> None:
     """It stores the file."""
     storage = DiskFileStorage(tmp_path)
@@ -64,16 +70,18 @@ def test_executable(tmp_path: pathlib.Path, executable: File) -> None:
     assert os.access(path, os.X_OK)
 
 
-def test_hooks(storage: DiskFileStorage, file: File, hook: File) -> None:
+def test_hooks(storagewithhook: DiskFileStorage, file: File) -> None:
     """It executes the hook."""
-    storage.store([hook, file])
+    storage = storagewithhook
+    storage.store([file])
     path = storage.resolve(PurePath("example", "marker"))
     assert path.is_file()
 
 
-def test_no_files(storage: DiskFileStorage, hook: File) -> None:
+def test_no_files(storagewithhook: DiskFileStorage) -> None:
     """It does nothing."""
-    storage.store([hook])
+    storage = storagewithhook
+    storage.store([])
     path = storage.resolve(PurePath("example", "marker"))
     assert not path.is_file()
 
