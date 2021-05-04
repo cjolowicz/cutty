@@ -34,12 +34,6 @@ def main(
     """Generate a project from a Cookiecutter template."""
     hooks = PluggyRegistry("cutty")
     provider = getrepositoryprovider(hooks, projectname="cutty")
-    storage = CookiecutterFileStorage(
-        pathlib.Path.cwd() if output_dir is None else output_dir,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-    )
-
     url = parseurl(template)
     path = provider(url, revision=checkout)
 
@@ -57,6 +51,12 @@ def main(
         registerrenderers=registerrenderers,
         iterpaths=iterpaths,
         renderbind=renderbindwith(binder),
+    )
+
+    storage = CookiecutterFileStorage(
+        pathlib.Path.cwd() if output_dir is None else output_dir,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
     )
 
     storage.store(files)
