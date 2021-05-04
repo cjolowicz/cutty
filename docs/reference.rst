@@ -48,13 +48,6 @@ cutty.templates.domain.renderfiles
    :members:
 
 
-cutty.templates.domain.services
--------------------------------
-
-.. automodule:: cutty.templates.domain.services
-   :members:
-
-
 cutty.templates.adapters.jinja
 ------------------------------
 
