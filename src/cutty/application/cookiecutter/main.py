@@ -1,5 +1,4 @@
 """Main entry point for the Cookiecutter compatibility layer."""
-import functools
 import pathlib
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -17,7 +16,9 @@ from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.services import render
+from cutty.templates.domain.render import createrenderer
+from cutty.templates.domain.render import defaultrenderregistry
+from cutty.templates.domain.renderfiles import renderfiles
 
 
 def main(
@@ -45,14 +46,13 @@ def main(
         [Binding(key, value) for key, value in extra_context.items()],
     )
 
-    files = render(
-        path,
-        loadconfig=functools.partial(loadconfig, template),
-        registerrenderers=registerrenderers,
-        iterpaths=iterpaths,
-        renderbind=renderbindwith(binder),
-    )
-
+    config = loadconfig(template, path)
+    renderregistry = registerrenderers(path, config)
+    render = createrenderer({**defaultrenderregistry, **renderregistry})
+    paths = iterpaths(path, config)
+    renderbind = renderbindwith(binder)
+    bindings = renderbind(render, config.variables)
+    files = renderfiles(paths, render, bindings)
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         overwrite_if_exists=overwrite_if_exists,
