@@ -47,6 +47,15 @@ def temporarystorage() -> Iterator[DiskFileStorage]:
         yield DiskFileStorage(path)
 
 
+@contextmanager
+def storehook(hookfile: File) -> Iterator[pathlib.Path]:
+    """Store the hook on disk."""
+    with temporarystorage() as storage:
+        path = storage.resolve(hookfile.path)
+        storage.storefile(hookfile, path)
+        yield path
+
+
 class CookiecutterFileStorage(DiskFileStorage):
     """Disk-based file store with pre and post hooks."""
 
@@ -86,12 +95,3 @@ class CookiecutterFileStorage(DiskFileStorage):
 
         if project is not None:
             executehook(hooks, "post_gen_project", cwd=project, storehook=storehook)
-
-
-@contextmanager
-def storehook(hookfile: File) -> Iterator[pathlib.Path]:
-    """Store the hook on disk."""
-    with temporarystorage() as storage:
-        path = storage.resolve(hookfile.path)
-        storage.storefile(hookfile, path)
-        yield path
