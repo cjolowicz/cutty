@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pathlib
 import tempfile
-from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from typing import Optional
@@ -38,6 +37,14 @@ class DiskFileStorage:
     def resolve(self, path: PurePath) -> pathlib.Path:
         """Resolve the path to a filesystem location."""
         return self.root.joinpath(*path.parts)
+
+
+@contextmanager
+def temporarystorage() -> Iterator[DiskFileStorage]:
+    """Return temporary storage."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = pathlib.Path(tmpdir)
+        yield DiskFileStorage(path)
 
 
 class CookiecutterFileStorage(DiskFileStorage):
@@ -84,17 +91,7 @@ class CookiecutterFileStorage(DiskFileStorage):
 @contextmanager
 def storehook(hookfile: File) -> Iterator[pathlib.Path]:
     """Store the hook on disk."""
-    with temporarystorage(CookiecutterFileStorage) as storage:
+    with temporarystorage() as storage:
         path = storage.resolve(hookfile.path)
         storage.storefile(hookfile, path)
         yield path
-
-
-@contextmanager
-def temporarystorage(
-    filestorage: Callable[[pathlib.Path], DiskFileStorage]
-) -> Iterator[DiskFileStorage]:
-    """Return temporary storage."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        path = pathlib.Path(tmpdir)
-        yield filestorage(path)
