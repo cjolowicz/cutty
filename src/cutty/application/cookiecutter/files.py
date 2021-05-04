@@ -2,9 +2,6 @@
 from __future__ import annotations
 
 import pathlib
-import platform
-import subprocess  # noqa: S404
-import sys
 import tempfile
 from collections.abc import Callable
 from collections.abc import Iterable
@@ -12,6 +9,7 @@ from collections.abc import Iterator
 from collections.abc import Mapping
 from typing import Optional
 
+from cutty.application.cookiecutter.hooks import runhook
 from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.files import File
@@ -109,11 +107,3 @@ def temporarystorage(
     with tempfile.TemporaryDirectory() as tmpdir:
         path = pathlib.Path(tmpdir)
         yield filestorage(path)
-
-
-def runhook(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
-    """Run the hook."""
-    command = [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
-    shell = platform.system() == "Windows"
-
-    subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
