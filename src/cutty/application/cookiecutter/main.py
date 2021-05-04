@@ -6,6 +6,7 @@ from typing import Optional
 
 from cutty.application.cookiecutter.config import loadconfig
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
+from cutty.application.cookiecutter.hooks import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
@@ -49,12 +50,16 @@ def main(
     config = loadconfig(template, path)
     renderregistry = registerrenderers(path, config)
     render = createrenderer({**defaultrenderregistry, **renderregistry})
-    paths = iterpaths(path, config)
     renderbind = renderbindwith(binder)
     bindings = renderbind(render, config.variables)
+
+    paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
+    hookpaths = iterhooks(path)
+    hookfiles = renderfiles(hookpaths, render, bindings)
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
+        hooks=hookfiles,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
     )
