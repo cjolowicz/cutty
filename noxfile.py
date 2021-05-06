@@ -147,6 +147,33 @@ def coverage(session: Session) -> None:
     session.run("coverage", *args)
 
 
+@session(python=python_versions[0])
+def unittests(session: Session) -> None:
+    """Run the unit tests for a specific module."""
+    module, *posargs = session.posargs if session.posargs else [""]
+
+    testdir = Path("tests/unit").joinpath(*module.split("."))
+    source = f"{package}.{module}" if module else package
+
+    session.install(".")
+    session.install("coverage[toml]", *dependencies["test"])
+
+    try:
+        session.run(
+            "coverage",
+            "run",
+            "--parallel",
+            f"--source={source}",
+            "-m",
+            "pytest",
+            *posargs,
+            str(testdir),
+        )
+    finally:
+        session.run("coverage", "combine")
+        session.run("coverage", "report")
+
+
 @session(python=python_versions)
 def typeguard(session: Session) -> None:
     """Runtime type checking using Typeguard."""
