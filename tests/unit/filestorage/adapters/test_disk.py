@@ -1,6 +1,7 @@
 """Unit tests for cutty.filestorage.adapters.disk."""
 import contextlib
 import pathlib
+import platform
 
 import pytest
 
@@ -100,7 +101,8 @@ def test_file_exists_overwrite_directory(tmp_path: pathlib.Path) -> None:
     path.mkdir()
 
     with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storefile:
-        with pytest.raises(IsADirectoryError):
+        error = PermissionError if platform.system() == "Windows" else IsADirectoryError
+        with pytest.raises(error):
             storefile(file)
 
 
