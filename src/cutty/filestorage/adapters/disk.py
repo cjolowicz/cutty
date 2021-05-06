@@ -24,38 +24,36 @@ class FileExistsPolicy(enum.Enum):
     SKIP = enum.auto()
 
 
-def storefile(  # noqa: C901
+def _storefile(
     file: File,
+    path: pathlib.Path,
     *,
-    root: pathlib.Path,
-    fileexists: FileExistsPolicy,
     undo: list[Callable[[], None]],
+    overwrite: bool = False,
 ) -> None:
-    """Store the file in a directory on disk."""
-    path = root.joinpath(*file.path.parts)
-    overwrite = False
+    """Store the file at the given path on disk."""
+    # OVERWRITING.
+    #
+    # These operations are allowed:
+    #
+    # - Overwrite a regular file with another regular file.
+    # - Overwrite a symbolic link with a regular file.
+    # - Overwrite a symbolic link with another symbolic link.
+    #
+    # These operations raise exceptions:
+    #
+    # - Do not overwrite a directory with a regular file.
+    # - Do not overwrite a directory with a symbolic link.
+    # - Do not overwrite a regular file with a symbolic link.
+    # - Do not overwrite a regular file with a directory.
+    # - Do not overwrite a symbolic link with a directory if the link target is
+    #   not a directory. (Symbolic links in the path are followed if they point
+    #   to directories.)
 
-    if path.exists():
-        if fileexists is FileExistsPolicy.RAISE:
-            raise FileExistsError(f"{path} already exists")
-
-        if fileexists is FileExistsPolicy.SKIP:
-            return
-
-        overwrite = True
-
-        # Overwriting directories with regular files or symbolic links is not
-        # allowed. Neither is overwriting regular files with symbolic links. Let
-        # these operations raise their own exceptions. Overwriting a symbolic
-        # link with a regular file or another symbolic link requires removing
-        # the existing symbolic link beforehand.
-        if path.is_symlink():
-            path.unlink()
+    if overwrite and path.is_symlink():
+        path.unlink()
 
     for parent in reversed(path.parents):
-        # A symbolic link in the path whose target is not a directory will
-        # result in FileExistsError. XXX Should we guard against symbolic links
-        # whose target is a directory here?
         if not parent.is_dir():
             parent.mkdir()
             undo.append(parent.rmdir)
@@ -78,6 +76,24 @@ def storefile(  # noqa: C901
 
     else:
         raise TypeError(f"cannot store file of type {type(file)}")
+
+
+def storefile(
+    file: File,
+    *,
+    root: pathlib.Path,
+    fileexists: FileExistsPolicy,
+    undo: list[Callable[[], None]],
+) -> None:
+    """Store the file in a directory on disk."""
+    path = root.joinpath(*file.path.parts)
+
+    if not path.exists():
+        _storefile(file, path, undo=undo)
+    elif fileexists is FileExistsPolicy.OVERWRITE:
+        _storefile(file, path, undo=undo, overwrite=True)
+    elif fileexists is FileExistsPolicy.RAISE:
+        raise FileExistsError(f"{path} already exists")
 
 
 @contextmanager
