@@ -1,6 +1,7 @@
 """Disk-based file storage."""
 from __future__ import annotations
 
+import enum
 import functools
 import pathlib
 import tempfile
@@ -14,9 +15,30 @@ from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filestorage.domain.storage import FileStore
 
 
-def storefile(file: File, *, root: pathlib.Path) -> None:
+class FileExistsPolicy(enum.Enum):
+    """What to do when a file already exists."""
+
+    RAISE = enum.auto()
+    OVERWRITE = enum.auto()
+    SKIP = enum.auto()
+
+
+def storefile(
+    file: File,
+    *,
+    root: pathlib.Path,
+    fileexists: FileExistsPolicy,
+) -> None:
     """Store the file in a directory on disk."""
     path = root.joinpath(*file.path.parts)
+
+    if path.exists():
+        if fileexists is FileExistsPolicy.RAISE:
+            raise FileExistsError(f"{path} already exists")
+
+        if fileexists is FileExistsPolicy.SKIP:
+            return
+
     path.parent.mkdir(parents=True, exist_ok=True)
 
     if isinstance(file, RegularFile):
@@ -33,14 +55,22 @@ def storefile(file: File, *, root: pathlib.Path) -> None:
 
 
 @contextmanager
-def diskfilestorage(root: pathlib.Path) -> Iterator[FileStore]:
+def diskfilestorage(
+    root: pathlib.Path,
+    *,
+    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+) -> Iterator[FileStore]:
     """Disk-based store for files."""
-    yield functools.partial(storefile, root=root)
+    yield functools.partial(storefile, root=root, fileexists=fileexists)
 
 
 @contextmanager
-def temporarydiskfilestorage() -> Iterator[FileStore]:
+def temporarydiskfilestorage(
+    *,
+    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+) -> Iterator[FileStore]:
     """Temporary disk-based store for files."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        with diskfilestorage(pathlib.Path(tmpdir)) as storefile:
+        root = pathlib.Path(tmpdir)
+        with diskfilestorage(root, fileexists=fileexists) as storefile:
             yield storefile
