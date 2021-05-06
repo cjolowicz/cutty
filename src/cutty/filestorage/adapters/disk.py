@@ -44,6 +44,14 @@ def storefile(  # noqa: C901
 
         overwrite = True
 
+        # Overwriting directories with regular files or symbolic links is not
+        # allowed. Neither is overwriting regular files with symbolic links. Let
+        # these operations raise their own exceptions. Overwriting a symbolic
+        # link with a regular file or another symbolic link requires removing
+        # the existing symbolic link beforehand.
+        if path.is_symlink():
+            path.unlink()
+
     for parent in reversed(path.parents):
         # A symbolic link in the path whose target is not a directory will
         # result in FileExistsError. XXX Should we guard against symbolic links
