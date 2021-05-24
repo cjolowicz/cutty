@@ -3,6 +3,7 @@ import pytest
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.files import File
@@ -26,6 +27,10 @@ from cutty.templates.domain.variables import GenericVariable
         (
             Executable(PurePath("{x}"), b"{x}"),
             Executable(PurePath("teapot"), b"teapot"),
+        ),
+        (
+            SymbolicLink(PurePath("{x}"), PurePath("{x}")),
+            SymbolicLink(PurePath("teapot"), PurePath("teapot")),
         ),
     ],
 )
