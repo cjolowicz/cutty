@@ -155,7 +155,7 @@ def unittests(session: Session) -> None:
     testdir = Path("tests/unit").joinpath(*module.split("."))
     source = f"{package}.{module}" if module else package
 
-    session.install(".")
+    session.run_always("poetry", "install", "--no-dev", external=True)
     session.install("coverage[toml]", *dependencies["test"])
 
     try:
