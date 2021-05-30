@@ -52,7 +52,7 @@ def parseurl(location: str) -> URL:
 
     try:
         exists = path.exists()
-    except OSError:
+    except OSError:  # pragma: no cover
         exists = False  # illegal filename on Windows
 
     if not exists:
