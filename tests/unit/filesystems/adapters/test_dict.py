@@ -288,6 +288,12 @@ def test_iterdir_directory(root: Path) -> None:
     assert str(path) == "etc/passwd"
 
 
+def test_read_bytes(root: Path) -> None:
+    """It returns the file contents."""
+    path = root / "root" / ".profile"
+    assert path.read_bytes() == b"# .profile\n"
+
+
 def test_read_text(root: Path) -> None:
     """It returns the file contents."""
     path = root / "root" / ".profile"

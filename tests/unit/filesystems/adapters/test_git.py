@@ -5,6 +5,7 @@ import pygit2
 import pytest
 
 from cutty.filesystems.adapters.git import GitFilesystem
+from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -42,6 +43,39 @@ def filesystem(tmp_path: Path) -> GitFilesystem:
 @pytest.mark.parametrize(
     "path",
     [
+        PurePath("file"),
+        PurePath("dir", "script.py"),
+        PurePath("dir", "link"),
+        PurePath(".", "file"),
+        PurePath("..", "file"),
+        PurePath("dir", ".", "script.py"),
+    ],
+    ids=str,
+)
+def test_is_file_true(filesystem: GitFilesystem, path: PurePath) -> None:
+    """It returns True."""
+    assert filesystem.is_file(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("dir"),
+        PurePath("dir", "subdir"),
+        PurePath("."),
+        PurePath(".."),
+        PurePath("sh"),
+    ],
+    ids=str,
+)
+def test_is_file_false(filesystem: GitFilesystem, path: PurePath) -> None:
+    """It returns False."""
+    assert not filesystem.is_file(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
         PurePath(),
         PurePath("dir"),
         PurePath("dir", "subdir"),
@@ -74,6 +108,25 @@ def test_is_dir_false(filesystem: GitFilesystem, path: PurePath) -> None:
     assert not filesystem.is_dir(path)
 
 
+def test_iterdir(filesystem: GitFilesystem) -> None:
+    """It returns the directory entries."""
+    [entry] = filesystem.iterdir(PurePath("dir", "subdir"))
+    assert entry == ".keep"
+
+
 def test_read_text_symlink(filesystem: GitFilesystem) -> None:
     """It returns the contents of the target."""
     assert filesystem.read_text(PurePath("dir", "link")) == "lorem ipsum dolor\n"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        PurePath("dir", "script.py"),
+        PurePath("dir", ".", "script.py"),
+    ],
+    ids=str,
+)
+def test_access_executable(filesystem: GitFilesystem, path: PurePath) -> None:
+    """It returns True."""
+    assert filesystem.access(path, Access.EXECUTE)
