@@ -12,8 +12,8 @@ from cutty.templates.domain.renderfiles import renderfiles
 @pytest.fixture
 def path() -> Path:
     """Fixture for a path."""
-    filesystem = DictFilesystem({"{x}": "{x}-blob"})
-    return Path("{x}", filesystem=filesystem)
+    filesystem = DictFilesystem({"dir": {"{x}": "{x}-blob"}})
+    return Path("dir", filesystem=filesystem)
 
 
 def test_renderfiles_default(render: Renderer, path: Path) -> None:
@@ -22,7 +22,7 @@ def test_renderfiles_default(render: Renderer, path: Path) -> None:
 
     [file] = renderfiles([path], render, [binding])
 
-    assert file.path.parts == ("teapot",)
+    assert file.path.parts == ("dir", "teapot")
     assert file.mode == Mode.DEFAULT
     assert file.blob == b"teapot-blob"
 

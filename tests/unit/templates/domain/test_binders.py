@@ -37,3 +37,12 @@ def test_renderbind_with_override(
     [binding] = renderbind(render, [variable])
 
     assert binding == expected
+
+
+def test_override_empty(variable: GenericVariable[str]) -> None:
+    """It does not override the variable."""
+    binder = override(binddefault, [])
+    binding = binder(variable)
+
+    assert binding.name == variable.name
+    assert binding.value == variable.default
