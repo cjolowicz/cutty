@@ -12,28 +12,43 @@ from cutty.filesystems.domain.purepath import PurePath
 @pytest.fixture
 def filesystem(tmp_path: Path) -> GitFilesystem:
     """Fixture for a git filesystem."""
-    (tmp_path / "file").write_text("lorem ipsum dolor\n")
-    (tmp_path / "dir").mkdir()
-    (tmp_path / "dir" / "script.py").write_text("#!/usr/bin/env python\n")
-    (tmp_path / "dir" / "script.py").chmod(0o755)
-    (tmp_path / "dir" / "link").symlink_to("../file")
-    (tmp_path / "dir" / "subdir").mkdir()
-    (tmp_path / "dir" / "subdir" / ".keep").touch()
-    (tmp_path / "sh").symlink_to("/bin/sh")
+
+    def _blob(builder: pygit2.TreeBuilder, name: str, text: str, attr: int) -> None:
+        builder.insert(name, repository.create_blob(text.encode()), attr)
+
+    def _file(builder: pygit2.TreeBuilder, name: str, text: str) -> None:
+        _blob(builder, name, text, pygit2.GIT_FILEMODE_BLOB)
+
+    def _exec(builder: pygit2.TreeBuilder, name: str, text: str) -> None:
+        _blob(builder, name, text, pygit2.GIT_FILEMODE_BLOB_EXECUTABLE)
+
+    def _link(builder: pygit2.TreeBuilder, name: str, target: str) -> None:
+        _blob(builder, name, target, pygit2.GIT_FILEMODE_LINK)
+
+    def _tree(builder: pygit2.TreeBuilder, name: str, tree: pygit2.TreeBuilder) -> None:
+        builder.insert(name, tree.write(), pygit2.GIT_FILEMODE_TREE)
 
     signature = pygit2.Signature("you", "you@example.com")
     repository = pygit2.init_repository(tmp_path)
-    repository.index.add("file")
-    repository.index.add("dir/script.py")
-    repository.index.add("dir/link")
-    repository.index.add("dir/subdir/.keep")
-    repository.index.add("sh")
+
+    root = repository.TreeBuilder()
+    root_dir = repository.TreeBuilder()
+    root_dir_subdir = repository.TreeBuilder()
+
+    _file(root, "file", "lorem ipsum dolor\n")
+    _exec(root_dir, "script.py", "#!/usr/bin/env python\n")
+    _link(root_dir, "link", "../file")
+    _file(root_dir_subdir, ".keep", "")
+    _tree(root_dir, "subdir", root_dir_subdir)
+    _tree(root, "dir", root_dir)
+    _link(root, "sh", "/bin/sh")
+
     repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.index.write_tree(),
+        root.write(),
         [],
     )
 
