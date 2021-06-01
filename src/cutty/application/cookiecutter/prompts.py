@@ -46,6 +46,25 @@ def choiceprompt(variable: Variable) -> Binding:
 
 def jsonprompt(variable: Variable) -> Binding:
     """Prompt to provide a dictionary of data."""
+
+    def _load_json_dict(value: Optional[str]) -> dict[str, Any]:
+        """Load entered value as a JSON dict."""
+        if value == "default":
+            result: dict[str, Any] = variable.default
+            return result
+
+        assert value is not None  # noqa: S101
+
+        try:
+            result = json.loads(value)
+        except Exception as error:
+            raise click.UsageError(f"unable to decode to JSON: {error}")
+
+        if not isinstance(result, dict):
+            raise click.UsageError("requires JSON object")
+
+        return result
+
     value = click.prompt(
         variable.name,
         default="default",
@@ -53,25 +72,7 @@ def jsonprompt(variable: Variable) -> Binding:
         value_proc=_load_json_dict,
     )
 
-    if value == "default":
-        return binddefault(variable)
-
     return bind(variable, value)
-
-
-def _load_json_dict(value: Optional[str]) -> dict[str, Any]:
-    """Load entered value as a JSON dict."""
-    assert value is not None  # noqa: S101
-
-    try:
-        result = json.loads(value)
-    except Exception as error:
-        raise click.UsageError(f"unable to decode to JSON: {error}")
-
-    if not isinstance(result, dict):
-        raise click.UsageError("requires JSON object")
-
-    return result
 
 
 def prompt(variable: Variable) -> Binding:
