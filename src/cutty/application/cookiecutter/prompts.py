@@ -36,7 +36,7 @@ def choiceprompt(variable: Variable) -> Binding:
 
     choice = click.prompt(
         "\n".join(lines),
-        type=click.Choice(choices.keys()),
+        type=click.Choice(list(choices)),
         default="1",
         show_choices=False,
     )
