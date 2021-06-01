@@ -18,7 +18,7 @@ def create_template() -> CreateTemplate:
     """Factory fixture for a Jinja template."""
 
     def _factory(
-        template: str, *, extensions: list[jinja2.ext.Extension]
+        template: str, *, extensions: list[type[jinja2.ext.Extension]]
     ) -> jinja2.Template:
         loader = jinja2.FunctionLoader(lambda _name: template)
         environment = jinja2.Environment(  # noqa: S701
