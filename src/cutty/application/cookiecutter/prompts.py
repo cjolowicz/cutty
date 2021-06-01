@@ -47,14 +47,12 @@ def choiceprompt(variable: Variable) -> Binding:
 def jsonprompt(variable: Variable) -> Binding:
     """Prompt to provide a dictionary of data."""
     value = click.prompt(
-        variable.name,
-        default="default",
+        f"{variable.name} [default]",
+        default=json.dumps(variable.default),
+        show_default=False,
         type=click.STRING,
         value_proc=_load_json_dict,
     )
-
-    if value == "default":
-        return binddefault(variable)
 
     return bind(variable, value)
 
