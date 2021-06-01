@@ -6,10 +6,8 @@ from typing import Optional
 import click
 
 import cutty.application.cookiecutter.main
-from cutty.util.typeguard_ignore import typeguard_ignore
 
 
-@typeguard_ignore
 def extra_context_callback(
     context: click.Context, parameter: click.Parameter, args: tuple[str, ...]
 ) -> dict[str, str]:
@@ -27,22 +25,6 @@ def extra_context_callback(
                 )
 
     return dict(_generate())
-
-
-# Work around an issue when running under Typeguard, where click erroneously
-# believes it's dealing with a deprecated 2-argument parameter callback. This
-# should no longer be needed under click 8.0.
-
-if extra_context_callback.__code__.co_argcount < 3:  # pragma: no cover
-    from typing import Any
-
-    _original_extra_context_callback = extra_context_callback
-
-    def extra_context_callback(  # type: ignore[misc]  # noqa: D103
-        context: click.Context, args: tuple[str, ...]
-    ) -> dict[str, str]:
-        parameter: Any = ...
-        return _original_extra_context_callback(context, parameter, args)
 
 
 @click.command()
