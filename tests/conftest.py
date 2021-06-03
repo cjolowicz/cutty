@@ -1,18 +1,9 @@
 """Common fixtures."""
-import os
 import pathlib
 import platform
 from textwrap import dedent
 
 import pytest
-from _pytest.config import Config
-from hypothesis import settings
-
-
-def pytest_configure(config: Config) -> None:
-    """Load the hypothesis profile."""
-    settings.register_profile("fast", max_examples=1)
-    settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "default"))
 
 
 def create(path: pathlib.Path, text: str) -> None:
