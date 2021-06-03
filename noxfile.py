@@ -23,7 +23,7 @@ nox.options.sessions = (
 )
 dependencies = {
     "doc": ["sphinx", "sphinx-click", "sphinx-rtd-theme"],
-    "test": ["pytest", "pygments", "hypothesis", "pyftpdlib"],
+    "test": ["pytest", "pygments", "pyftpdlib"],
     "lint": [
         "black",
         "darglint",
