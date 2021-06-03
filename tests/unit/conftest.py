@@ -5,13 +5,6 @@ from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import GenericVariable
-from cutty.util.bus import Bus
-
-
-@pytest.fixture
-def bus() -> Bus:
-    """Return an event bus."""
-    return Bus()
 
 
 @pytest.fixture
