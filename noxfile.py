@@ -1,6 +1,7 @@
 """Nox sessions."""
 import shutil
 import sys
+import tarfile
 from pathlib import Path
 from textwrap import dedent
 
@@ -147,6 +148,37 @@ def coverage(session: Session) -> None:
     session.run("coverage", *args)
 
 
+def installeditable(session: Session) -> None:
+    """Install the package in editable mode."""
+    output = session.run_always(
+        "poetry", "build", "--format=sdist", external=True, silent=True, stderr=None
+    )
+    if output is None:
+        return
+
+    assert isinstance(output, str)  # noqa: S101
+
+    package = Path("dist") / output.split()[-1]
+    targetdir = package.parent / package.name.removesuffix(".tar.gz")
+
+    if targetdir.is_dir():
+        # Remove stale files, but never anything outside `dist`.
+        targetdir.resolve().relative_to(Path("dist").resolve())
+        shutil.rmtree(targetdir)
+
+    with tarfile.open(package) as archive:
+        # Avoid an isolated build, we need setuptools.
+        members = [
+            member
+            for member in archive.getmembers()
+            if Path(member.name).name != "pyproject.toml"
+        ]
+        archive.extractall(package.parent, members=members)
+
+    session.run_always("python", "-m", "pip", "install", "setuptools", silent=True)
+    session.install("-e", str(targetdir), silent=True)
+
+
 @session(python=python_versions[0])
 def unittests(session: Session) -> None:
     """Run the unit tests for a specific module."""
@@ -155,7 +187,7 @@ def unittests(session: Session) -> None:
     testdir = Path("tests/unit").joinpath(*module.split("."))
     source = f"{package}.{module}" if module else package
 
-    session.run_always("poetry", "install", "--no-dev", external=True)
+    installeditable(session)
     session.install("coverage[toml]", *dependencies["test"])
 
     try:
