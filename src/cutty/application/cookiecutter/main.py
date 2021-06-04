@@ -12,7 +12,6 @@ from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
 from cutty.plugins.adapters.pluggy import PluggyRegistry
 from cutty.repositories.adapters.hooks import getrepositoryprovider
-from cutty.repositories.domain.urls import parseurl
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
@@ -36,8 +35,7 @@ def main(
     """Generate a project from a Cookiecutter template."""
     hooks = PluggyRegistry("cutty")
     provider = getrepositoryprovider(hooks, projectname="cutty")
-    url = parseurl(template)
-    path = provider(url, revision=checkout)
+    path = provider(template, revision=checkout)
 
     if directory is not None:
         path = path.joinpath(*directory.parts)  # pragma: no cover
