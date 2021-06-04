@@ -27,24 +27,6 @@ def extra_context_callback(
     return dict(_generate())
 
 
-try:
-    # https://github.com/agronholm/typeguard/issues/191
-    import typeguard  # type: ignore[import]
-except ImportError:
-    pass
-else:  # pragma: no cover
-    from typing import no_type_check
-
-    @no_type_check
-    def _patched_typechecked(*args, **kwargs):
-        if args and isinstance(args[0], click.Command):
-            return args[0]
-        return typeguard_typechecked(*args, **kwargs)
-
-    typeguard_typechecked = typeguard.typechecked
-    typeguard.typechecked = _patched_typechecked
-
-
 @click.command()
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
