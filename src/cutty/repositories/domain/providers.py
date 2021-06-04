@@ -21,6 +21,7 @@ from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 from cutty.repositories.domain.urls import aspath
+from cutty.repositories.domain.urls import parseurl
 
 
 class RepositoryProvider(Protocol):
@@ -28,7 +29,7 @@ class RepositoryProvider(Protocol):
 
     def __call__(
         self,
-        url: URL,
+        location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> Path:
@@ -197,10 +198,11 @@ def repositoryprovider(
     """Return a repository provider."""
 
     def _provide(
-        url: URL,
+        location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> Path:
+        url = parseurl(location)
         providername, url = _splitprovidername(url)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
