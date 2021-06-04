@@ -267,7 +267,7 @@ def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None
     registry = registerproviderfactories()
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
-        provider(url)
+        provider(str(url))
 
 
 def test_repositoryprovider_happy(
@@ -277,7 +277,7 @@ def test_repositoryprovider_happy(
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
     provider = repositoryprovider(registry, providerstore)
-    path = provider(url)
+    path = provider(str(url))
     assert not list(path.iterdir())
 
 
@@ -292,4 +292,4 @@ def test_repositoryprovider_with_provider_specific_url(
     )
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
-        provider(url)
+        provider(str(url))

@@ -20,6 +20,5 @@ def test_getrepositoryprovider() -> None:
     """It raises an exception for an invalid scheme."""
     registry = FakeRegistry()
     repositoryprovider = getrepositoryprovider(registry, "cutty")
-    url = URL("invalid-scheme://example.com/repository")
     with pytest.raises(Exception):
-        repositoryprovider(url)
+        repositoryprovider("invalid-scheme://example.com/repository")
