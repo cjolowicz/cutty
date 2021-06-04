@@ -167,14 +167,16 @@ def installeditable(session: Session) -> None:
         shutil.rmtree(targetdir)
 
     with tarfile.open(package) as archive:
-        # Avoid an isolated build, we need setuptools.
+        # Exclude pyproject.toml, we use setuptools as the build backend.
+        # Exclude src, we provide a symbolic link instead.
         members = [
             member
             for member in archive.getmembers()
-            if Path(member.name).name != "pyproject.toml"
+            if Path(member.name).parts[1] not in ["pyproject.toml", "src"]
         ]
         archive.extractall(package.parent, members=members)
 
+    (targetdir / "src").symlink_to(Path("src").resolve())
     session.run_always("python", "-m", "pip", "install", "setuptools", silent=True)
     session.install("-e", str(targetdir), silent=True)
 
