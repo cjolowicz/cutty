@@ -6,12 +6,11 @@ import platform
 from yarl import URL
 
 
-def aspath(url: URL) -> pathlib.Path:
-    """Convert URL to filesystem path."""
+def aspurewindowspath(url: URL) -> pathlib.PureWindowsPath:
+    """Convert URL to Windows filesystem path."""
     if any(
         (
             url.scheme and url.scheme != "file",
-            url.host and platform.system() != "Windows",
             url.user,
             url.password,
             url.port,
@@ -21,15 +20,41 @@ def aspath(url: URL) -> pathlib.Path:
     ):
         raise ValueError(f"not a path: {url}")
 
-    if platform.system() == "Windows":
-        if url.host:
-            return pathlib.Path(f"//{url.host}{url.path}")
+    if url.host:
+        return pathlib.PureWindowsPath(f"//{url.host}{url.path}")
 
-        path = pathlib.Path(url.path[1:])
-        if path.drive:
-            return path
+    path = pathlib.PureWindowsPath(url.path[1:])
+    if path.drive:
+        return path
 
-    return pathlib.Path(url.path)
+    return pathlib.PureWindowsPath(url.path)
+
+
+def aspureposixpath(url: URL) -> pathlib.PurePosixPath:
+    """Convert URL to POSIX filesystem path."""
+    if any(
+        (
+            url.scheme and url.scheme != "file",
+            url.host,
+            url.user,
+            url.password,
+            url.port,
+            url.query_string,
+            url.fragment,
+        )
+    ):
+        raise ValueError(f"not a path: {url}")
+
+    return pathlib.PurePosixPath(url.path)
+
+
+def aspath(url: URL) -> pathlib.Path:
+    """Convert URL to filesystem path."""
+    return pathlib.Path(
+        aspurewindowspath(url)
+        if platform.system() == "Windows"
+        else aspureposixpath(url)
+    )
 
 
 def realpath(path: pathlib.Path) -> pathlib.Path:
