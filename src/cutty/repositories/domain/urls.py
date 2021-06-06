@@ -75,23 +75,6 @@ def asurl(path: pathlib.Path) -> URL:
     return URL(path.as_uri())
 
 
-def parseurl(location: str) -> URL:
-    """Construct a URL from a string."""
-    path = pathlib.Path(location)
-
-    try:
-        exists = path.exists()
-    except OSError:  # pragma: no cover
-        exists = False  # illegal filename on Windows
-
-    if not exists:
-        url = URL(location)
-        if url.scheme:
-            return url
-
-    return asurl(path)
-
-
 def parselocation(location: str) -> Location:
     """Construct a path or URL from a string."""
     path = pathlib.Path(location)
