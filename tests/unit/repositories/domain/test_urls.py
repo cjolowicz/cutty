@@ -9,6 +9,7 @@ import pytest
 from yarl import URL
 
 from cutty.repositories.domain.urls import aspath
+from cutty.repositories.domain.urls import aspureposixpath
 from cutty.repositories.domain.urls import aspurewindowspath
 from cutty.repositories.domain.urls import asurl
 from cutty.repositories.domain.urls import parseurl
@@ -49,6 +50,7 @@ def test_asurl_aspath_roundtrip(path: Path) -> None:
 @pytest.mark.parametrize(
     "url",
     [
+        URL("//host/drive/dir"),
         URL("http://example.com"),
         URL("file:///path/to/dir#fragment"),
         URL("file:///path/to/dir?query"),
@@ -57,10 +59,27 @@ def test_asurl_aspath_roundtrip(path: Path) -> None:
     ],
     ids=str,
 )
-def test_aspath_invalid(url: URL) -> None:
+def test_aspureposixpath_invalid(url: URL) -> None:
     """It raises an exception."""
     with pytest.raises(ValueError):
-        aspath(url)
+        aspureposixpath(url)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        URL("http://example.com"),
+        URL("file:///path/to/dir#fragment"),
+        URL("file:///path/to/dir?query"),
+        URL("/path/to/dir#fragment"),
+        URL("/path/to/dir?query"),
+    ],
+    ids=str,
+)
+def test_aspurewindowspath_invalid(url: URL) -> None:
+    """It raises an exception."""
+    with pytest.raises(ValueError):
+        aspurewindowspath(url)
 
 
 @pytest.mark.parametrize(
