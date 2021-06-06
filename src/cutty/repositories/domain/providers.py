@@ -15,15 +15,15 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import aspath
+from cutty.repositories.domain.locations import asurl
+from cutty.repositories.domain.locations import Location
+from cutty.repositories.domain.locations import parselocation
 from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.matchers import PathMatcher
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import aspath
-from cutty.repositories.domain.urls import asurl
-from cutty.repositories.domain.urls import Location
-from cutty.repositories.domain.urls import parselocation
 
 
 class RepositoryProvider(Protocol):

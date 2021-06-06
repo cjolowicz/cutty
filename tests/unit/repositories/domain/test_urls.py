@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.urls."""
+"""Unit tests for cutty.repositories.domain.locations."""
 import os
 import platform
 from collections.abc import Iterator
@@ -8,13 +8,13 @@ from pathlib import PureWindowsPath
 import pytest
 from yarl import URL
 
-from cutty.repositories.domain.urls import aspath
-from cutty.repositories.domain.urls import aspureposixpath
-from cutty.repositories.domain.urls import aspurewindowspath
-from cutty.repositories.domain.urls import asurl
-from cutty.repositories.domain.urls import Location
-from cutty.repositories.domain.urls import parselocation
-from cutty.repositories.domain.urls import realpath
+from cutty.repositories.domain.locations import aspath
+from cutty.repositories.domain.locations import aspureposixpath
+from cutty.repositories.domain.locations import aspurewindowspath
+from cutty.repositories.domain.locations import asurl
+from cutty.repositories.domain.locations import Location
+from cutty.repositories.domain.locations import parselocation
+from cutty.repositories.domain.locations import realpath
 
 
 onlywindows = pytest.mark.skipif(platform.system() != "Windows", reason="Windows only")

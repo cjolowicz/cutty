@@ -13,6 +13,8 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import asurl
+from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
@@ -27,8 +29,6 @@ from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import asurl
-from cutty.repositories.domain.urls import Location
 
 
 def nullprovider(

@@ -12,9 +12,9 @@ from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import aspath
+from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import aspath
-from cutty.repositories.domain.urls import asurl
 
 
 class Hg(Protocol):

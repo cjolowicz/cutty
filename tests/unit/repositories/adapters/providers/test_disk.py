@@ -5,7 +5,7 @@ import pytest
 
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.disk import diskprovider
-from cutty.repositories.domain.urls import asurl
+from cutty.repositories.domain.locations import asurl
 
 
 @pytest.fixture

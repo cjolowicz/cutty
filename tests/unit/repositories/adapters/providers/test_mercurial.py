@@ -11,8 +11,8 @@ from yarl import URL
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import asurl
 
 
 class Hg(Protocol):

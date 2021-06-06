@@ -6,8 +6,8 @@ from yarl import URL
 
 from cutty.repositories.adapters.fetchers.file import filefetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import asurl
 
 
 @pytest.fixture

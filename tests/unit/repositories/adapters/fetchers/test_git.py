@@ -10,9 +10,9 @@ from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.git import gitfetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import aspath
+from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import aspath
-from cutty.repositories.domain.urls import asurl
 
 
 signature = pygit2.Signature("you", "you@example.com")
