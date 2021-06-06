@@ -38,21 +38,19 @@ class RepositoryProvider(Protocol):
         """Return a path to the repository located at the given URL."""
 
 
-Provider = Callable[[URL, Optional[Revision]], Optional[Filesystem]]
+Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 
 
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Path:
     """Provide a filesystem path for the repository located at the given URL."""
-    url = location if isinstance(location, URL) else asurl(location)
-
     for provider in providers:
-        filesystem = provider(url, revision)
+        filesystem = provider(location, revision)
         if filesystem is not None:
             return Path(filesystem=filesystem)
 
-    raise RuntimeError(f"unknown location {url}")
+    raise RuntimeError(f"unknown location {location}")
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
@@ -61,9 +59,11 @@ ProviderFactory = Callable[[Store, FetchMode], Provider]
 def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
     """Create a view onto the local filesystem."""
 
-    def _localprovider(url: URL, revision: Optional[Revision]) -> Optional[Filesystem]:
+    def _localprovider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Filesystem]:
         try:
-            path = aspath(url)
+            path = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
         else:
@@ -88,8 +88,9 @@ def remoteproviderfactory(
 
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         def _remoteprovider(
-            url: URL, revision: Optional[Revision]
+            location: Location, revision: Optional[Revision]
         ) -> Optional[Filesystem]:
+            url = location if isinstance(location, URL) else asurl(location)
             if match is None or match(url):
                 for fetcher in fetch:
                     path = fetcher(url, store, revision, fetchmode)
