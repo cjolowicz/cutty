@@ -22,6 +22,7 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 from cutty.repositories.domain.urls import aspath
 from cutty.repositories.domain.urls import asurl
+from cutty.repositories.domain.urls import Location
 from cutty.repositories.domain.urls import parselocation
 
 
@@ -183,14 +184,15 @@ def _createproviders(
             )
 
 
-def _splitprovidername(url: URL) -> tuple[Optional[ProviderName], URL]:
+def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Location]:
     """Split off the provider name from the URL scheme, if any."""
-    providername, _, scheme = url.scheme.rpartition("+")
+    if isinstance(location, URL):
+        providername, _, scheme = location.scheme.rpartition("+")
 
-    if providername:
-        return providername, url.with_scheme(scheme)
+        if providername:
+            return providername, location.with_scheme(scheme)
 
-    return None, url
+    return None, location
 
 
 def repositoryprovider(
@@ -204,12 +206,12 @@ def repositoryprovider(
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> Path:
         location_ = parselocation(location)
-        url = location_ if isinstance(location_, URL) else asurl(location_)
-        providername, url = _splitprovidername(url)
+        providername, location_ = _splitprovidername(location_)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
         )
 
+        url = location_ if isinstance(location_, URL) else asurl(location_)
         return provide(providers, url, revision)
 
     return _provide
