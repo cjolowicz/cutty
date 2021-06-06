@@ -21,7 +21,8 @@ from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 from cutty.repositories.domain.urls import aspath
-from cutty.repositories.domain.urls import parseurl
+from cutty.repositories.domain.urls import asurl
+from cutty.repositories.domain.urls import parselocation
 
 
 class RepositoryProvider(Protocol):
@@ -202,7 +203,8 @@ def repositoryprovider(
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> Path:
-        url = parseurl(location)
+        location_ = parselocation(location)
+        url = location_ if isinstance(location_, URL) else asurl(location_)
         providername, url = _splitprovidername(url)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
