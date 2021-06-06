@@ -14,7 +14,6 @@ from cutty.repositories.domain.urls import aspurewindowspath
 from cutty.repositories.domain.urls import asurl
 from cutty.repositories.domain.urls import Location
 from cutty.repositories.domain.urls import parselocation
-from cutty.repositories.domain.urls import parseurl
 from cutty.repositories.domain.urls import realpath
 
 
@@ -175,67 +174,3 @@ def test_parselocation_no_scheme(name: str) -> None:
     location = parselocation(name)
 
     assert location == Path(name)
-
-
-@pytest.mark.parametrize(
-    "location,expected",
-    [
-        pytest.param("/", URL("file:///"), marks=skipwindows),
-        pytest.param("C:\\", URL("file:///C:/"), marks=onlywindows),
-        ("https://example.com/repository", URL("https://example.com/repository")),
-        pytest.param("a:b", URL("a:b"), marks=skipwindows),
-    ],
-    ids=str,
-)
-def test_parseurl_normal(location: str, expected: URL) -> None:
-    """It parses the URL as expected."""
-    assert parseurl(location) == expected
-
-
-@pytest.mark.parametrize(
-    "name",
-    [
-        pytest.param("a:b", marks=skipwindows),
-        pytest.param("a?b", marks=skipwindows),
-        "a#b",
-        pytest.param("data:,", marks=skipwindows),
-    ],
-)
-def test_parseurl_path_with_special_characters(tmp_path: Path, name: str) -> None:
-    """It parses an existing path with URL-special characters."""
-    path = tmp_path / name
-    path.touch()
-
-    url = parseurl(str(path))
-
-    assert url.scheme == "file"
-    assert url.name == name
-
-
-@skipwindows
-@pytest.mark.parametrize("name", ["http://example.com"])
-def test_parseurl_path_is_url(name: str) -> None:
-    """It parses an existing path that is indistinguishable from a URL."""
-    path = Path(name)
-    path.parent.mkdir(parents=True)
-    path.touch()
-
-    url = parseurl(name)
-
-    assert url.scheme == "file"
-    assert Path(url.path) == realpath(path)
-
-
-@pytest.mark.parametrize(
-    "name",
-    [
-        "a#b",
-        pytest.param("a?b", marks=skipwindows),
-    ],
-)
-def test_parseurl_no_scheme(name: str) -> None:
-    """Locations without schemes are interpreted as paths even if they don't exist."""
-    url = parseurl(name)
-
-    assert url.scheme == "file"
-    assert aspath(url) == realpath(Path(name))
