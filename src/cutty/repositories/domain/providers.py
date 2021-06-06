@@ -42,9 +42,11 @@ Provider = Callable[[URL, Optional[Revision]], Optional[Filesystem]]
 
 
 def provide(
-    providers: Iterable[Provider], url: URL, revision: Optional[Revision]
+    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Path:
     """Provide a filesystem path for the repository located at the given URL."""
+    url = location if isinstance(location, URL) else asurl(location)
+
     for provider in providers:
         filesystem = provider(url, revision)
         if filesystem is not None:
@@ -211,7 +213,6 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        url = location_ if isinstance(location_, URL) else asurl(location_)
-        return provide(providers, url, revision)
+        return provide(providers, location_, revision)
 
     return _provide
