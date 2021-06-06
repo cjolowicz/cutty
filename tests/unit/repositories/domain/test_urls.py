@@ -12,6 +12,8 @@ from cutty.repositories.domain.urls import aspath
 from cutty.repositories.domain.urls import aspureposixpath
 from cutty.repositories.domain.urls import aspurewindowspath
 from cutty.repositories.domain.urls import asurl
+from cutty.repositories.domain.urls import Location
+from cutty.repositories.domain.urls import parselocation
 from cutty.repositories.domain.urls import parseurl
 from cutty.repositories.domain.urls import realpath
 
@@ -112,6 +114,67 @@ def test_aspurewindowspath(url: URL, expected: PureWindowsPath) -> None:
 def test_asurl_valid(path: Path, expected: URL) -> None:
     """It converts the path to a URL."""
     assert asurl(path) == expected
+
+
+@pytest.mark.parametrize(
+    "location,expected",
+    [
+        ("/", Path("/")),
+        pytest.param("C:\\", Path("C:\\"), marks=onlywindows),
+        ("https://example.com/repository", URL("https://example.com/repository")),
+        pytest.param("a:b", URL("a:b")),
+    ],
+    ids=str,
+)
+def test_parselocation_normal(location: str, expected: Location) -> None:
+    """It parses the location as expected."""
+    assert parselocation(location) == expected
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "a#b",
+        pytest.param("a:b", marks=skipwindows),
+        pytest.param("a?b", marks=skipwindows),
+        pytest.param("data:,", marks=skipwindows),
+    ],
+)
+def test_parselocation_path_with_special_characters(tmp_path: Path, name: str) -> None:
+    """It parses an existing path with URL-special characters."""
+    path = tmp_path / name
+    path.touch()
+
+    location = parselocation(str(path))
+
+    assert location == path
+
+
+@skipwindows
+@pytest.mark.parametrize("name", ["http://example.com"])
+def test_parselocation_path_is_url(name: str) -> None:
+    """It parses an existing path that is indistinguishable from a URL."""
+    path = Path(name)
+    path.parent.mkdir(parents=True)
+    path.touch()
+
+    location = parselocation(name)
+
+    assert location == path
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "a#b",
+        pytest.param("a?b", marks=skipwindows),
+    ],
+)
+def test_parselocation_no_scheme(name: str) -> None:
+    """Locations without schemes are interpreted as paths even if they don't exist."""
+    location = parselocation(name)
+
+    assert location == Path(name)
 
 
 @pytest.mark.parametrize(
