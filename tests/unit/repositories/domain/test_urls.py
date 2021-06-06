@@ -3,11 +3,13 @@ import os
 import platform
 from collections.abc import Iterator
 from pathlib import Path
+from pathlib import PureWindowsPath
 
 import pytest
 from yarl import URL
 
 from cutty.repositories.domain.urls import aspath
+from cutty.repositories.domain.urls import aspurewindowspath
 from cutty.repositories.domain.urls import asurl
 from cutty.repositories.domain.urls import parseurl
 from cutty.repositories.domain.urls import realpath
@@ -61,18 +63,17 @@ def test_aspath_invalid(url: URL) -> None:
         aspath(url)
 
 
-@onlywindows
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
-        (URL("file:///dir/file"), Path("\\dir\\file")),
-        (URL("file:///C:/dir/file"), Path("C:\\dir\\file")),
-        (URL("file://host/share/file"), Path("\\\\host\\share\\file")),
+        (URL("file:///dir/file"), PureWindowsPath("\\dir\\file")),
+        (URL("file:///C:/dir/file"), PureWindowsPath("C:\\dir\\file")),
+        (URL("file://host/share/file"), PureWindowsPath("\\\\host\\share\\file")),
     ],
 )
-def test_aspath_windows(url: URL, expected: Path) -> None:
+def test_aspurewindowspath(url: URL, expected: PureWindowsPath) -> None:
     """It translates drive letters and hosts."""
-    assert aspath(url) == expected
+    assert aspurewindowspath(url) == expected
 
 
 @pytest.mark.parametrize(
