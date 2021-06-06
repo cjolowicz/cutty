@@ -2,8 +2,12 @@
 import os.path
 import pathlib
 import platform
+from typing import Union
 
 from yarl import URL
+
+
+Location = Union[pathlib.Path, URL]
 
 
 def aspurewindowspath(url: URL) -> pathlib.PureWindowsPath:
@@ -86,3 +90,26 @@ def parseurl(location: str) -> URL:
             return url
 
     return asurl(path)
+
+
+def parselocation(location: str) -> Location:
+    """Construct a path or URL from a string."""
+    path = pathlib.Path(location)
+
+    try:
+        exists = path.exists()
+    except OSError:  # pragma: no cover
+        exists = False  # illegal filename on Windows
+
+    if not exists:
+        url = URL(location)
+
+        # A location without a scheme can be one of three things: a vanilla
+        # path, a UNC-style Windows path, or a network-path reference (RFC 3986)
+        # a.k.a. protocol-relative URL. The first two are paths, and the third
+        # makes no sense without a base URI. So we treat all as paths.
+
+        if url.scheme:
+            return url
+
+    return path
