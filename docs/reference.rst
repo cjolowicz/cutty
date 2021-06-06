@@ -111,10 +111,10 @@ cutty.filesystems.adapters.zip
    :members:
 
 
-cutty.repositories.domain.urls
-------------------------------
+cutty.repositories.domain.locations
+-----------------------------------
 
-.. automodule:: cutty.repositories.domain.urls
+.. automodule:: cutty.repositories.domain.locations
    :members:
 
 

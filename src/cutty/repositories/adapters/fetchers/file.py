@@ -6,9 +6,9 @@ from typing import Optional
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import fetcher
+from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
-from cutty.repositories.domain.urls import aspath
 
 
 @fetcher(match=scheme("file"))

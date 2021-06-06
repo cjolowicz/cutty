@@ -9,8 +9,8 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.repositories.domain.urls import asurl
 
 
 @pytest.fixture
