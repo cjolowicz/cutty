@@ -28,17 +28,22 @@ from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 from cutty.repositories.domain.urls import asurl
+from cutty.repositories.domain.urls import Location
 
 
-def nullprovider(url: URL, revision: Optional[Revision]) -> Optional[Filesystem]:
-    """Provider that matches no URL."""
+def nullprovider(
+    location: Location, revision: Optional[Revision]
+) -> Optional[Filesystem]:
+    """Provider that matches no location."""
     return None
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
-    def _dictprovider(url: URL, revision: Optional[Revision]) -> Optional[Filesystem]:
+    def _dictprovider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Filesystem]:
         return DictFilesystem(mapping or {})
 
     return _dictprovider
