@@ -281,6 +281,24 @@ def test_repositoryprovider_happy(
     assert not list(path.iterdir())
 
 
+def test_repositoryprovider_with_path(
+    tmp_path: pathlib.Path, providerstore: ProviderStore, fetcher: Fetcher
+) -> None:
+    """It returns a provider that allows traversing repositories."""
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    (repository / "marker").touch()
+
+    registry = registerproviders(
+        default=localprovider(match=lambda path: True, mount=defaultmount)
+    )
+    provider = repositoryprovider(registry, providerstore)
+    path = provider(str(repository))
+    [entry] = path.iterdir()
+
+    assert entry.name == "marker"
+
+
 def test_repositoryprovider_with_provider_specific_url(
     providerstore: ProviderStore, fetcher: Fetcher, url: URL
 ) -> None:
