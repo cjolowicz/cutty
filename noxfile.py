@@ -12,6 +12,7 @@ from nox_poetry import session
 
 package = "cutty"
 python_versions = ["3.9"]
+nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
     "safety",
