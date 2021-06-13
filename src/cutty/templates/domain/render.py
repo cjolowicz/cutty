@@ -8,6 +8,8 @@ from typing import Any
 from typing import Mapping
 from typing import TypeVar
 
+from cutty.filestorage.domain.files import Executable
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
@@ -114,9 +116,23 @@ def renderfile(
     return File(path, file.mode, text.encode())
 
 
+def renderregularfile(
+    file: RegularFile,
+    bindings: Sequence[Binding],
+    render: Renderer,
+) -> RegularFile:
+    """Render a file by rendering its path and contents."""
+    cls = Executable if isinstance(file, Executable) else RegularFile
+    path = render(file.path, bindings)
+    text = file.blob.decode()
+    text = render(text, bindings)
+    return cls(path, text.encode())
+
+
 defaultrenderregistry: RenderRegistry = {
     GenericVariable: rendervariable,
     PurePath: renderpurepath,
     Path: renderpath,
     File: renderfile,
+    RegularFile: renderregularfile,
 }
