@@ -10,26 +10,15 @@ from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
-from cutty.filestorage.domain.files import Executable
-from cutty.filestorage.domain.files import File as BaseFile
-from cutty.filestorage.domain.files import RegularFile
 from cutty.plugins.adapters.pluggy import PluggyRegistry
 from cutty.repositories.adapters.hooks import getrepositoryprovider
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import File
-from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.renderfiles import renderfiles
-
-
-def _convert_file_representation(file: File) -> BaseFile:
-    if Mode.EXECUTABLE in file.mode:
-        return Executable(file.path, file.blob)  # pragma: no cover
-    return RegularFile(file.path, file.blob)
 
 
 def main(
