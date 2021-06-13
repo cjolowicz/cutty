@@ -117,3 +117,16 @@ def test_render_with_context_prefix(cookiecutter_render: Renderer) -> None:
     variable = Binding("value", "teapot")
     text = cookiecutter_render("{{ cookiecutter.value }}", [variable])
     assert text == "teapot"
+
+
+def test_render_with_extra_context(tmp_path: pathlib.Path) -> None:
+    """It renders a Jinja template with extra context."""
+    root = Path(filesystem=DiskFilesystem(tmp_path))
+    rendertext = createjinjarenderer(
+        searchpath=[root], extra_context={"value": "teapot"}
+    )
+    render = createrenderer(
+        {**defaultrenderregistry, str: asrendercontinuation(rendertext)}
+    )
+    text = render("{{ value }}", [])
+    assert text == "teapot"
