@@ -24,13 +24,13 @@ class CookiecutterFileStorage:
         self,
         root: pathlib.Path,
         *,
-        hooks: Iterable[File] = (),
+        hooks: Iterable[BaseFile] = (),
         overwrite_if_exists: bool = False,
         skip_if_file_exists: bool = False,
     ) -> None:
         """Initialize."""
         self.root = root
-        self.hookfiles = tuple(_convert_file_representation(hook) for hook in hooks)
+        self.hookfiles = hooks
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
 
