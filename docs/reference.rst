@@ -20,13 +20,6 @@ cutty.templates.domain.variables
    :members:
 
 
-cutty.templates.domain.files
-----------------------------
-
-.. automodule:: cutty.templates.domain.files
-   :members:
-
-
 cutty.templates.domain.render
 -----------------------------
 
