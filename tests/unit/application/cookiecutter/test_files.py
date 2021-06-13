@@ -5,8 +5,8 @@ import platform
 
 import pytest
 
-from cutty.application.cookiecutter.files import _convert_file_representation
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
+from cutty.application.cookiecutter.main import _convert_file_representation
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode

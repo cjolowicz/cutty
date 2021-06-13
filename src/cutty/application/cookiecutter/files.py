@@ -3,18 +3,8 @@ import pathlib
 from collections.abc import Iterable
 
 from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
-from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File as BaseFile
-from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.templates.domain.files import File
-from cutty.templates.domain.files import Mode
-
-
-def _convert_file_representation(file: File) -> BaseFile:
-    if Mode.EXECUTABLE in file.mode:
-        return Executable(file.path, file.blob)
-    return RegularFile(file.path, file.blob)
 
 
 class CookiecutterFileStorage:
