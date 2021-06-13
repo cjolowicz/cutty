@@ -34,7 +34,7 @@ class CookiecutterFileStorage:
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
 
-    def store(self, files: Iterable[File]) -> None:
+    def store(self, files: Iterable[BaseFile]) -> None:
         """Store the files on disk."""
         with cookiecutterfilestorage(
             self.root,
@@ -43,7 +43,7 @@ class CookiecutterFileStorage:
             skip_if_file_exists=self.skip_if_file_exists,
         ) as storefile:
             for file in files:
-                storefile(_convert_file_representation(file))
+                storefile(file)
 
     def resolve(self, path: PurePath) -> pathlib.Path:
         """Resolve the path to a filesystem location."""

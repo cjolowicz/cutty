@@ -51,7 +51,7 @@ def storagewithhook(tmp_path: pathlib.Path, hook: File) -> CookiecutterFileStora
 def test_storage(tmp_path: pathlib.Path, file: File) -> None:
     """It stores the file."""
     storage = CookiecutterFileStorage(tmp_path)
-    storage.store([file])
+    storage.store([_convert_file_representation(file)])
 
     path = storage.resolve(file.path)
     assert file.blob == path.read_bytes()
@@ -64,7 +64,7 @@ def test_storage(tmp_path: pathlib.Path, file: File) -> None:
 def test_executable(tmp_path: pathlib.Path, executable: File) -> None:
     """It stores the file."""
     storage = CookiecutterFileStorage(tmp_path)
-    storage.store([executable])
+    storage.store([_convert_file_representation(executable)])
 
     path = storage.resolve(executable.path)
     assert os.access(path, os.X_OK)
@@ -73,7 +73,7 @@ def test_executable(tmp_path: pathlib.Path, executable: File) -> None:
 def test_hooks(storagewithhook: CookiecutterFileStorage, file: File) -> None:
     """It executes the hook."""
     storage = storagewithhook
-    storage.store([file])
+    storage.store([_convert_file_representation(file)])
     path = storage.resolve(PurePath("example", "marker"))
     assert path.is_file()
 
@@ -90,15 +90,20 @@ def test_multiple_files(
     storage: CookiecutterFileStorage, file: File, executable: File
 ) -> None:
     """It stores all the files."""
-    storage.store([executable, file])
+    storage.store(
+        [
+            _convert_file_representation(executable),
+            _convert_file_representation(file),
+        ]
+    )
     assert all(storage.resolve(x.path).is_file() for x in (file, executable))
 
 
 def test_already_exists(storage: CookiecutterFileStorage, file: File) -> None:
     """It raises an exception if the project already exists."""
-    storage.store([file])
+    storage.store([_convert_file_representation(file)])
     with pytest.raises(Exception):
-        storage.store([file])
+        storage.store([_convert_file_representation(file)])
 
 
 def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
@@ -111,7 +116,7 @@ def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
     path = storage.resolve(file.path)
     path.parent.mkdir()
     path.write_text("old")
-    storage.store([file])
+    storage.store([_convert_file_representation(file)])
     assert path.read_text() != "old"
 
 
@@ -125,5 +130,5 @@ def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
     path = storage.resolve(file.path)
     path.parent.mkdir()
     path.write_text("old")
-    storage.store([file])
+    storage.store([_convert_file_representation(file)])
     assert path.read_text() == "old"
