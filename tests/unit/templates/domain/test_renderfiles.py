@@ -1,10 +1,10 @@
 """Unit tests for cutty.templates.domain.renderfiles."""
 import pytest
 
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 
@@ -22,8 +22,8 @@ def test_renderfiles_default(render: Renderer, path: Path) -> None:
 
     [file] = renderfiles([path], render, [binding])
 
+    assert isinstance(file, RegularFile)
     assert file.path.parts == ("dir", "teapot")
-    assert file.mode == Mode.DEFAULT
     assert file.blob == b"teapot-blob"
 
 
