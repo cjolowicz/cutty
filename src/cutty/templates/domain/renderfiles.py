@@ -28,11 +28,9 @@ def renderfiles(
             if "/" in name or "\\" in name or name in (".", ".."):
                 raise InvalidPathComponent(str(path), name)
 
-            if path.is_file():
-                yield render(loadfile(path), bindings)
-            elif path.is_dir():
+            if path.is_dir():
                 yield from _renderfiles(path.iterdir())
-            else:  # pragma: no cover
-                raise RuntimeError(f"{path}: not a regular file or directory")
+            else:
+                yield render(loadfile(path), bindings)
 
     return _renderfiles(paths)
