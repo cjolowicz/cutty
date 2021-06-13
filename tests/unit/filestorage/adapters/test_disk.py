@@ -210,7 +210,20 @@ def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
     assert not path.parent.exists()
 
 
-def test_temporarydiskfilestorage(file: RegularFile) -> None:
+def test_temporarydiskfilestorage_storefile(file: RegularFile) -> None:
     """It stores the file in a temporary directory."""
     with temporarydiskfilestorage() as storefile:
         storefile(file)
+
+
+def test_temporarydiskfilestorage_onstore(file: RegularFile) -> None:
+    """It invokes the callback with each storage location."""
+    locations: list[pathlib.Path] = []
+
+    with temporarydiskfilestorage(onstore=locations.append) as storefile:
+        storefile(file)
+
+    [location] = locations
+
+    assert location.name == file.path.name
+    assert location.parent.name == file.path.parent.name
