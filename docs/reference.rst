@@ -300,13 +300,6 @@ cutty.plugins.adapters.pluggy
    :members:
 
 
-cutty.application.cookiecutter.files
-------------------------------------
-
-.. automodule:: cutty.application.cookiecutter.files
-   :members:
-
-
 cutty.application.cookiecutter.config
 -------------------------------------
 
