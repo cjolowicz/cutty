@@ -63,15 +63,9 @@ def main(
     bindings = renderbind(render, config.variables)
 
     paths = iterpaths(path, config)
-    files = [
-        _convert_file_representation(file)
-        for file in renderfiles(paths, render, bindings)
-    ]
+    files = renderfiles(paths, render, bindings)
     hookpaths = iterhooks(path)
-    hookfiles = [
-        _convert_file_representation(hook)
-        for hook in renderfiles(hookpaths, render, bindings)
-    ]
+    hookfiles = renderfiles(hookpaths, render, bindings)
 
     with cookiecutterfilestorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,

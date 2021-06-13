@@ -3,9 +3,10 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
 
+from cutty.filestorage.domain.files import File
+from cutty.filestorage.domain.files import loadfile
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import File
 from cutty.templates.domain.render import Renderer
 
 
@@ -28,7 +29,7 @@ def renderfiles(
                 raise InvalidPathComponent(str(path), name)
 
             if path.is_file():
-                yield render(File.load(path), bindings)
+                yield render(loadfile(path), bindings)
             elif path.is_dir():
                 yield from _renderfiles(path.iterdir())
             else:  # pragma: no cover
