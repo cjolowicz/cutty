@@ -28,7 +28,7 @@ from cutty.templates.domain.renderfiles import renderfiles
 
 def _convert_file_representation(file: File) -> BaseFile:
     if Mode.EXECUTABLE in file.mode:
-        return Executable(file.path, file.blob)
+        return Executable(file.path, file.blob)  # pragma: no cover
     return RegularFile(file.path, file.blob)
 
 
