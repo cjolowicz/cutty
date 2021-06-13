@@ -14,7 +14,6 @@ from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import File
 from cutty.templates.domain.variables import GenericVariable
 from cutty.templates.domain.variables import Variable
 
@@ -105,18 +104,6 @@ def renderpath(
     )
 
 
-def renderfile(
-    file: File,
-    bindings: Sequence[Binding],
-    render: Renderer,
-) -> File:
-    """Render a file by rendering its path and contents."""
-    path = render(file.path, bindings)
-    text = file.blob.decode()
-    text = render(text, bindings)
-    return File(path, file.mode, text.encode())
-
-
 def renderregularfile(
     file: RegularFile,
     bindings: Sequence[Binding],
@@ -144,7 +131,6 @@ defaultrenderregistry: RenderRegistry = {
     GenericVariable: rendervariable,
     PurePath: renderpurepath,
     Path: renderpath,
-    File: renderfile,
     RegularFile: renderregularfile,
     SymbolicLink: rendersymlink,
 }
