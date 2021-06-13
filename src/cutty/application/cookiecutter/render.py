@@ -12,7 +12,6 @@ from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.files import File
 from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
@@ -56,23 +55,6 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:  # noqa: C9
     extensions = DEFAULT_EXTENSIONS[:]
     extensions.extend(asstringlist(config.settings, "_extensions"))
 
-    def renderfile(file: File, bindings: Sequence[Binding], render: Renderer) -> File:
-        """Render a file."""
-        path = render(file.path, bindings)
-
-        ancestors = [file.path, *file.path.parents[:-1]]
-        for ancestor in reversed(ancestors):
-            for pattern in copy_without_render:
-                if fnmatch.fnmatch(str(ancestor), pattern):
-                    return File(path, file.mode, file.blob)
-
-        if is_binary(file.blob):
-            return File(path, file.mode, file.blob)
-
-        text = file.blob.decode()
-        text = render(text, bindings)
-        return File(path, file.mode, text.encode())
-
     def renderregularfile(
         file: RegularFile, bindings: Sequence[Binding], render: Renderer
     ) -> RegularFile:
@@ -104,6 +86,5 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:  # noqa: C9
         str: asrendercontinuation(rendertext),
         list: renderlist,
         dict: renderdict,
-        File: renderfile,
         RegularFile: renderregularfile,
     }
