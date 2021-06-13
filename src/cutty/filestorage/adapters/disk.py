@@ -5,6 +5,7 @@ import pathlib
 import tempfile
 from collections.abc import Callable
 from collections.abc import Iterator
+from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.domain.files import Executable
@@ -115,9 +116,16 @@ def diskfilestorage(
 def temporarydiskfilestorage(
     *,
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    onstore: Optional[Callable[[pathlib.Path], None]] = None,
 ) -> Iterator[FileStore]:
     """Temporary disk-based store for files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = pathlib.Path(tmpdir)
         with diskfilestorage(root, fileexists=fileexists) as storefile:
-            yield storefile
+
+            def _storefile(file: File) -> None:
+                storefile(file)
+                assert onstore is not None  # noqa: S101
+                onstore(root.joinpath(*file.path.parts))
+
+            yield _storefile if onstore is not None else storefile
