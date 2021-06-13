@@ -10,6 +10,7 @@ from typing import TypeVar
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
@@ -129,10 +130,21 @@ def renderregularfile(
     return cls(path, text.encode())
 
 
+def rendersymlink(
+    symlink: SymbolicLink, bindings: Sequence[Binding], render: Renderer
+) -> SymbolicLink:
+    """Render a symbolic link by rendering its path and target."""
+    return SymbolicLink(
+        render(symlink.path, bindings),
+        render(symlink.target, bindings),
+    )
+
+
 defaultrenderregistry: RenderRegistry = {
     GenericVariable: rendervariable,
     PurePath: renderpurepath,
     Path: renderpath,
     File: renderfile,
     RegularFile: renderregularfile,
+    SymbolicLink: rendersymlink,
 }
