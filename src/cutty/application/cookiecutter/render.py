@@ -6,6 +6,8 @@ from typing import Any
 from binaryornot.helpers import is_binary_string
 
 from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
+from cutty.filestorage.domain.files import Executable
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.domain.bindings import Binding
@@ -48,7 +50,7 @@ def renderdict(
     }
 
 
-def registerrenderers(path: Path, config: Config) -> RenderRegistry:
+def registerrenderers(path: Path, config: Config) -> RenderRegistry:  # noqa: C901
     """Register render functions."""
     copy_without_render = asstringlist(config.settings, "_copy_without_render")
     extensions = DEFAULT_EXTENSIONS[:]
@@ -71,6 +73,26 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:
         text = render(text, bindings)
         return File(path, file.mode, text.encode())
 
+    def renderregularfile(
+        file: RegularFile, bindings: Sequence[Binding], render: Renderer
+    ) -> RegularFile:
+        """Render a file."""
+        cls = Executable if isinstance(file, Executable) else RegularFile
+        path = render(file.path, bindings)
+
+        ancestors = [file.path, *file.path.parents[:-1]]
+        for ancestor in reversed(ancestors):
+            for pattern in copy_without_render:
+                if fnmatch.fnmatch(str(ancestor), pattern):
+                    return cls(path, file.blob)
+
+        if is_binary(file.blob):
+            return cls(path, file.blob)
+
+        text = file.blob.decode()
+        text = render(text, bindings)
+        return cls(path, text.encode())
+
     rendertext = createjinjarenderer(
         searchpath=[path],
         context_prefix="cookiecutter",
@@ -83,4 +105,5 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:
         list: renderlist,
         dict: renderdict,
         File: renderfile,
+        RegularFile: renderregularfile,
     }
