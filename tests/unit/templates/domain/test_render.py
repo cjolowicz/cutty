@@ -1,6 +1,8 @@
 """Unit tests for cutty.templates.domain.render."""
 import pytest
 
+from cutty.filestorage.domain.files import Executable
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.files import File
@@ -16,6 +18,14 @@ from cutty.templates.domain.variables import GenericVariable
         (
             File(PurePath("{x}"), Mode.DEFAULT, b"{x}"),
             File(PurePath("teapot"), Mode.DEFAULT, b"teapot"),
+        ),
+        (
+            RegularFile(PurePath("{x}"), b"{x}"),
+            RegularFile(PurePath("teapot"), b"teapot"),
+        ),
+        (
+            Executable(PurePath("{x}"), b"{x}"),
+            Executable(PurePath("teapot"), b"teapot"),
         ),
     ],
 )
