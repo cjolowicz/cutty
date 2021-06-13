@@ -6,8 +6,6 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.files import File
-from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import GenericVariable
 
@@ -16,10 +14,6 @@ from cutty.templates.domain.variables import GenericVariable
     "template,expected",
     [
         (PurePath("src", "{x}"), PurePath("src", "teapot")),
-        (
-            File(PurePath("{x}"), Mode.DEFAULT, b"{x}"),
-            File(PurePath("teapot"), Mode.DEFAULT, b"teapot"),
-        ),
         (
             RegularFile(PurePath("{x}"), b"{x}"),
             RegularFile(PurePath("teapot"), b"teapot"),
