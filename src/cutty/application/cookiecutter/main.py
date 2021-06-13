@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import Optional
 
 from cutty.application.cookiecutter.config import loadconfig
+from cutty.application.cookiecutter.files import _convert_file_representation
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
@@ -54,7 +55,10 @@ def main(
     paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
     hookpaths = iterhooks(path)
-    hookfiles = renderfiles(hookpaths, render, bindings)
+    hookfiles = [
+        _convert_file_representation(hook)
+        for hook in renderfiles(hookpaths, render, bindings)
+    ]
     storage = CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         hooks=hookfiles,

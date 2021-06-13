@@ -5,6 +5,7 @@ import platform
 
 import pytest
 
+from cutty.application.cookiecutter.files import _convert_file_representation
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.files import File
@@ -44,7 +45,7 @@ def storage(tmp_path: pathlib.Path) -> CookiecutterFileStorage:
 @pytest.fixture
 def storagewithhook(tmp_path: pathlib.Path, hook: File) -> CookiecutterFileStorage:
     """Fixture for a storage with hooks."""
-    return CookiecutterFileStorage(tmp_path, hooks=[hook])
+    return CookiecutterFileStorage(tmp_path, hooks=[_convert_file_representation(hook)])
 
 
 def test_storage(tmp_path: pathlib.Path, file: File) -> None:
