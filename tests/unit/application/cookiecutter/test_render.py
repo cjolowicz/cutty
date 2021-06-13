@@ -5,13 +5,12 @@ from typing import Any
 import pytest
 
 from cutty.application.cookiecutter.render import registerrenderers
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.files import File
-from cutty.templates.domain.files import Mode
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
@@ -53,8 +52,8 @@ def test_copy_without_render(rendererfactory: Callable[..., Renderer]) -> None:
     path1 = PurePath("{{ cookiecutter.project }}", "README.norender")
     path2 = PurePath("example", "README.norender")
 
-    file1 = File(path1, Mode.DEFAULT, b"{{ do not render }}")
-    file2 = File(path2, file1.mode, file1.blob)
+    file1 = RegularFile(path1, b"{{ do not render }}")
+    file2 = RegularFile(path2, file1.blob)
 
     assert render(file1, [Binding("project", "example")]) == file2
 
@@ -64,7 +63,7 @@ def test_binary(render: Renderer) -> None:
     path1 = PurePath("{{ cookiecutter.project }}", "README")
     path2 = PurePath("example", "README")
 
-    file1 = File(path1, Mode.DEFAULT, b"\0{{ binary files are not rendered }}")
-    file2 = File(path2, file1.mode, file1.blob)
+    file1 = RegularFile(path1, b"\0{{ binary files are not rendered }}")
+    file2 = RegularFile(path2, file1.blob)
 
     assert render(file1, [Binding("project", "example")]) == file2
