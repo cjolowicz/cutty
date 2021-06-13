@@ -6,7 +6,6 @@ import platform
 import pytest
 
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
-from cutty.application.cookiecutter.files import DiskFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.files import File
 from cutty.templates.domain.files import Mode
@@ -37,20 +36,20 @@ def hook() -> File:
 
 
 @pytest.fixture
-def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
+def storage(tmp_path: pathlib.Path) -> CookiecutterFileStorage:
     """Fixture for a storage."""
     return CookiecutterFileStorage(tmp_path)
 
 
 @pytest.fixture
-def storagewithhook(tmp_path: pathlib.Path, hook: File) -> DiskFileStorage:
+def storagewithhook(tmp_path: pathlib.Path, hook: File) -> CookiecutterFileStorage:
     """Fixture for a storage with hooks."""
     return CookiecutterFileStorage(tmp_path, hooks=[hook])
 
 
 def test_storage(tmp_path: pathlib.Path, file: File) -> None:
     """It stores the file."""
-    storage = DiskFileStorage(tmp_path)
+    storage = CookiecutterFileStorage(tmp_path)
     storage.store([file])
 
     path = storage.resolve(file.path)
@@ -63,14 +62,14 @@ def test_storage(tmp_path: pathlib.Path, file: File) -> None:
 )
 def test_executable(tmp_path: pathlib.Path, executable: File) -> None:
     """It stores the file."""
-    storage = DiskFileStorage(tmp_path)
+    storage = CookiecutterFileStorage(tmp_path)
     storage.store([executable])
 
     path = storage.resolve(executable.path)
     assert os.access(path, os.X_OK)
 
 
-def test_hooks(storagewithhook: DiskFileStorage, file: File) -> None:
+def test_hooks(storagewithhook: CookiecutterFileStorage, file: File) -> None:
     """It executes the hook."""
     storage = storagewithhook
     storage.store([file])
@@ -78,7 +77,7 @@ def test_hooks(storagewithhook: DiskFileStorage, file: File) -> None:
     assert path.is_file()
 
 
-def test_no_files(storagewithhook: DiskFileStorage) -> None:
+def test_no_files(storagewithhook: CookiecutterFileStorage) -> None:
     """It does nothing."""
     storage = storagewithhook
     storage.store([])
@@ -86,13 +85,15 @@ def test_no_files(storagewithhook: DiskFileStorage) -> None:
     assert not path.is_file()
 
 
-def test_multiple_files(storage: DiskFileStorage, file: File, executable: File) -> None:
+def test_multiple_files(
+    storage: CookiecutterFileStorage, file: File, executable: File
+) -> None:
     """It stores all the files."""
     storage.store([executable, file])
     assert all(storage.resolve(x.path).is_file() for x in (file, executable))
 
 
-def test_already_exists(storage: DiskFileStorage, file: File) -> None:
+def test_already_exists(storage: CookiecutterFileStorage, file: File) -> None:
     """It raises an exception if the project already exists."""
     storage.store([file])
     with pytest.raises(Exception):
