@@ -10,10 +10,6 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
 
 
-class InvalidPathComponent(Exception):
-    """The rendered path has an invalid component."""
-
-
 def renderfiles(
     paths: Iterable[Path], render: Renderer, bindings: Sequence[Binding]
 ) -> Iterator[File]:
@@ -26,7 +22,9 @@ def renderfiles(
                 continue
 
             if "/" in name or "\\" in name or name in (".", ".."):
-                raise InvalidPathComponent(str(path), name)
+                raise RuntimeError(
+                    f"invalid component {name!r} from {path.name!r} in {path}"
+                )
 
             if path.is_dir():
                 yield from _renderfiles(path.iterdir())
