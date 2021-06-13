@@ -6,7 +6,7 @@ from typing import Optional
 
 from cutty.application.cookiecutter.config import loadconfig
 from cutty.application.cookiecutter.files import CookiecutterFileStorage
-from cutty.application.cookiecutter.hooks import iterhooks
+from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
