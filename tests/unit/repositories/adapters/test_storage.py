@@ -6,6 +6,7 @@ import pytest
 from yarl import URL
 
 from cutty.repositories.adapters.storage import defaulttimer
+from cutty.repositories.adapters.storage import getproviderstore
 from cutty.repositories.adapters.storage import hashurl
 from cutty.repositories.adapters.storage import RepositoryStorage
 from cutty.repositories.adapters.storage import StorageRecord
@@ -178,3 +179,20 @@ def test_storage_clean_something(
 
     assert first not in records
     assert second in records
+
+
+def test_getproviderstore_exists(storage: RepositoryStorage, url: URL) -> None:
+    """It returns a valid filesystem path."""
+    providerstore = getproviderstore(storage)
+    store = providerstore("git")
+    path = store(url)
+
+    assert path.exists()
+
+
+def test_getproviderstore_idempotent(storage: RepositoryStorage, url: URL) -> None:
+    """It returns the same path each time."""
+    providerstore = getproviderstore(storage)
+    store = providerstore("git")
+
+    assert store(url) == store(url)

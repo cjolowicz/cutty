@@ -4,14 +4,18 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
 
+import appdirs
+
 from cutty.application.cookiecutter.config import loadconfig
 from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
 from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
-from cutty.plugins.adapters.pluggy import PluggyRegistry
-from cutty.repositories.adapters.hooks import getrepositoryprovider
+from cutty.repositories.adapters.registry import defaultproviderregistry
+from cutty.repositories.adapters.storage import getproviderstore
+from cutty.repositories.adapters.storage import RepositoryStorage
+from cutty.repositories.domain.providers import repositoryprovider
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
@@ -33,8 +37,9 @@ def main(
     skip_if_file_exists: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    hooks = PluggyRegistry("cutty")
-    provider = getrepositoryprovider(hooks, projectname="cutty")
+    cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
+    storage = RepositoryStorage(cachedir)
+    provider = repositoryprovider(defaultproviderregistry, getproviderstore(storage))
     path = provider(template, revision=checkout)
 
     if directory is not None:
