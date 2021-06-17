@@ -15,6 +15,8 @@ from typing import Optional
 from yarl import URL
 
 from cutty.repositories.domain.providers import ProviderName
+from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.stores import Store
 
 
 @dataclass
@@ -122,3 +124,21 @@ class RepositoryStorage:
             if record.updated < cutoff:
                 yield record
                 shutil.rmtree(record.path)
+
+
+def getproviderstore(storage: RepositoryStorage) -> ProviderStore:
+    """Return a provider store."""
+
+    def providerstore(provider: str) -> Store:
+        """Return a store function for the provider."""
+
+        def store(url: URL) -> pathlib.Path:
+            """Return a storage location for the URL."""
+            record = storage.get(url, provider=provider)
+            if record is None:
+                record = storage.allocate(url, provider=provider)
+            return record.path
+
+        return store
+
+    return providerstore

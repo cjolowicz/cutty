@@ -5,7 +5,6 @@ from types import MappingProxyType
 from typing import Optional
 
 import appdirs
-from yarl import URL
 
 from cutty.application.cookiecutter.config import loadconfig
 from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
@@ -14,9 +13,9 @@ from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
 from cutty.repositories.adapters.registry import defaultproviderregistry
+from cutty.repositories.adapters.storage import getproviderstore
 from cutty.repositories.adapters.storage import RepositoryStorage
 from cutty.repositories.domain.providers import repositoryprovider
-from cutty.repositories.domain.stores import Store
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
@@ -40,26 +39,7 @@ def main(
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
     storage = RepositoryStorage(cachedir)
-
-    def getrepositorystorage(provider: str, url: str) -> Optional[pathlib.Path]:
-        """Return a storage location for a repository."""
-        url_ = URL(url)
-        record = storage.get(url_, provider=provider)
-        if record is None:
-            record = storage.allocate(url_, provider=provider)
-        return record.path
-
-    def providerstore(provider: str) -> Store:
-        """Return a provider store."""
-
-        def _store(url: URL) -> pathlib.Path:
-            result = getrepositorystorage(provider, str(url))
-            assert result is not None  # noqa: S101
-            return result
-
-        return _store
-
-    provider = repositoryprovider(defaultproviderregistry, providerstore)
+    provider = repositoryprovider(defaultproviderregistry, getproviderstore(storage))
     path = provider(template, revision=checkout)
 
     if directory is not None:
