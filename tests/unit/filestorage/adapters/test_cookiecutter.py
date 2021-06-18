@@ -1,10 +1,10 @@
-"""Unit tests for cutty.application.cookiecutter.filestorage."""
+"""Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
 
 import pytest
 
-from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
-from cutty.application.cookiecutter.filestorage import iterhooks
+from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
+from cutty.filestorage.adapters.cookiecutter import iterhooks
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile

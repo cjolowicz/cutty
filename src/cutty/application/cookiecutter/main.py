@@ -7,11 +7,11 @@ from typing import Optional
 import appdirs
 
 from cutty.application.cookiecutter.config import loadconfig
-from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
-from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
+from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
+from cutty.filestorage.adapters.cookiecutter import iterhooks
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
