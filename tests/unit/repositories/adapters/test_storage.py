@@ -10,6 +10,7 @@ from cutty.repositories.adapters.storage import getdefaultproviderstore
 from cutty.repositories.adapters.storage import hashurl
 from cutty.repositories.adapters.storage import RepositoryStorage
 from cutty.repositories.adapters.storage import StorageRecord
+from cutty.repositories.domain.providers import ProviderStore
 
 
 @pytest.fixture
@@ -181,9 +182,14 @@ def test_storage_clean_something(
     assert second in records
 
 
-def test_getdefaultproviderstore_exists(storage: RepositoryStorage, url: URL) -> None:
+@pytest.fixture
+def providerstore(tmp_path: Path, timer: FakeTimer) -> ProviderStore:
+    """Fixture for a repository storage."""
+    return getdefaultproviderstore(tmp_path, timer=timer)
+
+
+def test_getdefaultproviderstore_exists(providerstore: ProviderStore, url: URL) -> None:
     """It returns a valid filesystem path."""
-    providerstore = getdefaultproviderstore(storage)
     store = providerstore("git")
     path = store(url)
 
@@ -191,10 +197,9 @@ def test_getdefaultproviderstore_exists(storage: RepositoryStorage, url: URL) ->
 
 
 def test_getdefaultproviderstore_idempotent(
-    storage: RepositoryStorage, url: URL
+    providerstore: ProviderStore, url: URL
 ) -> None:
     """It returns the same path each time."""
-    providerstore = getdefaultproviderstore(storage)
     store = providerstore("git")
 
     assert store(url) == store(url)
