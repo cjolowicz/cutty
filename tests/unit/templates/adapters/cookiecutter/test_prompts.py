@@ -1,11 +1,11 @@
-"""Unit tests for cutty.application.cookiecutter.prompts."""
+"""Unit tests for cutty.templates.adapters.cookiecutter.prompts."""
 from collections.abc import Callable
 from io import StringIO
 
 import pytest
 
-from cutty.application.cookiecutter.prompts import choiceprompt
-from cutty.application.cookiecutter.prompts import prompt
+from cutty.templates.adapters.cookiecutter.prompts import choiceprompt
+from cutty.templates.adapters.cookiecutter.prompts import prompt
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.variables import GenericVariable
 
