@@ -28,7 +28,7 @@ def extra_context_callback(
     return dict(_generate())
 
 
-@_main.command("create")
+@_main.command()
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
@@ -73,7 +73,7 @@ def extra_context_callback(
     help="Skip the files in the corresponding directories if they already exist.",
 )
 @click.version_option()
-def main(
+def create(
     template: str,
     extra_context: dict[str, str],
     no_input: bool,
