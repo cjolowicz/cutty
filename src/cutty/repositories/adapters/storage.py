@@ -126,7 +126,7 @@ class RepositoryStorage:
                 shutil.rmtree(record.path)
 
 
-def getproviderstore(storage: RepositoryStorage) -> ProviderStore:
+def getdefaultproviderstore(storage: RepositoryStorage) -> ProviderStore:
     """Return a provider store."""
 
     def providerstore(provider: str) -> Store:
