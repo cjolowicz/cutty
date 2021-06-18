@@ -6,7 +6,7 @@ import pygit2
 import pytest
 from click.testing import CliRunner
 
-from cutty.entrypoints.cli.create import main
+from cutty.entrypoints.cli import main
 
 
 @pytest.fixture
