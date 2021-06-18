@@ -1,14 +1,14 @@
-"""Unit tests for cutty.application.cookiecutter.render."""
+"""Unit tests for cutty.templates.adapters.cookiecutter.render."""
 from collections.abc import Callable
 from typing import Any
 
 import pytest
 
-from cutty.application.cookiecutter.render import registerrenderers
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.templates.adapters.cookiecutter.render import registerrenderers
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import createrenderer

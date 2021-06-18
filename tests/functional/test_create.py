@@ -1,4 +1,4 @@
-"""Test cases for the __main__ module."""
+"""Functional tests for the create CLI."""
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -6,7 +6,7 @@ import pygit2
 import pytest
 from click.testing import CliRunner
 
-from cutty import __main__
+from cutty.entrypoints.cli.create import main
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def runner() -> Iterator[CliRunner]:
 
 def test_main_help(runner: CliRunner) -> None:
     """It exits with a status code of zero."""
-    result = runner.invoke(__main__.main, ["--help"])
+    result = runner.invoke(main, ["--help"])
     assert result.exit_code == 0
 
 
@@ -44,10 +44,5 @@ def repository(template_directory: Path) -> Path:
 
 def test_main_cookiecutter(runner: CliRunner, repository: Path) -> None:
     """It generates a project."""
-    runner.invoke(
-        __main__.main,
-        [str(repository)],
-        input="foobar\n\n\n",
-        catch_exceptions=False,
-    )
+    runner.invoke(main, [str(repository)], input="foobar\n\n\n", catch_exceptions=False)
     assert Path("foobar", "README.md").read_text() == "# foobar\n"

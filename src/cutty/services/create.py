@@ -1,28 +1,50 @@
-"""Main entry point for the Cookiecutter compatibility layer."""
+"""Create a project from a Cookiecutter template."""
 import pathlib
+from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
 
 import appdirs
 
-from cutty.application.cookiecutter.config import loadconfig
-from cutty.application.cookiecutter.filestorage import cookiecutterfilestorage
-from cutty.application.cookiecutter.filestorage import iterhooks
-from cutty.application.cookiecutter.paths import iterpaths
-from cutty.application.cookiecutter.prompts import prompt
-from cutty.application.cookiecutter.render import registerrenderers
+from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
+from cutty.templates.adapters.cookiecutter.config import loadconfig
+from cutty.templates.adapters.cookiecutter.prompts import prompt
+from cutty.templates.adapters.cookiecutter.render import registerrenderers
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.renderfiles import renderfiles
 
 
-def main(
+def iterpaths(path: Path, config: Config) -> Iterator[Path]:
+    """Load project files in a Cookiecutter template."""
+    for template_dir in path.iterdir():
+        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
+            break
+    else:
+        raise RuntimeError("template directory not found")  # pragma: no cover
+
+    yield template_dir
+
+
+def iterhooks(path: Path) -> Iterator[Path]:
+    """Load hooks in a Cookiecutter template."""
+    hooks = {"pre_gen_project", "post_gen_project"}
+    hookdir = path / "hooks"
+    if hookdir.is_dir():
+        for path in hookdir.iterdir():
+            if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
+                yield path
+
+
+def create(
     template: str,
     *,
     extra_context: Mapping[str, str] = MappingProxyType({}),
