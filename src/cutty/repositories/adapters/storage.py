@@ -14,8 +14,11 @@ from typing import Optional
 
 from yarl import URL
 
+from cutty.repositories.adapters.registry import defaultproviderregistry
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.providers import RepositoryProvider
+from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.stores import Store
 
 
@@ -126,8 +129,11 @@ class RepositoryStorage:
                 shutil.rmtree(record.path)
 
 
-def getproviderstore(storage: RepositoryStorage) -> ProviderStore:
+def getdefaultproviderstore(
+    path: pathlib.Path, *, timer: Timer = defaulttimer
+) -> ProviderStore:
     """Return a provider store."""
+    storage = RepositoryStorage(path, timer=timer)
 
     def providerstore(provider: str) -> Store:
         """Return a store function for the provider."""
@@ -142,3 +148,13 @@ def getproviderstore(storage: RepositoryStorage) -> ProviderStore:
         return store
 
     return providerstore
+
+
+def getdefaultrepositoryprovider(
+    path: pathlib.Path, *, timer: Timer = defaulttimer
+) -> RepositoryProvider:
+    """Return a repository provider."""
+    return repositoryprovider(
+        defaultproviderregistry,
+        getdefaultproviderstore(path, timer=timer),
+    )

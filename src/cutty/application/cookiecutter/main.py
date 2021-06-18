@@ -12,10 +12,7 @@ from cutty.application.cookiecutter.filestorage import iterhooks
 from cutty.application.cookiecutter.paths import iterpaths
 from cutty.application.cookiecutter.prompts import prompt
 from cutty.application.cookiecutter.render import registerrenderers
-from cutty.repositories.adapters.registry import defaultproviderregistry
-from cutty.repositories.adapters.storage import getproviderstore
-from cutty.repositories.adapters.storage import RepositoryStorage
-from cutty.repositories.domain.providers import repositoryprovider
+from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
@@ -38,8 +35,7 @@ def main(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
-    storage = RepositoryStorage(cachedir)
-    provider = repositoryprovider(defaultproviderregistry, getproviderstore(storage))
+    provider = getdefaultrepositoryprovider(cachedir)
     path = provider(template, revision=checkout)
 
     if directory is not None:
