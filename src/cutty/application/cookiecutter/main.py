@@ -8,7 +8,6 @@ from typing import Optional
 import appdirs
 
 from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
-from cutty.filestorage.adapters.cookiecutter import iterhooks
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -33,6 +32,16 @@ def iterpaths(path: Path, config: Config) -> Iterator[Path]:
         raise RuntimeError("template directory not found")  # pragma: no cover
 
     yield template_dir
+
+
+def iterhooks(path: Path) -> Iterator[Path]:
+    """Load hooks in a Cookiecutter template."""
+    hooks = {"pre_gen_project", "post_gen_project"}
+    hookdir = path / "hooks"
+    if hookdir.is_dir():
+        for path in hookdir.iterdir():
+            if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
+                yield path
 
 
 def main(
