@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-import cutty.application.cookiecutter.main
+import cutty.services.create
 
 
 def extra_context_callback(
@@ -83,7 +83,7 @@ def main(
     skip_if_file_exists: bool,
 ) -> None:
     """cutty."""
-    cutty.application.cookiecutter.main.main(
+    cutty.services.create.main(
         template,
         extra_context=extra_context,
         no_input=no_input,

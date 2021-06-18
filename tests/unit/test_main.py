@@ -49,7 +49,7 @@ def runner(monkeypatch: pytest.MonkeyPatch) -> RunnerDecoratorFactory:
 def test_extra_context_happy(runner: RunnerDecoratorFactory) -> None:
     """It parses additional arguments into key-value pairs."""
 
-    @runner(main, monkeypatch="cutty.application.cookiecutter.main.main")
+    @runner(main, monkeypatch="cutty.services.create.main")
     def invoke(*args: Any, extra_context: dict[str, str], **kwargs: Any) -> None:
         """Main function."""
         assert extra_context == {"project": "example"}
@@ -60,7 +60,7 @@ def test_extra_context_happy(runner: RunnerDecoratorFactory) -> None:
 def test_extra_context_invalid(runner: RunnerDecoratorFactory) -> None:
     """It raises an exception if additional arguments cannot be parsed."""
 
-    @runner(main, monkeypatch="cutty.application.cookiecutter.main.main")
+    @runner(main, monkeypatch="cutty.services.create.main")
     def invoke(*args: Any, **kwargs: Any) -> None:
         pass
 

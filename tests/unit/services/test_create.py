@@ -1,8 +1,8 @@
-"""Unit tests for cutty.application.cookiecutter.main."""
-from cutty.application.cookiecutter.main import iterhooks
-from cutty.application.cookiecutter.main import iterpaths
+"""Unit tests for cutty.services.create."""
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
+from cutty.services.create import iterhooks
+from cutty.services.create import iterpaths
 from cutty.templates.domain.config import Config
 
 
