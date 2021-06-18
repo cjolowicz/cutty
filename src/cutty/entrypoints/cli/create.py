@@ -1,11 +1,11 @@
-"""Command-line interface for creating projects from templates."""
+"""Command-line interface for creating projects from Cookiecutter templates."""
 import pathlib
 from typing import Iterator
 from typing import Optional
 
 import click
 
-import cutty.services.create
+from cutty.services.create import create
 
 
 def extra_context_callback(
@@ -83,7 +83,7 @@ def main(
     skip_if_file_exists: bool,
 ) -> None:
     """cutty."""
-    cutty.services.create.main(
+    create(
         template,
         extra_context=extra_context,
         no_input=no_input,

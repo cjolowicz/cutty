@@ -1,4 +1,4 @@
-"""Main entry point for the Cookiecutter compatibility layer."""
+"""Create a project from a Cookiecutter template."""
 import pathlib
 from collections.abc import Iterator
 from collections.abc import Mapping
@@ -44,7 +44,7 @@ def iterhooks(path: Path) -> Iterator[Path]:
                 yield path
 
 
-def main(
+def create(
     template: str,
     *,
     extra_context: Mapping[str, str] = MappingProxyType({}),
