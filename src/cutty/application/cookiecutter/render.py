@@ -5,10 +5,10 @@ from typing import Any
 
 from binaryornot.helpers import is_binary_string
 
-from cutty.application.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
+from cutty.templates.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
