@@ -47,12 +47,13 @@ def extra_context_callback(
     "-o",
     "--output-dir",
     metavar="DIR",
-    type=click.Path(file_okay=False, dir_okay=True),
+    type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
     help="Parent directory of the generated project.",
 )
 @click.option(
     "--directory",
     metavar="DIR",
+    type=click.Path(path_type=pathlib.Path),
     help=(
         "Directory within the template repository that contains the "
         "cookiecutter.json file."
@@ -78,8 +79,8 @@ def create(
     extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
-    output_dir: Optional[str],
-    directory: Optional[str],
+    output_dir: Optional[pathlib.Path],
+    directory: Optional[pathlib.Path],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
 ) -> None:
@@ -89,7 +90,7 @@ def create(
         extra_context=extra_context,
         no_input=no_input,
         checkout=checkout,
-        output_dir=pathlib.Path(output_dir) if output_dir is not None else None,
+        output_dir=output_dir,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
