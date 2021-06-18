@@ -6,7 +6,7 @@ import pygit2
 import pytest
 from click.testing import CliRunner
 
-from cutty.entrypoints.cli.create import main
+from cutty.entrypoints.cli import main
 
 
 @pytest.fixture
@@ -17,9 +17,9 @@ def runner() -> Iterator[CliRunner]:
         yield runner
 
 
-def test_main_help(runner: CliRunner) -> None:
+def test_create_help(runner: CliRunner) -> None:
     """It exits with a status code of zero."""
-    result = runner.invoke(main, ["--help"])
+    result = runner.invoke(main, ["create", "--help"])
     assert result.exit_code == 0
 
 
@@ -42,7 +42,9 @@ def repository(template_directory: Path) -> Path:
     return template_directory
 
 
-def test_main_cookiecutter(runner: CliRunner, repository: Path) -> None:
+def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
     """It generates a project."""
-    runner.invoke(main, [str(repository)], input="foobar\n\n\n", catch_exceptions=False)
+    runner.invoke(
+        main, ["create", str(repository)], input="foobar\n\n\n", catch_exceptions=False
+    )
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
