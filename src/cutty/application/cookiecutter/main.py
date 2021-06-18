@@ -1,14 +1,15 @@
 """Main entry point for the Cookiecutter compatibility layer."""
 import pathlib
+from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
 
 import appdirs
 
-from cutty.application.cookiecutter.paths import iterpaths
 from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
 from cutty.filestorage.adapters.cookiecutter import iterhooks
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.prompts import prompt
@@ -17,9 +18,21 @@ from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.renderfiles import renderfiles
+
+
+def iterpaths(path: Path, config: Config) -> Iterator[Path]:
+    """Load project files in a Cookiecutter template."""
+    for template_dir in path.iterdir():
+        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
+            break
+    else:
+        raise RuntimeError("template directory not found")  # pragma: no cover
+
+    yield template_dir
 
 
 def main(

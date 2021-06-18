@@ -1,5 +1,5 @@
-"""Unit tests for cutty.application.cookiecutter.paths."""
-from cutty.application.cookiecutter.paths import iterpaths
+"""Unit tests for cutty.application.cookiecutter.main."""
+from cutty.application.cookiecutter.main import iterpaths
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.config import Config
