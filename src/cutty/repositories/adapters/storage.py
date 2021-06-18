@@ -14,8 +14,11 @@ from typing import Optional
 
 from yarl import URL
 
+from cutty.repositories.adapters.registry import defaultproviderregistry
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.providers import RepositoryProvider
+from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.stores import Store
 
 
@@ -145,3 +148,13 @@ def getdefaultproviderstore(
         return store
 
     return providerstore
+
+
+def getdefaultrepositoryprovider(
+    path: pathlib.Path, *, timer: Timer = defaulttimer
+) -> RepositoryProvider:
+    """Return a repository provider."""
+    return repositoryprovider(
+        defaultproviderregistry,
+        getdefaultproviderstore(path, timer=timer),
+    )
