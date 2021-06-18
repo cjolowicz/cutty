@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli._main import main as _main
-from cutty.services.create import create
+from cutty.services.create import create as service_create
 
 
 def extra_context_callback(
@@ -84,7 +84,7 @@ def main(
     skip_if_file_exists: bool,
 ) -> None:
     """cutty."""
-    create(
+    service_create(
         template,
         extra_context=extra_context,
         no_input=no_input,
