@@ -137,14 +137,12 @@ class TemporaryDiskFileStorage(DiskFileStorage):
     def __init__(
         self,
         *,
-        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
         onstore: Optional[Callable[[pathlib.Path], None]] = None,
     ) -> None:
         """Initialize."""
-        # FIXME: fileexists makes no sense for temporary storage
         self._directory = tempfile.TemporaryDirectory()
         self._onstore = onstore
-        super().__init__(pathlib.Path(self._directory.name), fileexists=fileexists)
+        super().__init__(pathlib.Path(self._directory.name))
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
@@ -166,9 +164,8 @@ class TemporaryDiskFileStorage(DiskFileStorage):
 @contextmanager
 def temporarydiskfilestorage(
     *,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
     onstore: Optional[Callable[[pathlib.Path], None]] = None,
 ) -> Iterator[FileStore]:
     """Temporary disk-based store for files."""
-    with TemporaryDiskFileStorage(fileexists=fileexists, onstore=onstore) as storage:
+    with TemporaryDiskFileStorage(onstore=onstore) as storage:
         yield storage.add
