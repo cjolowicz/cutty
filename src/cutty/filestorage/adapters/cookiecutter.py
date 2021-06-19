@@ -5,15 +5,12 @@ import platform
 import subprocess  # noqa: S404
 import sys
 from collections.abc import Iterable
-from collections.abc import Iterator
 from typing import Optional
 
-from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.disk import TemporaryDiskFileStorage
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStore
 
 
 def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
@@ -70,21 +67,3 @@ class CookiecutterFileStorage(DiskFileStorage):
         """Commit the stores."""
         if self.project is not None:
             _runhook(self.hooks, "post_gen_project", cwd=self.project)
-
-
-@contextmanager
-def cookiecutterfilestorage(
-    root: pathlib.Path,
-    *,
-    hookfiles: Iterable[File] = (),
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
-) -> Iterator[FileStore]:
-    """File store."""
-    with CookiecutterFileStorage(
-        root,
-        hookfiles=hookfiles,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-    ) as storage:
-        yield storage.add
