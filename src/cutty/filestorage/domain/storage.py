@@ -2,16 +2,10 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Callable
-from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Optional
 
 from cutty.filestorage.domain.files import File
-
-
-FileStore = Callable[[File], None]
-FileStoreManager = AbstractContextManager[FileStore]
 
 
 class FileStorage(abc.ABC):
