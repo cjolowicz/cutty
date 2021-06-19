@@ -1,6 +1,5 @@
 """Disk-based file storage."""
 import enum
-import functools
 import pathlib
 import tempfile
 from collections.abc import Callable
@@ -12,6 +11,7 @@ from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filestorage.domain.storage import FileStore
 
 
@@ -102,14 +102,35 @@ def diskfilestorage(
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> Iterator[FileStore]:
     """Disk-based store for files."""
-    undo: list[Callable[[], None]] = []
+    with DiskFileStorage(root, fileexists=fileexists) as storage:
+        yield storage.add
 
-    try:
-        yield functools.partial(storefile, root=root, fileexists=fileexists, undo=undo)
-    except BaseException:
-        for action in reversed(undo):
+
+class DiskFileStorage(FileStorage):
+    """Disk-based file storage."""
+
+    def __init__(
+        self,
+        root: pathlib.Path,
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    ) -> None:
+        """Initialize."""
+        self.root = root
+        self.fileexists = fileexists
+        self.undo: list[Callable[[], None]] = []
+
+    def add(self, file: File) -> None:
+        """Add the file to the storage."""
+        storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
+
+    def commit(self) -> None:
+        """Commit all stores."""
+
+    def rollback(self) -> None:
+        """Rollback all stores."""
+        for action in reversed(self.undo):
             action()  # if this fails then so be it
-        raise
 
 
 @contextmanager
