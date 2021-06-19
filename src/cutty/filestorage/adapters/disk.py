@@ -4,6 +4,7 @@ import pathlib
 import tempfile
 from collections.abc import Callable
 from collections.abc import Iterator
+from typing import Any
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
@@ -130,6 +131,38 @@ class DiskFileStorage(FileStorage):
             action()  # if this fails then so be it
 
 
+class TemporaryDiskFileStorage(DiskFileStorage):
+    """Temporary disk-based file storage."""
+
+    def __init__(
+        self,
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+        onstore: Optional[Callable[[pathlib.Path], None]] = None,
+    ) -> None:
+        """Initialize."""
+        # FIXME: fileexists makes no sense for temporary storage
+        self._directory = tempfile.TemporaryDirectory()
+        self._onstore = onstore
+        super().__init__(pathlib.Path(self._directory.name), fileexists=fileexists)
+
+    def add(self, file: File) -> None:
+        """Add the file to the storage."""
+        super().add(file)
+        if self._onstore is not None:
+            self._onstore(self.root.joinpath(*file.path.parts))
+
+    def __enter__(self) -> FileStorage:
+        """Enter the runtime context."""
+        self._directory.__enter__()
+        return super().__enter__()
+
+    def __exit__(self, *args: Any) -> None:
+        """Exit the runtime context."""
+        super().__exit__(*args)
+        self._directory.__exit__(*args)
+
+
 @contextmanager
 def temporarydiskfilestorage(
     *,
@@ -137,13 +170,5 @@ def temporarydiskfilestorage(
     onstore: Optional[Callable[[pathlib.Path], None]] = None,
 ) -> Iterator[FileStore]:
     """Temporary disk-based store for files."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        root = pathlib.Path(tmpdir)
-        with diskfilestorage(root, fileexists=fileexists) as storefile:
-
-            def _storefile(file: File) -> None:
-                storefile(file)
-                assert onstore is not None  # noqa: S101
-                onstore(root.joinpath(*file.path.parts))
-
-            yield _storefile if onstore is not None else storefile
+    with TemporaryDiskFileStorage(fileexists=fileexists, onstore=onstore) as storage:
+        yield storage.add
