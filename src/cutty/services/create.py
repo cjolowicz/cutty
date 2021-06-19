@@ -7,7 +7,7 @@ from typing import Optional
 
 import appdirs
 
-from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -79,11 +79,11 @@ def create(
     hookpaths = iterhooks(path)
     hookfiles = renderfiles(hookpaths, render, bindings)
 
-    with cookiecutterfilestorage(
+    with CookiecutterFileStorage(
         pathlib.Path.cwd() if output_dir is None else output_dir,
         hookfiles=hookfiles,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
-    ) as storefile:
+    ) as storage:
         for file in files:
-            storefile(file)
+            storage.add(file)
