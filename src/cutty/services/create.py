@@ -79,8 +79,11 @@ def create(
     hookpaths = iterhooks(path)
     hookfiles = renderfiles(hookpaths, render, bindings)
 
+    if output_dir is None:
+        output_dir = pathlib.Path.cwd()  # pragma: no cover
+
     with CookiecutterFileStorage(
-        pathlib.Path.cwd() if output_dir is None else output_dir,
+        output_dir,
         hookfiles=hookfiles,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
