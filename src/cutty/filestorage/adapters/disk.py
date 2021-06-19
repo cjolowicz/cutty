@@ -2,7 +2,6 @@
 import enum
 import pathlib
 from collections.abc import Callable
-from typing import Optional
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
@@ -99,19 +98,15 @@ class DiskFileStorage(FileStorage):
         root: pathlib.Path,
         *,
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-        onstore: Optional[Callable[[pathlib.Path], None]] = None,
     ) -> None:
         """Initialize."""
         self.root = root
         self.fileexists = fileexists
-        self.onstore = onstore
         self.undo: list[Callable[[], None]] = []
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
         storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
-        if self.onstore is not None:
-            self.onstore(self.root.joinpath(*file.path.parts))
 
     def rollback(self) -> None:
         """Rollback all stores."""
