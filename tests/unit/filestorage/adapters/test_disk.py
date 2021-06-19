@@ -8,7 +8,6 @@ import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.disk import TemporaryDiskFileStorage
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -208,22 +207,3 @@ def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
     path = tmp_path.joinpath(*file.path.parts)
     assert not path.exists()
     assert not path.parent.exists()
-
-
-def test_temporarydiskfilestorage_storage(file: RegularFile) -> None:
-    """It stores the file in a temporary directory."""
-    with TemporaryDiskFileStorage() as storage:
-        storage.add(file)
-
-
-def test_temporarydiskfilestorage_onstore(file: RegularFile) -> None:
-    """It invokes the callback with each storage location."""
-    locations: list[pathlib.Path] = []
-
-    with TemporaryDiskFileStorage(onstore=locations.append) as storage:
-        storage.add(file)
-
-    [location] = locations
-
-    assert location.name == file.path.name
-    assert location.parent.name == file.path.parent.name
