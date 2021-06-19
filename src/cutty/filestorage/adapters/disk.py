@@ -37,9 +37,9 @@ class DiskFileStorage(FileStorage):
         path = self.root.joinpath(*file.path.parts)
 
         if not path.exists():
-            self._storefile(file, path, undo=self.undo)
+            self._storefile(file, path)
         elif self.fileexists is FileExistsPolicy.OVERWRITE:
-            self._storefile(file, path, undo=self.undo, overwrite=True)
+            self._storefile(file, path, overwrite=True)
         elif self.fileexists is FileExistsPolicy.RAISE:
             raise FileExistsError(f"{path} already exists")
 
@@ -48,7 +48,6 @@ class DiskFileStorage(FileStorage):
         file: File,
         path: pathlib.Path,
         *,
-        undo: list[Callable[[], None]],
         overwrite: bool = False,
     ) -> None:
         """Store the file at the given path on disk."""
@@ -76,13 +75,13 @@ class DiskFileStorage(FileStorage):
         for parent in reversed(path.parents):
             if not parent.is_dir():
                 parent.mkdir()
-                undo.append(parent.rmdir)
+                self.undo.append(parent.rmdir)
 
         if isinstance(file, RegularFile):
             path.write_bytes(file.blob)
 
             if not overwrite:
-                undo.append(path.unlink)
+                self.undo.append(path.unlink)
 
             if isinstance(file, Executable):
                 path.chmod(path.stat().st_mode | 0o111)
@@ -92,7 +91,7 @@ class DiskFileStorage(FileStorage):
             path.symlink_to(target)
 
             if not overwrite:
-                undo.append(path.unlink)
+                self.undo.append(path.unlink)
 
         else:
             raise TypeError(f"cannot store file of type {type(file)}")
