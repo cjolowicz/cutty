@@ -3,17 +3,14 @@ import enum
 import pathlib
 import tempfile
 from collections.abc import Callable
-from collections.abc import Iterator
 from typing import Any
 from typing import Optional
 
-from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filestorage.domain.storage import FileStore
 
 
 class FileExistsPolicy(enum.Enum):
@@ -96,17 +93,6 @@ def storefile(
         raise FileExistsError(f"{path} already exists")
 
 
-@contextmanager
-def diskfilestorage(
-    root: pathlib.Path,
-    *,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-) -> Iterator[FileStore]:
-    """Disk-based store for files."""
-    with DiskFileStorage(root, fileexists=fileexists) as storage:
-        yield storage.add
-
-
 class DiskFileStorage(FileStorage):
     """Disk-based file storage."""
 
@@ -156,13 +142,3 @@ class TemporaryDiskFileStorage(DiskFileStorage):
         """Exit the runtime context."""
         super().__exit__(*args)
         self._directory.__exit__(*args)
-
-
-@contextmanager
-def temporarydiskfilestorage(
-    *,
-    onstore: Optional[Callable[[pathlib.Path], None]] = None,
-) -> Iterator[FileStore]:
-    """Temporary disk-based store for files."""
-    with TemporaryDiskFileStorage(onstore=onstore) as storage:
-        yield storage.add
