@@ -1,5 +1,4 @@
 """Cookiecutter file storage."""
-import functools
 import pathlib
 import platform
 import subprocess  # noqa: S404
@@ -23,10 +22,10 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
     hookfile = hooks.get(hook)
     if hookfile is not None:
         with tempfile.TemporaryDirectory() as root:
-            with DiskFileStorage(
-                pathlib.Path(root), onstore=functools.partial(_runcommand, cwd=cwd)
-            ) as storage:
+            with DiskFileStorage(pathlib.Path(root)) as storage:
                 storage.add(hookfile)
+                path = pathlib.Path(root, *hookfile.path.parts)
+                _runcommand(path, cwd=cwd)
 
 
 class CookiecutterFileStorage(DiskFileStorage):
