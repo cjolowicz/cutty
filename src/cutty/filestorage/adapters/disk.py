@@ -1,9 +1,7 @@
 """Disk-based file storage."""
 import enum
 import pathlib
-import tempfile
 from collections.abc import Callable
-from typing import Any
 from typing import Optional
 
 from cutty.filestorage.domain.files import Executable
@@ -119,26 +117,3 @@ class DiskFileStorage(FileStorage):
         """Rollback all stores."""
         for action in reversed(self.undo):
             action()  # if this fails then so be it
-
-
-class TemporaryDiskFileStorage(DiskFileStorage):
-    """Temporary disk-based file storage."""
-
-    def __init__(
-        self,
-        *,
-        onstore: Optional[Callable[[pathlib.Path], None]] = None,
-    ) -> None:
-        """Initialize."""
-        self._directory = tempfile.TemporaryDirectory()
-        super().__init__(pathlib.Path(self._directory.name), onstore=onstore)
-
-    def __enter__(self) -> FileStorage:
-        """Enter the runtime context."""
-        self._directory.__enter__()
-        return super().__enter__()
-
-    def __exit__(self, *args: Any) -> None:
-        """Exit the runtime context."""
-        super().__exit__(*args)
-        self._directory.__exit__(*args)
