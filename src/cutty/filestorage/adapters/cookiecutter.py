@@ -5,15 +5,12 @@ import platform
 import subprocess  # noqa: S404
 import sys
 from collections.abc import Iterable
-from collections.abc import Iterator
 from typing import Optional
 
-from cutty.compat.contextlib import contextmanager
-from cutty.filestorage.adapters.disk import diskfilestorage
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.disk import temporarydiskfilestorage
+from cutty.filestorage.adapters.disk import TemporaryDiskFileStorage
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStore
 
 
 def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
@@ -25,44 +22,48 @@ def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
 def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
     hookfile = hooks.get(hook)
     if hookfile is not None:
-        with temporarydiskfilestorage(
+        with TemporaryDiskFileStorage(
             onstore=functools.partial(_runcommand, cwd=cwd)
-        ) as storefile:
-            storefile(hookfile)
+        ) as storage:
+            storage.add(hookfile)
 
 
-@contextmanager
-def cookiecutterfilestorage(
-    root: pathlib.Path,
-    *,
-    hookfiles: Iterable[File] = (),
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
-) -> Iterator[FileStore]:
-    """File store."""
-    project: Optional[pathlib.Path] = None
-    hooks = {hook.path.stem: hook for hook in hookfiles}
-    fileexists = (
-        FileExistsPolicy.RAISE
-        if not overwrite_if_exists
-        else FileExistsPolicy.SKIP
-        if skip_if_file_exists
-        else FileExistsPolicy.OVERWRITE
-    )
+class CookiecutterFileStorage(DiskFileStorage):
+    """Disk-based file store with Cookiecutter hooks."""
 
-    with diskfilestorage(root, fileexists=fileexists) as storefile:
+    def __init__(
+        self,
+        root: pathlib.Path,
+        *,
+        hookfiles: Iterable[File] = (),
+        overwrite_if_exists: bool = False,
+        skip_if_file_exists: bool = False,
+    ):
+        """Initialize."""
+        fileexists = (
+            FileExistsPolicy.RAISE
+            if not overwrite_if_exists
+            else FileExistsPolicy.SKIP
+            if skip_if_file_exists
+            else FileExistsPolicy.OVERWRITE
+        )
+        super().__init__(root, fileexists=fileexists)
+        self.hooks = {hook.path.stem: hook for hook in hookfiles}
+        self.project: Optional[pathlib.Path] = None
+        self.overwrite_if_exists = overwrite_if_exists
 
-        def _storefile(file: File) -> None:
-            nonlocal project
+    def add(self, file: File) -> None:
+        """Add file to storage."""
+        if self.project is None:
+            self.project = self.root / file.path.parts[0]
+            self.project.mkdir(
+                parents=True, exist_ok=self.fileexists is not FileExistsPolicy.RAISE
+            )
+            _runhook(self.hooks, "pre_gen_project", cwd=self.project)
 
-            if project is None:
-                project = root / file.path.parts[0]
-                project.mkdir(parents=True, exist_ok=overwrite_if_exists)
-                _runhook(hooks, "pre_gen_project", cwd=project)
+        super().add(file)
 
-            return storefile(file)
-
-        yield _storefile
-
-        if project is not None:
-            _runhook(hooks, "post_gen_project", cwd=project)
+    def commit(self) -> None:
+        """Commit the stores."""
+        if self.project is not None:
+            _runhook(self.hooks, "post_gen_project", cwd=self.project)

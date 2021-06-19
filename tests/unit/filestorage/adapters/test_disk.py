@@ -6,9 +6,9 @@ import platform
 
 import pytest
 
-from cutty.filestorage.adapters.disk import diskfilestorage
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.disk import temporarydiskfilestorage
+from cutty.filestorage.adapters.disk import TemporaryDiskFileStorage
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -45,8 +45,8 @@ def symlink() -> SymbolicLink:
 
 def test_regular_file(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It stores the file."""
-    with diskfilestorage(tmp_path) as storefile:
-        storefile(file)
+    with DiskFileStorage(tmp_path) as storage:
+        storage.add(file)
 
     path = tmp_path.joinpath(*file.path.parts)
     assert path.read_bytes() == file.blob
@@ -59,8 +59,8 @@ class FakeError(Exception):
 def test_regular_file_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It removes a created file when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with diskfilestorage(tmp_path) as storefile:
-            storefile(file)
+        with DiskFileStorage(tmp_path) as storage:
+            storage.add(file)
             raise FakeError()
 
     path = tmp_path.joinpath(*file.path.parts)
@@ -70,8 +70,8 @@ def test_regular_file_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
 def test_directory_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It removes a created directory when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with diskfilestorage(tmp_path) as storefile:
-            storefile(file)
+        with DiskFileStorage(tmp_path) as storage:
+            storage.add(file)
             raise FakeError()
 
     path = tmp_path.joinpath(*file.path.parts)
@@ -85,9 +85,9 @@ def test_file_exists_raise(tmp_path: pathlib.Path, file: RegularFile) -> None:
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with diskfilestorage(tmp_path) as storefile:
+    with DiskFileStorage(tmp_path) as storage:
         with pytest.raises(FileExistsError):
-            storefile(file)
+            storage.add(file)
 
 
 def test_file_exists_skip(tmp_path: pathlib.Path, file: RegularFile) -> None:
@@ -96,8 +96,8 @@ def test_file_exists_skip(tmp_path: pathlib.Path, file: RegularFile) -> None:
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.SKIP) as storefile:
-        storefile(file)
+    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP) as storage:
+        storage.add(file)
 
     assert not path.read_bytes()
 
@@ -108,8 +108,8 @@ def test_file_exists_overwrite(tmp_path: pathlib.Path, file: RegularFile) -> Non
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storefile:
-        storefile(file)
+    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+        storage.add(file)
 
     assert path.read_bytes() == file.blob
 
@@ -121,10 +121,10 @@ def test_file_exists_overwrite_directory(
     path = tmp_path.joinpath(*file.path.parts)
     path.mkdir(parents=True)
 
-    with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storefile:
+    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
         error = PermissionError if platform.system() == "Windows" else IsADirectoryError
         with pytest.raises(error):
-            storefile(file)
+            storage.add(file)
 
 
 def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
@@ -134,10 +134,10 @@ def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -
     path.touch()
 
     with contextlib.suppress(FakeError):
-        with diskfilestorage(
+        with DiskFileStorage(
             tmp_path, fileexists=FileExistsPolicy.OVERWRITE
-        ) as storefile:
-            storefile(file)
+        ) as storage:
+            storage.add(file)
             raise FakeError()
 
     assert path.exists()
@@ -145,8 +145,8 @@ def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -
 
 def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None:
     """It stores the file."""
-    with diskfilestorage(tmp_path) as storefile:
-        storefile(executable)
+    with DiskFileStorage(tmp_path) as storage:
+        storage.add(executable)
 
     path = tmp_path.joinpath(*executable.path.parts)
     assert path.read_bytes() == executable.blob
@@ -158,8 +158,8 @@ def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None
 )
 def test_executable_mode(tmp_path: pathlib.Path, executable: File) -> None:
     """It stores the file."""
-    with diskfilestorage(tmp_path) as storefile:
-        storefile(executable)
+    with DiskFileStorage(tmp_path) as storage:
+        storage.add(executable)
 
     path = tmp_path.joinpath(*executable.path.parts)
     assert os.access(path, os.X_OK)
@@ -167,8 +167,8 @@ def test_executable_mode(tmp_path: pathlib.Path, executable: File) -> None:
 
 def test_symlink(tmp_path: pathlib.Path, symlink: SymbolicLink) -> None:
     """It stores the file."""
-    with diskfilestorage(tmp_path) as storefile:
-        storefile(symlink)
+    with DiskFileStorage(tmp_path) as storage:
+        storage.add(symlink)
 
     path = tmp_path.joinpath(*symlink.path.parts)
     assert path.readlink().parts == symlink.target.parts
@@ -181,8 +181,8 @@ def test_symlink_overwrite_symlink(
     path = tmp_path.joinpath(*symlink.path.parts)
     path.symlink_to(tmp_path)
 
-    with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storefile:
-        storefile(symlink)
+    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+        storage.add(symlink)
 
     assert path.readlink().parts == symlink.target.parts
 
@@ -192,9 +192,9 @@ def test_symlink_overwrite_file(tmp_path: pathlib.Path, symlink: SymbolicLink) -
     path = tmp_path.joinpath(*symlink.path.parts)
     path.touch()
 
-    with diskfilestorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storefile:
+    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
         with pytest.raises(FileExistsError):
-            storefile(symlink)
+            storage.add(symlink)
 
 
 def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
@@ -202,26 +202,26 @@ def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
     file = File(PurePath("dir", "file"))
 
     with pytest.raises(TypeError):
-        with diskfilestorage(tmp_path) as storefile:
-            storefile(file)
+        with DiskFileStorage(tmp_path) as storage:
+            storage.add(file)
 
     path = tmp_path.joinpath(*file.path.parts)
     assert not path.exists()
     assert not path.parent.exists()
 
 
-def test_temporarydiskfilestorage_storefile(file: RegularFile) -> None:
+def test_temporarydiskfilestorage_storage(file: RegularFile) -> None:
     """It stores the file in a temporary directory."""
-    with temporarydiskfilestorage() as storefile:
-        storefile(file)
+    with TemporaryDiskFileStorage() as storage:
+        storage.add(file)
 
 
 def test_temporarydiskfilestorage_onstore(file: RegularFile) -> None:
     """It invokes the callback with each storage location."""
     locations: list[pathlib.Path] = []
 
-    with temporarydiskfilestorage(onstore=locations.append) as storefile:
-        storefile(file)
+    with TemporaryDiskFileStorage(onstore=locations.append) as storage:
+        storage.add(file)
 
     [location] = locations
 

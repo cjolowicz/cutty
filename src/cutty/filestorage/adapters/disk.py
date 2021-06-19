@@ -1,18 +1,16 @@
 """Disk-based file storage."""
 import enum
-import functools
 import pathlib
 import tempfile
 from collections.abc import Callable
-from collections.abc import Iterator
+from typing import Any
 from typing import Optional
 
-from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
-from cutty.filestorage.domain.storage import FileStore
+from cutty.filestorage.domain.storage import FileStorage
 
 
 class FileExistsPolicy(enum.Enum):
@@ -95,37 +93,52 @@ def storefile(
         raise FileExistsError(f"{path} already exists")
 
 
-@contextmanager
-def diskfilestorage(
-    root: pathlib.Path,
-    *,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-) -> Iterator[FileStore]:
-    """Disk-based store for files."""
-    undo: list[Callable[[], None]] = []
+class DiskFileStorage(FileStorage):
+    """Disk-based file storage."""
 
-    try:
-        yield functools.partial(storefile, root=root, fileexists=fileexists, undo=undo)
-    except BaseException:
-        for action in reversed(undo):
+    def __init__(
+        self,
+        root: pathlib.Path,
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+        onstore: Optional[Callable[[pathlib.Path], None]] = None,
+    ) -> None:
+        """Initialize."""
+        self.root = root
+        self.fileexists = fileexists
+        self.onstore = onstore
+        self.undo: list[Callable[[], None]] = []
+
+    def add(self, file: File) -> None:
+        """Add the file to the storage."""
+        storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
+        if self.onstore is not None:
+            self.onstore(self.root.joinpath(*file.path.parts))
+
+    def rollback(self) -> None:
+        """Rollback all stores."""
+        for action in reversed(self.undo):
             action()  # if this fails then so be it
-        raise
 
 
-@contextmanager
-def temporarydiskfilestorage(
-    *,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    onstore: Optional[Callable[[pathlib.Path], None]] = None,
-) -> Iterator[FileStore]:
-    """Temporary disk-based store for files."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        root = pathlib.Path(tmpdir)
-        with diskfilestorage(root, fileexists=fileexists) as storefile:
+class TemporaryDiskFileStorage(DiskFileStorage):
+    """Temporary disk-based file storage."""
 
-            def _storefile(file: File) -> None:
-                storefile(file)
-                assert onstore is not None  # noqa: S101
-                onstore(root.joinpath(*file.path.parts))
+    def __init__(
+        self,
+        *,
+        onstore: Optional[Callable[[pathlib.Path], None]] = None,
+    ) -> None:
+        """Initialize."""
+        self._directory = tempfile.TemporaryDirectory()
+        super().__init__(pathlib.Path(self._directory.name), onstore=onstore)
 
-            yield _storefile if onstore is not None else storefile
+    def __enter__(self) -> FileStorage:
+        """Enter the runtime context."""
+        self._directory.__enter__()
+        return super().__enter__()
+
+    def __exit__(self, *args: Any) -> None:
+        """Exit the runtime context."""
+        super().__exit__(*args)
+        self._directory.__exit__(*args)

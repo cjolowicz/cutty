@@ -3,11 +3,11 @@ import pathlib
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import cookiecutterfilestorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
-from cutty.filestorage.domain.storage import FileStoreManager
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -28,33 +28,33 @@ def executable() -> Executable:
 
 
 @pytest.fixture
-def storage(tmp_path: pathlib.Path) -> FileStoreManager:
+def storage(tmp_path: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
-    return cookiecutterfilestorage(tmp_path)
+    return CookiecutterFileStorage(tmp_path)
 
 
 @pytest.fixture
-def storagewithhook(tmp_path: pathlib.Path) -> FileStoreManager:
+def storagewithhook(tmp_path: pathlib.Path) -> FileStorage:
     """Fixture for a storage with hooks."""
     hook = Executable(
         PurePath("hooks", "post_gen_project.py"),
         b"open('marker', mode='w')",
     )
-    return cookiecutterfilestorage(tmp_path, hookfiles=[hook])
+    return CookiecutterFileStorage(tmp_path, hookfiles=[hook])
 
 
 def test_hooks(
-    tmp_path: pathlib.Path, storagewithhook: FileStoreManager, file: File
+    tmp_path: pathlib.Path, storagewithhook: FileStorage, file: File
 ) -> None:
     """It executes the hook."""
-    with storagewithhook as storefile:
-        storefile(file)
+    with storagewithhook:
+        storagewithhook.add(file)
 
     path = tmp_path / "example" / "marker"
     assert path.is_file()
 
 
-def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStoreManager) -> None:
+def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStorage) -> None:
     """It does nothing."""
     with storagewithhook:
         pass
@@ -64,29 +64,29 @@ def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStoreManager) -> 
 
 
 def test_multiple_files(
-    tmp_path: pathlib.Path, storage: FileStoreManager, file: File, executable: File
+    tmp_path: pathlib.Path, storage: FileStorage, file: File, executable: File
 ) -> None:
     """It stores all the files."""
-    with storage as storefile:
-        storefile(executable)
-        storefile(file)
+    with storage:
+        storage.add(executable)
+        storage.add(file)
 
     assert all(
         tmp_path.joinpath(*each.path.parts).is_file() for each in (file, executable)
     )
 
 
-def test_already_exists(storage: FileStoreManager, file: File) -> None:
+def test_already_exists(storage: FileStorage, file: File) -> None:
     """It raises an exception if the file already exists."""
-    with storage as storefile:
-        storefile(file)
+    with storage:
+        storage.add(file)
         with pytest.raises(Exception):
-            storefile(file)
+            storage.add(file)
 
 
 def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It overwrites existing files."""
-    storage = cookiecutterfilestorage(
+    storage = CookiecutterFileStorage(
         tmp_path,
         overwrite_if_exists=True,
         skip_if_file_exists=False,
@@ -96,15 +96,15 @@ def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
     path.parent.mkdir()
     path.write_text("old")
 
-    with storage as storefile:
-        storefile(file)
+    with storage:
+        storage.add(file)
 
     assert path.read_text() != "old"
 
 
 def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It skips existing files."""
-    storage = cookiecutterfilestorage(
+    storage = CookiecutterFileStorage(
         tmp_path,
         overwrite_if_exists=True,
         skip_if_file_exists=True,
@@ -114,7 +114,7 @@ def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
     path.parent.mkdir()
     path.write_text("old")
 
-    with storage as storefile:
-        storefile(file)
+    with storage:
+        storage.add(file)
 
     assert path.read_text() == "old"
