@@ -124,9 +124,6 @@ class DiskFileStorage(FileStorage):
         """Add the file to the storage."""
         storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
 
-    def commit(self) -> None:
-        """Commit all stores."""
-
     def rollback(self) -> None:
         """Rollback all stores."""
         for action in reversed(self.undo):

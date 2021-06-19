@@ -21,7 +21,6 @@ class FileStorage(abc.ABC):
     def add(self, file: File) -> None:
         """Add the file to the storage."""
 
-    @abc.abstractmethod
     def commit(self) -> None:
         """Commit all stores."""
 

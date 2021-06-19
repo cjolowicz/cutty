@@ -26,9 +26,6 @@ class MemoryFileStorage(FileStorage):
         """Add the file to the storage."""
         self.files.append(file)
 
-    def commit(self) -> None:
-        """Commit all stores."""
-
     def rollback(self) -> None:
         """Rollback all stores."""
         self.files.clear()
