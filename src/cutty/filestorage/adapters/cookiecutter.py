@@ -50,7 +50,6 @@ class CookiecutterFileStorage(DiskFileStorage):
         super().__init__(root, fileexists=fileexists)
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.project: Optional[pathlib.Path] = None
-        self.overwrite_if_exists = overwrite_if_exists
 
     def add(self, file: File) -> None:
         """Add file to storage."""
