@@ -4,12 +4,12 @@ import pathlib
 import platform
 import subprocess  # noqa: S404
 import sys
+import tempfile
 from collections.abc import Iterable
 from typing import Optional
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.disk import TemporaryDiskFileStorage
 from cutty.filestorage.domain.files import File
 
 
@@ -22,10 +22,11 @@ def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
 def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
     hookfile = hooks.get(hook)
     if hookfile is not None:
-        with TemporaryDiskFileStorage(
-            onstore=functools.partial(_runcommand, cwd=cwd)
-        ) as storage:
-            storage.add(hookfile)
+        with tempfile.TemporaryDirectory() as root:
+            with DiskFileStorage(
+                pathlib.Path(root), onstore=functools.partial(_runcommand, cwd=cwd)
+            ) as storage:
+                storage.add(hookfile)
 
 
 class CookiecutterFileStorage(DiskFileStorage):
