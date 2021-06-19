@@ -72,24 +72,6 @@ def _storefile(
         raise TypeError(f"cannot store file of type {type(file)}")
 
 
-def storefile(
-    file: File,
-    *,
-    root: pathlib.Path,
-    fileexists: FileExistsPolicy,
-    undo: list[Callable[[], None]],
-) -> None:
-    """Store the file in a directory on disk."""
-    path = root.joinpath(*file.path.parts)
-
-    if not path.exists():
-        _storefile(file, path, undo=undo)
-    elif fileexists is FileExistsPolicy.OVERWRITE:
-        _storefile(file, path, undo=undo, overwrite=True)
-    elif fileexists is FileExistsPolicy.RAISE:
-        raise FileExistsError(f"{path} already exists")
-
-
 class DiskFileStorage(FileStorage):
     """Disk-based file storage."""
 
@@ -106,7 +88,14 @@ class DiskFileStorage(FileStorage):
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
-        storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
+        path = self.root.joinpath(*file.path.parts)
+
+        if not path.exists():
+            _storefile(file, path, undo=self.undo)
+        elif self.fileexists is FileExistsPolicy.OVERWRITE:
+            _storefile(file, path, undo=self.undo, overwrite=True)
+        elif self.fileexists is FileExistsPolicy.RAISE:
+            raise FileExistsError(f"{path} already exists")
 
     def rollback(self) -> None:
         """Rollback all stores."""
