@@ -1,7 +1,7 @@
 """Unit tests for cutty.filestorage.adapters.memory."""
 import pytest
 
-from cutty.filestorage.adapters.memory import memoryfilestorage
+from cutty.filestorage.adapters.memory import MemoryFileStorage
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
@@ -11,8 +11,8 @@ def test_store() -> None:
     """It stores the file."""
     file = RegularFile(PurePath("file"), b"Lorem")
     files: list[File] = []
-    with memoryfilestorage(files) as storefile:
-        storefile(file)
+    with MemoryFileStorage(files) as storage:
+        storage.add(file)
     assert file in files
 
 
@@ -22,7 +22,7 @@ def test_rollback() -> None:
     file = RegularFile(PurePath("file"), b"Lorem")
     files: list[File] = []
     with pytest.raises(RuntimeError):
-        with memoryfilestorage(files) as storefile:
-            storefile(file)
+        with MemoryFileStorage(files) as storage:
+            storage.add(file)
             raise RuntimeError()
     assert not files
