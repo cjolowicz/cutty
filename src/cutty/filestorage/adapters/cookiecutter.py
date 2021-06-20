@@ -24,7 +24,7 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
         with tempfile.TemporaryDirectory() as root:
             with DiskFileStorage(pathlib.Path(root)) as storage:
                 storage.add(hookfile)
-                path = storage.resolve(hookfile)
+                path = storage.resolve(hookfile.path)
                 _runcommand(path, cwd=cwd)
 
 

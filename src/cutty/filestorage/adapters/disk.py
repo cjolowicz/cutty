@@ -9,6 +9,7 @@ from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filesystems.domain.purepath import PurePath
 
 
 class FileExistsPolicy(enum.Enum):
@@ -52,15 +53,15 @@ class DiskFileStorage(FileStorage):
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
-        path = self.resolve(file)
+        path = self.resolve(file.path)
         if not path.exists():
             self._storefile(file, path, overwrite=False)
         elif self.fileexists.check(path):
             self._storefile(file, path, overwrite=True)
 
-    def resolve(self, file: File) -> pathlib.Path:
+    def resolve(self, path: PurePath) -> pathlib.Path:
         """Return the filesystem location."""
-        return self.root.joinpath(*file.path.parts)
+        return self.root.joinpath(*path.parts)
 
     def _storefile(
         self,
