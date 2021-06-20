@@ -34,7 +34,7 @@ class DiskFileStorage(FileStorage):
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
-        path = self.root.joinpath(*file.path.parts)
+        path = self.resolve(file)
 
         if not path.exists():
             self._storefile(file, path)
@@ -42,6 +42,10 @@ class DiskFileStorage(FileStorage):
             self._storefile(file, path, overwrite=True)
         elif self.fileexists is FileExistsPolicy.RAISE:
             raise FileExistsError(f"{path} already exists")
+
+    def resolve(self, file: File) -> pathlib.Path:
+        """Return the filesystem location."""
+        return self.root.joinpath(*file.path.parts)
 
     def _storefile(
         self,
