@@ -25,16 +25,11 @@ class FileExistsPolicy(enum.Enum):
             path: The path to be checked against the policy.
 
         Returns:
-            ``None`` if the path does not exist, ``False`` if the path should be
-            skipped, or ``True`` if the path should be overwritten.
+            ``True`` to overwrite the path, ``False`` to skip the path.
 
         Raises:
-            FileExistsError: The path already exists, and the policy does not
-                permit overwriting it.
+            FileExistsError: The policy does not permit overwriting the path.
         """
-        if not path.exists():
-            return None
-
         if self is FileExistsPolicy.OVERWRITE:
             return True
 
@@ -62,7 +57,10 @@ class DiskFileStorage(FileStorage):
     def add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file)
-        result = self.fileexists.check(path)
+        if not path.exists():
+            result = None
+        else:
+            result = self.fileexists.check(path)
 
         if result is not False:
             self._storefile(file, path, overwrite=result is True)
