@@ -1,5 +1,7 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
+from collections.abc import Callable
+from collections.abc import Iterable
 
 import pytest
 
@@ -20,30 +22,47 @@ def file() -> RegularFile:
     return RegularFile(path, blob)
 
 
+CreateFileStorage = Callable[[Iterable[str]], FileStorage]
+
+
 @pytest.fixture
-def storage(tmp_path: pathlib.Path) -> FileStorage:
-    """Fixture for a storage with hooks."""
-    hook = Executable(
-        PurePath("hooks", "post_gen_project.py"),
-        b"open('marker', mode='w')",
-    )
-    storage = DiskFileStorage(tmp_path)
-    return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=[hook])
+def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
+    """Factory fixture for a storage with hooks."""
+
+    def _createstorage(hooks: Iterable[str]) -> FileStorage:
+        hookfiles = [
+            Executable(
+                PurePath("hooks", f"{hook}.py"), f"open('{hook}', mode='w')".encode()
+            )
+            for hook in hooks
+        ]
+        storage = DiskFileStorage(tmp_path)
+        return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
+
+    return _createstorage
 
 
-def test_hooks(tmp_path: pathlib.Path, storage: FileStorage, file: File) -> None:
+def test_hooks(
+    tmp_path: pathlib.Path,
+    createstorage: CreateFileStorage,
+    file: File,
+) -> None:
     """It executes the hook."""
+    storage = createstorage(["post_gen_project"])
+
     with storage:
         storage.add(file)
 
-    path = tmp_path / "example" / "marker"
+    path = tmp_path / "example" / "post_gen_project"
     assert path.is_file()
 
 
-def test_no_files(tmp_path: pathlib.Path, storage: FileStorage) -> None:
+def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
     """It does nothing."""
+    storage = createstorage(["post_gen_project"])
+
     with storage:
         pass
 
-    path = tmp_path / "example" / "marker"
+    path = tmp_path / "example" / "post_gen_project"
     assert not path.is_file()
