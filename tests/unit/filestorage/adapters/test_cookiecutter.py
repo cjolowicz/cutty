@@ -69,10 +69,12 @@ def test_hooks(
 
 def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
     """It does nothing."""
-    storage = createstorage(["post_gen_project"])
+    hooks = ["pre_gen_project", "post_gen_project"]
+    storage = createstorage(hooks)
 
     with storage:
         pass
 
-    path = tmp_path / "example" / "post_gen_project"
-    assert not path.is_file()
+    for hook in hooks:
+        path = tmp_path / "example" / hook
+        assert not path.is_file()
