@@ -38,8 +38,8 @@ class CookiecutterFileStorageWrapper(FileStorageWrapper[DiskFileStorage]):
         cls, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
     ) -> FileStorage:
         """Wrap the disk storage using the given Cookiecutter hooks."""
-        # TODO: Use disk storage if there are no hooks.
-        return cls(storage, hookfiles=hookfiles)
+        hookfiles = tuple(hookfiles)
+        return cls(storage, hookfiles=hookfiles) if hookfiles else storage
 
     def __init__(
         self, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
