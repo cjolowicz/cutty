@@ -58,12 +58,9 @@ class DiskFileStorage(FileStorage):
         """Add the file to the storage."""
         path = self.resolve(file)
         if not path.exists():
-            result = None
-        else:
-            result = self.fileexists.check(path)
-
-        if result is not False:
-            self._storefile(file, path, overwrite=result is True)
+            self._storefile(file, path, overwrite=False)
+        elif self.fileexists.check(path):
+            self._storefile(file, path, overwrite=True)
 
     def resolve(self, file: File) -> pathlib.Path:
         """Return the filesystem location."""
