@@ -1,6 +1,5 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
-from collections.abc import Iterable
 
 import pytest
 
@@ -12,17 +11,6 @@ from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-
-
-def CookiecutterFileStorage(  # noqa: N802
-    root: pathlib.Path,
-    *,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    hookfiles: Iterable[File] = (),
-) -> FileStorage:
-    """Disk-based file store with Cookiecutter hooks."""
-    storage = DiskFileStorage(root, fileexists=fileexists)
-    return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
 
 
 @pytest.fixture
@@ -44,7 +32,7 @@ def executable() -> Executable:
 @pytest.fixture
 def storage(tmp_path: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
-    return CookiecutterFileStorage(tmp_path)
+    return DiskFileStorage(tmp_path)
 
 
 @pytest.fixture
@@ -54,7 +42,8 @@ def storagewithhook(tmp_path: pathlib.Path) -> FileStorage:
         PurePath("hooks", "post_gen_project.py"),
         b"open('marker', mode='w')",
     )
-    return CookiecutterFileStorage(tmp_path, hookfiles=[hook])
+    storage = DiskFileStorage(tmp_path)
+    return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=[hook])
 
 
 def test_hooks(
@@ -100,7 +89,7 @@ def test_already_exists(storage: FileStorage, file: File) -> None:
 
 def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It overwrites existing files."""
-    storage = CookiecutterFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
 
     path = tmp_path.joinpath(*file.path.parts)
     path.parent.mkdir()
@@ -114,7 +103,7 @@ def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
 
 def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It skips existing files."""
-    storage = CookiecutterFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
 
     path = tmp_path.joinpath(*file.path.parts)
     path.parent.mkdir()
