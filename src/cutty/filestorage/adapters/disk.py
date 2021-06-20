@@ -2,6 +2,7 @@
 import enum
 import pathlib
 from collections.abc import Callable
+from typing import Optional
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
@@ -35,17 +36,28 @@ class DiskFileStorage(FileStorage):
     def add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file)
+        overwrite = self.checkpolicy(path)
 
-        if not path.exists():
-            self._storefile(file, path)
-        elif self.fileexists is FileExistsPolicy.OVERWRITE:
-            self._storefile(file, path, overwrite=True)
-        elif self.fileexists is FileExistsPolicy.RAISE:
-            raise FileExistsError(f"{path} already exists")
+        if overwrite is not None:
+            self._storefile(file, path, overwrite=overwrite)
 
     def resolve(self, file: File) -> pathlib.Path:
         """Return the filesystem location."""
         return self.root.joinpath(*file.path.parts)
+
+    def checkpolicy(self, path: pathlib.Path) -> Optional[bool]:
+        """Check the policy for existing files."""
+        if not path.exists():
+            return False
+
+        if self.fileexists is FileExistsPolicy.OVERWRITE:
+            return True
+
+        if self.fileexists is FileExistsPolicy.RAISE:
+            raise FileExistsError(f"{path} already exists")
+
+        assert self.fileexists is FileExistsPolicy.SKIP  # noqa: S101
+        return None
 
     def _storefile(
         self,
