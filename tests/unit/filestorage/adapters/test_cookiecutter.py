@@ -42,19 +42,29 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     return _createstorage
 
 
+@pytest.mark.parametrize(
+    "hooks",
+    [
+        ["pre_gen_project"],
+        ["post_gen_project"],
+        ["pre_gen_project", "post_gen_project"],
+    ],
+)
 def test_hooks(
     tmp_path: pathlib.Path,
     createstorage: CreateFileStorage,
     file: File,
+    hooks: Iterable[str],
 ) -> None:
     """It executes the hook."""
-    storage = createstorage(["post_gen_project"])
+    storage = createstorage(hooks)
 
     with storage:
         storage.add(file)
 
-    path = tmp_path / "example" / "post_gen_project"
-    assert path.is_file()
+    for hook in hooks:
+        path = tmp_path / "example" / hook
+        assert path.is_file()
 
 
 def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
