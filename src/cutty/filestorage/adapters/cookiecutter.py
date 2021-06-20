@@ -51,7 +51,6 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
 
     def add(self, file: File) -> None:
         """Add file to storage."""
-        # FIXME: Hooks break rollback assumptions.
         if self.project is None:
             self.project = self.storage.resolve(file.path.parents[-2])
             self.project.mkdir(

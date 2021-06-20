@@ -80,3 +80,20 @@ def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> N
     for hook in hooks:
         path = tmp_path / "example" / hook
         assert not path.is_file()
+
+
+@pytest.mark.xfail(reason="FIXME: Hooks break rollback assumptions")
+def test_rollback(
+    tmp_path: pathlib.Path, createstorage: CreateFileStorage, files: Iterable[File]
+) -> None:
+    """It removes any created files."""
+    storage = createstorage(["pre_gen_project"])
+
+    with pytest.raises(RuntimeError):
+        with storage:
+            for file in files:
+                storage.add(file)
+            raise RuntimeError()
+
+    path = tmp_path / "example" / "pre_gen_project"
+    assert not path.is_file()
