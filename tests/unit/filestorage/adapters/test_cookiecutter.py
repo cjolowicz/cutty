@@ -21,7 +21,7 @@ def file() -> RegularFile:
 
 
 @pytest.fixture
-def storagewithhook(tmp_path: pathlib.Path) -> FileStorage:
+def storage(tmp_path: pathlib.Path) -> FileStorage:
     """Fixture for a storage with hooks."""
     hook = Executable(
         PurePath("hooks", "post_gen_project.py"),
@@ -31,20 +31,18 @@ def storagewithhook(tmp_path: pathlib.Path) -> FileStorage:
     return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=[hook])
 
 
-def test_hooks(
-    tmp_path: pathlib.Path, storagewithhook: FileStorage, file: File
-) -> None:
+def test_hooks(tmp_path: pathlib.Path, storage: FileStorage, file: File) -> None:
     """It executes the hook."""
-    with storagewithhook:
-        storagewithhook.add(file)
+    with storage:
+        storage.add(file)
 
     path = tmp_path / "example" / "marker"
     assert path.is_file()
 
 
-def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStorage) -> None:
+def test_no_files(tmp_path: pathlib.Path, storage: FileStorage) -> None:
     """It does nothing."""
-    with storagewithhook:
+    with storage:
         pass
 
     path = tmp_path / "example" / "marker"
