@@ -1,9 +1,12 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
+from collections.abc import Callable
+from collections.abc import Iterable
 
 import pytest
 
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -12,109 +15,85 @@ from cutty.filesystems.domain.purepath import PurePath
 
 
 @pytest.fixture
-def file() -> RegularFile:
-    """Fixture for a regular file."""
-    path = PurePath("example", "README.md")
-    blob = b"# example\n"
-    return RegularFile(path, blob)
+def files() -> Iterable[File]:
+    """Fixture with files to be stored."""
+    return [
+        RegularFile(PurePath("example", "file1"), b"data1"),
+        RegularFile(PurePath("example", "file2"), b"data2"),
+    ]
+
+
+CreateFileStorage = Callable[[Iterable[str]], FileStorage]
 
 
 @pytest.fixture
-def executable() -> Executable:
-    """Fixture for an executable file."""
-    path = PurePath("example", "main.py")
-    blob = b"#!/usr/bin/env python"
-    return Executable(path, blob)
+def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
+    """Factory fixture for a storage with hooks."""
+
+    def _createstorage(hooks: Iterable[str]) -> FileStorage:
+        hookfiles = [
+            Executable(
+                PurePath("hooks", f"{hook}.py"), f"open('{hook}', mode='w')".encode()
+            )
+            for hook in hooks
+        ]
+        storage = DiskFileStorage(tmp_path)
+        return CookiecutterFileStorage.wrap(storage, hookfiles=hookfiles)
+
+    return _createstorage
 
 
-@pytest.fixture
-def storage(tmp_path: pathlib.Path) -> FileStorage:
-    """Fixture for a storage."""
-    return CookiecutterFileStorage(tmp_path)
-
-
-@pytest.fixture
-def storagewithhook(tmp_path: pathlib.Path) -> FileStorage:
-    """Fixture for a storage with hooks."""
-    hook = Executable(
-        PurePath("hooks", "post_gen_project.py"),
-        b"open('marker', mode='w')",
-    )
-    return CookiecutterFileStorage(tmp_path, hookfiles=[hook])
-
-
+@pytest.mark.parametrize(
+    "hooks",
+    [
+        ["pre_gen_project"],
+        ["post_gen_project"],
+        ["pre_gen_project", "post_gen_project"],
+    ],
+)
 def test_hooks(
-    tmp_path: pathlib.Path, storagewithhook: FileStorage, file: File
+    tmp_path: pathlib.Path,
+    createstorage: CreateFileStorage,
+    files: Iterable[File],
+    hooks: Iterable[str],
 ) -> None:
     """It executes the hook."""
-    with storagewithhook:
-        storagewithhook.add(file)
+    storage = createstorage(hooks)
 
-    path = tmp_path / "example" / "marker"
-    assert path.is_file()
-
-
-def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStorage) -> None:
-    """It does nothing."""
-    with storagewithhook:
-        pass
-
-    path = tmp_path / "example" / "marker"
-    assert not path.is_file()
-
-
-def test_multiple_files(
-    tmp_path: pathlib.Path, storage: FileStorage, file: File, executable: File
-) -> None:
-    """It stores all the files."""
     with storage:
-        storage.add(executable)
-        storage.add(file)
-
-    assert all(
-        tmp_path.joinpath(*each.path.parts).is_file() for each in (file, executable)
-    )
-
-
-def test_already_exists(storage: FileStorage, file: File) -> None:
-    """It raises an exception if the file already exists."""
-    with storage:
-        storage.add(file)
-        with pytest.raises(Exception):
+        for file in files:
             storage.add(file)
 
+    for hook in hooks:
+        path = tmp_path / "example" / hook
+        assert path.is_file()
 
-def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It overwrites existing files."""
-    storage = CookiecutterFileStorage(
-        tmp_path,
-        overwrite_if_exists=True,
-        skip_if_file_exists=False,
-    )
 
-    path = tmp_path.joinpath(*file.path.parts)
-    path.parent.mkdir()
-    path.write_text("old")
+def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
+    """It does nothing."""
+    hooks = ["pre_gen_project", "post_gen_project"]
+    storage = createstorage(hooks)
 
     with storage:
-        storage.add(file)
+        pass
 
-    assert path.read_text() != "old"
+    for hook in hooks:
+        path = tmp_path / "example" / hook
+        assert not path.is_file()
 
 
-def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It skips existing files."""
-    storage = CookiecutterFileStorage(
-        tmp_path,
-        overwrite_if_exists=True,
-        skip_if_file_exists=True,
-    )
+@pytest.mark.xfail(reason="FIXME: Hooks break rollback assumptions")
+def test_rollback(
+    tmp_path: pathlib.Path, createstorage: CreateFileStorage, files: Iterable[File]
+) -> None:
+    """It removes any created files."""
+    storage = createstorage(["pre_gen_project"])
 
-    path = tmp_path.joinpath(*file.path.parts)
-    path.parent.mkdir()
-    path.write_text("old")
+    with pytest.raises(RuntimeError):
+        with storage:
+            for file in files:
+                storage.add(file)
+            raise RuntimeError()
 
-    with storage:
-        storage.add(file)
-
-    assert path.read_text() == "old"
+    path = tmp_path / "example" / "pre_gen_project"
+    assert not path.is_file()

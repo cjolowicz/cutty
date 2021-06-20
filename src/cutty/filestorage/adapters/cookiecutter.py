@@ -10,6 +10,8 @@ from typing import Optional
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
+from cutty.filestorage.domain.storage import FileStorage
+from cutty.filestorage.domain.storage import FileStorageWrapper
 
 
 def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
@@ -28,35 +30,32 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
                 _runcommand(path, cwd=cwd)
 
 
-class CookiecutterFileStorage(DiskFileStorage):
-    """Disk-based file store with Cookiecutter hooks."""
+class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
+    """Wrap a disk-based file store with Cookiecutter hooks."""
+
+    @classmethod
+    def wrap(
+        cls, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
+    ) -> FileStorage:
+        """Wrap the disk storage using the given Cookiecutter hooks."""
+        hookfiles = tuple(hookfiles)
+        return cls(storage, hookfiles=hookfiles) if hookfiles else storage
 
     def __init__(
-        self,
-        root: pathlib.Path,
-        *,
-        hookfiles: Iterable[File] = (),
-        overwrite_if_exists: bool = False,
-        skip_if_file_exists: bool = False,
-    ):
+        self, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
+    ) -> None:
         """Initialize."""
-        fileexists = (
-            FileExistsPolicy.RAISE
-            if not overwrite_if_exists
-            else FileExistsPolicy.SKIP
-            if skip_if_file_exists
-            else FileExistsPolicy.OVERWRITE
-        )
-        super().__init__(root, fileexists=fileexists)
+        super().__init__(storage)
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.project: Optional[pathlib.Path] = None
 
     def add(self, file: File) -> None:
         """Add file to storage."""
         if self.project is None:
-            self.project = super().resolve(file.path.parents[-2])
+            self.project = self.storage.resolve(file.path.parents[-2])
             self.project.mkdir(
-                parents=True, exist_ok=self.fileexists is not FileExistsPolicy.RAISE
+                parents=True,
+                exist_ok=self.storage.fileexists is not FileExistsPolicy.RAISE,
             )
             _runhook(self.hooks, "pre_gen_project", cwd=self.project)
 
@@ -66,3 +65,5 @@ class CookiecutterFileStorage(DiskFileStorage):
         """Commit the stores."""
         if self.project is not None:
             _runhook(self.hooks, "post_gen_project", cwd=self.project)
+
+        super().commit()

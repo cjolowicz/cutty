@@ -8,6 +8,9 @@ from typing import Optional
 import appdirs
 
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.disk import DiskFileStorage
+from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -42,6 +45,19 @@ def iterhooks(path: Path) -> Iterator[Path]:
         for path in hookdir.iterdir():
             if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
                 yield path
+
+
+def fileexistspolicy(
+    overwrite_if_exists: bool, skip_if_file_exists: bool
+) -> FileExistsPolicy:
+    """Return the policy for overwriting existing files."""
+    return (
+        FileExistsPolicy.RAISE
+        if not overwrite_if_exists
+        else FileExistsPolicy.SKIP
+        if skip_if_file_exists
+        else FileExistsPolicy.OVERWRITE
+    )
 
 
 def create(
@@ -82,11 +98,12 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
-    with CookiecutterFileStorage(
+    storage: FileStorage
+    storage = DiskFileStorage(
         output_dir,
-        hookfiles=hookfiles,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-    ) as storage:
+        fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
+    )
+    storage = CookiecutterFileStorage.wrap(storage, hookfiles=hookfiles)
+    with storage:
         for file in files:
             storage.add(file)

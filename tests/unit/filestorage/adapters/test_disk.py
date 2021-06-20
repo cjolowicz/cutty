@@ -42,60 +42,74 @@ def symlink() -> SymbolicLink:
     )
 
 
-def test_regular_file(tmp_path: pathlib.Path, file: RegularFile) -> None:
+@pytest.fixture
+def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
+    """Fixture for a storage."""
+    return DiskFileStorage(tmp_path)
+
+
+def test_regular_file(storage: DiskFileStorage, file: RegularFile) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(file)
 
-    path = tmp_path.joinpath(*file.path.parts)
+    path = storage.resolve(file.path)
     assert path.read_bytes() == file.blob
+
+
+def test_multiple_files(storage: DiskFileStorage, file: File, executable: File) -> None:
+    """It stores all the files."""
+    with storage:
+        storage.add(executable)
+        storage.add(file)
+
+    assert all(storage.resolve(each.path).is_file() for each in (file, executable))
 
 
 class FakeError(Exception):
     """Exception used for testing rollback."""
 
 
-def test_regular_file_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
+def test_regular_file_undo(storage: DiskFileStorage, file: RegularFile) -> None:
     """It removes a created file when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
             raise FakeError()
 
-    path = tmp_path.joinpath(*file.path.parts)
+    path = storage.resolve(file.path)
     assert not path.exists()
 
 
-def test_directory_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
+def test_directory_undo(storage: DiskFileStorage, file: RegularFile) -> None:
     """It removes a created directory when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
             raise FakeError()
 
-    path = tmp_path.joinpath(*file.path.parts)
+    path = storage.resolve(file.path)
     assert not path.exists()
     assert not path.parent.exists()
 
 
-def test_file_exists_raise(tmp_path: pathlib.Path, file: RegularFile) -> None:
-    """It raises an exception if the file exists."""
-    path = tmp_path.joinpath(*file.path.parts)
-    path.parent.mkdir(parents=True)
-    path.touch()
-
-    with DiskFileStorage(tmp_path) as storage:
+def test_file_exists_raise(storage: DiskFileStorage, file: File) -> None:
+    """It raises an exception if the file already exists."""
+    with storage:
+        storage.add(file)
         with pytest.raises(FileExistsError):
             storage.add(file)
 
 
 def test_file_exists_skip(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It skips existing files when requested."""
-    path = tmp_path.joinpath(*file.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
+
+    path = storage.resolve(file.path)
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP) as storage:
+    with storage:
         storage.add(file)
 
     assert not path.read_bytes()
@@ -103,11 +117,13 @@ def test_file_exists_skip(tmp_path: pathlib.Path, file: RegularFile) -> None:
 
 def test_file_exists_overwrite(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It overwrites an existing file when requested."""
-    path = tmp_path.joinpath(*file.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+
+    path = storage.resolve(file.path)
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+    with storage:
         storage.add(file)
 
     assert path.read_bytes() == file.blob
@@ -117,10 +133,12 @@ def test_file_exists_overwrite_directory(
     tmp_path: pathlib.Path, file: RegularFile
 ) -> None:
     """It raises an exception if the target is an existing directory."""
-    path = tmp_path.joinpath(*file.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+
+    path = storage.resolve(file.path)
     path.mkdir(parents=True)
 
-    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+    with storage:
         error = PermissionError if platform.system() == "Windows" else IsADirectoryError
         with pytest.raises(error):
             storage.add(file)
@@ -128,26 +146,26 @@ def test_file_exists_overwrite_directory(
 
 def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
     """It does not remove overwritten files when rolling back."""
-    path = tmp_path.joinpath(*file.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+
+    path = storage.resolve(file.path)
     path.parent.mkdir(parents=True)
     path.touch()
 
     with contextlib.suppress(FakeError):
-        with DiskFileStorage(
-            tmp_path, fileexists=FileExistsPolicy.OVERWRITE
-        ) as storage:
+        with storage:
             storage.add(file)
             raise FakeError()
 
     assert path.exists()
 
 
-def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None:
+def test_executable_blob(storage: DiskFileStorage, executable: Executable) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(executable)
 
-    path = tmp_path.joinpath(*executable.path.parts)
+    path = storage.resolve(executable.path)
     assert path.read_bytes() == executable.blob
 
 
@@ -155,21 +173,21 @@ def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None
     platform.system() == "Windows",
     reason="Path.chmod ignores executable bits on Windows.",
 )
-def test_executable_mode(tmp_path: pathlib.Path, executable: File) -> None:
+def test_executable_mode(storage: DiskFileStorage, executable: File) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(executable)
 
-    path = tmp_path.joinpath(*executable.path.parts)
+    path = storage.resolve(executable.path)
     assert os.access(path, os.X_OK)
 
 
-def test_symlink(tmp_path: pathlib.Path, symlink: SymbolicLink) -> None:
+def test_symlink(storage: DiskFileStorage, symlink: SymbolicLink) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(symlink)
 
-    path = tmp_path.joinpath(*symlink.path.parts)
+    path = storage.resolve(symlink.path)
     assert path.readlink().parts == symlink.target.parts
 
 
@@ -177,10 +195,12 @@ def test_symlink_overwrite_symlink(
     tmp_path: pathlib.Path, symlink: SymbolicLink
 ) -> None:
     """It raises an exception."""
-    path = tmp_path.joinpath(*symlink.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+
+    path = storage.resolve(symlink.path)
     path.symlink_to(tmp_path)
 
-    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+    with storage:
         storage.add(symlink)
 
     assert path.readlink().parts == symlink.target.parts
@@ -188,22 +208,24 @@ def test_symlink_overwrite_symlink(
 
 def test_symlink_overwrite_file(tmp_path: pathlib.Path, symlink: SymbolicLink) -> None:
     """It raises an exception."""
-    path = tmp_path.joinpath(*symlink.path.parts)
+    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
+
+    path = storage.resolve(symlink.path)
     path.touch()
 
-    with DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE) as storage:
+    with storage:
         with pytest.raises(FileExistsError):
             storage.add(symlink)
 
 
-def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
+def test_unknown_filetype(storage: DiskFileStorage) -> None:
     """It raises a TypeError."""
     file = File(PurePath("dir", "file"))
 
     with pytest.raises(TypeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
 
-    path = tmp_path.joinpath(*file.path.parts)
+    path = storage.resolve(file.path)
     assert not path.exists()
     assert not path.parent.exists()
