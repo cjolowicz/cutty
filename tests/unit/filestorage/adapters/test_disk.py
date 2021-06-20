@@ -57,6 +57,15 @@ def test_regular_file(file: RegularFile, storage: DiskFileStorage) -> None:
     assert path.read_bytes() == file.blob
 
 
+def test_multiple_files(storage: DiskFileStorage, file: File, executable: File) -> None:
+    """It stores all the files."""
+    with storage:
+        storage.add(executable)
+        storage.add(file)
+
+    assert all(storage.resolve(each.path).is_file() for each in (file, executable))
+
+
 class FakeError(Exception):
     """Exception used for testing rollback."""
 
@@ -84,13 +93,10 @@ def test_directory_undo(file: RegularFile, storage: DiskFileStorage) -> None:
     assert not path.parent.exists()
 
 
-def test_file_exists_raise(file: RegularFile, storage: DiskFileStorage) -> None:
-    """It raises an exception if the file exists."""
-    path = storage.resolve(file.path)
-    path.parent.mkdir(parents=True)
-    path.touch()
-
+def test_file_exists_raise(storage: DiskFileStorage, file: File) -> None:
+    """It raises an exception if the file already exists."""
     with storage:
+        storage.add(file)
         with pytest.raises(FileExistsError):
             storage.add(file)
 
@@ -223,48 +229,3 @@ def test_unknown_filetype(storage: DiskFileStorage) -> None:
     path = storage.resolve(file.path)
     assert not path.exists()
     assert not path.parent.exists()
-
-
-def test_multiple_files(storage: DiskFileStorage, file: File, executable: File) -> None:
-    """It stores all the files."""
-    with storage:
-        storage.add(executable)
-        storage.add(file)
-
-    assert all(storage.resolve(each.path).is_file() for each in (file, executable))
-
-
-def test_already_exists(storage: DiskFileStorage, file: File) -> None:
-    """It raises an exception if the file already exists."""
-    with storage:
-        storage.add(file)
-        with pytest.raises(Exception):
-            storage.add(file)
-
-
-def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It overwrites existing files."""
-    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
-
-    path = storage.resolve(file.path)
-    path.parent.mkdir()
-    path.write_text("old")
-
-    with storage:
-        storage.add(file)
-
-    assert path.read_text() != "old"
-
-
-def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It skips existing files."""
-    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
-
-    path = storage.resolve(file.path)
-    path.parent.mkdir()
-    path.write_text("old")
-
-    with storage:
-        storage.add(file)
-
-    assert path.read_text() == "old"
