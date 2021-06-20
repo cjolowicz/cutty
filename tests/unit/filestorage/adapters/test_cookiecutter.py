@@ -15,11 +15,12 @@ from cutty.filesystems.domain.purepath import PurePath
 
 
 @pytest.fixture
-def file() -> RegularFile:
-    """Fixture for a regular file."""
-    path = PurePath("example", "README.md")
-    blob = b"# example\n"
-    return RegularFile(path, blob)
+def files() -> Iterable[File]:
+    """Fixture with files to be stored."""
+    return [
+        RegularFile(PurePath("example", "file1"), b"data1"),
+        RegularFile(PurePath("example", "file2"), b"data2"),
+    ]
 
 
 CreateFileStorage = Callable[[Iterable[str]], FileStorage]
@@ -53,14 +54,15 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
 def test_hooks(
     tmp_path: pathlib.Path,
     createstorage: CreateFileStorage,
-    file: File,
+    files: Iterable[File],
     hooks: Iterable[str],
 ) -> None:
     """It executes the hook."""
     storage = createstorage(hooks)
 
     with storage:
-        storage.add(file)
+        for file in files:
+            storage.add(file)
 
     for hook in hooks:
         path = tmp_path / "example" / hook
