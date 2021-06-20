@@ -48,7 +48,7 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     return DiskFileStorage(tmp_path)
 
 
-def test_regular_file(file: RegularFile, storage: DiskFileStorage) -> None:
+def test_regular_file(storage: DiskFileStorage, file: RegularFile) -> None:
     """It stores the file."""
     with storage:
         storage.add(file)
@@ -70,7 +70,7 @@ class FakeError(Exception):
     """Exception used for testing rollback."""
 
 
-def test_regular_file_undo(file: RegularFile, storage: DiskFileStorage) -> None:
+def test_regular_file_undo(storage: DiskFileStorage, file: RegularFile) -> None:
     """It removes a created file when rolling back after an error."""
     with contextlib.suppress(FakeError):
         with storage:
@@ -81,7 +81,7 @@ def test_regular_file_undo(file: RegularFile, storage: DiskFileStorage) -> None:
     assert not path.exists()
 
 
-def test_directory_undo(file: RegularFile, storage: DiskFileStorage) -> None:
+def test_directory_undo(storage: DiskFileStorage, file: RegularFile) -> None:
     """It removes a created directory when rolling back after an error."""
     with contextlib.suppress(FakeError):
         with storage:
@@ -160,7 +160,7 @@ def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -
     assert path.exists()
 
 
-def test_executable_blob(executable: Executable, storage: DiskFileStorage) -> None:
+def test_executable_blob(storage: DiskFileStorage, executable: Executable) -> None:
     """It stores the file."""
     with storage:
         storage.add(executable)
@@ -173,7 +173,7 @@ def test_executable_blob(executable: Executable, storage: DiskFileStorage) -> No
     platform.system() == "Windows",
     reason="Path.chmod ignores executable bits on Windows.",
 )
-def test_executable_mode(executable: File, storage: DiskFileStorage) -> None:
+def test_executable_mode(storage: DiskFileStorage, executable: File) -> None:
     """It stores the file."""
     with storage:
         storage.add(executable)
@@ -182,7 +182,7 @@ def test_executable_mode(executable: File, storage: DiskFileStorage) -> None:
     assert os.access(path, os.X_OK)
 
 
-def test_symlink(symlink: SymbolicLink, storage: DiskFileStorage) -> None:
+def test_symlink(storage: DiskFileStorage, symlink: SymbolicLink) -> None:
     """It stores the file."""
     with storage:
         storage.add(symlink)
