@@ -30,36 +30,15 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
                 _runcommand(path, cwd=cwd)
 
 
-class CookiecutterFileStorage(DiskFileStorage):
+def CookiecutterFileStorage(  # noqa: N802
+    root: pathlib.Path,
+    *,
+    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    hookfiles: Iterable[File] = (),
+) -> FileStorage:
     """Disk-based file store with Cookiecutter hooks."""
-
-    def __init__(
-        self,
-        root: pathlib.Path,
-        *,
-        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-        hookfiles: Iterable[File] = (),
-    ) -> None:
-        """Initialize."""
-        super().__init__(root, fileexists=fileexists)
-        self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.project: Optional[pathlib.Path] = None
-
-    def add(self, file: File) -> None:
-        """Add file to storage."""
-        if self.project is None:
-            self.project = super().resolve(file.path.parents[-2])
-            self.project.mkdir(
-                parents=True, exist_ok=self.fileexists is not FileExistsPolicy.RAISE
-            )
-            _runhook(self.hooks, "pre_gen_project", cwd=self.project)
-
-        super().add(file)
-
-    def commit(self) -> None:
-        """Commit the stores."""
-        if self.project is not None:
-            _runhook(self.hooks, "post_gen_project", cwd=self.project)
+    storage = DiskFileStorage(root, fileexists=fileexists)
+    return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
 
 
 class CookiecutterFileStorageWrapper(FileStorageWrapper[DiskFileStorage]):
