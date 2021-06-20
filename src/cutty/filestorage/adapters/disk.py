@@ -30,14 +30,10 @@ class FileExistsPolicy(enum.Enum):
         Raises:
             FileExistsError: The policy does not permit overwriting the path.
         """
-        if self is FileExistsPolicy.OVERWRITE:
-            return True
-
         if self is FileExistsPolicy.RAISE:
             raise FileExistsError(f"{path} already exists")
 
-        assert self is FileExistsPolicy.SKIP  # noqa: S101
-        return False
+        return self is FileExistsPolicy.OVERWRITE
 
 
 class DiskFileStorage(FileStorage):
