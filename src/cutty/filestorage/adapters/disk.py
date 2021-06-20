@@ -18,6 +18,20 @@ class FileExistsPolicy(enum.Enum):
     OVERWRITE = enum.auto()
     SKIP = enum.auto()
 
+    def check(self, path: pathlib.Path) -> Optional[bool]:
+        """Check the policy for a given path."""
+        if not path.exists():
+            return False
+
+        if self is FileExistsPolicy.OVERWRITE:
+            return True
+
+        if self is FileExistsPolicy.RAISE:
+            raise FileExistsError(f"{path} already exists")
+
+        assert self is FileExistsPolicy.SKIP  # noqa: S101
+        return None
+
 
 class DiskFileStorage(FileStorage):
     """Disk-based file storage."""
@@ -36,7 +50,7 @@ class DiskFileStorage(FileStorage):
     def add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file)
-        overwrite = self.checkpolicy(path)
+        overwrite = self.fileexists.check(path)
 
         if overwrite is not None:
             self._storefile(file, path, overwrite=overwrite)
@@ -44,20 +58,6 @@ class DiskFileStorage(FileStorage):
     def resolve(self, file: File) -> pathlib.Path:
         """Return the filesystem location."""
         return self.root.joinpath(*file.path.parts)
-
-    def checkpolicy(self, path: pathlib.Path) -> Optional[bool]:
-        """Check the policy for existing files."""
-        if not path.exists():
-            return False
-
-        if self.fileexists is FileExistsPolicy.OVERWRITE:
-            return True
-
-        if self.fileexists is FileExistsPolicy.RAISE:
-            raise FileExistsError(f"{path} already exists")
-
-        assert self.fileexists is FileExistsPolicy.SKIP  # noqa: S101
-        return None
 
     def _storefile(
         self,
