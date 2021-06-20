@@ -43,9 +43,17 @@ def symlink() -> SymbolicLink:
     )
 
 
-def test_regular_file(tmp_path: pathlib.Path, file: RegularFile) -> None:
+@pytest.fixture
+def storage(tmp_path: pathlib.Path) -> FileStorage:
+    """Fixture for a storage."""
+    return DiskFileStorage(tmp_path)
+
+
+def test_regular_file(
+    tmp_path: pathlib.Path, file: RegularFile, storage: FileStorage
+) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(file)
 
     path = tmp_path.joinpath(*file.path.parts)
@@ -56,10 +64,12 @@ class FakeError(Exception):
     """Exception used for testing rollback."""
 
 
-def test_regular_file_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
+def test_regular_file_undo(
+    tmp_path: pathlib.Path, file: RegularFile, storage: FileStorage
+) -> None:
     """It removes a created file when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
             raise FakeError()
 
@@ -67,10 +77,12 @@ def test_regular_file_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
     assert not path.exists()
 
 
-def test_directory_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
+def test_directory_undo(
+    tmp_path: pathlib.Path, file: RegularFile, storage: FileStorage
+) -> None:
     """It removes a created directory when rolling back after an error."""
     with contextlib.suppress(FakeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
             raise FakeError()
 
@@ -79,13 +91,15 @@ def test_directory_undo(tmp_path: pathlib.Path, file: RegularFile) -> None:
     assert not path.parent.exists()
 
 
-def test_file_exists_raise(tmp_path: pathlib.Path, file: RegularFile) -> None:
+def test_file_exists_raise(
+    tmp_path: pathlib.Path, file: RegularFile, storage: FileStorage
+) -> None:
     """It raises an exception if the file exists."""
     path = tmp_path.joinpath(*file.path.parts)
     path.parent.mkdir(parents=True)
     path.touch()
 
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         with pytest.raises(FileExistsError):
             storage.add(file)
 
@@ -143,9 +157,11 @@ def test_file_exists_overwrite_undo(tmp_path: pathlib.Path, file: RegularFile) -
     assert path.exists()
 
 
-def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None:
+def test_executable_blob(
+    tmp_path: pathlib.Path, executable: Executable, storage: FileStorage
+) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(executable)
 
     path = tmp_path.joinpath(*executable.path.parts)
@@ -156,18 +172,22 @@ def test_executable_blob(tmp_path: pathlib.Path, executable: Executable) -> None
     platform.system() == "Windows",
     reason="Path.chmod ignores executable bits on Windows.",
 )
-def test_executable_mode(tmp_path: pathlib.Path, executable: File) -> None:
+def test_executable_mode(
+    tmp_path: pathlib.Path, executable: File, storage: FileStorage
+) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(executable)
 
     path = tmp_path.joinpath(*executable.path.parts)
     assert os.access(path, os.X_OK)
 
 
-def test_symlink(tmp_path: pathlib.Path, symlink: SymbolicLink) -> None:
+def test_symlink(
+    tmp_path: pathlib.Path, symlink: SymbolicLink, storage: FileStorage
+) -> None:
     """It stores the file."""
-    with DiskFileStorage(tmp_path) as storage:
+    with storage:
         storage.add(symlink)
 
     path = tmp_path.joinpath(*symlink.path.parts)
@@ -197,23 +217,17 @@ def test_symlink_overwrite_file(tmp_path: pathlib.Path, symlink: SymbolicLink) -
             storage.add(symlink)
 
 
-def test_unknown_filetype(tmp_path: pathlib.Path) -> None:
+def test_unknown_filetype(tmp_path: pathlib.Path, storage: FileStorage) -> None:
     """It raises a TypeError."""
     file = File(PurePath("dir", "file"))
 
     with pytest.raises(TypeError):
-        with DiskFileStorage(tmp_path) as storage:
+        with storage:
             storage.add(file)
 
     path = tmp_path.joinpath(*file.path.parts)
     assert not path.exists()
     assert not path.parent.exists()
-
-
-@pytest.fixture
-def storage(tmp_path: pathlib.Path) -> FileStorage:
-    """Fixture for a storage."""
-    return DiskFileStorage(tmp_path)
 
 
 def test_multiple_files(
