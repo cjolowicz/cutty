@@ -24,7 +24,7 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
         with tempfile.TemporaryDirectory() as root:
             with DiskFileStorage(pathlib.Path(root)) as storage:
                 storage.add(hookfile)
-                path = storage.resolve(hookfile)
+                path = storage.resolve(hookfile.path)
                 _runcommand(path, cwd=cwd)
 
 
@@ -54,7 +54,7 @@ class CookiecutterFileStorage(DiskFileStorage):
     def add(self, file: File) -> None:
         """Add file to storage."""
         if self.project is None:
-            self.project = self.root / file.path.parts[0]
+            self.project = super().resolve(file.path.parents[-2])
             self.project.mkdir(
                 parents=True, exist_ok=self.fileexists is not FileExistsPolicy.RAISE
             )
