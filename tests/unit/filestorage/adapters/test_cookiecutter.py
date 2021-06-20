@@ -1,15 +1,28 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
+from collections.abc import Iterable
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageWrapper
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
+
+
+def CookiecutterFileStorage(  # noqa: N802
+    root: pathlib.Path,
+    *,
+    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    hookfiles: Iterable[File] = (),
+) -> FileStorage:
+    """Disk-based file store with Cookiecutter hooks."""
+    storage = DiskFileStorage(root, fileexists=fileexists)
+    return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
 
 
 @pytest.fixture
