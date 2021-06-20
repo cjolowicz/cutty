@@ -37,7 +37,7 @@ class CookiecutterFileStorage(DiskFileStorage):
         *,
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
         hookfiles: Iterable[File] = (),
-    ):
+    ) -> None:
         """Initialize."""
         super().__init__(root, fileexists=fileexists)
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
