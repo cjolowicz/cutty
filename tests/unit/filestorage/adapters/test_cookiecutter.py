@@ -4,6 +4,7 @@ import pathlib
 import pytest
 
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -86,11 +87,7 @@ def test_already_exists(storage: FileStorage, file: File) -> None:
 
 def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It overwrites existing files."""
-    storage = CookiecutterFileStorage(
-        tmp_path,
-        overwrite_if_exists=True,
-        skip_if_file_exists=False,
-    )
+    storage = CookiecutterFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
 
     path = tmp_path.joinpath(*file.path.parts)
     path.parent.mkdir()
@@ -104,11 +101,7 @@ def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
 
 def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
     """It skips existing files."""
-    storage = CookiecutterFileStorage(
-        tmp_path,
-        overwrite_if_exists=True,
-        skip_if_file_exists=True,
-    )
+    storage = CookiecutterFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
 
     path = tmp_path.joinpath(*file.path.parts)
     path.parent.mkdir()
