@@ -5,7 +5,6 @@ import pytest
 
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageWrapper
 from cutty.filestorage.adapters.disk import DiskFileStorage
-from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -19,20 +18,6 @@ def file() -> RegularFile:
     path = PurePath("example", "README.md")
     blob = b"# example\n"
     return RegularFile(path, blob)
-
-
-@pytest.fixture
-def executable() -> Executable:
-    """Fixture for an executable file."""
-    path = PurePath("example", "main.py")
-    blob = b"#!/usr/bin/env python"
-    return Executable(path, blob)
-
-
-@pytest.fixture
-def storage(tmp_path: pathlib.Path) -> FileStorage:
-    """Fixture for a storage."""
-    return DiskFileStorage(tmp_path)
 
 
 @pytest.fixture
@@ -64,52 +49,3 @@ def test_no_files(tmp_path: pathlib.Path, storagewithhook: FileStorage) -> None:
 
     path = tmp_path / "example" / "marker"
     assert not path.is_file()
-
-
-def test_multiple_files(
-    tmp_path: pathlib.Path, storage: FileStorage, file: File, executable: File
-) -> None:
-    """It stores all the files."""
-    with storage:
-        storage.add(executable)
-        storage.add(file)
-
-    assert all(
-        tmp_path.joinpath(*each.path.parts).is_file() for each in (file, executable)
-    )
-
-
-def test_already_exists(storage: FileStorage, file: File) -> None:
-    """It raises an exception if the file already exists."""
-    with storage:
-        storage.add(file)
-        with pytest.raises(Exception):
-            storage.add(file)
-
-
-def test_overwrite_if_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It overwrites existing files."""
-    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.OVERWRITE)
-
-    path = tmp_path.joinpath(*file.path.parts)
-    path.parent.mkdir()
-    path.write_text("old")
-
-    with storage:
-        storage.add(file)
-
-    assert path.read_text() != "old"
-
-
-def test_skip_if_file_exists(tmp_path: pathlib.Path, file: File) -> None:
-    """It skips existing files."""
-    storage = DiskFileStorage(tmp_path, fileexists=FileExistsPolicy.SKIP)
-
-    path = tmp_path.joinpath(*file.path.parts)
-    path.parent.mkdir()
-    path.write_text("old")
-
-    with storage:
-        storage.add(file)
-
-    assert path.read_text() == "old"
