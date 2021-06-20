@@ -2,6 +2,7 @@
 import enum
 import pathlib
 from collections.abc import Callable
+from typing import Optional
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
@@ -17,77 +18,26 @@ class FileExistsPolicy(enum.Enum):
     OVERWRITE = enum.auto()
     SKIP = enum.auto()
 
+    def check(self, path: pathlib.Path) -> Optional[bool]:
+        """Check the policy for a given path.
 
-def _storefile(
-    file: File,
-    path: pathlib.Path,
-    *,
-    undo: list[Callable[[], None]],
-    overwrite: bool = False,
-) -> None:
-    """Store the file at the given path on disk."""
-    # OVERWRITING.
-    #
-    # These operations are allowed:
-    #
-    # - Overwrite a regular file with another regular file.
-    # - Overwrite a symbolic link with a regular file.
-    # - Overwrite a symbolic link with another symbolic link.
-    #
-    # These operations raise exceptions:
-    #
-    # - Do not overwrite a directory with a regular file.
-    # - Do not overwrite a directory with a symbolic link.
-    # - Do not overwrite a regular file with a symbolic link.
-    # - Do not overwrite a regular file with a directory.
-    # - Do not overwrite a symbolic link with a directory if the link target is
-    #   not a directory. (Symbolic links in the path are followed if they point
-    #   to directories.)
+        Args:
+            path: The path to be checked against the policy.
 
-    if overwrite and path.is_symlink():
-        path.unlink()
+        Returns:
+            ``True`` to overwrite the path, ``False`` to skip the path.
 
-    for parent in reversed(path.parents):
-        if not parent.is_dir():
-            parent.mkdir()
-            undo.append(parent.rmdir)
+        Raises:
+            FileExistsError: The policy does not permit overwriting the path.
+        """
+        if self is FileExistsPolicy.OVERWRITE:
+            return True
 
-    if isinstance(file, RegularFile):
-        path.write_bytes(file.blob)
+        if self is FileExistsPolicy.RAISE:
+            raise FileExistsError(f"{path} already exists")
 
-        if not overwrite:
-            undo.append(path.unlink)
-
-        if isinstance(file, Executable):
-            path.chmod(path.stat().st_mode | 0o111)
-
-    elif isinstance(file, SymbolicLink):
-        target = pathlib.Path(*file.target.parts)
-        path.symlink_to(target)
-
-        if not overwrite:
-            undo.append(path.unlink)
-
-    else:
-        raise TypeError(f"cannot store file of type {type(file)}")
-
-
-def storefile(
-    file: File,
-    *,
-    root: pathlib.Path,
-    fileexists: FileExistsPolicy,
-    undo: list[Callable[[], None]],
-) -> None:
-    """Store the file in a directory on disk."""
-    path = root.joinpath(*file.path.parts)
-
-    if not path.exists():
-        _storefile(file, path, undo=undo)
-    elif fileexists is FileExistsPolicy.OVERWRITE:
-        _storefile(file, path, undo=undo, overwrite=True)
-    elif fileexists is FileExistsPolicy.RAISE:
-        raise FileExistsError(f"{path} already exists")
+        assert self is FileExistsPolicy.SKIP  # noqa: S101
+        return False
 
 
 class DiskFileStorage(FileStorage):
@@ -106,7 +56,68 @@ class DiskFileStorage(FileStorage):
 
     def add(self, file: File) -> None:
         """Add the file to the storage."""
-        storefile(file, root=self.root, fileexists=self.fileexists, undo=self.undo)
+        path = self.resolve(file)
+        if not path.exists():
+            self._storefile(file, path, overwrite=False)
+        elif self.fileexists.check(path):
+            self._storefile(file, path, overwrite=True)
+
+    def resolve(self, file: File) -> pathlib.Path:
+        """Return the filesystem location."""
+        return self.root.joinpath(*file.path.parts)
+
+    def _storefile(
+        self,
+        file: File,
+        path: pathlib.Path,
+        *,
+        overwrite: bool = False,
+    ) -> None:
+        """Store the file at the given path on disk."""
+        # OVERWRITING.
+        #
+        # These operations are allowed:
+        #
+        # - Overwrite a regular file with another regular file.
+        # - Overwrite a symbolic link with a regular file.
+        # - Overwrite a symbolic link with another symbolic link.
+        #
+        # These operations raise exceptions:
+        #
+        # - Do not overwrite a directory with a regular file.
+        # - Do not overwrite a directory with a symbolic link.
+        # - Do not overwrite a regular file with a symbolic link.
+        # - Do not overwrite a regular file with a directory.
+        # - Do not overwrite a symbolic link with a directory if the link target is
+        #   not a directory. (Symbolic links in the path are followed if they point
+        #   to directories.)
+
+        if overwrite and path.is_symlink():
+            path.unlink()
+
+        for parent in reversed(path.parents):
+            if not parent.is_dir():
+                parent.mkdir()
+                self.undo.append(parent.rmdir)
+
+        if isinstance(file, RegularFile):
+            path.write_bytes(file.blob)
+
+            if not overwrite:
+                self.undo.append(path.unlink)
+
+            if isinstance(file, Executable):
+                path.chmod(path.stat().st_mode | 0o111)
+
+        elif isinstance(file, SymbolicLink):
+            target = pathlib.Path(*file.target.parts)
+            path.symlink_to(target)
+
+            if not overwrite:
+                self.undo.append(path.unlink)
+
+        else:
+            raise TypeError(f"cannot store file of type {type(file)}")
 
     def rollback(self) -> None:
         """Rollback all stores."""

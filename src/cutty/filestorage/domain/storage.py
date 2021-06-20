@@ -4,8 +4,12 @@ from __future__ import annotations
 import abc
 from types import TracebackType
 from typing import Optional
+from typing import TypeVar
 
 from cutty.filestorage.domain.files import File
+
+
+T = TypeVar("T", bound="FileStorage")
 
 
 class FileStorage(abc.ABC):
@@ -22,7 +26,7 @@ class FileStorage(abc.ABC):
     def rollback(self) -> None:
         """Rollback all stores."""
 
-    def __enter__(self) -> FileStorage:
+    def __enter__(self: T) -> T:
         """Enter the runtime context."""
         return self
 
