@@ -30,7 +30,7 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
                 _runcommand(path, cwd=cwd)
 
 
-class CookiecutterFileStorageWrapper(FileStorageWrapper[DiskFileStorage]):
+class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     """Wrap a disk-based file store with Cookiecutter hooks."""
 
     @classmethod

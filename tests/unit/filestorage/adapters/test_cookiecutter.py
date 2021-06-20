@@ -5,7 +5,7 @@ from collections.abc import Iterable
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageWrapper
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
@@ -38,7 +38,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             for hook in hooks
         ]
         storage = DiskFileStorage(tmp_path)
-        return CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
+        return CookiecutterFileStorage.wrap(storage, hookfiles=hookfiles)
 
     return _createstorage
 
