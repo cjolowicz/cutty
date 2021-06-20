@@ -7,8 +7,10 @@ from typing import Optional
 
 import appdirs
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageWrapper
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -96,10 +98,12 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
-    with CookiecutterFileStorage(
+    storage: FileStorage
+    storage = DiskFileStorage(
         output_dir,
-        hookfiles=hookfiles,
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
-    ) as storage:
+    )
+    storage = CookiecutterFileStorageWrapper.wrap(storage, hookfiles=hookfiles)
+    with storage:
         for file in files:
             storage.add(file)
