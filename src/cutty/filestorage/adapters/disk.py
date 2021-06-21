@@ -1,4 +1,5 @@
 """Disk-based file storage."""
+import contextlib
 import enum
 import pathlib
 from collections.abc import Callable
@@ -119,4 +120,5 @@ class DiskFileStorage(FileStorage):
     def rollback(self) -> None:
         """Rollback all stores."""
         for action in reversed(self.undo):
-            action()  # if this fails then so be it
+            with contextlib.suppress(Exception):
+                action()

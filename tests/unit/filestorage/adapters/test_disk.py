@@ -93,6 +93,21 @@ def test_directory_undo(storage: DiskFileStorage, file: RegularFile) -> None:
     assert not path.parent.exists()
 
 
+def test_undo_continues_on_error(
+    storage: DiskFileStorage, file: RegularFile, executable: File
+) -> None:
+    """It rolls back even if some actions cannot be undone."""
+    with contextlib.suppress(FakeError):
+        with storage:
+            storage.add(file)
+            storage.add(executable)
+            storage.resolve(executable.path).unlink()
+            raise FakeError()
+
+    path = storage.resolve(file.path)
+    assert not path.exists()
+
+
 def test_file_exists_raise(storage: DiskFileStorage, file: File) -> None:
     """It raises an exception if the file already exists."""
     with storage:
