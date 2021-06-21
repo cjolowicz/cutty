@@ -1,6 +1,7 @@
 """Cookiecutter file storage."""
 import pathlib
 import platform
+import shutil
 import subprocess  # noqa: S404
 import sys
 import tempfile
@@ -67,3 +68,13 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
             _runhook(self.hooks, "post_gen_project", cwd=self.project)
 
         super().commit()
+
+    def rollback(self) -> None:
+        """Roll back the stores."""
+        if (
+            self.project is None
+            or self.storage.fileexists is FileExistsPolicy.OVERWRITE
+        ):
+            super().rollback()
+        else:
+            shutil.rmtree(self.project, ignore_errors=True)

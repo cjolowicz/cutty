@@ -82,7 +82,6 @@ def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> N
         assert not path.is_file()
 
 
-@pytest.mark.xfail(reason="FIXME: Hooks break rollback assumptions")
 def test_rollback(
     tmp_path: pathlib.Path, createstorage: CreateFileStorage, files: Iterable[File]
 ) -> None:
