@@ -1,12 +1,13 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
-from collections.abc import Callable
 from collections.abc import Iterable
+from typing import Protocol
 
 import pytest
 
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
 from cutty.filestorage.adapters.disk import DiskFileStorage
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
@@ -23,21 +24,32 @@ def files() -> Iterable[File]:
     ]
 
 
-CreateFileStorage = Callable[[Iterable[str]], FileStorage]
+class CreateFileStorage(Protocol):
+    """Storage factory protocol."""
+
+    def __call__(
+        self,
+        hooks: Iterable[str],
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    ) -> FileStorage:
+        """Create the storage."""
 
 
 @pytest.fixture
 def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     """Factory fixture for a storage with hooks."""
 
-    def _createstorage(hooks: Iterable[str]) -> FileStorage:
+    def _createstorage(
+        hooks: Iterable[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
+    ) -> FileStorage:
         hookfiles = [
             Executable(
                 PurePath("hooks", f"{hook}.py"), f"open('{hook}', mode='w')".encode()
             )
             for hook in hooks
         ]
-        storage = DiskFileStorage(tmp_path)
+        storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         return CookiecutterFileStorage.wrap(storage, hookfiles=hookfiles)
 
     return _createstorage
@@ -82,8 +94,7 @@ def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> N
         assert not path.is_file()
 
 
-@pytest.mark.xfail(reason="FIXME: Hooks break rollback assumptions")
-def test_rollback(
+def test_rollback_default(
     tmp_path: pathlib.Path, createstorage: CreateFileStorage, files: Iterable[File]
 ) -> None:
     """It removes any created files."""
@@ -97,3 +108,20 @@ def test_rollback(
 
     path = tmp_path / "example" / "pre_gen_project"
     assert not path.is_file()
+
+
+def test_rollback_overwrite(
+    tmp_path: pathlib.Path, createstorage: CreateFileStorage, files: Iterable[File]
+) -> None:
+    """It only removes files added to the storage."""
+    storage = createstorage(["pre_gen_project"], fileexists=FileExistsPolicy.OVERWRITE)
+
+    with pytest.raises(RuntimeError):
+        with storage:
+            for file in files:
+                storage.add(file)
+            raise RuntimeError()
+
+    path = tmp_path / "example" / "pre_gen_project"
+    assert path.is_file()
+    assert not any(tmp_path.joinpath(*file.path.parts).is_file() for file in files)
