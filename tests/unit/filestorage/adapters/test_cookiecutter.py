@@ -43,13 +43,13 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     def _createstorage(
         hooks: Iterable[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
     ) -> FileStorage:
+        storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         hookfiles = [
             Executable(
                 PurePath("hooks", f"{hook}.py"), f"open('{hook}', mode='w')".encode()
             )
             for hook in hooks
         ]
-        storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         return (
             CookiecutterFileStorage(storage, hookfiles=hookfiles)
             if hookfiles
