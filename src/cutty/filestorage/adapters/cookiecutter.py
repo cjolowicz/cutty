@@ -20,23 +20,19 @@ def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
     subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
 
 
-def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
-    hookfile = hooks.get(hook)
-    if hookfile is not None:
-        with tempfile.TemporaryDirectory() as root:
-            with DiskFileStorage(pathlib.Path(root)) as storage:
-                storage.add(hookfile)
-                path = storage.resolve(hookfile.path)
-                _runcommand(path, cwd=cwd)
-
-
 class _Hooks:
     def __init__(self, *, hookfiles: Iterable[File] = (), cwd: pathlib.Path) -> None:
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.cwd = cwd
 
     def _runhook(self, hook: str) -> None:
-        _runhook(self.hooks, hook, cwd=self.cwd)
+        hookfile = self.hooks.get(hook)
+        if hookfile is not None:
+            with tempfile.TemporaryDirectory() as root:
+                with DiskFileStorage(pathlib.Path(root)) as storage:
+                    storage.add(hookfile)
+                    path = storage.resolve(hookfile.path)
+                    _runcommand(path, cwd=self.cwd)
 
 
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
