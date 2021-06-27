@@ -21,11 +21,14 @@ class _Hooks:
     def run(self, hook: str) -> None:
         hookfile = self.hooks.get(hook)
         if hookfile is not None:
-            with tempfile.TemporaryDirectory() as root:
-                with DiskFileStorage(pathlib.Path(root)) as storage:
-                    storage.add(hookfile)
-                    path = storage.resolve(hookfile.path)
-                    self._runcommand(path)
+            self._runfile(hookfile)
+
+    def _runfile(self, hookfile: File) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            with DiskFileStorage(pathlib.Path(root)) as storage:
+                storage.add(hookfile)
+                path = storage.resolve(hookfile.path)
+                self._runcommand(path)
 
     def _runcommand(self, path: pathlib.Path) -> None:
         command = (
