@@ -35,12 +35,16 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     """Wrap a disk-based file store with Cookiecutter hooks."""
 
     def __init__(
-        self, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
+        self,
+        storage: DiskFileStorage,
+        *,
+        hookfiles: Iterable[File] = (),
+        project: Optional[pathlib.Path] = None
     ) -> None:
         """Initialize."""
         super().__init__(storage)
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.project: Optional[pathlib.Path] = None
+        self.project = project
         self.added = False
 
     def add(self, file: File) -> None:
