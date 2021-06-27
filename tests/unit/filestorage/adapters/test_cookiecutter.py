@@ -50,11 +50,9 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             )
             for hook in hooks
         ]
-        return (
-            CookiecutterFileStorage(storage, hookfiles=hookfiles)
-            if hookfiles
-            else storage
-        )
+        if hookfiles:
+            return CookiecutterFileStorage(storage, hookfiles=hookfiles)
+        return storage
 
     return _createstorage
 
