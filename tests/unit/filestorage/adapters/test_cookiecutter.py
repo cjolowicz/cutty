@@ -1,6 +1,7 @@
 """Unit tests for cutty.filestorage.adapters.cookiecutter."""
 import pathlib
 from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Protocol
 
 import pytest
@@ -29,7 +30,7 @@ class CreateFileStorage(Protocol):
 
     def __call__(
         self,
-        hooks: Iterable[str],
+        hooks: Sequence[str],
         *,
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
     ) -> FileStorage:
@@ -41,7 +42,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     """Factory fixture for a storage with hooks."""
 
     def _createstorage(
-        hooks: Iterable[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
+        hooks: Sequence[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
     ) -> FileStorage:
         storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         hookfiles = [
@@ -50,7 +51,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             )
             for hook in hooks
         ]
-        if hookfiles:
+        if hooks:
             return CookiecutterFileStorage(storage, hookfiles=hookfiles)
         return storage
 
@@ -69,7 +70,7 @@ def test_hooks(
     tmp_path: pathlib.Path,
     createstorage: CreateFileStorage,
     files: Iterable[File],
-    hooks: Iterable[str],
+    hooks: Sequence[str],
 ) -> None:
     """It executes the hook."""
     storage = createstorage(hooks)
