@@ -11,7 +11,6 @@ from typing import Optional
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStorage
 from cutty.filestorage.domain.storage import FileStorageWrapper
 
 
@@ -33,14 +32,6 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
 
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     """Wrap a disk-based file store with Cookiecutter hooks."""
-
-    @classmethod
-    def wrap(
-        cls, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
-    ) -> FileStorage:
-        """Wrap the disk storage using the given Cookiecutter hooks."""
-        hookfiles = tuple(hookfiles)
-        return cls(storage, hookfiles=hookfiles) if hookfiles else storage
 
     def __init__(
         self, storage: DiskFileStorage, *, hookfiles: Iterable[File] = ()
