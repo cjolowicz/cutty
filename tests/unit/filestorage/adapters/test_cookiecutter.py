@@ -54,7 +54,8 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             )
             for hook in hooks
         ]
-        return CookiecutterFileStorage(storage, hookfiles=hookfiles)
+        project = storage.resolve(PurePath("example"))
+        return CookiecutterFileStorage(storage, hookfiles=hookfiles, project=project)
 
     return _createstorage
 
