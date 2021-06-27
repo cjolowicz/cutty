@@ -25,15 +25,15 @@ class _Hooks:
                 with DiskFileStorage(pathlib.Path(root)) as storage:
                     storage.add(hookfile)
                     path = storage.resolve(hookfile.path)
-                    self._runcommand(path, cwd=self.cwd)
+                    self._runcommand(path)
 
-    def _runcommand(self, path: pathlib.Path, *, cwd: pathlib.Path) -> None:
+    def _runcommand(self, path: pathlib.Path) -> None:
         command = (
             [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
         )
         shell = platform.system() == "Windows"
-        cwd.mkdir(parents=True, exist_ok=True)
-        subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
+        self.cwd.mkdir(parents=True, exist_ok=True)
+        subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
 
 
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
