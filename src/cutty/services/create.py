@@ -26,6 +26,7 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.util.peek import peek
 
 
 def iterpaths(path: Path, config: Config) -> Iterator[Path]:
@@ -108,7 +109,12 @@ def create(
 
     hookfiles = tuple(hookfiles)
     if hookfiles:  # pragma: no cover
-        storage = CookiecutterFileStorage(storage, hookfiles=hookfiles)
+        file, files = peek(files)
+        if file is not None:
+            project = storage.resolve(file.path.parents[-2])
+            storage = CookiecutterFileStorage(
+                storage, hookfiles=hookfiles, project=project
+            )
 
     with storage:
         for file in files:
