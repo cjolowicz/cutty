@@ -30,6 +30,15 @@ def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
                 _runcommand(path, cwd=cwd)
 
 
+class _Hooks:
+    def __init__(self, *, hookfiles: Iterable[File] = (), cwd: pathlib.Path) -> None:
+        self.hooks = {hook.path.stem: hook for hook in hookfiles}
+        self.cwd = cwd
+
+    def _runhook(self, hook: str) -> None:
+        _runhook(self.hooks, hook, cwd=self.cwd)
+
+
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     """Wrap a disk-based file store with Cookiecutter hooks."""
 
@@ -42,14 +51,13 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     ) -> None:
         """Initialize."""
         super().__init__(storage)
-        self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.project = project
+        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.added = False
 
     def add(self, file: File) -> None:
         """Add file to storage."""
         if not self.added:
-            _runhook(self.hooks, "pre_gen_project", cwd=self.project)
+            self.hooks._runhook("pre_gen_project")
             self.added = True
 
         super().add(file)
@@ -57,7 +65,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def commit(self) -> None:
         """Commit the stores."""
         if self.added:
-            _runhook(self.hooks, "post_gen_project", cwd=self.project)
+            self.hooks._runhook("post_gen_project")
 
         super().commit()
 
@@ -66,4 +74,4 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         super().rollback()
 
         if self.storage.fileexists is not FileExistsPolicy.OVERWRITE:
-            shutil.rmtree(self.project, ignore_errors=True)
+            shutil.rmtree(self.hooks.cwd, ignore_errors=True)
