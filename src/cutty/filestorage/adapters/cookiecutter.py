@@ -63,7 +63,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
 
     def rollback(self) -> None:
         """Roll back the stores."""
-        if self.storage.fileexists is FileExistsPolicy.OVERWRITE:
-            super().rollback()
-        else:
+        super().rollback()
+
+        if self.storage.fileexists is not FileExistsPolicy.OVERWRITE:
             shutil.rmtree(self.project, ignore_errors=True)
