@@ -41,18 +41,22 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         super().__init__(storage)
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.project: Optional[pathlib.Path] = None
+        self.added = False
 
     def add(self, file: File) -> None:
         """Add file to storage."""
         if self.project is None:
             self.project = self.storage.resolve(file.path.parents[-2])
+        if not self.added:
             _runhook(self.hooks, "pre_gen_project", cwd=self.project)
+            self.added = True
 
         super().add(file)
 
     def commit(self) -> None:
         """Commit the stores."""
-        if self.project is not None:
+        if self.added:
+            assert self.project is not None  # noqa: S101
             _runhook(self.hooks, "post_gen_project", cwd=self.project)
 
         super().commit()
