@@ -6,7 +6,6 @@ import subprocess  # noqa: S404
 import sys
 import tempfile
 from collections.abc import Iterable
-from typing import Optional
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
@@ -39,7 +38,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         storage: DiskFileStorage,
         *,
         hookfiles: Iterable[File] = (),
-        project: Optional[pathlib.Path] = None
+        project: pathlib.Path
     ) -> None:
         """Initialize."""
         super().__init__(storage)
@@ -49,8 +48,6 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
 
     def add(self, file: File) -> None:
         """Add file to storage."""
-        if self.project is None:
-            self.project = self.storage.resolve(file.path.parents[-2])
         if not self.added:
             _runhook(self.hooks, "pre_gen_project", cwd=self.project)
             self.added = True
@@ -60,17 +57,13 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def commit(self) -> None:
         """Commit the stores."""
         if self.added:
-            assert self.project is not None  # noqa: S101
             _runhook(self.hooks, "post_gen_project", cwd=self.project)
 
         super().commit()
 
     def rollback(self) -> None:
         """Roll back the stores."""
-        if (
-            self.project is None
-            or self.storage.fileexists is FileExistsPolicy.OVERWRITE
-        ):
+        if self.storage.fileexists is FileExistsPolicy.OVERWRITE:
             super().rollback()
         else:
             shutil.rmtree(self.project, ignore_errors=True)
