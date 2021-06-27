@@ -28,9 +28,9 @@ class _Hooks:
             with DiskFileStorage(pathlib.Path(root)) as storage:
                 storage.add(hookfile)
                 path = storage.resolve(hookfile.path)
-                self._runcommand(path)
+                self._runpath(path)
 
-    def _runcommand(self, path: pathlib.Path) -> None:
+    def _runpath(self, path: pathlib.Path) -> None:
         command = (
             [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
         )
