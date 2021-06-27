@@ -45,10 +45,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         """Add file to storage."""
         if self.project is None:
             self.project = self.storage.resolve(file.path.parents[-2])
-            self.project.mkdir(
-                parents=True,
-                exist_ok=self.storage.fileexists is not FileExistsPolicy.RAISE,
-            )
+            self.project.mkdir(parents=True, exist_ok=True)
             _runhook(self.hooks, "pre_gen_project", cwd=self.project)
 
         super().add(file)
