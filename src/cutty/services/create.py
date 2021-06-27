@@ -1,5 +1,6 @@
 """Create a project from a Cookiecutter template."""
 import pathlib
+from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -10,6 +11,7 @@ import appdirs
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
@@ -93,7 +95,7 @@ def create(
     paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
     hookpaths = iterhooks(path)
-    hookfiles = renderfiles(hookpaths, render, bindings)
+    hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
 
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
@@ -103,7 +105,10 @@ def create(
         output_dir,
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
     )
-    storage = CookiecutterFileStorage.wrap(storage, hookfiles=hookfiles)
+    hookfiles = tuple(hookfiles)
+    storage = (
+        CookiecutterFileStorage(storage, hookfiles=hookfiles) if hookfiles else storage
+    )
     with storage:
         for file in files:
             storage.add(file)
