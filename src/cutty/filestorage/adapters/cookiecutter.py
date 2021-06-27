@@ -18,7 +18,7 @@ class _Hooks:
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.cwd = cwd
 
-    def _runhook(self, hook: str) -> None:
+    def run(self, hook: str) -> None:
         hookfile = self.hooks.get(hook)
         if hookfile is not None:
             with tempfile.TemporaryDirectory() as root:
@@ -54,7 +54,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def add(self, file: File) -> None:
         """Add file to storage."""
         if not self.added:
-            self.hooks._runhook("pre_gen_project")
+            self.hooks.run("pre_gen_project")
             self.added = True
 
         super().add(file)
@@ -62,7 +62,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def commit(self) -> None:
         """Commit the stores."""
         if self.added:
-            self.hooks._runhook("post_gen_project")
+            self.hooks.run("post_gen_project")
 
         super().commit()
 
