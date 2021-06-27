@@ -105,10 +105,11 @@ def create(
         output_dir,
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
     )
+
     hookfiles = tuple(hookfiles)
-    storage = (
-        CookiecutterFileStorage(storage, hookfiles=hookfiles) if hookfiles else storage
-    )
+    if hookfiles:  # pragma: no cover
+        storage = CookiecutterFileStorage(storage, hookfiles=hookfiles)
+
     with storage:
         for file in files:
             storage.add(file)
