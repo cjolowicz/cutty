@@ -17,6 +17,7 @@ from cutty.filestorage.domain.storage import FileStorageWrapper
 def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
     command = [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
     shell = platform.system() == "Windows"
+    cwd.mkdir(parents=True, exist_ok=True)
     subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
 
 
@@ -45,7 +46,6 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         """Add file to storage."""
         if self.project is None:
             self.project = self.storage.resolve(file.path.parents[-2])
-            self.project.mkdir(parents=True, exist_ok=True)
             _runhook(self.hooks, "pre_gen_project", cwd=self.project)
 
         super().add(file)
