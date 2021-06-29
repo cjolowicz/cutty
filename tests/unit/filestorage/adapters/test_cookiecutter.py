@@ -54,11 +54,11 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             )
             for hook in hooks
         ]
-        project = storage.resolve(PurePath("example"))
+        project = tmp_path / "example"
 
         storage.observers.append(
             CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project, fileexists=storage.fileexists
+                hookfiles=hookfiles, project=project, fileexists=fileexists
             )
         )
 
