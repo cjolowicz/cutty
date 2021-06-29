@@ -107,11 +107,11 @@ def create(
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
     )
 
-    hookfiles = tuple(hookfiles)
-    if hookfiles:  # pragma: no cover
-        file, files = peek(files)
-        if file is not None:
-            project = storage.resolve(file.path.parents[-2])
+    file, files = peek(files)
+    if file is not None:  # pragma: no cover
+        project = storage.resolve(file.path.parents[-2])
+        hookfiles = tuple(hookfiles)
+        if hookfiles:
             storage.observers.append(
                 CookiecutterFileStorageObserver(
                     hookfiles=hookfiles, project=project, fileexists=storage.fileexists
