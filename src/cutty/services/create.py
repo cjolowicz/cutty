@@ -97,6 +97,10 @@ def create(
 
     paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
+    file, files = peek(files)
+    if file is None:  # pragma: no cover
+        return
+
     hookpaths = iterhooks(path)
     hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
 
@@ -106,16 +110,14 @@ def create(
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
-    file, files = peek(files)
-    if file is not None:  # pragma: no cover
-        project = output_dir / file.path.parts[0]
-        hookfiles = tuple(hookfiles)
-        if hookfiles:
-            observer = CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project, fileexists=fileexists
-            )
-            storage = observe(storage, observer)
-        storage = observe(storage, GitRepositoryObserver(project=project))
+    project = output_dir / file.path.parts[0]
+    hookfiles = tuple(hookfiles)
+    if hookfiles:  # pragma: no cover
+        observer = CookiecutterHooksObserver(
+            hookfiles=hookfiles, project=project, fileexists=fileexists
+        )
+        storage = observe(storage, observer)
+    storage = observe(storage, GitRepositoryObserver(project=project))
 
     with storage:
         for file in files:
