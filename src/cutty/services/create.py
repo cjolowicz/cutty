@@ -101,9 +101,6 @@ def create(
     if file is None:  # pragma: no cover
         return
 
-    hookpaths = iterhooks(path)
-    hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
-
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
@@ -111,6 +108,8 @@ def create(
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     project = output_dir / file.path.parts[0]
+    hookpaths = iterhooks(path)
+    hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
     hookfiles = tuple(hookfiles)
     if hookfiles:  # pragma: no cover
         storage = observe(
