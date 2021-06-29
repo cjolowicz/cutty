@@ -62,3 +62,16 @@ def test_index(
 
     repository = pygit2.Repository(project)
     assert file.path.name in repository.index
+
+
+def test_hook_edits(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It commits file modifications applied by hooks."""
+    with storage:
+        storage.add(file)
+        (project / file.path.name).write_bytes(b"teapot")
+
+    repository = pygit2.Repository(project)
+    blob = repository.head.peel().tree / file.path.name
+    assert b"teapot" == blob.data
