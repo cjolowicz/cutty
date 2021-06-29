@@ -77,6 +77,6 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         self.observers.append(
             CookiecutterFileStorageObserver(
                 _Hooks(hookfiles=hookfiles, cwd=project),
-                overwrite=self.storage.fileexists is FileExistsPolicy.OVERWRITE,
+                overwrite=storage.fileexists is FileExistsPolicy.OVERWRITE,
             )
         )
