@@ -53,6 +53,7 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
+        self.hooks.run("post_gen_project")
 
     def rollback(self) -> None:
         """A storage transaction was aborted."""
@@ -84,7 +85,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def commit(self) -> None:
         """Commit the stores."""
         if self.added:
-            self.hooks.run("post_gen_project")
+            pass
 
         super().commit()
 
