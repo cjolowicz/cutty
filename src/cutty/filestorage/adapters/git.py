@@ -25,3 +25,16 @@ class GitRepositoryObserver(FileStorageObserver):
         path = "/".join(file.path.parts[1:])
         assert self.repository is not None  # noqa: S101
         self.repository.index.add(path)
+
+    def commit(self) -> None:
+        """A storage transaction was completed."""
+        assert self.repository is not None  # noqa: S101
+        tree = self.repository.index.write_tree()
+        self.repository.create_commit(
+            "HEAD",
+            self.repository.default_signature,
+            self.repository.default_signature,
+            "Initial",
+            tree,
+            [],
+        )
