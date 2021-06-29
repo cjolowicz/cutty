@@ -44,7 +44,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     def _createstorage(
         hooks: Sequence[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
     ) -> FileStorage:
-        storage = DiskFileStorage(tmp_path, fileexists=fileexists)
+        storage = DiskFileStorage.create(tmp_path, fileexists=fileexists)
         if not hooks:
             return storage
 

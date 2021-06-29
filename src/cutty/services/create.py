@@ -104,7 +104,7 @@ def create(
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage
-    storage = DiskFileStorage(output_dir, fileexists=fileexists)
+    storage = DiskFileStorage.create(output_dir, fileexists=fileexists)
 
     file, files = peek(files)
     if file is not None:  # pragma: no cover

@@ -21,7 +21,7 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 def storage(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     observer = GitRepositoryObserver(project=project)
-    storage = DiskFileStorage(project.parent)
+    storage = DiskFileStorage.create(project.parent)
     storage.observers.append(observer)
     return storage
 
