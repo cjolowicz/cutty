@@ -7,6 +7,7 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -17,7 +18,7 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
-def storage(project: pathlib.Path) -> DiskFileStorage:
+def storage(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     observer = GitRepositoryObserver(project=project)
     storage = DiskFileStorage(project.parent)
@@ -33,7 +34,7 @@ def file(project: pathlib.Path) -> RegularFile:
 
 
 def test_repository(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates a repository."""
     with storage:
@@ -42,9 +43,7 @@ def test_repository(
     pygit2.Repository(project)  # does not raise
 
 
-def test_commit(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It creates a commit."""
     with storage:
         storage.add(file)
@@ -53,9 +52,7 @@ def test_commit(
     repository.head  # does not raise
 
 
-def test_index(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It updates the index."""
     with storage:
         storage.add(file)
@@ -70,7 +67,7 @@ def tree(repository: pygit2.Repository) -> pygit2.Tree:
 
 
 def test_hook_edits(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It commits file modifications applied by hooks."""
     with storage:
@@ -83,7 +80,7 @@ def test_hook_edits(
 
 
 def test_hook_deletes(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It does not commit files deleted by hooks."""
     with storage:
@@ -94,7 +91,7 @@ def test_hook_deletes(
     assert file.path.name not in tree(repository)
 
 
-def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None:
+def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
     """It commits files created by hooks."""
     with storage:
         project.mkdir()
@@ -113,7 +110,7 @@ def commit(repository: pygit2.Repository) -> None:
 
 
 def test_existing_repository(
-    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It does nothing if the repository already exists."""
     repository = pygit2.init_repository(project)
