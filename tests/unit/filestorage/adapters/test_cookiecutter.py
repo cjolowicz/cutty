@@ -13,6 +13,7 @@ from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -44,7 +45,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
     def _createstorage(
         hooks: Sequence[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
     ) -> FileStorage:
-        storage = DiskFileStorage.create(tmp_path, fileexists=fileexists)
+        storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         if not hooks:
             return storage
 
@@ -56,13 +57,11 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
         ]
         project = tmp_path / "example"
 
-        storage.observers.append(
-            CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project, fileexists=fileexists
-            )
+        observer = CookiecutterHooksObserver(
+            hookfiles=hookfiles, project=project, fileexists=fileexists
         )
 
-        return storage
+        return observe(storage, observer)
 
     return _createstorage
 
