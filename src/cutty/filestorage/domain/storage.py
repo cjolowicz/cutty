@@ -9,7 +9,7 @@ from typing import TypeVar
 from cutty.filestorage.domain.files import File
 
 
-T = TypeVar("T", bound="FileStorage")
+T = TypeVar("T", bound="FileStorageABC")
 
 
 class FileStorageObserver:
@@ -46,6 +46,11 @@ class FileStorageABC(abc.ABC):
     @abc.abstractmethod
     def rollback(self) -> None:
         """Rollback all stores."""
+
+    def __enter__(self: T) -> T:
+        """Enter the runtime context."""
+        self.begin()
+        return self
 
 
 class ObservableFileStorage(FileStorageABC):
@@ -105,11 +110,6 @@ class FileStorage(FileStorageABC):
 
     def commit(self) -> None:
         """Commit all stores."""
-
-    def __enter__(self: T) -> T:
-        """Enter the runtime context."""
-        self.begin()
-        return self
 
     def __exit__(
         self,
