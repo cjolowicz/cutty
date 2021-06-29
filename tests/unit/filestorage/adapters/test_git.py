@@ -62,3 +62,38 @@ def test_index(
 
     repository = pygit2.Repository(project)
     assert file.path.name in repository.index
+
+
+def test_hook_edits(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It commits file modifications applied by hooks."""
+    with storage:
+        storage.add(file)
+        (project / file.path.name).write_bytes(b"teapot")
+
+    repository = pygit2.Repository(project)
+    blob = repository.head.peel().tree / file.path.name
+    assert b"teapot" == blob.data
+
+
+def test_hook_deletes(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It does not commit files deleted by hooks."""
+    with storage:
+        storage.add(file)
+        (project / file.path.name).unlink()
+
+    repository = pygit2.Repository(project)
+    assert file.path.name not in repository.head.peel().tree
+
+
+def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None:
+    """It commits files created by hooks."""
+    with storage:
+        project.mkdir()
+        (project / "marker").touch()
+
+    repository = pygit2.Repository(project)
+    assert "marker" in repository.head.peel().tree
