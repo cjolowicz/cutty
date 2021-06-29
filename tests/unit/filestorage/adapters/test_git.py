@@ -64,6 +64,11 @@ def test_index(
     assert file.path.name in repository.index
 
 
+def tree(repository: pygit2.Repository) -> pygit2.Tree:
+    """Return the tree at the HEAD of the repository."""
+    return repository.head.peel().tree
+
+
 def test_hook_edits(
     storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
@@ -73,7 +78,7 @@ def test_hook_edits(
         (project / file.path.name).write_bytes(b"teapot")
 
     repository = pygit2.Repository(project)
-    blob = repository.head.peel().tree / file.path.name
+    blob = tree(repository) / file.path.name
     assert b"teapot" == blob.data
 
 
@@ -86,7 +91,7 @@ def test_hook_deletes(
         (project / file.path.name).unlink()
 
     repository = pygit2.Repository(project)
-    assert file.path.name not in repository.head.peel().tree
+    assert file.path.name not in tree(repository)
 
 
 def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None:
@@ -96,7 +101,15 @@ def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None
         (project / "marker").touch()
 
     repository = pygit2.Repository(project)
-    assert "marker" in repository.head.peel().tree
+    assert "marker" in tree(repository)
+
+
+def commit(repository: pygit2.Repository) -> None:
+    """Create an initial empty commit."""
+    tree = repository.index.write_tree()
+    repository.index.write()
+    signature = pygit2.Signature("you", "you@example.com")
+    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
 
 
 def test_existing_repository(
@@ -104,12 +117,9 @@ def test_existing_repository(
 ) -> None:
     """It does nothing if the repository already exists."""
     repository = pygit2.init_repository(project)
-    tree = repository.index.write_tree()
-    repository.index.write()
-    signature = pygit2.Signature("you", "you@example.com")
-    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+    commit(repository)
 
     with storage:
         storage.add(file)
 
-    assert file.path.name not in repository.head.peel().tree
+    assert file.path.name not in tree(repository)
