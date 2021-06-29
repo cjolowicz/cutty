@@ -13,21 +13,30 @@ from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorageWrapper
 
 
-def _runcommand(path: pathlib.Path, *, cwd: pathlib.Path) -> None:
-    command = [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
-    shell = platform.system() == "Windows"
-    cwd.mkdir(parents=True, exist_ok=True)
-    subprocess.run(command, shell=shell, cwd=cwd, check=True)  # noqa: S602
+class _Hooks:
+    def __init__(self, *, hookfiles: Iterable[File] = (), cwd: pathlib.Path) -> None:
+        self.hooks = {hook.path.stem: hook for hook in hookfiles}
+        self.cwd = cwd
 
+    def run(self, hook: str) -> None:
+        hookfile = self.hooks.get(hook)
+        if hookfile is not None:
+            self._runfile(hookfile)
 
-def _runhook(hooks: dict[str, File], hook: str, *, cwd: pathlib.Path) -> None:
-    hookfile = hooks.get(hook)
-    if hookfile is not None:
+    def _runfile(self, hookfile: File) -> None:
         with tempfile.TemporaryDirectory() as root:
             with DiskFileStorage(pathlib.Path(root)) as storage:
                 storage.add(hookfile)
                 path = storage.resolve(hookfile.path)
-                _runcommand(path, cwd=cwd)
+                self._runpath(path)
+
+    def _runpath(self, path: pathlib.Path) -> None:
+        command = (
+            [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
+        )
+        shell = platform.system() == "Windows"
+        self.cwd.mkdir(parents=True, exist_ok=True)
+        subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
 
 
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
@@ -42,14 +51,13 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     ) -> None:
         """Initialize."""
         super().__init__(storage)
-        self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.project = project
+        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.added = False
 
     def add(self, file: File) -> None:
         """Add file to storage."""
         if not self.added:
-            _runhook(self.hooks, "pre_gen_project", cwd=self.project)
+            self.hooks.run("pre_gen_project")
             self.added = True
 
         super().add(file)
@@ -57,7 +65,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def commit(self) -> None:
         """Commit the stores."""
         if self.added:
-            _runhook(self.hooks, "post_gen_project", cwd=self.project)
+            self.hooks.run("post_gen_project")
 
         super().commit()
 
@@ -66,4 +74,4 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         super().rollback()
 
         if self.storage.fileexists is not FileExistsPolicy.OVERWRITE:
-            shutil.rmtree(self.project, ignore_errors=True)
+            shutil.rmtree(self.hooks.cwd, ignore_errors=True)
