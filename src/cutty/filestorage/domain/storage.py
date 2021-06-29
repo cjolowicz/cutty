@@ -28,7 +28,23 @@ class FileStorageObserver:
         """A storage transaction was aborted."""
 
 
-class FileStorage(abc.ABC):
+class FileStorageABC(abc.ABC):
+    """Interface for file storage implementations."""
+
+    @abc.abstractmethod
+    def add(self, file: File) -> None:
+        """Add the file to the storage."""
+
+    @abc.abstractmethod
+    def commit(self) -> None:
+        """Commit all stores."""
+
+    @abc.abstractmethod
+    def rollback(self) -> None:
+        """Rollback all stores."""
+
+
+class FileStorage(FileStorageABC):
     """Interface for file storage implementations."""
 
     def __init__(self) -> None:
@@ -47,10 +63,6 @@ class FileStorage(abc.ABC):
 
     def commit(self) -> None:
         """Commit all stores."""
-
-    @abc.abstractmethod
-    def rollback(self) -> None:
-        """Rollback all stores."""
 
     def __enter__(self: T) -> T:
         """Enter the runtime context."""
