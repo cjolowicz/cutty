@@ -1,4 +1,6 @@
 """Storing files in a Git repository."""
+import contextlib
+import os
 import pathlib
 from typing import Optional
 
@@ -10,7 +12,12 @@ from cutty.filestorage.domain.storage import FileStorageObserver
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     """Return the default signature."""
-    return repository.default_signature
+    with contextlib.suppress(KeyError):
+        return pygit2.Signature(
+            os.environ["GIT_AUTHOR_NAME"],
+            os.environ["GIT_AUTHOR_EMAIL"],
+        )
+    return repository.default_signature  # pragma: no cover
 
 
 class GitRepositoryObserver(FileStorageObserver):
