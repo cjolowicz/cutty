@@ -51,3 +51,14 @@ def test_commit(
 
     repository = pygit2.Repository(project)
     repository.head  # does not raise
+
+
+def test_index(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It updates the index."""
+    with storage:
+        storage.add(file)
+
+    repository = pygit2.Repository(project)
+    assert file.path.name in repository.index
