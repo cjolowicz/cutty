@@ -51,6 +51,11 @@ class FileStorage(FileStorageABC):
         """Initialize."""
         self.observers: list[FileStorageObserver] = []
 
+    def begin(self) -> None:
+        """Begin a storage transaction."""
+        for observer in self.observers:
+            observer.begin()
+
     def add(self, file: File) -> None:
         """Add the file to the storage."""
         self._add(file)
@@ -66,9 +71,7 @@ class FileStorage(FileStorageABC):
 
     def __enter__(self: T) -> T:
         """Enter the runtime context."""
-        for observer in self.observers:
-            observer.begin()
-
+        self.begin()
         return self
 
     def __exit__(
