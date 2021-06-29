@@ -4,6 +4,7 @@ from typing import Optional
 
 import pygit2
 
+from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorageObserver
 
 
@@ -18,3 +19,9 @@ class GitRepositoryObserver(FileStorageObserver):
     def begin(self) -> None:
         """A storage transaction was started."""
         self.repository = pygit2.init_repository(self.project)
+
+    def add(self, file: File) -> None:
+        """A file was added to the transaction."""
+        path = "/".join(file.path.parts[1:])
+        assert self.repository is not None  # noqa: S101
+        self.repository.index.add(path)
