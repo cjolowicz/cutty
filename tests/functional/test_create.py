@@ -48,12 +48,3 @@ def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
         main, ["create", str(repository)], input="foobar\n\n\n", catch_exceptions=False
     )
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
-
-
-def test_create_repository(runner: CliRunner, repository: Path) -> None:
-    """It creates a git repository."""
-    runner.invoke(
-        main, ["create", str(repository)], input="foobar\n\n\n", catch_exceptions=False
-    )
-    project = pygit2.Repository("foobar")
-    assert not project.head_is_unborn
