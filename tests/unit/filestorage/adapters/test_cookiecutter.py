@@ -6,7 +6,7 @@ from typing import Protocol
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
+from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
@@ -57,7 +57,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
         project = storage.resolve(PurePath("example"))
 
         storage.observers.append(
-            CookiecutterFileStorageObserver(
+            CookiecutterHooksObserver(
                 hookfiles=hookfiles, project=project, fileexists=storage.fileexists
             )
         )

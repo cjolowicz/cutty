@@ -8,7 +8,7 @@ from typing import Optional
 
 import appdirs
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
+from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
@@ -114,7 +114,7 @@ def create(
         hookfiles = tuple(hookfiles)
         if hookfiles:
             storage.observers.append(
-                CookiecutterFileStorageObserver(
+                CookiecutterHooksObserver(
                     hookfiles=hookfiles, project=project, fileexists=storage.fileexists
                 )
             )

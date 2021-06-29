@@ -39,7 +39,7 @@ class _Hooks:
         subprocess.run(command, shell=shell, cwd=self.project, check=True)  # noqa: S602
 
 
-class CookiecutterFileStorageObserver(FileStorageObserver):
+class CookiecutterHooksObserver(FileStorageObserver):
     """Storage observer invoking Cookiecutter hooks."""
 
     def __init__(
