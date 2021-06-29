@@ -75,28 +75,9 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         """Initialize."""
         super().__init__(storage)
         self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
-        self.added = False
         self.observers.append(
             CookiecutterFileStorageObserver(
                 self.hooks,
                 overwrite=self.storage.fileexists is FileExistsPolicy.OVERWRITE,
             )
         )
-
-    def add(self, file: File) -> None:
-        """Add file to storage."""
-        if not self.added:
-            self.added = True
-
-        super().add(file)
-
-    def commit(self) -> None:
-        """Commit the stores."""
-        if self.added:
-            pass
-
-        super().commit()
-
-    def rollback(self) -> None:
-        """Roll back the stores."""
-        super().rollback()
