@@ -65,15 +65,3 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
         """A storage transaction was aborted."""
         if self.fileexists is not FileExistsPolicy.OVERWRITE:
             shutil.rmtree(self.hooks.cwd, ignore_errors=True)
-
-
-def CookiecutterFileStorage(  # noqa: N802
-    storage: DiskFileStorage, *, hookfiles: Iterable[File] = (), project: pathlib.Path
-) -> DiskFileStorage:
-    """Wrap a disk-based file store with Cookiecutter hooks."""
-    storage.observers.append(
-        CookiecutterFileStorageObserver(
-            hookfiles=hookfiles, project=project, fileexists=storage.fileexists
-        )
-    )
-    return storage
