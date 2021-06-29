@@ -97,36 +97,3 @@ class _ObservableFileStorage(FileStorage):
 def observe(storage: FileStorage, observer: FileStorageObserver) -> FileStorage:
     """Wrap a storage with an observer."""
     return _ObservableFileStorage(storage, observer)
-
-
-class ObservableFileStorage(FileStorage):
-    """Storage wrapper with observers."""
-
-    def __init__(self, storage: FileStorage) -> None:
-        """Initialize."""
-        self.storage = storage
-        self.observers: list[FileStorageObserver] = []
-
-    def begin(self) -> None:
-        """Begin a storage transaction."""
-        self.storage.begin()
-        for observer in self.observers:
-            observer.begin()
-
-    def add(self, file: File) -> None:
-        """Add the file to the storage."""
-        self.storage.add(file)
-        for observer in self.observers:
-            observer.add(file)
-
-    def commit(self) -> None:
-        """Commit all stores."""
-        self.storage.commit()
-        for observer in self.observers:
-            observer.commit()
-
-    def rollback(self) -> None:
-        """Rollback all stores."""
-        self.storage.rollback()
-        for observer in self.observers:
-            observer.rollback()
