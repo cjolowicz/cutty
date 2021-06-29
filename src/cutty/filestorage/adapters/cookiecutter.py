@@ -67,6 +67,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         super().__init__(storage)
         self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.added = False
+        self.observers.append(CookiecutterFileStorageObserver())
 
     def add(self, file: File) -> None:
         """Add file to storage."""
