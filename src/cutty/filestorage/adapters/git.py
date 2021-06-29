@@ -1,5 +1,6 @@
 """Storing files in a Git repository."""
 import pathlib
+from typing import Optional
 
 import pygit2
 
@@ -12,7 +13,8 @@ class GitRepositoryObserver(FileStorageObserver):
     def __init__(self, *, project: pathlib.Path) -> None:
         """Initialize."""
         self.project = project
+        self.repository: Optional[pygit2.Repository] = None
 
     def begin(self) -> None:
         """A storage transaction was started."""
-        pygit2.init_repository(self.project)
+        self.repository = pygit2.init_repository(self.project)
