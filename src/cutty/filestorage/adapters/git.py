@@ -13,6 +13,6 @@ class GitRepositoryObserver(FileStorageObserver):
         """Initialize."""
         self.project = project
 
-    def commit(self) -> None:
-        """A storage transaction was completed."""
+    def begin(self) -> None:
+        """A storage transaction was started."""
         pygit2.init_repository(self.project)
