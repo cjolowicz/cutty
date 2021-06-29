@@ -8,6 +8,7 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -21,9 +22,8 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 def storage(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     observer = GitRepositoryObserver(project=project)
-    storage = DiskFileStorage.create(project.parent)
-    storage.observers.append(observer)
-    return storage
+    storage = DiskFileStorage(project.parent)
+    return observe(storage, observer)
 
 
 @pytest.fixture
