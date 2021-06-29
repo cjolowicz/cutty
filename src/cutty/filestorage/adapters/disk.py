@@ -10,7 +10,6 @@ from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filestorage.domain.storage import ObservableFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -41,17 +40,6 @@ class FileExistsPolicy(enum.Enum):
 
 class DiskFileStorage(FileStorage):
     """Disk-based file storage."""
-
-    @classmethod
-    def create(
-        cls,
-        root: pathlib.Path,
-        *,
-        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    ) -> ObservableFileStorage:
-        """Create an observable disk storage implementation."""
-        storage = cls(root, fileexists=fileexists)
-        return ObservableFileStorage(storage)
 
     def __init__(
         self,
