@@ -13,6 +13,19 @@ from cutty.filestorage.domain.files import File
 T = TypeVar("T", bound="FileStorage")
 
 
+class FileStorageObserver:
+    """Base class for file storage observers."""
+
+    def begin(self) -> None:
+        """A storage transaction was started."""
+
+    def commit(self) -> None:
+        """A storage transaction was completed."""
+
+    def rollback(self) -> None:
+        """A storage transaction was aborted."""
+
+
 class FileStorage(abc.ABC):
     """Interface for file storage implementations."""
 
