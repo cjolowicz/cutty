@@ -14,6 +14,7 @@ from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -103,20 +104,18 @@ def create(
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage
-    storage = DiskFileStorage.create(output_dir, fileexists=fileexists)
+    storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     file, files = peek(files)
     if file is not None:  # pragma: no cover
         project = output_dir / file.path.parts[0]
         hookfiles = tuple(hookfiles)
         if hookfiles:
-            storage.observers.append(
-                CookiecutterHooksObserver(
-                    hookfiles=hookfiles, project=project, fileexists=fileexists
-                )
+            observer = CookiecutterHooksObserver(
+                hookfiles=hookfiles, project=project, fileexists=fileexists
             )
-        storage.observers.append(GitRepositoryObserver(project=project))
+            storage = observe(storage, observer)
+        storage = observe(storage, GitRepositoryObserver(project=project))
 
     with storage:
         for file in files:
