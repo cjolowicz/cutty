@@ -87,3 +87,13 @@ def test_hook_deletes(
 
     repository = pygit2.Repository(project)
     assert file.path.name not in repository.head.peel().tree
+
+
+def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None:
+    """It commits files created by hooks."""
+    with storage:
+        project.mkdir()
+        (project / "marker").touch()
+
+    repository = pygit2.Repository(project)
+    assert "marker" in repository.head.peel().tree
