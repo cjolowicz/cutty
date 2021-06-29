@@ -42,9 +42,11 @@ class _Hooks:
 class CookiecutterFileStorageObserver(FileStorageObserver):
     """Storage observer invoking Cookiecutter hooks."""
 
-    def __init__(self, hooks: _Hooks, *, overwrite: bool) -> None:
+    def __init__(
+        self, *, hookfiles: Iterable[File] = (), project: pathlib.Path, overwrite: bool
+    ) -> None:
         """Initialize."""
-        self.hooks = hooks
+        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.overwrite = overwrite
 
     def begin(self) -> None:
@@ -67,7 +69,8 @@ def CookiecutterFileStorage(  # noqa: N802
     """Wrap a disk-based file store with Cookiecutter hooks."""
     storage.observers.append(
         CookiecutterFileStorageObserver(
-            _Hooks(hookfiles=hookfiles, cwd=project),
+            hookfiles=hookfiles,
+            project=project,
             overwrite=storage.fileexists is FileExistsPolicy.OVERWRITE,
         )
     )
