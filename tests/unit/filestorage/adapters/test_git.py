@@ -97,3 +97,19 @@ def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None
 
     repository = pygit2.Repository(project)
     assert "marker" in repository.head.peel().tree
+
+
+def test_existing_repository(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It does nothing if the repository already exists."""
+    repository = pygit2.init_repository(project)
+    tree = repository.index.write_tree()
+    repository.index.write()
+    signature = pygit2.Signature("you", "you@example.com")
+    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+
+    with storage:
+        storage.add(file)
+
+    assert file.path.name not in repository.head.peel().tree
