@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import abc
 from types import TracebackType
-from typing import Generic
 from typing import Optional
 from typing import TypeVar
 
@@ -66,24 +65,3 @@ class FileStorage(abc.ABC):
             self.rollback()
             for observer in self.observers:
                 observer.rollback()
-
-
-class FileStorageWrapper(FileStorage, Generic[T]):
-    """Wrapper for file storage implementations."""
-
-    def __init__(self, storage: T) -> None:
-        """Initialize."""
-        super().__init__()
-        self.storage = storage
-
-    def add(self, file: File) -> None:
-        """Add the file to the storage."""
-        self.storage.add(file)
-
-    def commit(self) -> None:
-        """Commit all stores."""
-        self.storage.commit()
-
-    def rollback(self) -> None:
-        """Rollback all stores."""
-        self.storage.rollback()
