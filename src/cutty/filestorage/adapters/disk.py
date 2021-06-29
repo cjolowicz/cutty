@@ -53,7 +53,7 @@ class DiskFileStorage(FileStorage):
         self.fileexists = fileexists
         self.undo: list[Callable[[], None]] = []
 
-    def add(self, file: File) -> None:
+    def _add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file.path)
         if not path.exists():

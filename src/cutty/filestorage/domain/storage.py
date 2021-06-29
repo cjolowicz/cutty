@@ -18,6 +18,9 @@ class FileStorageObserver:
     def begin(self) -> None:
         """A storage transaction was started."""
 
+    def add(self, file: File) -> None:
+        """A file was added to the transaction."""
+
     def commit(self) -> None:
         """A storage transaction was completed."""
 
@@ -32,8 +35,14 @@ class FileStorage(abc.ABC):
         """Initialize."""
         self.observers: list[FileStorageObserver] = []
 
-    @abc.abstractmethod
     def add(self, file: File) -> None:
+        """Add the file to the storage."""
+        self._add(file)
+        for observer in self.observers:
+            observer.add(file)
+
+    @abc.abstractmethod
+    def _add(self, file: File) -> None:
         """Add the file to the storage."""
 
     def commit(self) -> None:
