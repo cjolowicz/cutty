@@ -52,6 +52,18 @@ class FileStorageABC(abc.ABC):
         self.begin()
         return self
 
+    def __exit__(
+        self,
+        exception_type: Optional[type[BaseException]],
+        exception: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        """Exit the runtime context."""
+        if exception is None:
+            self.commit()
+        else:
+            self.rollback()
+
 
 class ObservableFileStorage(FileStorageABC):
     """Storage wrapper with observers."""
