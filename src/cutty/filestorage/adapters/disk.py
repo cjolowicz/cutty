@@ -39,8 +39,19 @@ class FileExistsPolicy(enum.Enum):
         return self is FileExistsPolicy.OVERWRITE
 
 
-class _DiskFileStorage(FileStorage):
+class DiskFileStorage(FileStorage):
     """Disk-based file storage."""
+
+    @classmethod
+    def create(
+        cls,
+        root: pathlib.Path,
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    ) -> ObservableFileStorage:
+        """Create an observable disk storage implementation."""
+        storage = cls(root, fileexists=fileexists)
+        return ObservableFileStorage(storage)
 
     def __init__(
         self,
@@ -130,18 +141,3 @@ class _DiskFileStorage(FileStorage):
         for action in reversed(self.undo):
             with contextlib.suppress(Exception):
                 action()
-
-
-class DiskFileStorage(_DiskFileStorage):
-    """Disk-based file storage."""
-
-    @classmethod
-    def create(
-        cls,
-        root: pathlib.Path,
-        *,
-        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    ) -> ObservableFileStorage:
-        """Create an observable disk storage implementation."""
-        storage = cls(root, fileexists=fileexists)
-        return ObservableFileStorage(storage)
