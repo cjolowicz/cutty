@@ -49,6 +49,7 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
 
     def begin(self) -> None:
         """A storage transaction was started."""
+        self.hooks.run("pre_gen_project")
 
     def commit(self) -> None:
         """A storage transaction was completed."""
@@ -76,7 +77,6 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     def add(self, file: File) -> None:
         """Add file to storage."""
         if not self.added:
-            self.hooks.run("pre_gen_project")
             self.added = True
 
         super().add(file)
