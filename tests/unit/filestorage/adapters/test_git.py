@@ -75,3 +75,15 @@ def test_hook_edits(
     repository = pygit2.Repository(project)
     blob = repository.head.peel().tree / file.path.name
     assert b"teapot" == blob.data
+
+
+def test_hook_deletes(
+    storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It does not commit files deleted by hooks."""
+    with storage:
+        storage.add(file)
+        (project / file.path.name).unlink()
+
+    repository = pygit2.Repository(project)
+    assert file.path.name not in repository.head.peel().tree
