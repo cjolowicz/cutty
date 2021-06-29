@@ -11,7 +11,6 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorageObserver
-from cutty.filestorage.domain.storage import FileStorageWrapper
 
 
 class _Hooks:
@@ -62,21 +61,14 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
             shutil.rmtree(self.hooks.cwd, ignore_errors=True)
 
 
-class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
+def CookiecutterFileStorage(  # noqa: N802
+    storage: DiskFileStorage, *, hookfiles: Iterable[File] = (), project: pathlib.Path
+) -> DiskFileStorage:
     """Wrap a disk-based file store with Cookiecutter hooks."""
-
-    def __init__(
-        self,
-        storage: DiskFileStorage,
-        *,
-        hookfiles: Iterable[File] = (),
-        project: pathlib.Path
-    ) -> None:
-        """Initialize."""
-        super().__init__(storage)
-        self.observers.append(
-            CookiecutterFileStorageObserver(
-                _Hooks(hookfiles=hookfiles, cwd=project),
-                overwrite=storage.fileexists is FileExistsPolicy.OVERWRITE,
-            )
+    storage.observers.append(
+        CookiecutterFileStorageObserver(
+            _Hooks(hookfiles=hookfiles, cwd=project),
+            overwrite=storage.fileexists is FileExistsPolicy.OVERWRITE,
         )
+    )
+    return storage
