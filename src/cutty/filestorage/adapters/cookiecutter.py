@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
+from cutty.filestorage.domain.storage import FileStorageObserver
 from cutty.filestorage.domain.storage import FileStorageWrapper
 
 
@@ -37,6 +38,19 @@ class _Hooks:
         shell = platform.system() == "Windows"
         self.cwd.mkdir(parents=True, exist_ok=True)
         subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
+
+
+class CookiecutterFileStorageObserver(FileStorageObserver):
+    """Storage observer invoking Cookiecutter hooks."""
+
+    def begin(self) -> None:
+        """A storage transaction was started."""
+
+    def commit(self) -> None:
+        """A storage transaction was completed."""
+
+    def rollback(self) -> None:
+        """A storage transaction was aborted."""
 
 
 class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
