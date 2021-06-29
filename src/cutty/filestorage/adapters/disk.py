@@ -132,7 +132,7 @@ class _DiskFileStorage(FileStorage):
                 action()
 
 
-class DiskFileStorage(ObservableFileStorage):
+class DiskFileStorage(_DiskFileStorage):
     """Disk-based file storage."""
 
     @classmethod
@@ -143,14 +143,5 @@ class DiskFileStorage(ObservableFileStorage):
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
     ) -> ObservableFileStorage:
         """Create an observable disk storage implementation."""
-        return cls(root, fileexists=fileexists)
-
-    def __init__(
-        self,
-        root: pathlib.Path,
-        *,
-        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    ) -> None:
-        """Initialize."""
-        storage = _DiskFileStorage(root, fileexists=fileexists)
-        super().__init__(storage)
+        storage = cls(root, fileexists=fileexists)
+        return ObservableFileStorage(storage)
