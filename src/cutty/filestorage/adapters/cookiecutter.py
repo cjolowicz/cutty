@@ -74,10 +74,9 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
     ) -> None:
         """Initialize."""
         super().__init__(storage)
-        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.observers.append(
             CookiecutterFileStorageObserver(
-                self.hooks,
+                _Hooks(hookfiles=hookfiles, cwd=project),
                 overwrite=self.storage.fileexists is FileExistsPolicy.OVERWRITE,
             )
         )
