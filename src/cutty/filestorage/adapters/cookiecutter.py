@@ -14,7 +14,7 @@ from cutty.filestorage.domain.storage import FileStorageObserver
 
 
 class _Hooks:
-    def __init__(self, *, hookfiles: Iterable[File] = (), cwd: pathlib.Path) -> None:
+    def __init__(self, *, hookfiles: Iterable[File], cwd: pathlib.Path) -> None:
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
         self.cwd = cwd
 
@@ -45,7 +45,7 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
     def __init__(
         self,
         *,
-        hookfiles: Iterable[File] = (),
+        hookfiles: Iterable[File],
         project: pathlib.Path,
         fileexists: FileExistsPolicy,
     ) -> None:
