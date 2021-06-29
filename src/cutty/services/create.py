@@ -8,9 +8,10 @@ from typing import Optional
 
 import appdirs
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
+from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
@@ -107,16 +108,17 @@ def create(
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
     )
 
-    hookfiles = tuple(hookfiles)
-    if hookfiles:  # pragma: no cover
-        file, files = peek(files)
-        if file is not None:
-            project = storage.resolve(file.path.parents[-2])
+    file, files = peek(files)
+    if file is not None:  # pragma: no cover
+        project = storage.resolve(file.path.parents[-2])
+        hookfiles = tuple(hookfiles)
+        if hookfiles:
             storage.observers.append(
-                CookiecutterFileStorageObserver(
+                CookiecutterHooksObserver(
                     hookfiles=hookfiles, project=project, fileexists=storage.fileexists
                 )
             )
+        storage.observers.append(GitRepositoryObserver(project=project))
 
     with storage:
         for file in files:

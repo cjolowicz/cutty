@@ -45,6 +45,13 @@ def set_hg_user(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def set_git_user(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Provide author information to git."""
+    monkeypatch.setenv("GIT_AUTHOR_NAME", "You")
+    monkeypatch.setenv("GIT_AUTHOR_EMAIL", "you@example.com")
+
+
+@pytest.fixture(autouse=True)
 def set_user_cache_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) -> None:
     """Replace the user cache directory by a temporary directory."""
     path = tmp_path / "user_cache_dir"
