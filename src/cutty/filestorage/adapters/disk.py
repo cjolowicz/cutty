@@ -9,7 +9,8 @@ from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
-from cutty.filestorage.domain.storage import FileStorage
+from cutty.filestorage.domain.storage import FileStorageABC
+from cutty.filestorage.domain.storage import ObservableFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -38,7 +39,7 @@ class FileExistsPolicy(enum.Enum):
         return self is FileExistsPolicy.OVERWRITE
 
 
-class DiskFileStorage(FileStorage):
+class _DiskFileStorage(FileStorageABC):
     """Disk-based file storage."""
 
     def __init__(
@@ -53,7 +54,10 @@ class DiskFileStorage(FileStorage):
         self.fileexists = fileexists
         self.undo: list[Callable[[], None]] = []
 
-    def _add(self, file: File) -> None:
+    def begin(self) -> None:
+        """Begin a storage transaction."""
+
+    def add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file.path)
         if not path.exists():
@@ -118,8 +122,34 @@ class DiskFileStorage(FileStorage):
         else:
             raise TypeError(f"cannot store file of type {type(file)}")
 
+    def commit(self) -> None:
+        """Commit all stores."""
+
     def rollback(self) -> None:
         """Rollback all stores."""
         for action in reversed(self.undo):
             with contextlib.suppress(Exception):
                 action()
+
+
+class DiskFileStorage(ObservableFileStorage):
+    """Disk-based file storage."""
+
+    def __init__(
+        self,
+        root: pathlib.Path,
+        *,
+        fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
+    ) -> None:
+        """Initialize."""
+        self._diskstorage = _DiskFileStorage(root, fileexists=fileexists)
+        super().__init__(self._diskstorage)
+
+    @property
+    def fileexists(self) -> FileExistsPolicy:
+        """What to do when a file already exists."""
+        return self._diskstorage.fileexists
+
+    def resolve(self, path: PurePath) -> pathlib.Path:
+        """Return the filesystem location."""
+        return self._diskstorage.resolve(path)
