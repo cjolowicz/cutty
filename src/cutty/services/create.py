@@ -11,6 +11,7 @@ import appdirs
 from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
@@ -117,6 +118,7 @@ def create(
                     hookfiles=hookfiles, project=project, fileexists=storage.fileexists
                 )
             )
+        storage.observers.append(GitRepositoryObserver(project=project))
 
     with storage:
         for file in files:
