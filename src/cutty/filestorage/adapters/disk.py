@@ -53,7 +53,10 @@ class DiskFileStorage(FileStorage):
         self.fileexists = fileexists
         self.undo: list[Callable[[], None]] = []
 
-    def _add(self, file: File) -> None:
+    def begin(self) -> None:
+        """Begin a storage transaction."""
+
+    def add(self, file: File) -> None:
         """Add the file to the storage."""
         path = self.resolve(file.path)
         if not path.exists():
@@ -117,6 +120,9 @@ class DiskFileStorage(FileStorage):
 
         else:
             raise TypeError(f"cannot store file of type {type(file)}")
+
+    def commit(self) -> None:
+        """Commit all stores."""
 
     def rollback(self) -> None:
         """Rollback all stores."""
