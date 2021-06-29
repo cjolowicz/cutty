@@ -9,7 +9,7 @@ from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
-from cutty.filestorage.domain.storage import FileStorageABC
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filestorage.domain.storage import ObservableFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
@@ -39,7 +39,7 @@ class FileExistsPolicy(enum.Enum):
         return self is FileExistsPolicy.OVERWRITE
 
 
-class _DiskFileStorage(FileStorageABC):
+class _DiskFileStorage(FileStorage):
     """Disk-based file storage."""
 
     def __init__(

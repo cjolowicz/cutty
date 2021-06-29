@@ -12,7 +12,7 @@ from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
-from cutty.filestorage.domain.storage import FileStorageABC
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 
 
@@ -33,7 +33,7 @@ class CreateFileStorage(Protocol):
         hooks: Sequence[str],
         *,
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-    ) -> FileStorageABC:
+    ) -> FileStorage:
         """Create the storage."""
 
 
@@ -43,7 +43,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
 
     def _createstorage(
         hooks: Sequence[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
-    ) -> FileStorageABC:
+    ) -> FileStorage:
         storage = DiskFileStorage(tmp_path, fileexists=fileexists)
         if not hooks:
             return storage

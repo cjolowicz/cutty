@@ -13,7 +13,7 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStorageABC
+from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -102,7 +102,7 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
-    storage: FileStorageABC
+    storage: FileStorage
     storage = DiskFileStorage(
         output_dir,
         fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),

@@ -9,7 +9,7 @@ from typing import TypeVar
 from cutty.filestorage.domain.files import File
 
 
-T = TypeVar("T", bound="FileStorageABC")
+T = TypeVar("T", bound="FileStorage")
 
 
 class FileStorageObserver:
@@ -28,7 +28,7 @@ class FileStorageObserver:
         """A storage transaction was aborted."""
 
 
-class FileStorageABC(abc.ABC):
+class FileStorage(abc.ABC):
     """Interface for file storage implementations."""
 
     @abc.abstractmethod
@@ -65,10 +65,10 @@ class FileStorageABC(abc.ABC):
             self.rollback()
 
 
-class ObservableFileStorage(FileStorageABC):
+class ObservableFileStorage(FileStorage):
     """Storage wrapper with observers."""
 
-    def __init__(self, storage: FileStorageABC) -> None:
+    def __init__(self, storage: FileStorage) -> None:
         """Initialize."""
         self.storage = storage
         self.observers: list[FileStorageObserver] = []
