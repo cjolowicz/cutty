@@ -29,6 +29,10 @@ class FileStorageObserver:
 class FileStorage(abc.ABC):
     """Interface for file storage implementations."""
 
+    def __init__(self) -> None:
+        """Initialize."""
+        self.observers: list[FileStorageObserver] = []
+
     @abc.abstractmethod
     def add(self, file: File) -> None:
         """Add the file to the storage."""
@@ -62,6 +66,7 @@ class FileStorageWrapper(FileStorage, Generic[T]):
 
     def __init__(self, storage: T) -> None:
         """Initialize."""
+        super().__init__()
         self.storage = storage
 
     def add(self, file: File) -> None:
