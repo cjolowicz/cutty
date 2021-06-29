@@ -102,20 +102,18 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage
-    storage = DiskFileStorage(
-        output_dir,
-        fileexists=fileexistspolicy(overwrite_if_exists, skip_if_file_exists),
-    )
+    storage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     file, files = peek(files)
     if file is not None:  # pragma: no cover
-        project = storage.resolve(file.path.parents[-2])
+        project = output_dir / file.path.parts[0]
         hookfiles = tuple(hookfiles)
         if hookfiles:
             storage.observers.append(
                 CookiecutterHooksObserver(
-                    hookfiles=hookfiles, project=project, fileexists=storage.fileexists
+                    hookfiles=hookfiles, project=project, fileexists=fileexists
                 )
             )
         storage.observers.append(GitRepositoryObserver(project=project))
