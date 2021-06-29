@@ -142,14 +142,5 @@ class DiskFileStorage(ObservableFileStorage):
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
     ) -> None:
         """Initialize."""
-        self._diskstorage = _DiskFileStorage(root, fileexists=fileexists)
-        super().__init__(self._diskstorage)
-
-    @property
-    def fileexists(self) -> FileExistsPolicy:
-        """What to do when a file already exists."""
-        return self._diskstorage.fileexists
-
-    def resolve(self, path: PurePath) -> pathlib.Path:
-        """Return the filesystem location."""
-        return self._diskstorage.resolve(path)
+        storage = _DiskFileStorage(root, fileexists=fileexists)
+        super().__init__(storage)
