@@ -14,9 +14,9 @@ from cutty.filestorage.domain.storage import FileStorageObserver
 
 
 class _Hooks:
-    def __init__(self, *, hookfiles: Iterable[File], cwd: pathlib.Path) -> None:
+    def __init__(self, *, hookfiles: Iterable[File], project: pathlib.Path) -> None:
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.cwd = cwd
+        self.project = project
 
     def run(self, hook: str) -> None:
         hookfile = self.hooks.get(hook)
@@ -35,8 +35,8 @@ class _Hooks:
             [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
         )
         shell = platform.system() == "Windows"
-        self.cwd.mkdir(parents=True, exist_ok=True)
-        subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
+        self.project.mkdir(parents=True, exist_ok=True)
+        subprocess.run(command, shell=shell, cwd=self.project, check=True)  # noqa: S602
 
 
 class CookiecutterFileStorageObserver(FileStorageObserver):
@@ -50,7 +50,7 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
         fileexists: FileExistsPolicy,
     ) -> None:
         """Initialize."""
-        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
+        self.hooks = _Hooks(hookfiles=hookfiles, project=project)
         self.fileexists = fileexists
 
     def begin(self) -> None:
@@ -64,4 +64,4 @@ class CookiecutterFileStorageObserver(FileStorageObserver):
     def rollback(self) -> None:
         """A storage transaction was aborted."""
         if self.fileexists is not FileExistsPolicy.OVERWRITE:
-            shutil.rmtree(self.hooks.cwd, ignore_errors=True)
+            shutil.rmtree(self.hooks.project, ignore_errors=True)
