@@ -5,7 +5,7 @@ import pathlib
 
 import pygit2
 
-from cutty.filestorage.domain.storage import FileStorageObserver
+from cutty.filestorage.domain.observers import FileStorageObserver
 
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:

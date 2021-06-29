@@ -13,8 +13,8 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
+from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig

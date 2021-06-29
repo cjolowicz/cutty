@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStorageObserver
+from cutty.filestorage.domain.observers import FileStorageObserver
 
 
 class _Hooks:

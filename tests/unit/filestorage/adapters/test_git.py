@@ -7,8 +7,8 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.purepath import PurePath
 
 

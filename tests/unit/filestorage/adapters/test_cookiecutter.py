@@ -12,8 +12,8 @@ from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filestorage.domain.storage import observe
 from cutty.filesystems.domain.purepath import PurePath
 
 
