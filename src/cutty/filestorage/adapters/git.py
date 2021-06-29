@@ -8,6 +8,11 @@ from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.storage import FileStorageObserver
 
 
+def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
+    """Return the default signature."""
+    return repository.default_signature
+
+
 class GitRepositoryObserver(FileStorageObserver):
     """Storage observer creating a git repository."""
 
@@ -30,11 +35,5 @@ class GitRepositoryObserver(FileStorageObserver):
         """A storage transaction was completed."""
         assert self.repository is not None  # noqa: S101
         tree = self.repository.index.write_tree()
-        self.repository.create_commit(
-            "HEAD",
-            self.repository.default_signature,
-            self.repository.default_signature,
-            "Initial",
-            tree,
-            [],
-        )
+        signature = default_signature(self.repository)
+        self.repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
