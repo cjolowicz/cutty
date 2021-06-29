@@ -43,6 +43,10 @@ class _Hooks:
 class CookiecutterFileStorageObserver(FileStorageObserver):
     """Storage observer invoking Cookiecutter hooks."""
 
+    def __init__(self, hooks: _Hooks) -> None:
+        """Initialize."""
+        self.hooks = hooks
+
     def begin(self) -> None:
         """A storage transaction was started."""
 
@@ -67,7 +71,7 @@ class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
         super().__init__(storage)
         self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
         self.added = False
-        self.observers.append(CookiecutterFileStorageObserver())
+        self.observers.append(CookiecutterFileStorageObserver(self.hooks))
 
     def add(self, file: File) -> None:
         """Add file to storage."""
