@@ -1,6 +1,5 @@
 """Create a project from a Cookiecutter template."""
 import pathlib
-from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -12,7 +11,6 @@ from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
-from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
@@ -108,10 +106,9 @@ def create(
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     project = output_dir / file.path.parts[0]
-    hookpaths = iterhooks(path)
-    hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
-    hookfiles = tuple(hookfiles)
-    if hookfiles:  # pragma: no cover
+    hookpaths = tuple(iterhooks(path))
+    if hookpaths:  # pragma: no cover
+        hookfiles = renderfiles(hookpaths, render, bindings)
         storage = observe(
             storage,
             CookiecutterHooksObserver(
