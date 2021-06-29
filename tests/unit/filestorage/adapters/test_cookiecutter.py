@@ -87,7 +87,7 @@ def test_hooks(
 
 
 def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
-    """It does nothing."""
+    """It executes the hook."""
     hooks = ["pre_gen_project", "post_gen_project"]
     storage = createstorage(hooks)
 
@@ -96,7 +96,7 @@ def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> N
 
     for hook in hooks:
         path = tmp_path / "example" / hook
-        assert not path.is_file()
+        assert path.is_file()
 
 
 def test_rollback_default(
