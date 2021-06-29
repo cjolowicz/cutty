@@ -104,15 +104,20 @@ def test_hook_additions(storage: DiskFileStorage, project: pathlib.Path) -> None
     assert "marker" in tree(repository)
 
 
+def commit(repository: pygit2.Repository) -> None:
+    """Create an initial empty commit."""
+    tree = repository.index.write_tree()
+    repository.index.write()
+    signature = pygit2.Signature("you", "you@example.com")
+    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+
+
 def test_existing_repository(
     storage: DiskFileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It does nothing if the repository already exists."""
     repository = pygit2.init_repository(project)
-    tree = repository.index.write_tree()
-    repository.index.write()
-    signature = pygit2.Signature("you", "you@example.com")
-    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+    commit(repository)
 
     with storage:
         storage.add(file)
