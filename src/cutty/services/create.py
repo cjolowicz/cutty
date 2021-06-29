@@ -113,10 +113,12 @@ def create(
     project = output_dir / file.path.parts[0]
     hookfiles = tuple(hookfiles)
     if hookfiles:  # pragma: no cover
-        observer = CookiecutterHooksObserver(
-            hookfiles=hookfiles, project=project, fileexists=fileexists
+        storage = observe(
+            storage,
+            CookiecutterHooksObserver(
+                hookfiles=hookfiles, project=project, fileexists=fileexists
+            ),
         )
-        storage = observe(storage, observer)
     storage = observe(storage, GitRepositoryObserver(project=project))
 
     with storage:
