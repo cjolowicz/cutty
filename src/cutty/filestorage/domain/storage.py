@@ -32,6 +32,10 @@ class FileStorageABC(abc.ABC):
     """Interface for file storage implementations."""
 
     @abc.abstractmethod
+    def begin(self) -> None:
+        """Begin a storage transaction."""
+
+    @abc.abstractmethod
     def add(self, file: File) -> None:
         """Add the file to the storage."""
 
