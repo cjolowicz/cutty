@@ -46,6 +46,9 @@ class FileStorage(abc.ABC):
 
     def __enter__(self: T) -> T:
         """Enter the runtime context."""
+        for observer in self.observers:
+            observer.begin()
+
         return self
 
     def __exit__(
@@ -57,8 +60,12 @@ class FileStorage(abc.ABC):
         """Exit the runtime context."""
         if exception is None:
             self.commit()
+            for observer in self.observers:
+                observer.commit()
         else:
             self.rollback()
+            for observer in self.observers:
+                observer.rollback()
 
 
 class FileStorageWrapper(FileStorage, Generic[T]):
