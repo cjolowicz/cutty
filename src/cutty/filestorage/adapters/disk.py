@@ -48,6 +48,7 @@ class DiskFileStorage(FileStorage):
         fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
     ) -> None:
         """Initialize."""
+        super().__init__()
         self.root = root
         self.fileexists = fileexists
         self.undo: list[Callable[[], None]] = []

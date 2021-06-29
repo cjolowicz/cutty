@@ -8,7 +8,7 @@ from typing import Optional
 
 import appdirs
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
@@ -112,8 +112,10 @@ def create(
         file, files = peek(files)
         if file is not None:
             project = storage.resolve(file.path.parents[-2])
-            storage = CookiecutterFileStorage(
-                storage, hookfiles=hookfiles, project=project
+            storage.observers.append(
+                CookiecutterFileStorageObserver(
+                    hookfiles=hookfiles, project=project, fileexists=storage.fileexists
+                )
             )
 
     with storage:

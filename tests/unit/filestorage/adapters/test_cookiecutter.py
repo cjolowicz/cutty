@@ -6,7 +6,7 @@ from typing import Protocol
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorage
+from cutty.filestorage.adapters.cookiecutter import CookiecutterFileStorageObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import Executable
@@ -55,7 +55,14 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
             for hook in hooks
         ]
         project = storage.resolve(PurePath("example"))
-        return CookiecutterFileStorage(storage, hookfiles=hookfiles, project=project)
+
+        storage.observers.append(
+            CookiecutterFileStorageObserver(
+                hookfiles=hookfiles, project=project, fileexists=storage.fileexists
+            )
+        )
+
+        return storage
 
     return _createstorage
 
@@ -87,7 +94,7 @@ def test_hooks(
 
 
 def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> None:
-    """It does nothing."""
+    """It executes the hook."""
     hooks = ["pre_gen_project", "post_gen_project"]
     storage = createstorage(hooks)
 
@@ -96,7 +103,7 @@ def test_no_files(tmp_path: pathlib.Path, createstorage: CreateFileStorage) -> N
 
     for hook in hooks:
         path = tmp_path / "example" / hook
-        assert not path.is_file()
+        assert path.is_file()
 
 
 def test_rollback_default(

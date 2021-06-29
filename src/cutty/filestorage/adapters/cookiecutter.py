@@ -10,13 +10,13 @@ from collections.abc import Iterable
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.storage import FileStorageWrapper
+from cutty.filestorage.domain.storage import FileStorageObserver
 
 
 class _Hooks:
-    def __init__(self, *, hookfiles: Iterable[File] = (), cwd: pathlib.Path) -> None:
+    def __init__(self, *, hookfiles: Iterable[File], project: pathlib.Path) -> None:
         self.hooks = {hook.path.stem: hook for hook in hookfiles}
-        self.cwd = cwd
+        self.project = project
 
     def run(self, hook: str) -> None:
         hookfile = self.hooks.get(hook)
@@ -35,43 +35,33 @@ class _Hooks:
             [pathlib.Path(sys.executable), path] if path.suffix == ".py" else [path]
         )
         shell = platform.system() == "Windows"
-        self.cwd.mkdir(parents=True, exist_ok=True)
-        subprocess.run(command, shell=shell, cwd=self.cwd, check=True)  # noqa: S602
+        self.project.mkdir(parents=True, exist_ok=True)
+        subprocess.run(command, shell=shell, cwd=self.project, check=True)  # noqa: S602
 
 
-class CookiecutterFileStorage(FileStorageWrapper[DiskFileStorage]):
-    """Wrap a disk-based file store with Cookiecutter hooks."""
+class CookiecutterFileStorageObserver(FileStorageObserver):
+    """Storage observer invoking Cookiecutter hooks."""
 
     def __init__(
         self,
-        storage: DiskFileStorage,
         *,
-        hookfiles: Iterable[File] = (),
-        project: pathlib.Path
+        hookfiles: Iterable[File],
+        project: pathlib.Path,
+        fileexists: FileExistsPolicy,
     ) -> None:
         """Initialize."""
-        super().__init__(storage)
-        self.hooks = _Hooks(hookfiles=hookfiles, cwd=project)
-        self.added = False
+        self.hooks = _Hooks(hookfiles=hookfiles, project=project)
+        self.fileexists = fileexists
 
-    def add(self, file: File) -> None:
-        """Add file to storage."""
-        if not self.added:
-            self.hooks.run("pre_gen_project")
-            self.added = True
-
-        super().add(file)
+    def begin(self) -> None:
+        """A storage transaction was started."""
+        self.hooks.run("pre_gen_project")
 
     def commit(self) -> None:
-        """Commit the stores."""
-        if self.added:
-            self.hooks.run("post_gen_project")
-
-        super().commit()
+        """A storage transaction was completed."""
+        self.hooks.run("post_gen_project")
 
     def rollback(self) -> None:
-        """Roll back the stores."""
-        super().rollback()
-
-        if self.storage.fileexists is not FileExistsPolicy.OVERWRITE:
-            shutil.rmtree(self.hooks.cwd, ignore_errors=True)
+        """A storage transaction was aborted."""
+        if self.fileexists is not FileExistsPolicy.OVERWRITE:
+            shutil.rmtree(self.hooks.project, ignore_errors=True)
