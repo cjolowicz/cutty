@@ -42,5 +42,6 @@ class GitRepositoryObserver(FileStorageObserver):
         """A storage transaction was completed."""
         assert self.repository is not None  # noqa: S101
         tree = self.repository.index.write_tree()
+        self.repository.index.write()
         signature = default_signature(self.repository)
         self.repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
