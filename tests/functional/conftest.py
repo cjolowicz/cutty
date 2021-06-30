@@ -45,6 +45,13 @@ def template_directory(tmp_path: Path) -> Path:
         """,
     )
 
+    create(
+        tmp_path / "hooks" / "post_gen_project.py",
+        """
+        open("post_gen_project", mode="w")
+        """,
+    )
+
     return tmp_path
 
 
@@ -55,6 +62,7 @@ def repository(template_directory: Path) -> Path:
     signature = pygit2.Signature("you", "you@example.com")
     repository.index.add("cookiecutter.json")
     repository.index.add("{{ cookiecutter.project }}/README.md")
+    repository.index.add("hooks/post_gen_project.py")
     tree = repository.index.write_tree()
     repository.create_commit(
         "HEAD",

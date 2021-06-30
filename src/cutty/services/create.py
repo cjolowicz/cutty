@@ -107,7 +107,7 @@ def create(
 
     project = output_dir / file.path.parts[0]
     hookpaths = tuple(iterhooks(path))
-    if hookpaths:  # pragma: no cover
+    if hookpaths:  # pragma: no branch
         hookfiles = renderfiles(hookpaths, render, bindings)
         storage = observe(
             storage,
