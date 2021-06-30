@@ -1,6 +1,7 @@
 """Fixtures for functional tests."""
 from collections.abc import Iterator
 from pathlib import Path
+from textwrap import dedent
 
 import pygit2
 import pytest
@@ -13,6 +14,38 @@ def runner() -> Iterator[CliRunner]:
     runner = CliRunner()
     with runner.isolated_filesystem():
         yield runner
+
+
+@pytest.fixture
+def template_directory(tmp_path: Path) -> Path:
+    """Fixture for a template directory."""
+
+    def create(path: Path, text: str) -> None:
+        """Create a file with the given path and contents."""
+        text = dedent(text).removeprefix("\n")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+
+    create(
+        tmp_path / "cookiecutter.json",
+        """
+        {
+          "project": "example",
+          "license": ["MIT", "GPL-3.0", "Apache-2.0"],
+          "cli": true,
+          "_extensions": ["jinja2_time.TimeExtension"]
+        }
+        """,
+    )
+
+    create(
+        tmp_path / "{{ cookiecutter.project }}" / "README.md",
+        """
+        # {{ cookiecutter.project }}
+        """,
+    )
+
+    return tmp_path
 
 
 @pytest.fixture
