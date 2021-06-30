@@ -1,6 +1,5 @@
 """Create a project from a Cookiecutter template."""
 import pathlib
-from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -12,7 +11,6 @@ from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
-from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
@@ -97,8 +95,9 @@ def create(
 
     paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
-    hookpaths = iterhooks(path)
-    hookfiles: Iterable[File] = renderfiles(hookpaths, render, bindings)
+    file, files = peek(files)
+    if file is None:  # pragma: no cover
+        return
 
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
@@ -106,16 +105,17 @@ def create(
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
-    file, files = peek(files)
-    if file is not None:  # pragma: no cover
-        project = output_dir / file.path.parts[0]
-        hookfiles = tuple(hookfiles)
-        if hookfiles:
-            observer = CookiecutterHooksObserver(
+    project = output_dir / file.path.parts[0]
+    hookpaths = tuple(iterhooks(path))
+    if hookpaths:  # pragma: no cover
+        hookfiles = renderfiles(hookpaths, render, bindings)
+        storage = observe(
+            storage,
+            CookiecutterHooksObserver(
                 hookfiles=hookfiles, project=project, fileexists=fileexists
-            )
-            storage = observe(storage, observer)
-        storage = observe(storage, GitRepositoryObserver(project=project))
+            ),
+        )
+    storage = observe(storage, GitRepositoryObserver(project=project))
 
     with storage:
         for file in files:
