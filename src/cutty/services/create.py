@@ -9,14 +9,7 @@ from typing import Optional
 import appdirs
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
-from cutty.filestorage.adapters.disk import DiskFileStorage
-from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.observers.cookiecutter import CookiecutterHooksObserver
-from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
-from cutty.filestorage.domain.observers import FileStorageObserver
-from cutty.filestorage.domain.observers import observe
-from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
@@ -73,45 +66,6 @@ def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.P
     """Determine the location of the generated project."""
     parent = output_dir if output_dir is not None else pathlib.Path.cwd()
     return parent / file.path.parts[0]
-
-
-def fileexistspolicy(
-    overwrite_if_exists: bool, skip_if_file_exists: bool
-) -> FileExistsPolicy:
-    """Return the policy for overwriting existing files."""
-    return (
-        FileExistsPolicy.RAISE
-        if not overwrite_if_exists
-        else FileExistsPolicy.SKIP
-        if skip_if_file_exists
-        else FileExistsPolicy.OVERWRITE
-    )
-
-
-def createstorage(
-    template_dir: Path,
-    project_dir: pathlib.Path,
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    hookfiles: Sequence[File],
-) -> FileStorage:
-    """Create storage for the project files."""
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
-
-    observer: Optional[FileStorageObserver] = None
-
-    if hookfiles:  # pragma: no branch
-        observer = CookiecutterHooksObserver(
-            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-        )
-
-    if observer:  # pragma: no branch
-        storage = observe(storage, observer)
-
-    storage = observe(storage, GitRepositoryObserver(project=project_dir))
-
-    return storage
 
 
 def create(
