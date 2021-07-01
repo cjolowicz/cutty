@@ -19,6 +19,11 @@ def test_getitem() -> None:
     assert 1 == LazySequence([1])[0]
 
 
+def test_getitem_second() -> None:
+    """It returns the item at the given position."""
+    assert 2 == LazySequence([1, 2])[1]
+
+
 def test_getitem_negative() -> None:
     """It returns the item at the given position."""
     assert 2 == LazySequence([1, 2])[-1]
