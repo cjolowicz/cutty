@@ -92,12 +92,11 @@ def createstorage(
     project_dir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
+    hookfiles: Sequence[File],
     render: Renderer,
     bindings: Sequence[Binding],
 ) -> FileStorage:
     """Create storage for the project files."""
-    hookfiles = tuple(renderfiles(iterhooks(template_dir), render, bindings))
-
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
@@ -147,12 +146,14 @@ def create(
         return
 
     project_dir = get_project_dir(output_dir, file)
+    hookfiles = tuple(renderfiles(iterhooks(template_dir), render, bindings))
 
     with createstorage(
         template_dir,
         project_dir,
         overwrite_if_exists,
         skip_if_file_exists,
+        hookfiles,
         render,
         bindings,
     ) as storage:
