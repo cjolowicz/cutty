@@ -1,4 +1,4 @@
-"""Unit tests for cutty.filestorage.adapters.cookiecutter."""
+"""Unit tests for cutty.filestorage.adapters.observers.cookiecutter."""
 import pathlib
 from collections.abc import Iterable
 from collections.abc import Sequence
@@ -6,9 +6,9 @@ from typing import Protocol
 
 import pytest
 
-from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
+from cutty.filestorage.adapters.observers.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import RegularFile
