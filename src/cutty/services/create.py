@@ -101,8 +101,8 @@ def createstorage(
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
     observer: Optional[FileStorageObserver] = None
-    hookfiles: Iterator[File] = (
-        iter(()) if not hookpaths else renderfiles(hookpaths, render, bindings)
+    hookfiles: Sequence[File] = (
+        () if not hookpaths else tuple(renderfiles(hookpaths, render, bindings))
     )
 
     if hookpaths:  # pragma: no branch
