@@ -12,6 +12,7 @@ from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
+from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
@@ -119,12 +120,14 @@ def create(
     hookpaths = tuple(iterhooks(template_dir))
     if hookpaths:  # pragma: no branch
         hookfiles = renderfiles(hookpaths, render, bindings)
-        storage = observe(
-            storage,
-            CookiecutterHooksObserver(
+
+        def createhooksobserver() -> FileStorageObserver:
+            """Create storage observer invoking Cookiecutter hooks."""
+            return CookiecutterHooksObserver(
                 hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-            ),
-        )
+            )
+
+        storage = observe(storage, createhooksobserver())
     storage = observe(storage, GitRepositoryObserver(project=project_dir))
 
     with storage:
