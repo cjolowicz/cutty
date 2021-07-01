@@ -12,6 +12,7 @@ from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
+from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
@@ -65,6 +66,12 @@ def bindvariables(
     bindings = [Binding(key, value) for key, value in extra_context.items()]
     binder = override(binder, bindings)
     return renderbindwith(binder)(render, variables)
+
+
+def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
+    """Determine the location of the generated project."""
+    parent = output_dir if output_dir is not None else pathlib.Path.cwd()
+    return parent / file.path.parts[0]
 
 
 def fileexistspolicy(
@@ -150,14 +157,7 @@ def create(
     if file is None:  # pragma: no cover
         return
 
-    def get_project_dir() -> pathlib.Path:
-        """Determine the location of the generated project."""
-        assert file is not None  # noqa: S101
-
-        parent = output_dir if output_dir is not None else pathlib.Path.cwd()
-        return parent / file.path.parts[0]
-
-    project_dir = get_project_dir()
+    project_dir = get_project_dir(output_dir, file)
 
     with createstorage(
         template_dir,
