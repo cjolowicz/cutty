@@ -53,10 +53,8 @@ def template_directory(tmp_path: Path) -> Path:
     return tmp_path
 
 
-@pytest.fixture
-def repository(template_directory: Path) -> Path:
-    """Fixture for a template repository."""
-    repository = pygit2.init_repository(template_directory)
+def commit(repository: pygit2.Repository) -> None:
+    """Commit all changes."""
     signature = pygit2.Signature("you", "you@example.com")
     repository.index.add("cookiecutter.json")
     repository.index.add("{{ cookiecutter.project }}/README.md")
@@ -70,4 +68,11 @@ def repository(template_directory: Path) -> Path:
         tree,
         [],
     )
+
+
+@pytest.fixture
+def repository(template_directory: Path) -> Path:
+    """Fixture for a template repository."""
+    repository = pygit2.init_repository(template_directory)
+    commit(repository)
     return template_directory
