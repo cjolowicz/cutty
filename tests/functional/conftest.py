@@ -53,7 +53,7 @@ def template_directory(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def commit(repository: pygit2.Repository) -> None:
+def commit(repository: pygit2.Repository, *, message: str) -> None:
     """Commit all changes."""
     signature = pygit2.Signature("you", "you@example.com")
     repository.index.add("cookiecutter.json")
@@ -64,7 +64,7 @@ def commit(repository: pygit2.Repository) -> None:
         "HEAD",
         signature,
         signature,
-        "Initial",
+        message,
         tree,
         [],
     )
@@ -74,5 +74,5 @@ def commit(repository: pygit2.Repository) -> None:
 def repository(template_directory: Path) -> Path:
     """Fixture for a template repository."""
     repository = pygit2.init_repository(template_directory)
-    commit(repository)
+    commit(repository, message="Initial")
     return template_directory
