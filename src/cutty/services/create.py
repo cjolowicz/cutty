@@ -2,6 +2,7 @@
 import pathlib
 from collections.abc import Iterator
 from collections.abc import Mapping
+from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
@@ -11,21 +12,24 @@ from cutty.filestorage.adapters.cookiecutter import CookiecutterHooksObserver
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.git import GitRepositoryObserver
+from cutty.filestorage.domain.files import File
+from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.prompts import prompt
-from cutty.templates.adapters.cookiecutter.render import registerrenderers
+from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.binders import binddefault
+from cutty.templates.domain.binders import Binder
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
+from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.templates.domain.variables import Variable
 from cutty.util.peek import peek
 
 
@@ -50,6 +54,26 @@ def iterhooks(path: Path) -> Iterator[Path]:
                 yield path
 
 
+def bindvariables(
+    variables: Sequence[Variable],
+    render: Renderer,
+    *,
+    extra_context: Mapping[str, str],
+    no_input: bool,
+) -> Sequence[Binding]:
+    """Bind the template variables."""
+    binder: Binder = binddefault if no_input else prompt
+    bindings = [Binding(key, value) for key, value in extra_context.items()]
+    binder = override(binder, bindings)
+    return renderbindwith(binder)(render, variables)
+
+
+def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
+    """Determine the location of the generated project."""
+    parent = output_dir if output_dir is not None else pathlib.Path.cwd()
+    return parent / file.path.parts[0]
+
+
 def fileexistspolicy(
     overwrite_if_exists: bool, skip_if_file_exists: bool
 ) -> FileExistsPolicy:
@@ -61,6 +85,46 @@ def fileexistspolicy(
         if skip_if_file_exists
         else FileExistsPolicy.OVERWRITE
     )
+
+
+def createhooksobserver(
+    template_dir: Path,
+    project_dir: pathlib.Path,
+    render: Renderer,
+    bindings: Sequence[Binding],
+    fileexists: FileExistsPolicy,
+) -> Optional[FileStorageObserver]:
+    """Create storage observer invoking Cookiecutter hooks."""
+    hookpaths = tuple(iterhooks(template_dir))
+    if not hookpaths:  # pragma: no cover
+        return None
+
+    hookfiles = renderfiles(hookpaths, render, bindings)
+    return CookiecutterHooksObserver(
+        hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+    )
+
+
+def createstorage(
+    template_dir: Path,
+    project_dir: pathlib.Path,
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    render: Renderer,
+    bindings: Sequence[Binding],
+) -> FileStorage:
+    """Create storage for the project files."""
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
+    storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
+
+    if observer := createhooksobserver(  # pragma: no branch
+        template_dir, project_dir, render, bindings, fileexists
+    ):
+        storage = observe(storage, observer)
+
+    storage = observe(storage, GitRepositoryObserver(project=project_dir))
+
+    return storage
 
 
 def create(
@@ -76,47 +140,32 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
-    provider = getdefaultrepositoryprovider(cachedir)
-    path = provider(template, revision=checkout)
+    template_dir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
     if directory is not None:
-        path = path.joinpath(*directory.parts)  # pragma: no cover
+        template_dir = template_dir.joinpath(*directory.parts)  # pragma: no cover
 
-    binder = override(
-        binddefault if no_input else prompt,
-        [Binding(key, value) for key, value in extra_context.items()],
+    config = loadconfig(template, template_dir)
+    render = createcookiecutterrenderer(template_dir, config)
+    bindings = bindvariables(
+        config.variables, render, extra_context=extra_context, no_input=no_input
     )
 
-    config = loadconfig(template, path)
-    renderregistry = registerrenderers(path, config)
-    render = createrenderer({**defaultrenderregistry, **renderregistry})
-    renderbind = renderbindwith(binder)
-    bindings = renderbind(render, config.variables)
-
-    paths = iterpaths(path, config)
+    paths = iterpaths(template_dir, config)
     files = renderfiles(paths, render, bindings)
     file, files = peek(files)
     if file is None:  # pragma: no cover
         return
 
-    if output_dir is None:
-        output_dir = pathlib.Path.cwd()  # pragma: no cover
+    project_dir = get_project_dir(output_dir, file)
 
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
-
-    project = output_dir / file.path.parts[0]
-    hookpaths = tuple(iterhooks(path))
-    if hookpaths:  # pragma: no branch
-        hookfiles = renderfiles(hookpaths, render, bindings)
-        storage = observe(
-            storage,
-            CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project, fileexists=fileexists
-            ),
-        )
-    storage = observe(storage, GitRepositoryObserver(project=project))
-
-    with storage:
+    with createstorage(
+        template_dir,
+        project_dir,
+        overwrite_if_exists,
+        skip_if_file_exists,
+        render,
+        bindings,
+    ) as storage:
         for file in files:
             storage.add(file)
