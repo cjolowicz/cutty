@@ -16,7 +16,7 @@ from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.util.peek import peek
+from cutty.util.lazysequence import LazySequence
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
@@ -53,12 +53,11 @@ def create(
     )
 
     paths = findpaths(template_dir, config)
-    files = renderfiles(paths, render, bindings)
-    file, files = peek(files)
-    if file is None:  # pragma: no cover
+    files = LazySequence(renderfiles(paths, render, bindings))
+    if not files:  # pragma: no cover
         return
 
-    project_dir = get_project_dir(output_dir, file)
+    project_dir = get_project_dir(output_dir, files[0])
     hookfiles = tuple(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
