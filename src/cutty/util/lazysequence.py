@@ -7,6 +7,7 @@ from typing import overload
 from typing import TypeVar
 from typing import Union
 
+
 _T_co = TypeVar("_T_co", covariant=True)
 
 
@@ -27,6 +28,14 @@ class LazySequence(Sequence[_T_co]):
         """Iterate over the items in the sequence."""
         yield from self._cache
         yield from self._consume()
+
+    def release(self) -> Iterator[_T_co]:
+        """Iterate over the sequence without caching additional items.
+
+        The sequence should no longer be used after calling this function.
+        """
+        yield from self._cache
+        yield from self._iter
 
     def __bool__(self) -> bool:
         """Return True if there are any items in the sequence."""
