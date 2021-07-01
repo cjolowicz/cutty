@@ -105,6 +105,8 @@ def createstorage(
 
     if hookpaths:  # pragma: no branch
         hookfiles = renderfiles(hookpaths, render, bindings)
+
+    if hookpaths:  # pragma: no branch
         observer = CookiecutterHooksObserver(
             hookfiles=hookfiles, project=project_dir, fileexists=fileexists
         )
