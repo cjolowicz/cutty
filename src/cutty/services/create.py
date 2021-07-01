@@ -2,7 +2,6 @@
 import pathlib
 from collections.abc import Iterator
 from collections.abc import Mapping
-from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
@@ -12,18 +11,12 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
+from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import loadconfig
-from cutty.templates.adapters.cookiecutter.prompts import prompt
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.binders import binddefault
-from cutty.templates.domain.binders import Binder
-from cutty.templates.domain.binders import override
-from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.templates.domain.variables import Variable
 from cutty.util.peek import peek
 
 
@@ -46,20 +39,6 @@ def iterhooks(path: Path) -> Iterator[Path]:
         for path in hookdir.iterdir():
             if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
                 yield path
-
-
-def bindvariables(
-    variables: Sequence[Variable],
-    render: Renderer,
-    *,
-    extra_context: Mapping[str, str],
-    no_input: bool,
-) -> Sequence[Binding]:
-    """Bind the template variables."""
-    binder: Binder = binddefault if no_input else prompt
-    bindings = [Binding(key, value) for key, value in extra_context.items()]
-    binder = override(binder, bindings)
-    return renderbindwith(binder)(render, variables)
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
@@ -88,8 +67,11 @@ def create(
 
     config = loadconfig(template, template_dir)
     render = createcookiecutterrenderer(template_dir, config)
-    bindings = bindvariables(
-        config.variables, render, extra_context=extra_context, no_input=no_input
+    bindings = bindcookiecuttervariables(
+        config.variables,
+        render,
+        interactive=not no_input,
+        bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
     paths = iterpaths(template_dir, config)
