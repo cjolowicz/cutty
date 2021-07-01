@@ -1,4 +1,5 @@
 """Lazy sequences."""
+from collections import deque
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
@@ -15,7 +16,7 @@ class LazySequence(Sequence[_T_co]):
     def __init__(self, iterable: Iterable[_T_co]) -> None:
         """Initialize."""
         self._iter = iter(iterable)
-        self._cache: list[_T_co] = []
+        self._cache: deque[_T_co] = deque()
 
     def _read(self) -> Iterator[_T_co]:
         for item in self._iter:
