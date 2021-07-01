@@ -12,6 +12,7 @@ from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
+from cutty.templates.adapters.cookiecutter.config import findhooks
 from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
@@ -33,12 +34,7 @@ def iterpaths(path: Path, config: Config) -> Iterator[Path]:
 
 def iterhooks(path: Path) -> Iterator[Path]:
     """Load hooks in a Cookiecutter template."""
-    hooks = {"pre_gen_project", "post_gen_project"}
-    hookdir = path / "hooks"
-    if hookdir.is_dir():
-        for path in hookdir.iterdir():
-            if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
-                yield path
+    return findhooks(path)
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
