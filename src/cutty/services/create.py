@@ -118,16 +118,20 @@ def create(
 
     project_dir = output_dir / file.path.parts[0]
     hookpaths = tuple(iterhooks(template_dir))
-    if hookpaths:  # pragma: no branch
 
-        def createhooksobserver() -> FileStorageObserver:
-            """Create storage observer invoking Cookiecutter hooks."""
-            hookfiles = renderfiles(hookpaths, render, bindings)
-            return CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-            )
+    def createhooksobserver() -> Optional[FileStorageObserver]:
+        """Create storage observer invoking Cookiecutter hooks."""
+        if not hookpaths:  # pragma: no cover
+            return None
 
-        storage = observe(storage, createhooksobserver())
+        hookfiles = renderfiles(hookpaths, render, bindings)
+        return CookiecutterHooksObserver(
+            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+        )
+
+    if observer := createhooksobserver():  # pragma: no branch
+        storage = observe(storage, observer)
+
     storage = observe(storage, GitRepositoryObserver(project=project_dir))
 
     with storage:
