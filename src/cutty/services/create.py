@@ -131,18 +131,24 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()  # pragma: no cover
 
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
-
     project_dir = output_dir / file.path.parts[0]
 
-    if observer := createhooksobserver(  # pragma: no branch
-        template_dir, project_dir, render, bindings, fileexists
-    ):
-        storage = observe(storage, observer)
+    def createstorage() -> FileStorage:
+        """Create storage for the project files."""
+        assert output_dir is not None  # noqa: S101
 
-    storage = observe(storage, GitRepositoryObserver(project=project_dir))
+        fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
+        storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
-    with storage:
+        if observer := createhooksobserver(  # pragma: no branch
+            template_dir, project_dir, render, bindings, fileexists
+        ):
+            storage = observe(storage, observer)
+
+        storage = observe(storage, GitRepositoryObserver(project=project_dir))
+
+        return storage
+
+    with createstorage() as storage:
         for file in files:
             storage.add(file)
