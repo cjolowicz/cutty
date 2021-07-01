@@ -66,7 +66,7 @@ def loadconfig(template: str, path: Path) -> Config:
     return Config(settings, variables)
 
 
-def iterpaths(path: Path, config: Config) -> Iterator[Path]:
+def findpaths(path: Path, config: Config) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
