@@ -51,6 +51,9 @@ class LazySequence(Sequence[_T_co]):
                 self[position] for position in range(*index.indices(len(self)))
             )
 
+        if index < 0:
+            index += len(self)
+
         for position, item in enumerate(self):
             if index == position:
                 return item
