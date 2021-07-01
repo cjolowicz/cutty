@@ -63,8 +63,7 @@ def bindvariables(
         binddefault if no_input else prompt,
         [Binding(key, value) for key, value in extra_context.items()],
     )
-    bindings = renderbindwith(binder)(render, variables)
-    return bindings
+    return renderbindwith(binder)(render, variables)
 
 
 def fileexistspolicy(
