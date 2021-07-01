@@ -54,12 +54,12 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    project_dir = output_dir / projectfiles[0].path.parts[0]
+    projectdir = output_dir / projectfiles[0].path.parts[0]
     hookfiles = LazySequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
         templatedir,
-        project_dir,
+        projectdir,
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
