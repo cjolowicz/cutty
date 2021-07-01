@@ -33,6 +33,9 @@ def create(
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
     template_dir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
+    if output_dir is None:  # pragma: no branch
+        output_dir = pathlib.Path.cwd()
+
     if directory is not None:
         template_dir = template_dir.joinpath(*directory.parts)  # pragma: no cover
 
@@ -50,9 +53,6 @@ def create(
     )
     if not projectfiles:  # pragma: no cover
         return
-
-    if output_dir is None:  # pragma: no branch
-        output_dir = pathlib.Path.cwd()
 
     project_dir = output_dir / projectfiles[0].path.parts[0]
     hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
