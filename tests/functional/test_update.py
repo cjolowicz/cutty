@@ -6,6 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
+from tests.functional.conftest import commit
 
 
 def test_help(runner: CliRunner) -> None:
@@ -26,18 +27,7 @@ def test_update(runner: CliRunner, repository: Path) -> None:
     path.write_text(path.read_text() + "An awesome project.\n")
 
     # Commit the changes.
-    repo = pygit2.Repository(repository)
-    signature = pygit2.Signature("you", "you@example.com")
-    repo.index.add("{{ cookiecutter.project }}/README.md")
-    tree = repo.index.write_tree()
-    repo.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Update README.md",
-        tree,
-        [repo.head.target],
-    )
+    commit(pygit2.Repository(repository), message="Update README.md")
 
     runner.invoke(main, ["update"], catch_exceptions=False)
     assert (

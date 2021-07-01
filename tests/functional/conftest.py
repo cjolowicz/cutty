@@ -1,4 +1,5 @@
 """Fixtures for functional tests."""
+import json
 from collections.abc import Iterator
 from pathlib import Path
 from textwrap import dedent
@@ -26,17 +27,14 @@ def template_directory(tmp_path: Path) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
 
-    create(
-        tmp_path / "cookiecutter.json",
-        """
-        {
-          "project": "example",
-          "license": ["MIT", "GPL-3.0", "Apache-2.0"],
-          "cli": true,
-          "_extensions": ["jinja2_time.TimeExtension"]
-        }
-        """,
-    )
+    context = {
+        "project": "example",
+        "license": ["MIT", "GPL-3.0", "Apache-2.0"],
+        "cli": True,
+        "_extensions": ["jinja2_time.TimeExtension"],
+    }
+
+    create(tmp_path / "cookiecutter.json", json.dumps(context))
 
     create(
         tmp_path / "{{ cookiecutter.project }}" / "README.md",
@@ -55,21 +53,18 @@ def template_directory(tmp_path: Path) -> Path:
     return tmp_path
 
 
+def commit(repository: pygit2.Repository, *, message: str) -> None:
+    """Commit all changes in the repository."""
+    repository.index.add_all()
+    tree = repository.index.write_tree()
+    signature = pygit2.Signature("you", "you@example.com")
+    parents = [] if repository.head_is_unborn else [repository.head.target]
+    repository.create_commit("HEAD", signature, signature, message, tree, parents)
+
+
 @pytest.fixture
 def repository(template_directory: Path) -> Path:
     """Fixture for a template repository."""
     repository = pygit2.init_repository(template_directory)
-    signature = pygit2.Signature("you", "you@example.com")
-    repository.index.add("cookiecutter.json")
-    repository.index.add("{{ cookiecutter.project }}/README.md")
-    repository.index.add("hooks/post_gen_project.py")
-    tree = repository.index.write_tree()
-    repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        tree,
-        [],
-    )
+    commit(repository, message="Initial")
     return template_directory
