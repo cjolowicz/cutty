@@ -1,11 +1,11 @@
-"""Unit tests for cutty.filestorage.adapters.git."""
+"""Unit tests for cutty.filestorage.adapters.observers.git."""
 import pathlib
 
 import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
-from cutty.filestorage.adapters.git import GitRepositoryObserver
+from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
