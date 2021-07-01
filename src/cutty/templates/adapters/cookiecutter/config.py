@@ -66,11 +66,6 @@ def loadcookiecutterconfig(template: str, path: Path) -> Config:
     return Config(settings, variables)
 
 
-def loadconfig(template: str, path: Path) -> Config:
-    """Load the configurations for a Cookiecutter template."""
-    return loadcookiecutterconfig(template, path)
-
-
 def findpaths(path: Path, config: Config) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
