@@ -105,9 +105,10 @@ def createstorage(
         fileexists: FileExistsPolicy,
     ) -> Optional[FileStorageObserver]:
         """Create storage observer invoking Cookiecutter hooks."""
+        observer: Optional[FileStorageObserver] = None
         hookpaths = tuple(iterhooks(template_dir))
         if not hookpaths:  # pragma: no cover
-            return None
+            return observer
 
         hookfiles = renderfiles(hookpaths, render, bindings)
         return CookiecutterHooksObserver(
