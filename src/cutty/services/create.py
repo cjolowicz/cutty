@@ -117,10 +117,10 @@ def create(
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     project_dir = output_dir / file.path.parts[0]
-    hookpaths = tuple(iterhooks(template_dir))
 
     def createhooksobserver() -> Optional[FileStorageObserver]:
         """Create storage observer invoking Cookiecutter hooks."""
+        hookpaths = tuple(iterhooks(template_dir))
         if not hookpaths:  # pragma: no cover
             return None
 
