@@ -1,10 +1,12 @@
 """Lazy sequences."""
+from collections import deque
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from typing import overload
 from typing import TypeVar
 from typing import Union
+
 
 _T_co = TypeVar("_T_co", covariant=True)
 
@@ -15,9 +17,9 @@ class LazySequence(Sequence[_T_co]):
     def __init__(self, iterable: Iterable[_T_co]) -> None:
         """Initialize."""
         self._iter = iter(iterable)
-        self._cache: list[_T_co] = []
+        self._cache: deque[_T_co] = deque()
 
-    def _read(self) -> Iterator[_T_co]:
+    def _consume(self) -> Iterator[_T_co]:
         for item in self._iter:
             self._cache.append(item)
             yield item
@@ -25,7 +27,15 @@ class LazySequence(Sequence[_T_co]):
     def __iter__(self) -> Iterator[_T_co]:
         """Iterate over the items in the sequence."""
         yield from self._cache
-        yield from self._read()
+        yield from self._consume()
+
+    def release(self) -> Iterator[_T_co]:
+        """Iterate over the sequence without caching additional items.
+
+        The sequence should no longer be used after calling this function.
+        """
+        yield from self._cache
+        yield from self._iter
 
     def __bool__(self) -> bool:
         """Return True if there are any items in the sequence."""
@@ -35,7 +45,7 @@ class LazySequence(Sequence[_T_co]):
 
     def __len__(self) -> int:
         """Return the number of items in the sequence."""
-        return len(self._cache) + sum(1 for _ in self._read())
+        return len(self._cache) + sum(1 for _ in self._consume())
 
     @overload
     def __getitem__(self, index: int) -> _T_co:
@@ -60,7 +70,7 @@ class LazySequence(Sequence[_T_co]):
         except IndexError:
             pass
 
-        for position, item in enumerate(self._read()):
+        for position, item in enumerate(self._consume()):
             if index == position:
                 return item
 

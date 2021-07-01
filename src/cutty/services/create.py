@@ -66,5 +66,5 @@ def create(
         skip_if_file_exists,
         hookfiles,
     ) as storage:
-        for file in files:
+        for file in files.release():
             storage.add(file)
