@@ -52,8 +52,7 @@ def create(
         bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
-    paths = findpaths(template_dir, config)
-    files = LazySequence(renderfiles(paths, render, bindings))
+    files = LazySequence(renderfiles(findpaths(template_dir, config), render, bindings))
     if not files:  # pragma: no cover
         return
 
