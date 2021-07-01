@@ -115,17 +115,17 @@ def create(
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
-    project = output_dir / file.path.parts[0]
+    project_dir = output_dir / file.path.parts[0]
     hookpaths = tuple(iterhooks(template_dir))
     if hookpaths:  # pragma: no branch
         hookfiles = renderfiles(hookpaths, render, bindings)
         storage = observe(
             storage,
             CookiecutterHooksObserver(
-                hookfiles=hookfiles, project=project, fileexists=fileexists
+                hookfiles=hookfiles, project=project_dir, fileexists=fileexists
             ),
         )
-    storage = observe(storage, GitRepositoryObserver(project=project))
+    storage = observe(storage, GitRepositoryObserver(project=project_dir))
 
     with storage:
         for file in files:
