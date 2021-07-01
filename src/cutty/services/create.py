@@ -12,13 +12,9 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
+from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import loadconfig
-from cutty.templates.adapters.cookiecutter.prompts import prompt
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.binders import binddefault
-from cutty.templates.domain.binders import Binder
-from cutty.templates.domain.binders import override
-from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
@@ -56,9 +52,9 @@ def bindvariables(
     bindings: Sequence[Binding],
 ) -> Sequence[Binding]:
     """Bind the template variables."""
-    binder: Binder = prompt if interactive else binddefault
-    binder = override(binder, bindings)
-    return renderbindwith(binder)(render, variables)
+    return bindcookiecuttervariables(
+        variables, render, interactive=interactive, bindings=bindings
+    )
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
