@@ -10,7 +10,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 
 
 class LazySequence(Sequence[_T_co]):
-    """Lazy sequence."""
+    """A lazy sequence provides sequence operations on an iterable."""
 
     def __init__(self, iterable: Iterable[_T_co]) -> None:
         """Initialize."""
@@ -33,15 +33,15 @@ class LazySequence(Sequence[_T_co]):
         return False
 
     def __len__(self) -> int:
-        """Return the length of the sequence."""
+        """Return the number of items in the sequence."""
         return sum(1 for _ in self)
 
     @overload
-    def __getitem__(self, i: int) -> _T_co:
+    def __getitem__(self, index: int) -> _T_co:
         """Return the item at the given index."""  # noqa: D418
 
     @overload
-    def __getitem__(self, s: slice) -> Sequence[_T_co]:
+    def __getitem__(self, indices: slice) -> Sequence[_T_co]:
         """Return a slice of the sequence."""  # noqa: D418
 
     def __getitem__(self, index: Union[int, slice]) -> Union[_T_co, Sequence[_T_co]]:
