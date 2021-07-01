@@ -1,4 +1,5 @@
 """Fixtures for functional tests."""
+import json
 from collections.abc import Iterator
 from pathlib import Path
 from textwrap import dedent
@@ -26,17 +27,14 @@ def template_directory(tmp_path: Path) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
 
-    create(
-        tmp_path / "cookiecutter.json",
-        """
-        {
-          "project": "example",
-          "license": ["MIT", "GPL-3.0", "Apache-2.0"],
-          "cli": true,
-          "_extensions": ["jinja2_time.TimeExtension"]
-        }
-        """,
-    )
+    context = {
+        "project": "example",
+        "license": ["MIT", "GPL-3.0", "Apache-2.0"],
+        "cli": True,
+        "_extensions": ["jinja2_time.TimeExtension"],
+    }
+
+    create(tmp_path / "cookiecutter.json", json.dumps(context))
 
     create(
         tmp_path / "{{ cookiecutter.project }}" / "README.md",
