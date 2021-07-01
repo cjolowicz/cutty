@@ -32,11 +32,6 @@ def iterpaths(path: Path, config: Config) -> Iterator[Path]:
     yield template_dir
 
 
-def iterhooks(path: Path) -> Iterator[Path]:
-    """Load hooks in a Cookiecutter template."""
-    return findhooks(path)
-
-
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
     """Determine the location of the generated project."""
     parent = output_dir if output_dir is not None else pathlib.Path.cwd()
@@ -77,7 +72,7 @@ def create(
         return
 
     project_dir = get_project_dir(output_dir, file)
-    hookfiles = tuple(renderfiles(iterhooks(template_dir), render, bindings))
+    hookfiles = tuple(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
         template_dir,
