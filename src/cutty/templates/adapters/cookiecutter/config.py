@@ -66,6 +66,17 @@ def loadconfig(template: str, path: Path) -> Config:
     return Config(settings, variables)
 
 
+def iterpaths(path: Path, config: Config) -> Iterator[Path]:
+    """Load project files in a Cookiecutter template."""
+    for template_dir in path.iterdir():
+        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
+            break
+    else:
+        raise RuntimeError("template directory not found")  # pragma: no cover
+
+    yield template_dir
+
+
 def findhooks(path: Path) -> Iterator[Path]:
     """Load hooks in a Cookiecutter template."""
     hooks = {"pre_gen_project", "post_gen_project"}
