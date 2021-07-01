@@ -66,7 +66,7 @@ def loadconfig(template: str, path: Path) -> Config:
     return Config(settings, variables)
 
 
-def iterhooks(path: Path) -> Iterator[Path]:
+def findhooks(path: Path) -> Iterator[Path]:
     """Load hooks in a Cookiecutter template."""
     hooks = {"pre_gen_project", "post_gen_project"}
     hookdir = path / "hooks"
