@@ -101,9 +101,7 @@ def createstorage(
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
     observer: Optional[FileStorageObserver] = None
-    hookfiles: Sequence[File] = (
-        () if not hookpaths else tuple(renderfiles(hookpaths, render, bindings))
-    )
+    hookfiles = tuple(renderfiles(hookpaths, render, bindings))
 
     if hookpaths:  # pragma: no branch
         observer = CookiecutterHooksObserver(
