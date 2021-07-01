@@ -96,7 +96,7 @@ def createstorage(
     bindings: Sequence[Binding],
 ) -> FileStorage:
     """Create storage for the project files."""
-    hookpaths = tuple(iterhooks(template_dir))
+    hookpaths = iterhooks(template_dir)
     hookfiles = tuple(renderfiles(hookpaths, render, bindings))
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
