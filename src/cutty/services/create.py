@@ -2,7 +2,6 @@
 import pathlib
 from collections.abc import Iterator
 from collections.abc import Mapping
-from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
@@ -68,11 +67,11 @@ def create(
 
     config = loadconfig(template, template_dir)
     render = createcookiecutterrenderer(template_dir, config)
-    bindings: Sequence[Binding] = [
-        Binding(key, value) for key, value in extra_context.items()
-    ]
     bindings = bindcookiecuttervariables(
-        config.variables, render, interactive=not no_input, bindings=bindings
+        config.variables,
+        render,
+        interactive=not no_input,
+        bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
     paths = iterpaths(template_dir, config)
