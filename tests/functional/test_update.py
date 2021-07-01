@@ -27,11 +27,7 @@ def test_update(runner: CliRunner, repository: Path) -> None:
     path.write_text(path.read_text() + "An awesome project.\n")
 
     # Commit the changes.
-    commit(
-        pygit2.Repository(repository),
-        message="Update README.md",
-        paths=["{{ cookiecutter.project }}/README.md"],
-    )
+    commit(pygit2.Repository(repository), message="Update README.md")
 
     runner.invoke(main, ["update"], catch_exceptions=False)
     assert (

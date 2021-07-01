@@ -53,10 +53,9 @@ def template_directory(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def commit(repository: pygit2.Repository, *, message: str, paths: list[str]) -> None:
-    """Commit changes to the given paths."""
-    for path in paths:
-        repository.index.add(path)
+def commit(repository: pygit2.Repository, *, message: str) -> None:
+    """Commit all changes in the repository."""
+    repository.index.add_all()
     tree = repository.index.write_tree()
     signature = pygit2.Signature("you", "you@example.com")
     parents = [] if repository.head_is_unborn else [repository.head.target]
@@ -67,10 +66,5 @@ def commit(repository: pygit2.Repository, *, message: str, paths: list[str]) -> 
 def repository(template_directory: Path) -> Path:
     """Fixture for a template repository."""
     repository = pygit2.init_repository(template_directory)
-    paths = [
-        "cookiecutter.json",
-        "{{ cookiecutter.project }}/README.md",
-        "hooks/post_gen_project.py",
-    ]
-    commit(repository, message="Initial", paths=paths)
+    commit(repository, message="Initial")
     return template_directory
