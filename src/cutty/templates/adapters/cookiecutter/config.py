@@ -44,7 +44,7 @@ def loadvariable(name: str, value: Any) -> Variable:
     )
 
 
-def loadconfig(template: str, path: Path) -> Config:
+def loadcookiecutterconfig(template: str, path: Path) -> Config:
     """Load the configurations for a Cookiecutter template."""
     text = (path / "cookiecutter.json").read_text()
     data = json.loads(text)
@@ -64,6 +64,11 @@ def loadconfig(template: str, path: Path) -> Config:
     )
 
     return Config(settings, variables)
+
+
+def loadconfig(template: str, path: Path) -> Config:
+    """Load the configurations for a Cookiecutter template."""
+    return loadcookiecutterconfig(template, path)
 
 
 def findpaths(path: Path, config: Config) -> Iterator[Path]:
