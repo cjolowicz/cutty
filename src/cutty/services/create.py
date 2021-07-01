@@ -8,6 +8,7 @@ from typing import Optional
 
 import appdirs
 
+from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.adapters.observers.cookiecutter import CookiecutterHooksObserver
@@ -146,7 +147,7 @@ def create(
     project_dir = get_project_dir(output_dir, file)
     hookfiles = tuple(renderfiles(iterhooks(template_dir), render, bindings))
 
-    with createstorage(
+    with createcookiecutterstorage(
         template_dir,
         project_dir,
         overwrite_if_exists,
