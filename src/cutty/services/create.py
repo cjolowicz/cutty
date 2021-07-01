@@ -17,14 +17,12 @@ from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.prompts import prompt
-from cutty.templates.adapters.cookiecutter.render import registerrenderers
+from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.util.peek import peek
 
@@ -88,8 +86,7 @@ def create(
     )
 
     config = loadconfig(template, path)
-    renderregistry = registerrenderers(path, config)
-    render = createrenderer({**defaultrenderregistry, **renderregistry})
+    render = createcookiecutterrenderer(path, config)
     renderbind = renderbindwith(binder)
     bindings = renderbind(render, config.variables)
 
