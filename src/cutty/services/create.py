@@ -24,7 +24,7 @@ def create(
     extra_context: Mapping[str, str] = MappingProxyType({}),
     no_input: bool = False,
     checkout: Optional[str] = None,
-    output_dir: Optional[pathlib.Path] = None,
+    outputdir: Optional[pathlib.Path] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
@@ -33,8 +33,8 @@ def create(
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
-    if output_dir is None:  # pragma: no branch
-        output_dir = pathlib.Path.cwd()
+    if outputdir is None:  # pragma: no branch
+        outputdir = pathlib.Path.cwd()
 
     if directory is not None:
         templatedir = templatedir.joinpath(*directory.parts)  # pragma: no cover
@@ -54,7 +54,7 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    projectdir = output_dir / projectfiles[0].path.parts[0]
+    projectdir = outputdir / projectfiles[0].path.parts[0]
     hookfiles = LazySequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
