@@ -11,7 +11,7 @@ from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import Variable
 
 
-def bindvariables(
+def bindcookiecuttervariables(
     variables: Sequence[Variable],
     render: Renderer,
     *,
