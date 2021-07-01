@@ -1,6 +1,5 @@
 """Create a project from a Cookiecutter template."""
 import pathlib
-from collections.abc import Iterator
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
@@ -9,27 +8,15 @@ import appdirs
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.domain.files import File
-from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findhooks
+from cutty.templates.adapters.cookiecutter.config import findpaths
 from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
-from cutty.templates.domain.config import Config
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.util.peek import peek
-
-
-def iterpaths(path: Path, config: Config) -> Iterator[Path]:
-    """Load project files in a Cookiecutter template."""
-    for template_dir in path.iterdir():
-        if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):
-            break
-    else:
-        raise RuntimeError("template directory not found")  # pragma: no cover
-
-    yield template_dir
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
@@ -65,7 +52,7 @@ def create(
         bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
-    paths = iterpaths(template_dir, config)
+    paths = findpaths(template_dir, config)
     files = renderfiles(paths, render, bindings)
     file, files = peek(files)
     if file is None:  # pragma: no cover
