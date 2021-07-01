@@ -1,5 +1,6 @@
 """Cookiecutter loader."""
 import json
+from collections.abc import Iterator
 from typing import Any
 
 from cutty.filesystems.domain.path import Path
@@ -63,3 +64,13 @@ def loadconfig(template: str, path: Path) -> Config:
     )
 
     return Config(settings, variables)
+
+
+def iterhooks(path: Path) -> Iterator[Path]:
+    """Load hooks in a Cookiecutter template."""
+    hooks = {"pre_gen_project", "post_gen_project"}
+    hookdir = path / "hooks"
+    if hookdir.is_dir():
+        for path in hookdir.iterdir():
+            if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
+                yield path
