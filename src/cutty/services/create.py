@@ -80,6 +80,24 @@ def fileexistspolicy(
     )
 
 
+def createhooksobserver(
+    template_dir: Path,
+    project_dir: pathlib.Path,
+    render: Renderer,
+    bindings: Sequence[Binding],
+    fileexists: FileExistsPolicy,
+) -> Optional[FileStorageObserver]:
+    """Create storage observer invoking Cookiecutter hooks."""
+    hookpaths = tuple(iterhooks(template_dir))
+    if not hookpaths:  # pragma: no cover
+        return None
+
+    hookfiles = renderfiles(hookpaths, render, bindings)
+    return CookiecutterHooksObserver(
+        hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+    )
+
+
 def create(
     template: str,
     *,
@@ -118,18 +136,9 @@ def create(
 
     project_dir = output_dir / file.path.parts[0]
 
-    def createhooksobserver() -> Optional[FileStorageObserver]:
-        """Create storage observer invoking Cookiecutter hooks."""
-        hookpaths = tuple(iterhooks(template_dir))
-        if not hookpaths:  # pragma: no cover
-            return None
-
-        hookfiles = renderfiles(hookpaths, render, bindings)
-        return CookiecutterHooksObserver(
-            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-        )
-
-    if observer := createhooksobserver():  # pragma: no branch
+    if observer := createhooksobserver(  # pragma: no branch
+        template_dir, project_dir, render, bindings, fileexists
+    ):
         storage = observe(storage, observer)
 
     storage = observe(storage, GitRepositoryObserver(project=project_dir))
