@@ -10,8 +10,8 @@ import appdirs
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.adapters.git import GitRepositoryObserver
 from cutty.filestorage.adapters.observers.cookiecutter import CookiecutterHooksObserver
+from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
