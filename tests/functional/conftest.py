@@ -59,13 +59,14 @@ def commit(repository: pygit2.Repository, *, message: str, paths: list[str]) -> 
         repository.index.add(path)
     tree = repository.index.write_tree()
     signature = pygit2.Signature("you", "you@example.com")
+    parents: list[pygit2.Oid] = []
     repository.create_commit(
         "HEAD",
         signature,
         signature,
         message,
         tree,
-        [],
+        parents,
     )
 
 
