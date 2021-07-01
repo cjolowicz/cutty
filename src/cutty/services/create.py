@@ -93,8 +93,6 @@ def createstorage(
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     hookfiles: Sequence[File],
-    render: Renderer,
-    bindings: Sequence[Binding],
 ) -> FileStorage:
     """Create storage for the project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
@@ -154,8 +152,6 @@ def create(
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
-        render,
-        bindings,
     ) as storage:
         for file in files:
             storage.add(file)
