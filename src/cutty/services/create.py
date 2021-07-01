@@ -103,7 +103,7 @@ def createstorage(
     observer: Optional[FileStorageObserver] = None
     hookfiles = tuple(renderfiles(hookpaths, render, bindings))
 
-    if hookpaths:  # pragma: no branch
+    if hookfiles:  # pragma: no branch
         observer = CookiecutterHooksObserver(
             hookfiles=hookfiles, project=project_dir, fileexists=fileexists
         )
