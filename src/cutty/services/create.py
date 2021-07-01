@@ -87,8 +87,7 @@ def create(
 
     config = loadconfig(template, path)
     render = createcookiecutterrenderer(path, config)
-    renderbind = renderbindwith(binder)
-    bindings = renderbind(render, config.variables)
+    bindings = renderbindwith(binder)(render, config.variables)
 
     paths = iterpaths(path, config)
     files = renderfiles(paths, render, bindings)
