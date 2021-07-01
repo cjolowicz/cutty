@@ -53,10 +53,10 @@ def bindvariables(
     render: Renderer,
     *,
     extra_context: Mapping[str, str],
-    no_input: bool,
+    interactive: bool,
 ) -> Sequence[Binding]:
     """Bind the template variables."""
-    binder: Binder = binddefault if no_input else prompt
+    binder: Binder = binddefault if not interactive else prompt
     bindings = [Binding(key, value) for key, value in extra_context.items()]
     binder = override(binder, bindings)
     return renderbindwith(binder)(render, variables)
@@ -89,7 +89,7 @@ def create(
     config = loadconfig(template, template_dir)
     render = createcookiecutterrenderer(template_dir, config)
     bindings = bindvariables(
-        config.variables, render, extra_context=extra_context, no_input=no_input
+        config.variables, render, extra_context=extra_context, interactive=not no_input
     )
 
     paths = iterpaths(template_dir, config)
