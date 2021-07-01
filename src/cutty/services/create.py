@@ -58,7 +58,7 @@ def create(
         return
 
     project_dir = get_project_dir(output_dir, files[0])
-    hookfiles = tuple(renderfiles(findhooks(template_dir), render, bindings))
+    hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
         template_dir,
