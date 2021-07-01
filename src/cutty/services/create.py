@@ -97,11 +97,12 @@ def createstorage(
 ) -> FileStorage:
     """Create storage for the project files."""
     hookpaths = tuple(iterhooks(template_dir))
+    hookfiles = tuple(renderfiles(hookpaths, render, bindings))
+
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
     observer: Optional[FileStorageObserver] = None
-    hookfiles = tuple(renderfiles(hookpaths, render, bindings))
 
     if hookfiles:  # pragma: no branch
         observer = CookiecutterHooksObserver(
