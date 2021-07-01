@@ -2,6 +2,7 @@
 import pathlib
 from collections.abc import Iterator
 from collections.abc import Mapping
+from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
@@ -23,7 +24,9 @@ from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
+from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.templates.domain.variables import Variable
 from cutty.util.peek import peek
 
 
@@ -46,6 +49,22 @@ def iterhooks(path: Path) -> Iterator[Path]:
         for path in hookdir.iterdir():
             if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
                 yield path
+
+
+def bindvariables(
+    variables: Sequence[Variable],
+    render: Renderer,
+    *,
+    extra_context: Mapping[str, str],
+    no_input: bool,
+) -> Sequence[Binding]:
+    """Bind the template variables."""
+    binder = override(
+        binddefault if no_input else prompt,
+        [Binding(key, value) for key, value in extra_context.items()],
+    )
+    bindings = renderbindwith(binder)(render, variables)
+    return bindings
 
 
 def fileexistspolicy(
@@ -81,12 +100,9 @@ def create(
 
     config = loadconfig(template, template_dir)
     render = createcookiecutterrenderer(template_dir, config)
-
-    binder = override(
-        binddefault if no_input else prompt,
-        [Binding(key, value) for key, value in extra_context.items()],
+    bindings = bindvariables(
+        config.variables, render, extra_context=extra_context, no_input=no_input
     )
-    bindings = renderbindwith(binder)(render, config.variables)
 
     paths = iterpaths(template_dir, config)
     files = renderfiles(paths, render, bindings)
