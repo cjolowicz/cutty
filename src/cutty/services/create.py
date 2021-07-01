@@ -52,7 +52,6 @@ def bindvariables(
     variables: Sequence[Variable],
     render: Renderer,
     *,
-    extra_context: Mapping[str, str],
     interactive: bool,
     bindings: Sequence[Binding],
 ) -> Sequence[Binding]:
@@ -92,11 +91,7 @@ def create(
         Binding(key, value) for key, value in extra_context.items()
     ]
     bindings = bindvariables(
-        config.variables,
-        render,
-        extra_context=extra_context,
-        interactive=not no_input,
-        bindings=bindings,
+        config.variables, render, interactive=not no_input, bindings=bindings
     )
 
     paths = iterpaths(template_dir, config)
