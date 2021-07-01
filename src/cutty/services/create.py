@@ -31,16 +31,16 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
-    template_dir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
+    templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
     if output_dir is None:  # pragma: no branch
         output_dir = pathlib.Path.cwd()
 
     if directory is not None:
-        template_dir = template_dir.joinpath(*directory.parts)  # pragma: no cover
+        templatedir = templatedir.joinpath(*directory.parts)  # pragma: no cover
 
-    config = loadcookiecutterconfig(template, template_dir)
-    render = createcookiecutterrenderer(template_dir, config)
+    config = loadcookiecutterconfig(template, templatedir)
+    render = createcookiecutterrenderer(templatedir, config)
     bindings = bindcookiecuttervariables(
         config.variables,
         render,
@@ -49,16 +49,16 @@ def create(
     )
 
     projectfiles = LazySequence(
-        renderfiles(findpaths(template_dir, config), render, bindings)
+        renderfiles(findpaths(templatedir, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
         return
 
     project_dir = output_dir / projectfiles[0].path.parts[0]
-    hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
+    hookfiles = LazySequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
-        template_dir,
+        templatedir,
         project_dir,
         overwrite_if_exists,
         skip_if_file_exists,
