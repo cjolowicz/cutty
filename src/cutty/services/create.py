@@ -51,8 +51,10 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    parent = output_dir if output_dir is not None else pathlib.Path.cwd()
-    project_dir = parent / projectfiles[0].path.parts[0]
+    if output_dir is None:  # pragma: no branch
+        output_dir = pathlib.Path.cwd()
+
+    project_dir = output_dir / projectfiles[0].path.parts[0]
     hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
