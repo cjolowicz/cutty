@@ -101,7 +101,6 @@ def createhooksobserver(
 def createstorage(
     template_dir: Path,
     project_dir: pathlib.Path,
-    output_dir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     render: Renderer,
@@ -109,7 +108,7 @@ def createstorage(
 ) -> FileStorage:
     """Create storage for the project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
+    storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
     if observer := createhooksobserver(  # pragma: no branch
         template_dir, project_dir, render, bindings, fileexists
@@ -159,7 +158,6 @@ def create(
     with createstorage(
         template_dir,
         project_dir,
-        output_dir,
         overwrite_if_exists,
         skip_if_file_exists,
         render,
