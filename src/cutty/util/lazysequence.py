@@ -26,6 +26,12 @@ class LazySequence(Sequence[_T_co]):
             self._cache.append(item)
             yield item
 
+    def __bool__(self) -> bool:
+        """Return True if there are any items in the sequence."""
+        for _ in self:
+            return True
+        return False
+
     def __len__(self) -> int:
         """Return the length of the sequence."""
         return sum(1 for _ in self)
