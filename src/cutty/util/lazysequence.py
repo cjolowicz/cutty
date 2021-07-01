@@ -54,7 +54,13 @@ class LazySequence(Sequence[_T_co]):
         if index < 0:
             index += len(self)
 
-        for position, item in enumerate(self):
+        try:
+            return self._cache[index]
+        except IndexError:
+            pass
+
+        for position, item in enumerate(self._iter):
+            self._cache.append(item)
             if index == position:
                 return item
 
