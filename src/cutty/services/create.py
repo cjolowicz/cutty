@@ -1,14 +1,12 @@
 """Create a project from a Cookiecutter template."""
 import pathlib
 from collections.abc import Mapping
-from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
 import appdirs
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
-from cutty.filestorage.domain.files import File
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findhooks
@@ -18,14 +16,6 @@ from cutty.templates.adapters.cookiecutter.render import createcookiecutterrende
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.util.lazysequence import LazySequence
-
-
-def get_project_dir(
-    output_dir: Optional[pathlib.Path], projectfiles: Sequence[File]
-) -> pathlib.Path:
-    """Determine the location of the generated project."""
-    parent = output_dir if output_dir is not None else pathlib.Path.cwd()
-    return parent / projectfiles[0].path.parts[0]
 
 
 def create(
@@ -61,7 +51,8 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    project_dir = get_project_dir(output_dir, projectfiles)
+    parent = output_dir if output_dir is not None else pathlib.Path.cwd()
+    project_dir = parent / projectfiles[0].path.parts[0]
     hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
