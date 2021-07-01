@@ -12,7 +12,7 @@ from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findhooks
 from cutty.templates.adapters.cookiecutter.config import findpaths
-from cutty.templates.adapters.cookiecutter.config import loadconfig
+from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
@@ -43,7 +43,7 @@ def create(
     if directory is not None:
         template_dir = template_dir.joinpath(*directory.parts)  # pragma: no cover
 
-    config = loadconfig(template, template_dir)
+    config = loadcookiecutterconfig(template, template_dir)
     render = createcookiecutterrenderer(template_dir, config)
     bindings = bindcookiecuttervariables(
         config.variables,
