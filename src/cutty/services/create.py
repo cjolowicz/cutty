@@ -52,11 +52,13 @@ def create(
         bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
-    files = LazySequence(renderfiles(findpaths(template_dir, config), render, bindings))
-    if not files:  # pragma: no cover
+    projectfiles = LazySequence(
+        renderfiles(findpaths(template_dir, config), render, bindings)
+    )
+    if not projectfiles:  # pragma: no cover
         return
 
-    project_dir = get_project_dir(output_dir, files[0])
+    project_dir = get_project_dir(output_dir, projectfiles[0])
     hookfiles = LazySequence(renderfiles(findhooks(template_dir), render, bindings))
 
     with createcookiecutterstorage(
@@ -66,5 +68,5 @@ def create(
         skip_if_file_exists,
         hookfiles,
     ) as storage:
-        for file in files.release():
-            storage.add(file)
+        for projectfile in projectfiles.release():
+            storage.add(projectfile)
