@@ -119,10 +119,10 @@ def create(
     project_dir = output_dir / file.path.parts[0]
     hookpaths = tuple(iterhooks(template_dir))
     if hookpaths:  # pragma: no branch
-        hookfiles = renderfiles(hookpaths, render, bindings)
 
         def createhooksobserver() -> FileStorageObserver:
             """Create storage observer invoking Cookiecutter hooks."""
+            hookfiles = renderfiles(hookpaths, render, bindings)
             return CookiecutterHooksObserver(
                 hookfiles=hookfiles, project=project_dir, fileexists=fileexists
             )
