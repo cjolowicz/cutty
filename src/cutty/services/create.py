@@ -20,6 +20,7 @@ from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.prompts import prompt
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.binders import binddefault
+from cutty.templates.domain.binders import Binder
 from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.bindings import Binding
@@ -59,8 +60,9 @@ def bindvariables(
     no_input: bool,
 ) -> Sequence[Binding]:
     """Bind the template variables."""
+    binder: Binder = binddefault if no_input else prompt
     binder = override(
-        binddefault if no_input else prompt,
+        binder,
         [Binding(key, value) for key, value in extra_context.items()],
     )
     return renderbindwith(binder)(render, variables)
