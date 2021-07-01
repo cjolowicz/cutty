@@ -17,9 +17,7 @@ from cutty.templates.adapters.cookiecutter.config import loadconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.templates.domain.variables import Variable
 from cutty.util.peek import peek
 
 
@@ -42,19 +40,6 @@ def iterhooks(path: Path) -> Iterator[Path]:
         for path in hookdir.iterdir():
             if path.is_file() and not path.name.endswith("~") and path.stem in hooks:
                 yield path
-
-
-def bindvariables(
-    variables: Sequence[Variable],
-    render: Renderer,
-    *,
-    interactive: bool,
-    bindings: Sequence[Binding],
-) -> Sequence[Binding]:
-    """Bind the template variables."""
-    return bindcookiecuttervariables(
-        variables, render, interactive=interactive, bindings=bindings
-    )
 
 
 def get_project_dir(output_dir: Optional[pathlib.Path], file: File) -> pathlib.Path:
@@ -86,7 +71,7 @@ def create(
     bindings: Sequence[Binding] = [
         Binding(key, value) for key, value in extra_context.items()
     ]
-    bindings = bindvariables(
+    bindings = bindcookiecuttervariables(
         config.variables, render, interactive=not no_input, bindings=bindings
     )
 
