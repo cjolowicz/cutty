@@ -56,7 +56,7 @@ def bindvariables(
     interactive: bool,
 ) -> Sequence[Binding]:
     """Bind the template variables."""
-    binder: Binder = binddefault if not interactive else prompt
+    binder: Binder = prompt if interactive else binddefault
     bindings = [Binding(key, value) for key, value in extra_context.items()]
     binder = override(binder, bindings)
     return renderbindwith(binder)(render, variables)
