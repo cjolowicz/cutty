@@ -24,9 +24,7 @@ class LazySequence(Sequence[_T_co]):
 
     def __iter__(self) -> Iterator[_T_co]:
         """Iterate over the items in the sequence."""
-        for item in self._cache:
-            yield item
-
+        yield from self._cache
         yield from self._readitems()
 
     def __bool__(self) -> bool:
