@@ -17,7 +17,7 @@ class LazySequence(Sequence[_T_co]):
         self._iter = iter(iterable)
         self._cache: list[_T_co] = []
 
-    def _readitems(self) -> Iterator[_T_co]:
+    def _read(self) -> Iterator[_T_co]:
         for item in self._iter:
             self._cache.append(item)
             yield item
@@ -25,7 +25,7 @@ class LazySequence(Sequence[_T_co]):
     def __iter__(self) -> Iterator[_T_co]:
         """Iterate over the items in the sequence."""
         yield from self._cache
-        yield from self._readitems()
+        yield from self._read()
 
     def __bool__(self) -> bool:
         """Return True if there are any items in the sequence."""
@@ -60,7 +60,7 @@ class LazySequence(Sequence[_T_co]):
         except IndexError:
             pass
 
-        for position, item in enumerate(self._readitems()):
+        for position, item in enumerate(self._read()):
             if index == position:
                 return item
 
