@@ -87,24 +87,6 @@ def fileexistspolicy(
     )
 
 
-def createhooksobserver(
-    template_dir: Path,
-    project_dir: pathlib.Path,
-    render: Renderer,
-    bindings: Sequence[Binding],
-    fileexists: FileExistsPolicy,
-) -> Optional[FileStorageObserver]:
-    """Create storage observer invoking Cookiecutter hooks."""
-    hookpaths = tuple(iterhooks(template_dir))
-    if not hookpaths:  # pragma: no cover
-        return None
-
-    hookfiles = renderfiles(hookpaths, render, bindings)
-    return CookiecutterHooksObserver(
-        hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-    )
-
-
 def createstorage(
     template_dir: Path,
     project_dir: pathlib.Path,
@@ -114,6 +96,24 @@ def createstorage(
     bindings: Sequence[Binding],
 ) -> FileStorage:
     """Create storage for the project files."""
+
+    def createhooksobserver(
+        template_dir: Path,
+        project_dir: pathlib.Path,
+        render: Renderer,
+        bindings: Sequence[Binding],
+        fileexists: FileExistsPolicy,
+    ) -> Optional[FileStorageObserver]:
+        """Create storage observer invoking Cookiecutter hooks."""
+        hookpaths = tuple(iterhooks(template_dir))
+        if not hookpaths:  # pragma: no cover
+            return None
+
+        hookfiles = renderfiles(hookpaths, render, bindings)
+        return CookiecutterHooksObserver(
+            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+        )
+
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
