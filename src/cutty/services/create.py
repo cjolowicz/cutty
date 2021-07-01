@@ -80,13 +80,13 @@ def create(
     if directory is not None:
         path = path.joinpath(*directory.parts)  # pragma: no cover
 
+    config = loadconfig(template, path)
+    render = createcookiecutterrenderer(path, config)
+
     binder = override(
         binddefault if no_input else prompt,
         [Binding(key, value) for key, value in extra_context.items()],
     )
-
-    config = loadconfig(template, path)
-    render = createcookiecutterrenderer(path, config)
     bindings = renderbindwith(binder)(render, config.variables)
 
     paths = iterpaths(path, config)
