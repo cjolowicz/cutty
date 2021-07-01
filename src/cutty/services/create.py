@@ -87,39 +87,25 @@ def fileexistspolicy(
     )
 
 
-def createhooksobserver(
-    template_dir: Path,
-    project_dir: pathlib.Path,
-    render: Renderer,
-    bindings: Sequence[Binding],
-    fileexists: FileExistsPolicy,
-) -> Optional[FileStorageObserver]:
-    """Create storage observer invoking Cookiecutter hooks."""
-    hookpaths = tuple(iterhooks(template_dir))
-    if not hookpaths:  # pragma: no cover
-        return None
-
-    hookfiles = renderfiles(hookpaths, render, bindings)
-    return CookiecutterHooksObserver(
-        hookfiles=hookfiles, project=project_dir, fileexists=fileexists
-    )
-
-
 def createstorage(
     template_dir: Path,
     project_dir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
-    render: Renderer,
-    bindings: Sequence[Binding],
+    hookfiles: Sequence[File],
 ) -> FileStorage:
     """Create storage for the project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
 
-    if observer := createhooksobserver(  # pragma: no branch
-        template_dir, project_dir, render, bindings, fileexists
-    ):
+    observer: Optional[FileStorageObserver] = None
+
+    if hookfiles:  # pragma: no branch
+        observer = CookiecutterHooksObserver(
+            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+        )
+
+    if observer:  # pragma: no branch
         storage = observe(storage, observer)
 
     storage = observe(storage, GitRepositoryObserver(project=project_dir))
@@ -158,14 +144,14 @@ def create(
         return
 
     project_dir = get_project_dir(output_dir, file)
+    hookfiles = tuple(renderfiles(iterhooks(template_dir), render, bindings))
 
     with createstorage(
         template_dir,
         project_dir,
         overwrite_if_exists,
         skip_if_file_exists,
-        render,
-        bindings,
+        hookfiles,
     ) as storage:
         for file in files:
             storage.add(file)
