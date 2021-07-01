@@ -75,13 +75,13 @@ def create(
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
     provider = getdefaultrepositoryprovider(cachedir)
-    path = provider(template, revision=checkout)
+    template_dir = provider(template, revision=checkout)
 
     if directory is not None:
-        path = path.joinpath(*directory.parts)  # pragma: no cover
+        template_dir = template_dir.joinpath(*directory.parts)  # pragma: no cover
 
-    config = loadconfig(template, path)
-    render = createcookiecutterrenderer(path, config)
+    config = loadconfig(template, template_dir)
+    render = createcookiecutterrenderer(template_dir, config)
 
     binder = override(
         binddefault if no_input else prompt,
@@ -89,7 +89,7 @@ def create(
     )
     bindings = renderbindwith(binder)(render, config.variables)
 
-    paths = iterpaths(path, config)
+    paths = iterpaths(template_dir, config)
     files = renderfiles(paths, render, bindings)
     file, files = peek(files)
     if file is None:  # pragma: no cover
@@ -102,7 +102,7 @@ def create(
     storage: FileStorage = DiskFileStorage(output_dir, fileexists=fileexists)
 
     project = output_dir / file.path.parts[0]
-    hookpaths = tuple(iterhooks(path))
+    hookpaths = tuple(iterhooks(template_dir))
     if hookpaths:  # pragma: no branch
         hookfiles = renderfiles(hookpaths, render, bindings)
         storage = observe(
