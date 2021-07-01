@@ -35,7 +35,7 @@ class LazySequence(Sequence[_T_co]):
 
     def __len__(self) -> int:
         """Return the number of items in the sequence."""
-        return sum(1 for _ in self)
+        return len(self._cache) + sum(1 for _ in self._read())
 
     @overload
     def __getitem__(self, index: int) -> _T_co:
