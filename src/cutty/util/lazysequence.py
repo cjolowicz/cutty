@@ -17,14 +17,17 @@ class LazySequence(Sequence[_T_co]):
         self._iter = iter(iterable)
         self._cache: list[_T_co] = []
 
+    def _readitems(self) -> Iterator[_T_co]:
+        for item in self._iter:
+            self._cache.append(item)
+            yield item
+
     def __iter__(self) -> Iterator[_T_co]:
         """Iterate over the items in the sequence."""
         for item in self._cache:
             yield item
 
-        for item in self._iter:
-            self._cache.append(item)
-            yield item
+        yield from self._readitems()
 
     def __bool__(self) -> bool:
         """Return True if there are any items in the sequence."""
