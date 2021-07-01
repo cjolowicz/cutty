@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import pygit2
+import pytest
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
@@ -13,6 +14,7 @@ def test_help(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
 
+@pytest.mark.xfail(reason="not implemented")
 def test_update(runner: CliRunner, repository: Path) -> None:
     """It applies changes from the template."""
     runner.invoke(
