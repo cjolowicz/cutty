@@ -150,10 +150,14 @@ def create(
     if file is None:  # pragma: no cover
         return
 
-    if output_dir is None:
-        output_dir = pathlib.Path.cwd()  # pragma: no cover
+    def get_project_dir() -> pathlib.Path:
+        """Determine the location of the generated project."""
+        assert file is not None  # noqa: S101
 
-    project_dir = output_dir / file.path.parts[0]
+        parent = output_dir if output_dir is not None else pathlib.Path.cwd()
+        return parent / file.path.parts[0]
+
+    project_dir = get_project_dir()
 
     with createstorage(
         template_dir,
