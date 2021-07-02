@@ -1,7 +1,9 @@
 """Lazy sequences."""
 from collections import deque
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
+from collections.abc import MutableSequence
 from collections.abc import Sequence
 from typing import overload
 from typing import TypeVar
@@ -14,10 +16,15 @@ _T_co = TypeVar("_T_co", covariant=True)
 class LazySequence(Sequence[_T_co]):
     """A lazy sequence provides sequence operations on an iterable."""
 
-    def __init__(self, iterable: Iterable[_T_co]) -> None:
+    def __init__(
+        self,
+        iterable: Iterable[_T_co],
+        *,
+        storage: Callable[[], MutableSequence[_T_co]] = deque
+    ) -> None:
         """Initialize."""
         self._iter = iter(iterable)
-        self._cache: deque[_T_co] = deque()
+        self._cache: MutableSequence[_T_co] = storage()
 
     def _consume(self) -> Iterator[_T_co]:
         for item in self._iter:
