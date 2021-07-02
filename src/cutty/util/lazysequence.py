@@ -77,6 +77,8 @@ class LazySequence(Sequence[_T_co]):
         except IndexError:
             pass
 
+        index -= len(self._cache)
+
         for position, item in enumerate(self._consume()):
             if index == position:
                 return item

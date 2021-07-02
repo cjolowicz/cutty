@@ -35,6 +35,12 @@ def test_getitem_negative() -> None:
     assert 2 == LazySequence([1, 2])[-1]
 
 
+def test_getitem_past_cache() -> None:
+    """It returns the item at the given position."""
+    s = LazySequence([1, 2])
+    assert (1, 2) == (s[0], s[1])
+
+
 def test_getslice() -> None:
     """It returns the items at the given positions."""
     [item] = LazySequence([1, 2])[1:]
