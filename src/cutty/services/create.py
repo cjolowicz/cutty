@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import Optional
 
 import appdirs
+from lazysequence import lazysequence
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
@@ -15,7 +16,6 @@ from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.util.lazysequence import LazySequence
 
 
 def create(
@@ -48,14 +48,14 @@ def create(
         bindings=[Binding(key, value) for key, value in extra_context.items()],
     )
 
-    projectfiles = LazySequence(
+    projectfiles = lazysequence(
         renderfiles(findpaths(templatedir, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
         return
 
     projectdir = outputdir / projectfiles[0].path.parts[0]
-    hookfiles = LazySequence(renderfiles(findhooks(templatedir), render, bindings))
+    hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
         templatedir,
