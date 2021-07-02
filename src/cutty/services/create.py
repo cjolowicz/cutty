@@ -33,11 +33,11 @@ def create(
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
-    if outputdir is None:  # pragma: no branch
-        outputdir = pathlib.Path.cwd()
-
     if directory is not None:
         templatedir = templatedir.joinpath(*directory.parts)  # pragma: no cover
+
+    if outputdir is None:  # pragma: no branch
+        outputdir = pathlib.Path.cwd()
 
     config = loadcookiecutterconfig(template, templatedir)
     render = createcookiecutterrenderer(templatedir, config)
@@ -58,11 +58,7 @@ def create(
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
-        templatedir,
-        projectdir,
-        overwrite_if_exists,
-        skip_if_file_exists,
-        hookfiles,
+        projectdir, overwrite_if_exists, skip_if_file_exists, hookfiles
     ) as storage:
         for projectfile in projectfiles.release():
             storage.add(projectfile)

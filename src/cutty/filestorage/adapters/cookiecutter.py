@@ -9,7 +9,6 @@ from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filesystems.domain.path import Path
 
 
 def fileexistspolicy(
@@ -26,7 +25,6 @@ def fileexistspolicy(
 
 
 def createcookiecutterstorage(
-    template_dir: Path,
     project_dir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
