@@ -462,6 +462,14 @@ arrow = "*"
 jinja2 = "*"
 
 [[package]]
+name = "lazysequence"
+version = "0.2.1"
+description = "lazysequence"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[[package]]
 name = "livereload"
 version = "2.6.3"
 description = "Python LiveReload is an awesome tool for web developers"
@@ -1148,7 +1156,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "c557aa45787b74f1b7d86e987a401642a659b5c2a7452332995b8c1ae10d297f"
+content-hash = "7b01eb247009818e9ae2e81ca635fabbcb281c103d491a84b70de87dc3b4d876"
 
 [metadata.files]
 alabaster = [
@@ -1410,6 +1418,10 @@ jinja2 = [
 jinja2-time = [
     {file = "jinja2-time-0.2.0.tar.gz", hash = "sha256:d14eaa4d315e7688daa4969f616f226614350c48730bfa1692d2caebd8c90d40"},
     {file = "jinja2_time-0.2.0-py2.py3-none-any.whl", hash = "sha256:d3eab6605e3ec8b7a0863df09cc1d23714908fa61aa6986a845c20ba488b4efa"},
+]
+lazysequence = [
+    {file = "lazysequence-0.2.1-py3-none-any.whl", hash = "sha256:3a365e7eb775b7bca353ea4a6fd49cd34b526185fc192565156681a364715631"},
+    {file = "lazysequence-0.2.1.tar.gz", hash = "sha256:da6494a43a59ff2b965596b797aa0077f8de13e96c5853846fd8ecad63e9dde6"},
 ]
 livereload = [
     {file = "livereload-2.6.3.tar.gz", hash = "sha256:776f2f865e59fde56490a56bcc6773b6917366bce0c267c60ee8aaf1a0959869"},
