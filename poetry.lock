@@ -463,7 +463,7 @@ jinja2 = "*"
 
 [[package]]
 name = "lazysequence"
-version = "0.2.1"
+version = "0.2.5"
 description = "lazysequence"
 category = "main"
 optional = false
@@ -1420,8 +1420,8 @@ jinja2-time = [
     {file = "jinja2_time-0.2.0-py2.py3-none-any.whl", hash = "sha256:d3eab6605e3ec8b7a0863df09cc1d23714908fa61aa6986a845c20ba488b4efa"},
 ]
 lazysequence = [
-    {file = "lazysequence-0.2.1-py3-none-any.whl", hash = "sha256:3a365e7eb775b7bca353ea4a6fd49cd34b526185fc192565156681a364715631"},
-    {file = "lazysequence-0.2.1.tar.gz", hash = "sha256:da6494a43a59ff2b965596b797aa0077f8de13e96c5853846fd8ecad63e9dde6"},
+    {file = "lazysequence-0.2.5-py3-none-any.whl", hash = "sha256:cd93caedb2fac42d44cc84ea4a03b413405b0a4ee6f5423a4c2b7a0290e59e98"},
+    {file = "lazysequence-0.2.5.tar.gz", hash = "sha256:8364054eba0b4ec8da394d29973d3b0b14d3b43cb837bc0e79fe78e50122ab64"},
 ]
 livereload = [
     {file = "livereload-2.6.3.tar.gz", hash = "sha256:776f2f865e59fde56490a56bcc6773b6917366bce0c267c60ee8aaf1a0959869"},
