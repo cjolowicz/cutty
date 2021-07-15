@@ -16,4 +16,4 @@ def getprojecttemplate(projectdir: Path) -> str:
 def update() -> None:
     """Update a project with changes from its Cookiecutter template."""
     template = getprojecttemplate(Path.cwd())
-    create(template)
+    create(template, no_input=True)
