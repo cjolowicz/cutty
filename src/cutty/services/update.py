@@ -1,5 +1,4 @@
 """Update a project with changes from its Cookiecutter template."""
-import contextlib
 import json
 import tempfile
 from collections.abc import Iterator
@@ -7,6 +6,7 @@ from pathlib import Path
 
 import pygit2
 
+from cutty.compat.contextlib import contextmanager
 from cutty.services.create import create
 
 
@@ -29,7 +29,7 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
     }
 
 
-@contextlib.contextmanager
+@contextmanager
 def createworktree(repositorypath: Path, branch: str) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
     repository = pygit2.Repository(repositorypath)
