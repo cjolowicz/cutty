@@ -1,4 +1,5 @@
 """Functional tests for the update CLI."""
+import os
 from pathlib import Path
 
 import pygit2
@@ -27,7 +28,7 @@ def test_update(runner: CliRunner, repository: Path) -> None:
     # Commit the changes.
     commit(pygit2.Repository(repository), message="Update README.md")
 
+    os.chdir("example")
+
     runner.invoke(main, ["update"], catch_exceptions=False)
-    assert (
-        Path("example", "README.md").read_text() == "# example\nAn awesome project.\n"
-    )
+    assert Path("README.md").read_text() == "# example\nAn awesome project.\n"
