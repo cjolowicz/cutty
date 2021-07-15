@@ -37,3 +37,4 @@ class GitRepositoryObserver(FileStorageObserver):
         repository.index.write()
         signature = default_signature(repository)
         repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+        repository.branches.create("cutty/latest", repository.head.peel())
