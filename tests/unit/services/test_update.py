@@ -3,12 +3,6 @@ import json
 from pathlib import Path
 
 from cutty.services.update import getprojecttemplate
-from cutty.services.update import update
-
-
-def test_update() -> None:
-    """It does not raise."""
-    update()
 
 
 def test_getprojecttemplate(tmp_path: Path) -> None:
