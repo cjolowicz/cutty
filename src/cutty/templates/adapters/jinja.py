@@ -18,7 +18,7 @@ from cutty.util.reraise import reraise
 
 
 @dataclass
-class TemplateExtensionNotFound(Exception):
+class TemplateExtensionNotFoundError(Exception):
     """The template extension was not found."""
 
     extension: str
@@ -60,7 +60,7 @@ def import_object(import_path: str) -> Any:
 
 def load_extension(import_path: str) -> type[jinja2.ext.Extension]:
     """Import a Jinja extension from the specified path."""
-    with reraise(TemplateExtensionNotFound(import_path)):
+    with reraise(TemplateExtensionNotFoundError(import_path)):
         extension = import_object(import_path)
 
     if not (
