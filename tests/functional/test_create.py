@@ -19,3 +19,4 @@ def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
     )
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
     assert Path("foobar", "post_gen_project").is_file()
+    assert Path("foobar", ".cookiecutter.json").is_file()
