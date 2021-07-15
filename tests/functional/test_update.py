@@ -18,7 +18,9 @@ def test_help(runner: CliRunner) -> None:
 def test_update(runner: CliRunner, repository: Path) -> None:
     """It applies changes from the template."""
     runner.invoke(
-        main, ["create", "--no-input", str(repository)], catch_exceptions=False
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
     )
 
     # Update README.md.
@@ -28,7 +30,7 @@ def test_update(runner: CliRunner, repository: Path) -> None:
     # Commit the changes.
     commit(pygit2.Repository(repository), message="Update README.md")
 
-    os.chdir("example")
+    os.chdir("awesome")
 
     runner.invoke(main, ["update"], catch_exceptions=False)
-    assert Path("README.md").read_text() == "# example\nAn awesome project.\n"
+    assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
