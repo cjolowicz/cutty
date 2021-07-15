@@ -2,6 +2,8 @@
 import json
 from pathlib import Path
 
+from cutty.services.create import create
+
 
 def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
@@ -12,3 +14,5 @@ def getprojecttemplate(projectdir: Path) -> str:
 
 def update() -> None:
     """Update a project with changes from its Cookiecutter template."""
+    template = getprojecttemplate(Path.cwd())
+    create(template)
