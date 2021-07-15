@@ -9,7 +9,8 @@ def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
     text = (projectdir / ".cookiecutter.json").read_text()
     data = json.loads(text)
-    return data["_template"]
+    result: str = data["_template"]
+    return result
 
 
 def update() -> None:
