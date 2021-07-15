@@ -2,8 +2,12 @@
 import json
 from pathlib import Path
 
+import pygit2
+
+from cutty.services.update import createworktree
 from cutty.services.update import getprojectcontext
 from cutty.services.update import getprojecttemplate
+from tests.functional.conftest import commit
 
 
 def test_getprojecttemplate(tmp_path: Path) -> None:
@@ -22,3 +26,18 @@ def test_getprojectcontext(tmp_path: Path) -> None:
     (tmp_path / ".cookiecutter.json").write_text(text)
 
     assert context == getprojectcontext(tmp_path)
+
+
+def test_createworktree(tmp_path: Path) -> None:
+    """It returns a path to the worktree."""
+    repositorypath = tmp_path / "repository"
+    repository = pygit2.init_repository(repositorypath)
+    (tmp_path / "repository" / "README").touch()
+    commit(repository, message="Initial")
+    repository.branches.create("mybranch", repository.head.peel())
+
+    with createworktree(repositorypath, "mybranch") as worktree:
+        assert (worktree / ".git").is_file()
+        assert (worktree / "README").is_file()
+
+    assert not worktree.is_dir()
