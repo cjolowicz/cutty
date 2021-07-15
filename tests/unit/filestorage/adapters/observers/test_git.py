@@ -130,3 +130,14 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     repository = pygit2.Repository(project)
     reference = repository.references["refs/heads/cutty/latest"]
     assert repository.head.peel() == reference.peel()
+
+
+def test_branch_not_checked_out(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It does not check out the ``cutty/latest`` branch."""
+    with storage:
+        storage.add(file)
+
+    repository = pygit2.Repository(project)
+    assert repository.references["HEAD"].target != "refs/heads/cutty/latest"
