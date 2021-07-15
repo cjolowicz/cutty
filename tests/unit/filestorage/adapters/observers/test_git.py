@@ -120,3 +120,13 @@ def test_existing_repository(
         storage.add(file)
 
     assert file.path.name not in tree(repository)
+
+
+def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
+    """It creates a ``cutty/latest`` branch pointing to the initial commit."""
+    with storage:
+        storage.add(file)
+
+    repository = pygit2.Repository(project)
+    reference = repository.references["refs/heads/cutty/latest"]
+    assert repository.head.peel() == reference.peel()
