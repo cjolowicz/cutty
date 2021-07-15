@@ -28,6 +28,11 @@ def update() -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectdir = Path.cwd()
     template = getprojecttemplate(projectdir)
+    context = getprojectcontext(projectdir)
     create(
-        template, no_input=True, outputdir=projectdir.parent, overwrite_if_exists=True
+        template,
+        no_input=True,
+        outputdir=projectdir.parent,
+        overwrite_if_exists=True,
+        extra_context=context,
     )
