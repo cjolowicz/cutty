@@ -13,6 +13,17 @@ def getprojecttemplate(projectdir: Path) -> str:
     return result
 
 
+def getprojectcontext(projectdir: Path) -> dict[str, str]:
+    """Return the Cookiecutter context of the project."""
+    text = (projectdir / ".cookiecutter.json").read_text()
+    data = json.loads(text)
+    return {
+        key: value
+        for key, value in data.items()
+        if isinstance(key, str) and isinstance(value, str)
+    }
+
+
 def update() -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectdir = Path.cwd()
