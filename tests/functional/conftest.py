@@ -46,6 +46,13 @@ def template_directory(tmp_path: Path) -> Path:
     )
 
     create(
+        tmp_path / "{{ cookiecutter.project }}" / ".cookiecutter.json",
+        """
+        {{ cookiecutter | jsonify }}
+        """,
+    )
+
+    create(
         tmp_path / "hooks" / "post_gen_project.py",
         """
         open("post_gen_project", mode="w")
