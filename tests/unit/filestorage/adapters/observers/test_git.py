@@ -157,3 +157,17 @@ def test_existing_branch(
         storage.add(file)
 
     assert file.path.name in tree(repository)
+
+
+def test_existing_branch_not_head(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It raises an exception."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+    branchname = "cutty/latest"
+    repository.branches.create(branchname, repository.head.peel())
+
+    with pytest.raises(Exception):
+        with storage:
+            storage.add(file)
