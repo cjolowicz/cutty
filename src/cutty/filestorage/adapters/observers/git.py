@@ -38,4 +38,6 @@ class GitRepositoryObserver(FileStorageObserver):
         signature = default_signature(repository)
         parents = [] if repository.head_is_unborn else [repository.head.target]
         repository.create_commit("HEAD", signature, signature, "Initial", tree, parents)
-        repository.branches.create("cutty/latest", repository.head.peel())
+
+        if "cutty/latest" not in repository.branches:
+            repository.branches.create("cutty/latest", repository.head.peel())
