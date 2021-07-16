@@ -88,3 +88,25 @@ def test_update_conflict(runner: CliRunner, repository: Path) -> None:
     result = runner.invoke(main, ["update"])
 
     assert result.exit_code != 0
+
+
+def test_update_remove(runner: CliRunner, repository: Path) -> None:
+    """It applies file deletions from the template."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    projectdir = Path("awesome")
+
+    # Remove README in the template.
+    path = repository / "{{ cookiecutter.project }}" / "README.md"
+    path.unlink()
+    commit(pygit2.Repository(repository), message="Remove README.md")
+
+    # Update the project.
+    os.chdir(projectdir)
+    runner.invoke(main, ["update"], catch_exceptions=False)
+
+    assert not Path("README.md").is_file()
