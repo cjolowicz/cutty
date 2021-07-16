@@ -18,6 +18,16 @@ def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     return repository.default_signature  # pragma: no cover
 
 
+def commit(repository: pygit2.Repository, *, message: str) -> None:
+    """Commit all changes in the repository."""
+    repository.index.add_all()
+    tree = repository.index.write_tree()
+    repository.index.write()
+    signature = default_signature(repository)
+    parents = [] if repository.head_is_unborn else [repository.head.target]
+    repository.create_commit("HEAD", signature, signature, message, tree, parents)
+
+
 class GitRepositoryObserver(FileStorageObserver):
     """Storage observer creating a git repository."""
 
@@ -32,12 +42,7 @@ class GitRepositoryObserver(FileStorageObserver):
         except pygit2.GitError:
             repository = pygit2.init_repository(self.project)
 
-        repository.index.add_all()
-        tree = repository.index.write_tree()
-        repository.index.write()
-        signature = default_signature(repository)
-        parents = [] if repository.head_is_unborn else [repository.head.target]
-        repository.create_commit("HEAD", signature, signature, "Initial", tree, parents)
+        commit(repository, message="Initial")
 
         if "cutty/latest" not in repository.branches:
             repository.branches.create("cutty/latest", repository.head.peel())
