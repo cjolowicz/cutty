@@ -5,7 +5,9 @@ import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
+from cutty.filestorage.adapters.observers.git import commit as _commit
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
@@ -103,41 +105,69 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
 
 def commit(repository: pygit2.Repository) -> None:
     """Create an initial empty commit."""
-    tree = repository.index.write_tree()
-    repository.index.write()
     signature = pygit2.Signature("you", "you@example.com")
-    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+    _commit(repository, message="Initial", signature=signature)
 
 
 def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
-    """It does nothing if the repository already exists."""
+    """It creates the commit in an existing repository."""
     repository = pygit2.init_repository(project)
     commit(repository)
 
     with storage:
         storage.add(file)
 
-    assert file.path.name not in tree(repository)
+    assert file.path.name in tree(repository)
 
 
 def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
-    """It creates a ``cutty/latest`` branch pointing to the initial commit."""
+    """It creates a branch pointing to the initial commit."""
     with storage:
         storage.add(file)
 
     repository = pygit2.Repository(project)
-    reference = repository.references["refs/heads/cutty/latest"]
+    reference = repository.references[f"refs/heads/{LATEST_BRANCH}"]
     assert repository.head.peel() == reference.peel()
 
 
 def test_branch_not_checked_out(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
-    """It does not check out the ``cutty/latest`` branch."""
+    """It does not check out the `latest` branch."""
     with storage:
         storage.add(file)
 
     repository = pygit2.Repository(project)
-    assert repository.references["HEAD"].target != "refs/heads/cutty/latest"
+    assert repository.references["HEAD"].target != f"refs/heads/{LATEST_BRANCH}"
+
+
+def test_existing_branch(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It updates the `latest` branch if it exists."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+
+    with storage:
+        storage.add(file)
+
+    assert file.path.name in tree(repository)
+
+
+def test_existing_branch_not_head(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It raises an exception if `latest` exists but HEAD points elsewhere."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    with pytest.raises(Exception):
+        with storage:
+            storage.add(file)
+
+    assert file.path.name not in tree(repository)
