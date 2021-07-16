@@ -8,6 +8,8 @@ import pygit2
 import pytest
 from click.testing import CliRunner
 
+from cutty.filestorage.adapters.observers.git import commit as _commit
+
 
 @pytest.fixture
 def runner() -> Iterator[CliRunner]:
@@ -55,11 +57,8 @@ def template_directory(tmp_path: Path) -> Path:
 
 def commit(repository: pygit2.Repository, *, message: str) -> None:
     """Commit all changes in the repository."""
-    repository.index.add_all()
-    tree = repository.index.write_tree()
     signature = pygit2.Signature("you", "you@example.com")
-    parents = [] if repository.head_is_unborn else [repository.head.target]
-    repository.create_commit("HEAD", signature, signature, message, tree, parents)
+    _commit(repository, message=message, signature=signature)
 
 
 @pytest.fixture
