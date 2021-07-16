@@ -9,6 +9,9 @@ import pygit2
 from cutty.filestorage.domain.observers import FileStorageObserver
 
 
+LATEST_BRANCH = "cutty/latest"
+
+
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     """Return the default signature."""
     with contextlib.suppress(KeyError):
@@ -53,10 +56,10 @@ class GitRepositoryObserver(FileStorageObserver):
 
         commit(repository, message="Initial")
 
-        if "cutty/latest" not in repository.branches:
-            repository.branches.create("cutty/latest", repository.head.peel())
+        if LATEST_BRANCH not in repository.branches:
+            repository.branches.create(LATEST_BRANCH, repository.head.peel())
         else:
-            # HEAD must point to `cutty/latest` if that branch exists.
+            # HEAD must point to latest branch if it exists.
             head = repository.references["HEAD"].target
-            if head != "refs/heads/cutty/latest":
+            if head != f"refs/heads/{LATEST_BRANCH}":
                 raise RuntimeError(f"unexpected HEAD: {head}")
