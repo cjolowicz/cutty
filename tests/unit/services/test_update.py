@@ -45,6 +45,19 @@ def test_createworktree(tmp_path: Path) -> None:
     assert not worktree.is_dir()
 
 
+def test_createworktree_no_checkout(tmp_path: Path) -> None:
+    """It creates a worktree without checking out the files."""
+    repositorypath = tmp_path / "repository"
+    repository = pygit2.init_repository(repositorypath)
+    (tmp_path / "repository" / "README").touch()
+    commit(repository, message="Initial")
+    repository.branches.create("mybranch", repository.head.peel())
+
+    with createworktree(repositorypath, "mybranch", checkout=False) as worktree:
+        assert (worktree / ".git").is_file()
+        assert not (worktree / "README").is_file()
+
+
 def test_cherrypick(tmp_path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
     repositorypath = tmp_path / "repository"
