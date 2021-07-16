@@ -1,7 +1,7 @@
 cutty
 =====
 
-|PyPI| |Python Version| |License| |Read the Docs| |Tests| |Codecov|
+|PyPI| |Status| |Python Version| |License| |Read the Docs| |Tests| |Codecov|
 
 .. |Status| image:: https://badgen.net/badge/status/alpha/d8624d
    :target: https://badgen.net/badge/status/alpha/d8624d
@@ -9,6 +9,9 @@ cutty
 .. |PyPI| image:: https://img.shields.io/pypi/v/cutty.svg
    :target: https://pypi.org/project/cutty/
    :alt: PyPI
+.. |Status| image:: https://img.shields.io/pypi/status/cutty.svg
+   :target: https://pypi.org/project/cutty/
+   :alt: Status
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/cutty
    :target: https://pypi.org/project/cutty
    :alt: Python Version
