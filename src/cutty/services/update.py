@@ -38,6 +38,7 @@ def createworktree(repositorypath: Path, branch: str) -> Iterator[Path]:
         yield path
 
     # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
+    # https://github.com/libgit2/libgit2/issues/5280
     worktree.prune(True)
 
 
