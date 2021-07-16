@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import pygit2
+import pytest
 
 from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
@@ -63,3 +64,25 @@ def test_cherrypick(tmp_path: Path) -> None:
 
     cherrypick(repositorypath, f"refs/heads/{otherbranch}")
     assert (repositorypath / "README").is_file()
+
+
+def test_cherrypick_conflict(tmp_path: Path) -> None:
+    """It raises an exception on merge conflicts."""
+    repositorypath = tmp_path / "repository"
+    repository = pygit2.init_repository(repositorypath)
+    commit(repository, message="Initial")
+
+    mainbranch = repository.references[repository.references["HEAD"].target]
+    otherbranch = repository.branches.create("mybranch", repository.head.peel())
+
+    (repositorypath / "README").write_text("This is the version on the main branch.")
+    commit(repository, message="Add README")
+
+    repository.checkout(otherbranch)
+    (repositorypath / "README").write_text("This is the version on the other branch.")
+    commit(repository, message="Add README")
+
+    repository.checkout(mainbranch)
+
+    with pytest.raises(Exception):
+        cherrypick(repositorypath, otherbranch.name)
