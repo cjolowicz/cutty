@@ -54,12 +54,13 @@ class GitRepositoryObserver(FileStorageObserver):
         except pygit2.GitError:
             repository = pygit2.init_repository(self.project)
 
-        commit(repository, message="Initial")
-
-        if LATEST_BRANCH not in repository.branches:
-            repository.branches.create(LATEST_BRANCH, repository.head.peel())
-        else:
+        if LATEST_BRANCH in repository.branches:
             # HEAD must point to latest branch if it exists.
             head = repository.references["HEAD"].target
             if head != f"refs/heads/{LATEST_BRANCH}":
                 raise RuntimeError(f"unexpected HEAD: {head}")
+
+        commit(repository, message="Initial")
+
+        if LATEST_BRANCH not in repository.branches:
+            repository.branches.create(LATEST_BRANCH, repository.head.peel())
