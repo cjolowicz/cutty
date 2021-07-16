@@ -5,6 +5,7 @@ import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
+from cutty.filestorage.adapters.observers.git import commit as _commit
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
@@ -103,10 +104,8 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
 
 def commit(repository: pygit2.Repository) -> None:
     """Create an initial empty commit."""
-    tree = repository.index.write_tree()
-    repository.index.write()
     signature = pygit2.Signature("you", "you@example.com")
-    repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+    _commit(repository, message="Initial", signature=signature)
 
 
 def test_existing_repository(
