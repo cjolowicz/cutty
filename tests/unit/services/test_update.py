@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pygit2
 
+from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
 from cutty.services.update import getprojectcontext
 from cutty.services.update import getprojecttemplate
@@ -41,3 +42,24 @@ def test_createworktree(tmp_path: Path) -> None:
         assert (worktree / "README").is_file()
 
     assert not worktree.is_dir()
+
+
+def test_cherrypick(tmp_path: Path) -> None:
+    """It cherry-picks the commit onto the current branch."""
+    repositorypath = tmp_path / "repository"
+    repository = pygit2.init_repository(repositorypath)
+    commit(repository, message="Initial")
+
+    currentbranch = repository.references["HEAD"].target
+    otherbranch = "mybranch"
+
+    (repositorypath / "README").touch()
+    repository.branches.create(otherbranch, repository.head.peel())
+    repository.set_head(f"refs/heads/{otherbranch}")
+    commit(repository, message="Add README")
+
+    repository.checkout(currentbranch)
+    assert not (repositorypath / "README").is_file()
+
+    cherrypick(repositorypath, f"refs/heads/{otherbranch}")
+    assert (repositorypath / "README").is_file()
