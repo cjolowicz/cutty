@@ -171,3 +171,19 @@ def test_existing_branch_not_head(
             storage.add(file)
 
     assert file.path.name not in tree(repository)
+
+
+def test_existing_branch_commit_message(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It uses a different commit message on updates."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+
+    with storage:
+        storage.add(file)
+
+    commit_ = repository.head.peel()
+    assert "initial" not in commit_.message.lower()
