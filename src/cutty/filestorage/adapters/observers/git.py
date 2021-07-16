@@ -60,7 +60,13 @@ class GitRepositoryObserver(FileStorageObserver):
             if head != f"refs/heads/{LATEST_BRANCH}":
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
-        commit(repository, message="Initial")
+        message = (
+            "Initial import"
+            if LATEST_BRANCH not in repository.branches
+            else "Update project template"
+        )
+
+        commit(repository, message=message)
 
         if LATEST_BRANCH not in repository.branches:
             repository.branches.create(LATEST_BRANCH, repository.head.peel())
