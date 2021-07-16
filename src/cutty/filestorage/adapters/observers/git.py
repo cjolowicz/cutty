@@ -28,9 +28,16 @@ def commit(
     message: str,
     signature: Optional[pygit2.Signature] = None,
 ) -> None:
-    """Commit all changes in the repository."""
+    """Commit all changes in the repository.
+
+    If there are no changes relative to the parent, this is a noop.
+    """
     repository.index.add_all()
+
     tree = repository.index.write_tree()
+    if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
+        return
+
     repository.index.write()
 
     if signature is None:

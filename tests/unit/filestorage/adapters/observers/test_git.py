@@ -187,3 +187,20 @@ def test_existing_branch_commit_message(
 
     commit_ = repository.head.peel()
     assert "initial" not in commit_.message.lower()
+
+
+def test_existing_branch_no_changes(
+    storage: FileStorage, project: pathlib.Path
+) -> None:
+    """It does not create an empty commit."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+    oldhead = repository.head.target
+
+    with storage:
+        pass
+
+    assert oldhead == repository.head.target
