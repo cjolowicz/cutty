@@ -2,6 +2,7 @@
 import contextlib
 import os
 import pathlib
+from typing import Optional
 
 import pygit2
 
@@ -18,12 +19,20 @@ def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     return repository.default_signature  # pragma: no cover
 
 
-def commit(repository: pygit2.Repository, *, message: str) -> None:
+def commit(
+    repository: pygit2.Repository,
+    *,
+    message: str,
+    signature: Optional[pygit2.Signature] = None,
+) -> None:
     """Commit all changes in the repository."""
     repository.index.add_all()
     tree = repository.index.write_tree()
     repository.index.write()
-    signature = default_signature(repository)
+
+    if signature is None:
+        signature = default_signature(repository)
+
     parents = [] if repository.head_is_unborn else [repository.head.target]
     repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
