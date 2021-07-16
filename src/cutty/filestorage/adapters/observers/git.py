@@ -27,14 +27,15 @@ class GitRepositoryObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
-        if pygit2.discover_repository(self.project, False, self.project.parent):
-            # Do nothing if there's already a repository.
-            return
+        try:
+            repository = pygit2.Repository(self.project)
+        except pygit2.GitError:
+            repository = pygit2.init_repository(self.project)
 
-        repository = pygit2.init_repository(self.project)
         repository.index.add_all()
         tree = repository.index.write_tree()
         repository.index.write()
         signature = default_signature(repository)
-        repository.create_commit("HEAD", signature, signature, "Initial", tree, [])
+        parents = [] if repository.head_is_unborn else [repository.head.target]
+        repository.create_commit("HEAD", signature, signature, "Initial", tree, parents)
         repository.branches.create("cutty/latest", repository.head.peel())
