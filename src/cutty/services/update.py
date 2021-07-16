@@ -53,10 +53,13 @@ def update() -> None:
     projectdir = Path.cwd()
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
-    create(
-        template,
-        no_input=True,
-        outputdir=projectdir.parent,
-        overwrite_if_exists=True,
-        extra_context=context,
-    )
+    with createworktree(
+        projectdir, "cutty/latest", dirname=projectdir.name
+    ) as worktree:
+        create(
+            template,
+            no_input=True,
+            outputdir=worktree.parent,
+            overwrite_if_exists=True,
+            extra_context=context,
+        )
