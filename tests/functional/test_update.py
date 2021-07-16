@@ -23,16 +23,15 @@ def test_update_trivial(runner: CliRunner, repository: Path) -> None:
         catch_exceptions=False,
     )
 
-    # Update README.md.
+    # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-
-    # Commit the changes.
     commit(pygit2.Repository(repository), message="Update README.md")
 
+    # Update the project.
     os.chdir("awesome")
-
     runner.invoke(main, ["update"], catch_exceptions=False)
+
     assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
