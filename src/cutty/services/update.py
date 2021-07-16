@@ -70,9 +70,10 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
 
     if repository.index.conflicts:
         paths = {
-            path
+            side.path
             for _, ours, theirs in repository.index.conflicts
-            for path in (ours.path, theirs.path)
+            for side in (ours, theirs)
+            if side is not None
         }
         raise RuntimeError(f"Merge conflicts: {' '.join(paths)}")
 
