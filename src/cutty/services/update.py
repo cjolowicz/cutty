@@ -86,7 +86,7 @@ def update() -> None:
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
     with createworktree(
-        projectdir, "cutty/latest", dirname=projectdir.name
+        projectdir, "cutty/latest", dirname=projectdir.name, checkout=False
     ) as worktree:
         create(
             template,
