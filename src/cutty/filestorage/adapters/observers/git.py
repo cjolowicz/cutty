@@ -41,3 +41,8 @@ class GitRepositoryObserver(FileStorageObserver):
 
         if "cutty/latest" not in repository.branches:
             repository.branches.create("cutty/latest", repository.head.peel())
+        else:
+            # HEAD must point to `cutty/latest` if that branch exists.
+            head = repository.references["HEAD"].target
+            if head != "refs/heads/cutty/latest":
+                raise RuntimeError(f"unexpected HEAD: {head}")
