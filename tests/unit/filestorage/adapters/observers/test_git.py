@@ -141,3 +141,19 @@ def test_branch_not_checked_out(
 
     repository = pygit2.Repository(project)
     assert repository.references["HEAD"].target != "refs/heads/cutty/latest"
+
+
+def test_existing_branch(
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
+) -> None:
+    """It updates an existing branch."""
+    repository = pygit2.init_repository(project)
+    commit(repository)
+    branchname = "cutty/latest"
+    repository.branches.create(branchname, repository.head.peel())
+    repository.set_head(f"refs/heads/{branchname}")
+
+    with storage:
+        storage.add(file)
+
+    assert file.path.name in tree(repository)
