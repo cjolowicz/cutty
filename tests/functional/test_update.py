@@ -1,4 +1,5 @@
 """Functional tests for the update CLI."""
+import json
 import os
 from pathlib import Path
 
@@ -128,3 +129,28 @@ def test_update_noop(runner: CliRunner, repository: Path) -> None:
     runner.invoke(main, ["update"], catch_exceptions=False)
 
     assert oldhead == project.head.target
+
+
+def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
+    """It does nothing if the generated project did not change."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    # Add project variable `status`.
+    path = repository / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    data["status"] = ["alpha", "beta", "stable"]
+    path.write_text(json.dumps(data))
+    commit(pygit2.Repository(repository), message="Add status variable")
+
+    # Update the project.
+    os.chdir("awesome")
+    runner.invoke(main, ["update"], input="3\n", catch_exceptions=False)
+
+    # Verify that the variable was bound by user input.
+    path = Path(".cookiecutter.json")
+    data = json.loads(path.read_text())
+    assert "stable" == data["status"]
