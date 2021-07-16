@@ -56,6 +56,8 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
     repository = pygit2.Repository(repositorypath)
     oid = repository.references[reference].resolve().target
     repository.cherrypick(oid)
+    if repository.index.conflicts:
+        raise Exception("There were conflicts")
     commit(repository, message="Update project template")
     repository.state_cleanup()
 
