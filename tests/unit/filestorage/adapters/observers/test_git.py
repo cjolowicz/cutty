@@ -169,3 +169,5 @@ def test_existing_branch_not_head(
     with pytest.raises(Exception):
         with storage:
             storage.add(file)
+
+    assert file.path.name not in tree(repository)
