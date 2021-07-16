@@ -75,3 +75,4 @@ def update() -> None:
             overwrite_if_exists=True,
             extra_context=context,
         )
+    cherrypick(projectdir, "refs/heads/cutty/latest")
