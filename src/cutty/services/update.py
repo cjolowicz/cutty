@@ -32,7 +32,7 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
 
 @contextmanager
 def createworktree(
-    repositorypath: Path, branch: str, dirname: Optional[str] = None
+    repositorypath: Path, branch: str, *, dirname: Optional[str] = None
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
     if dirname is None:
