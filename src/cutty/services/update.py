@@ -1,4 +1,5 @@
 """Update a project with changes from its Cookiecutter template."""
+import hashlib
 import json
 import tempfile
 from collections.abc import Iterator
@@ -39,8 +40,9 @@ def createworktree(
     repository = pygit2.Repository(repositorypath)
 
     with tempfile.TemporaryDirectory() as directory:
+        name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
         path = Path(directory) / dirname
-        worktree = repository.add_worktree(branch, path, repository.branches[branch])
+        worktree = repository.add_worktree(name, path, repository.branches[branch])
         yield path
 
     # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
