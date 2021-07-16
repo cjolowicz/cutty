@@ -112,14 +112,14 @@ def commit(repository: pygit2.Repository) -> None:
 def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
-    """It does nothing if the repository already exists."""
+    """It creates the commit in an existing repository."""
     repository = pygit2.init_repository(project)
     commit(repository)
 
     with storage:
         storage.add(file)
 
-    assert file.path.name not in tree(repository)
+    assert file.path.name in tree(repository)
 
 
 def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
