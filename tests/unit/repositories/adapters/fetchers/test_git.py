@@ -1,6 +1,7 @@
 """Unit tests for cutty.repositories.adapters.fetchers.git."""
 import pathlib
 from textwrap import dedent
+from typing import Iterator
 
 import pygit2
 import pytest
@@ -85,7 +86,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
 
 
 @pytest.fixture
-def custom_default_branch(tmp_path: pathlib.Path) -> str:
+def custom_default_branch(tmp_path: pathlib.Path) -> Iterator[str]:
     """Fixture simulating custom ``init.defaultBranch`` in git config."""
     text = """
     [init]
@@ -96,13 +97,24 @@ def custom_default_branch(tmp_path: pathlib.Path) -> str:
     gitconfig.parent.mkdir()
     gitconfig.write_text(dedent(text))
 
+    searchpath = pygit2.option(
+        pygit2.GIT_OPT_GET_SEARCH_PATH,
+        pygit2.GIT_CONFIG_LEVEL_GLOBAL,
+    )
+
     pygit2.option(
         pygit2.GIT_OPT_SET_SEARCH_PATH,
         pygit2.GIT_CONFIG_LEVEL_GLOBAL,
         str(gitconfig.parent),
     )
 
-    return "teapot"
+    yield "teapot"
+
+    pygit2.option(
+        pygit2.GIT_OPT_SET_SEARCH_PATH,
+        pygit2.GIT_CONFIG_LEVEL_GLOBAL,
+        searchpath,
+    )
 
 
 def test_broken_head_after_clone(
