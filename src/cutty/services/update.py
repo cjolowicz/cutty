@@ -9,6 +9,7 @@ from typing import Optional
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
+from cutty.filestorage.adapters.observers.git import commit
 from cutty.services.create import create
 
 
@@ -48,6 +49,15 @@ def createworktree(
     # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
     # https://github.com/libgit2/libgit2/issues/5280
     worktree.prune(True)
+
+
+def cherrypick(repositorypath: Path, reference: str) -> None:
+    """Cherry-pick the commit onto the current branch."""
+    repository = pygit2.Repository(repositorypath)
+    oid = repository.references[reference].resolve().target
+    repository.cherrypick(oid)
+    commit(repository, message="Update project template")
+    repository.state_cleanup()
 
 
 def update() -> None:
