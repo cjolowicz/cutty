@@ -32,7 +32,11 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
 
 @contextmanager
 def createworktree(
-    repositorypath: Path, branch: str, *, dirname: Optional[str] = None
+    repositorypath: Path,
+    branch: str,
+    *,
+    dirname: Optional[str] = None,
+    checkout: bool = True,
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
     if dirname is None:
@@ -44,6 +48,13 @@ def createworktree(
         name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
         path = Path(directory) / dirname
         worktree = repository.add_worktree(name, path, repository.branches[branch])
+
+        if not checkout:
+            # Emulate `--no-checkout` by checking out an empty tree after the fact.
+            worktree_repository = pygit2.Repository(path)
+            oid = worktree_repository.TreeBuilder().write()
+            worktree_repository.checkout_tree(worktree_repository[oid])
+
         yield path
 
     # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
