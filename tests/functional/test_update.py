@@ -110,3 +110,21 @@ def test_update_remove(runner: CliRunner, repository: Path) -> None:
     runner.invoke(main, ["update"], catch_exceptions=False)
 
     assert not Path("README.md").is_file()
+
+
+def test_update_noop(runner: CliRunner, repository: Path) -> None:
+    """It does nothing if the generated project did not change."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    projectdir = Path("awesome")
+    project = pygit2.Repository(projectdir)
+    oldhead = project.head.target
+
+    os.chdir(projectdir)
+    runner.invoke(main, ["update"], catch_exceptions=False)
+
+    assert oldhead == project.head.target
