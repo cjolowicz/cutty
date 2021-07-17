@@ -8,6 +8,15 @@ from cutty.services.update import update as service_update
 
 @_main.command()
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
-def update(extra_context: dict[str, str]) -> None:
+@click.option(
+    "--no-input",
+    is_flag=True,
+    default=False,
+    help="Do not prompt for template variables.",
+)
+def update(
+    extra_context: dict[str, str],
+    no_input: bool,
+) -> None:
     """Update a project with changes from its template."""
-    service_update(extra_context=extra_context)
+    service_update(extra_context=extra_context, no_input=no_input)
