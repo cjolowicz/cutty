@@ -95,7 +95,6 @@ def update() -> None:
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            overwrite_if_exists=True,
             extra_context=context,
         )
 
