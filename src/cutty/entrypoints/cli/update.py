@@ -1,4 +1,7 @@
 """Command-line interface for updating projects from Cookiecutter templates."""
+import pathlib
+from typing import Optional
+
 import click
 
 from cutty.entrypoints.cli._main import main as _main
@@ -14,9 +17,19 @@ from cutty.services.update import update as service_update
     default=False,
     help="Do not prompt for template variables.",
 )
+@click.option(
+    "-C",
+    "--cwd",
+    metavar="DIR",
+    type=click.Path(
+        exists=True, file_okay=False, dir_okay=True, path_type=pathlib.Path
+    ),
+    help="Directory of the generated project.",
+)
 def update(
     extra_context: dict[str, str],
     no_input: bool,
+    cwd: Optional[pathlib.Path],
 ) -> None:
     """Update a project with changes from its template."""
-    service_update(extra_context=extra_context, no_input=no_input)
+    service_update(extra_context=extra_context, no_input=no_input, projectdir=cwd)
