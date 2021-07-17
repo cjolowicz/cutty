@@ -154,3 +154,28 @@ def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
     path = Path(".cookiecutter.json")
     data = json.loads(path.read_text())
     assert "stable" == data["status"]
+
+
+def test_update_rename_projectdir(runner: CliRunner, repository: Path) -> None:
+    """It generates the project in the project directory irrespective of its name."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    # Rename the project directory.
+    projectdir = Path("awesome")
+    projectdir.rename("awesome2")
+
+    # Update README.md in the template.
+    path = repository / "{{ cookiecutter.project }}" / "README.md"
+    path.write_text(path.read_text() + "An awesome project.\n")
+    commit(pygit2.Repository(repository), message="Update README.md")
+
+    # Update the project.
+    os.chdir("awesome2")
+    runner.invoke(main, ["update"], catch_exceptions=False)
+
+    # Verify that the README was updated.
+    assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
