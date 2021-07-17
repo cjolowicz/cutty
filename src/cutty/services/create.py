@@ -7,7 +7,7 @@ from typing import Optional
 import appdirs
 from lazysequence import lazysequence
 
-from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage2
+from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findhooks
@@ -57,7 +57,7 @@ def create(
     projectdir = outputdir / projectfiles[0].path.parts[0]
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
-    with createcookiecutterstorage2(
+    with createcookiecutterstorage(
         projectdir.parent,
         projectdir,
         overwrite_if_exists,

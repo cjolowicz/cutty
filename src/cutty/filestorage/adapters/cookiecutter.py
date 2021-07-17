@@ -24,7 +24,7 @@ def fileexistspolicy(
     )
 
 
-def createcookiecutterstorage2(
+def createcookiecutterstorage(
     outputdir: pathlib.Path,
     project_dir: pathlib.Path,
     overwrite_if_exists: bool,
