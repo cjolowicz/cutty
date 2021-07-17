@@ -8,6 +8,7 @@ import appdirs
 from lazysequence import lazysequence
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
+from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findhooks
@@ -28,6 +29,7 @@ def create(
     directory: Optional[pathlib.PurePosixPath] = None,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
+    outputdirisproject: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
@@ -54,15 +56,22 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    projectdir = outputdir / projectfiles[0].path.parts[0]
+    if outputdirisproject:
+        projectdir = outputdir
+    else:
+        projectdir = outputdir / projectfiles[0].path.parts[0]
+
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
-        projectdir.parent,
+        outputdir,
         projectdir,
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
     ) as storage:
         for projectfile in projectfiles.release():
+            if outputdirisproject:
+                path = PurePath(*projectfile.path.parts[1:])
+                projectfile = projectfile.withpath(path)
             storage.add(projectfile)

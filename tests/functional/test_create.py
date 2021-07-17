@@ -20,3 +20,16 @@ def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
     assert Path("foobar", "post_gen_project").is_file()
     assert Path("foobar", ".cookiecutter.json").is_file()
+
+
+def test_create_inplace(runner: CliRunner, repository: Path) -> None:
+    """It generates the project files in the current directory."""
+    result = runner.invoke(
+        main,
+        ["create", "--no-input", "--in-place", str(repository)],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+    assert Path("README.md").read_text() == "# example\n"
+    assert Path("post_gen_project").is_file()
+    assert Path(".cookiecutter.json").is_file()

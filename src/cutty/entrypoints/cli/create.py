@@ -73,6 +73,13 @@ def extra_context_callback(
     default=False,
     help="Skip the files in the corresponding directories if they already exist.",
 )
+@click.option(
+    "-i",
+    "--in-place",
+    is_flag=True,
+    default=False,
+    help="Strip the leading path component from generated files.",
+)
 @click.version_option()
 def create(
     template: str,
@@ -83,6 +90,7 @@ def create(
     directory: Optional[pathlib.Path],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
+    in_place: bool,
 ) -> None:
     """cutty."""
     service_create(
@@ -94,4 +102,5 @@ def create(
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=in_place,
     )
