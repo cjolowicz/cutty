@@ -49,3 +49,16 @@ def test_load_directory(filesystem: Filesystem) -> None:
     path = Path(filesystem=filesystem)
     with pytest.raises(Exception):
         loadfile(path, follow_symlinks=False)
+
+
+def test_withpath_regularfile(filesystem: Filesystem) -> None:
+    """It replaces the path of a regular file."""
+    path1 = PurePath("dir", "file")
+    path2 = PurePath("file")
+
+    file1 = RegularFile(path1, b"Lorem ipsum dolor")
+    file2 = file1.withpath(path2)
+
+    assert isinstance(file2, RegularFile)
+    assert file2.path == path2
+    assert file2.blob == file1.blob
