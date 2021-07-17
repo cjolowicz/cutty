@@ -4,7 +4,6 @@ import json
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Optional
 
 import pygit2
 
@@ -36,18 +35,14 @@ def createworktree(
     repositorypath: Path,
     branch: str,
     *,
-    dirname: Optional[str] = None,
     checkout: bool = True,
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
-    if dirname is None:
-        dirname = branch
-
     repository = pygit2.Repository(repositorypath)
 
     with tempfile.TemporaryDirectory() as directory:
         name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
-        path = Path(directory) / dirname
+        path = Path(directory) / name
         worktree = repository.add_worktree(name, path, repository.branches[branch])
 
         if not checkout:
@@ -88,9 +83,7 @@ def update() -> None:
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
 
-    with createworktree(
-        projectdir, LATEST_BRANCH, dirname=projectdir.name, checkout=False
-    ) as worktree:
+    with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
             template,
             outputdir=worktree,
