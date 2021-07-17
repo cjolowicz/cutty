@@ -254,3 +254,23 @@ def test_update_rename_projectdir(runner: CliRunner, repository: Path) -> None:
 
     # Verify that the README was updated.
     assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
+
+
+def test_update_cwd(runner: CliRunner, repository: Path) -> None:
+    """It updates the project in the specified directory."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    # Update README.md in the template.
+    path = repository / "{{ cookiecutter.project }}" / "README.md"
+    path.write_text(path.read_text() + "An awesome project.\n")
+    commit(pygit2.Repository(repository), message="Update README.md")
+
+    # Update the project.
+    projectdir = Path("awesome")
+    runner.invoke(main, ["update", f"--cwd={projectdir}"], catch_exceptions=False)
+
+    assert (projectdir / "README.md").read_text() == "# awesome\nAn awesome project.\n"
