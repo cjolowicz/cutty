@@ -10,6 +10,8 @@ from cutty.filestorage.domain.observers import FileStorageObserver
 
 
 LATEST_BRANCH = "cutty/latest"
+CREATE_MESSAGE = "Initial import"
+UPDATE_MESSAGE = "Update project template"
 
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
@@ -68,9 +70,9 @@ class GitRepositoryObserver(FileStorageObserver):
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
-            "Initial import"
+            CREATE_MESSAGE
             if LATEST_BRANCH not in repository.branches
-            else "Update project template"
+            else UPDATE_MESSAGE
         )
 
         commit(repository, message=message)

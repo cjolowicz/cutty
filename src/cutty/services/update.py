@@ -4,12 +4,13 @@ import json
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Optional
 
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 
 
@@ -30,30 +31,31 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
     }
 
 
+def checkoutemptytree(repositorypath: Path) -> None:
+    """Check out an empty tree from the repository."""
+    repository = pygit2.Repository(repositorypath)
+    oid = repository.TreeBuilder().write()
+    repository.checkout_tree(repository[oid])
+
+
 @contextmanager
 def createworktree(
     repositorypath: Path,
     branch: str,
     *,
-    dirname: Optional[str] = None,
     checkout: bool = True,
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
-    if dirname is None:
-        dirname = branch
-
     repository = pygit2.Repository(repositorypath)
 
     with tempfile.TemporaryDirectory() as directory:
         name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
-        path = Path(directory) / dirname
+        path = Path(directory) / name
         worktree = repository.add_worktree(name, path, repository.branches[branch])
 
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
-            worktree_repository = pygit2.Repository(path)
-            oid = worktree_repository.TreeBuilder().write()
-            worktree_repository.checkout_tree(worktree_repository[oid])
+            checkoutemptytree(path)
 
         yield path
 
@@ -75,9 +77,9 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
             for side in (ours, theirs)
             if side is not None
         }
-        raise RuntimeError(f"Merge conflicts: {' '.join(paths)}")
+        raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-    commit(repository, message="Update project template")
+    commit(repository, message=UPDATE_MESSAGE)
     repository.state_cleanup()
 
 
@@ -86,14 +88,13 @@ def update() -> None:
     projectdir = Path.cwd()
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
-    with createworktree(
-        projectdir, "cutty/latest", dirname=projectdir.name, checkout=False
-    ) as worktree:
+
+    with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            overwrite_if_exists=True,
             extra_context=context,
         )
-    cherrypick(projectdir, "refs/heads/cutty/latest")
+
+    cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
