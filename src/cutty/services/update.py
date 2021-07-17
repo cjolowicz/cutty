@@ -87,6 +87,7 @@ def update() -> None:
     projectdir = Path.cwd()
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
+
     with createworktree(
         projectdir, LATEST_BRANCH, dirname=projectdir.name, checkout=False
     ) as worktree:
@@ -97,4 +98,5 @@ def update() -> None:
             overwrite_if_exists=True,
             extra_context=context,
         )
+
     cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
