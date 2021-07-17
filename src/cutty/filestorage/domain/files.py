@@ -1,9 +1,16 @@
 """Files."""
+from __future__ import annotations
+
+import dataclasses
 from dataclasses import dataclass
+from typing import TypeVar
 
 from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+
+
+_FileT = TypeVar("_FileT", bound="File")
 
 
 @dataclass(frozen=True)
@@ -11,6 +18,10 @@ class File:
     """A file."""
 
     path: PurePath
+
+    def withpath(self: _FileT, path: PurePath) -> _FileT:
+        """Return a copy of this file with the specified path."""
+        return dataclasses.replace(self, path=path)
 
 
 @dataclass(frozen=True)
