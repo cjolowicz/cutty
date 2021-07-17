@@ -10,6 +10,7 @@ import pygit2
 
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.services.create import create
 
 
@@ -87,7 +88,7 @@ def update() -> None:
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
     with createworktree(
-        projectdir, "cutty/latest", dirname=projectdir.name, checkout=False
+        projectdir, LATEST_BRANCH, dirname=projectdir.name, checkout=False
     ) as worktree:
         create(
             template,
@@ -96,4 +97,4 @@ def update() -> None:
             overwrite_if_exists=True,
             extra_context=context,
         )
-    cherrypick(projectdir, "refs/heads/cutty/latest")
+    cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
