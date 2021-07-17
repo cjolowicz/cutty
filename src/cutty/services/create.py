@@ -58,7 +58,11 @@ def create(
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
     with createcookiecutterstorage(
-        projectdir, overwrite_if_exists, skip_if_file_exists, hookfiles
+        projectdir.parent,
+        projectdir,
+        overwrite_if_exists,
+        skip_if_file_exists,
+        hookfiles,
     ) as storage:
         for projectfile in projectfiles.release():
             storage.add(projectfile)
