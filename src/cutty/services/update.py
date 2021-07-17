@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
+from typing import Optional
 
 import pygit2
 
@@ -87,11 +88,14 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
 
 def update(
     *,
+    projectdir: Optional[Path] = None,
     extra_context: Mapping[str, str] = MappingProxyType({}),
     no_input: bool = False,
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
-    projectdir = Path.cwd()
+    if projectdir is None:
+        projectdir = Path.cwd()
+
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
 
