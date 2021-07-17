@@ -80,7 +80,6 @@ def extra_context_callback(
     default=False,
     help="Strip the leading path component from generated files.",
 )
-@click.version_option()
 def create(
     template: str,
     extra_context: dict[str, str],
