@@ -30,6 +30,13 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
     }
 
 
+def checkoutemptytree(repositorypath: Path) -> None:
+    """Check out an empty tree from the repository."""
+    repository = pygit2.Repository(repositorypath)
+    oid = repository.TreeBuilder().write()
+    repository.checkout_tree(repository[oid])
+
+
 @contextmanager
 def createworktree(
     repositorypath: Path,
@@ -47,9 +54,7 @@ def createworktree(
 
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
-            worktree_repository = pygit2.Repository(path)
-            oid = worktree_repository.TreeBuilder().write()
-            worktree_repository.checkout_tree(worktree_repository[oid])
+            checkoutemptytree(path)
 
         yield path
 
