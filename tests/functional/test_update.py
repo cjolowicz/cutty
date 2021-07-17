@@ -156,6 +156,32 @@ def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
     assert "stable" == data["status"]
 
 
+def test_update_extra_context_new_variable(runner: CliRunner, repository: Path) -> None:
+    """It allows setting variables on the command-line."""
+    runner.invoke(
+        main,
+        ["create", "--no-input", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    # Add project variable `status`.
+    path = repository / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    data["status"] = ["alpha", "beta", "stable"]
+    path.write_text(json.dumps(data))
+    commit(pygit2.Repository(repository), message="Add status variable")
+
+    # Update the project.
+    os.chdir("awesome")
+    result = runner.invoke(main, ["update", "status=stable"], catch_exceptions=False)
+    assert result.exit_code == 0
+
+    # Verify that the variable was bound.
+    path = Path(".cookiecutter.json")
+    data = json.loads(path.read_text())
+    assert "stable" == data["status"]
+
+
 def test_update_rename_projectdir(runner: CliRunner, repository: Path) -> None:
     """It generates the project in the project directory irrespective of its name."""
     runner.invoke(
