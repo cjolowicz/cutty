@@ -88,6 +88,7 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
 def update(
     *,
     extra_context: Mapping[str, str] = MappingProxyType({}),
+    no_input: bool = False,
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectdir = Path.cwd()
@@ -100,6 +101,7 @@ def update(
             outputdir=worktree,
             outputdirisproject=True,
             extra_context={**context, **extra_context},
+            no_input=no_input,
         )
 
     cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
