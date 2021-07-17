@@ -25,6 +25,7 @@ def fileexistspolicy(
 
 
 def createcookiecutterstorage2(
+    outputdir: pathlib.Path,
     project_dir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
@@ -32,7 +33,7 @@ def createcookiecutterstorage2(
 ) -> FileStorage:
     """Create storage for Cookiecutter project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    storage: FileStorage = DiskFileStorage(project_dir.parent, fileexists=fileexists)
+    storage: FileStorage = DiskFileStorage(outputdir, fileexists=fileexists)
 
     if hookfiles:  # pragma: no branch
         observer = CookiecutterHooksObserver(
@@ -53,5 +54,9 @@ def createcookiecutterstorage(
 ) -> FileStorage:
     """Create storage for Cookiecutter project files."""
     return createcookiecutterstorage2(
-        project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
+        project_dir.parent,
+        project_dir,
+        overwrite_if_exists,
+        skip_if_file_exists,
+        hookfiles,
     )
