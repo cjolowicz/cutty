@@ -10,6 +10,7 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 
 
@@ -78,7 +79,7 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
         }
         raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-    commit(repository, message="Update project template")
+    commit(repository, message=UPDATE_MESSAGE)
     repository.state_cleanup()
 
 
