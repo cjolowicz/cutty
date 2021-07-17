@@ -76,7 +76,7 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
             for side in (ours, theirs)
             if side is not None
         }
-        raise RuntimeError(f"Merge conflicts: {' '.join(paths)}")
+        raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
     commit(repository, message="Update project template")
     repository.state_cleanup()
