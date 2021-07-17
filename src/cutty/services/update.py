@@ -3,7 +3,9 @@ import hashlib
 import json
 import tempfile
 from collections.abc import Iterator
+from collections.abc import Mapping
 from pathlib import Path
+from types import MappingProxyType
 
 import pygit2
 
@@ -83,7 +85,10 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
     repository.state_cleanup()
 
 
-def update() -> None:
+def update(
+    *,
+    extra_context: Mapping[str, str] = MappingProxyType({}),
+) -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectdir = Path.cwd()
     template = getprojecttemplate(projectdir)
@@ -94,7 +99,7 @@ def update() -> None:
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            extra_context=context,
+            extra_context={**context, **extra_context},
         )
 
     cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
