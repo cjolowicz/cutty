@@ -62,3 +62,16 @@ def test_withpath_regularfile(filesystem: Filesystem) -> None:
     assert isinstance(file2, RegularFile)
     assert file2.path == path2
     assert file2.blob == file1.blob
+
+
+def test_withpath_symlink(filesystem: Filesystem) -> None:
+    """It replaces the path of a symbolic link."""
+    path1 = PurePath("dir", "link")
+    path2 = PurePath("link")
+
+    link1 = SymbolicLink(path1, PurePath("file"))
+    link2 = link1.withpath(path2)
+
+    assert isinstance(link2, SymbolicLink)
+    assert link2.path == path2
+    assert link2.target == link1.target
