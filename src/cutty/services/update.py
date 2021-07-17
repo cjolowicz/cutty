@@ -91,7 +91,8 @@ def update() -> None:
     ) as worktree:
         create(
             template,
-            outputdir=worktree.parent,
+            outputdir=worktree,
+            outputdirisproject=True,
             overwrite_if_exists=True,
             extra_context=context,
         )
