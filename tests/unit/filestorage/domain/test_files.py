@@ -1,6 +1,7 @@
 """Unit tests for cutty.filestorage.domain.files."""
 import pytest
 
+from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import loadfile
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
@@ -62,6 +63,19 @@ def test_withpath_regularfile(filesystem: Filesystem) -> None:
     assert isinstance(file2, RegularFile)
     assert file2.path == path2
     assert file2.blob == file1.blob
+
+
+def test_withpath_executable(filesystem: Filesystem) -> None:
+    """It replaces the path of an executable file."""
+    path1 = PurePath("dir", "exec")
+    path2 = PurePath("exec")
+
+    exec1 = Executable(path1, b":")
+    exec2 = exec1.withpath(path2)
+
+    assert isinstance(exec2, Executable)
+    assert exec2.path == path2
+    assert exec2.blob == exec1.blob
 
 
 def test_withpath_symlink(filesystem: Filesystem) -> None:
