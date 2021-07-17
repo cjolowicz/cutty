@@ -99,7 +99,7 @@ def update(
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            extra_context=context,
+            extra_context={**context, **extra_context},
         )
 
     cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
