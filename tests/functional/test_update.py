@@ -132,7 +132,7 @@ def test_update_noop(runner: CliRunner, repository: Path) -> None:
 
 
 def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
-    """It does nothing if the generated project did not change."""
+    """It prompts for variables added after the last project generation."""
     runner.invoke(
         main,
         ["create", "--no-input", str(repository), "project=awesome"],
