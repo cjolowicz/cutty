@@ -23,3 +23,14 @@ def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
     assert Path("foobar", "post_gen_project").is_file()
     assert Path("foobar", ".cookiecutter.json").is_file()
+
+
+def test_no_input(runner: CliRunner, repository: Path) -> None:
+    """It does not prompt for variables."""
+    runner.invoke(
+        main,
+        ["cookiecutter", "--no-input", str(repository)],
+        catch_exceptions=False,
+    )
+
+    assert Path("example", "README.md").is_file()
