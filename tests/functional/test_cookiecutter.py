@@ -66,3 +66,16 @@ def test_checkout(runner: CliRunner, repository: Path) -> None:
 
     assert result.exit_code == 0
     assert not Path("example", "LICENSE").exists()
+
+
+def test_output_dir(runner: CliRunner, repository: Path, tmp_path: Path) -> None:
+    """It generates the project under the specified directory."""
+    outputdir = tmp_path / "outputdir"
+    result = runner.invoke(
+        main,
+        ["cookiecutter", f"--output-dir={outputdir}", str(repository)],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert (outputdir / "example" / "README.md").is_file()
