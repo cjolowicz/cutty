@@ -38,7 +38,7 @@ def create(
     if directory is not None:
         templatedir = templatedir.joinpath(*directory.parts)
 
-    if outputdir is None:  # pragma: no branch
+    if outputdir is None:
         outputdir = pathlib.Path.cwd()
 
     config = loadcookiecutterconfig(template, templatedir)
