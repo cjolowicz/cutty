@@ -56,10 +56,13 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
+    strip = 0 if directory is None else len(directory.parts)
+
     if outputdirisproject:
         projectdir = outputdir
+        strip += 1
     else:
-        projectdir = outputdir / projectfiles[0].path.parts[0]
+        projectdir = outputdir / projectfiles[0].path.parts[strip]
 
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
 
@@ -71,7 +74,7 @@ def create(
         hookfiles,
     ) as storage:
         for projectfile in projectfiles.release():
-            if outputdirisproject:
-                path = PurePath(*projectfile.path.parts[1:])
+            if strip:
+                path = PurePath(*projectfile.path.parts[strip:])
                 projectfile = projectfile.withpath(path)
             storage.add(projectfile)
