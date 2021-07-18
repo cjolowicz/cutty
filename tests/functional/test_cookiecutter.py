@@ -1,9 +1,11 @@
 """Functional tests for the cookiecutter CLI."""
 from pathlib import Path
 
+import pygit2
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
+from tests.functional.conftest import commit
 
 
 def test_create_help(runner: CliRunner) -> None:
@@ -45,3 +47,22 @@ def test_extra_context(runner: CliRunner, repository: Path) -> None:
     )
 
     assert Path("awesome", "README.md").is_file()
+
+
+def test_checkout(runner: CliRunner, repository: Path) -> None:
+    """It uses the specified revision of the template."""
+    initial = pygit2.Repository(repository).head.target
+
+    # Add LICENSE to the template.
+    path = repository / "{{ cookiecutter.project }}" / "LICENSE"
+    path.touch()
+    commit(pygit2.Repository(repository), message="Add LICENSE")
+
+    result = runner.invoke(
+        main,
+        ["cookiecutter", f"--checkout={initial}", str(repository)],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert not Path("example", "LICENSE").exists()
