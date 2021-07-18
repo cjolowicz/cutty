@@ -1,5 +1,6 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Optional
 
 import click
@@ -31,12 +32,22 @@ from cutty.services.create import create as service_create
     type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
     help="Parent directory of the generated project.",
 )
+@click.option(
+    "--directory",
+    metavar="DIR",
+    type=click.Path(path_type=Path),
+    help=(
+        "Directory within the template repository that contains the "
+        "cookiecutter.json file."
+    ),
+)
 def cookiecutter(
     template: str,
     extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
     output_dir: Optional[Path],
+    directory: Optional[Path],
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     service_create(
@@ -45,4 +56,5 @@ def cookiecutter(
         no_input=no_input,
         checkout=checkout,
         outputdir=output_dir,
+        directory=PurePosixPath(directory) if directory is not None else None,
     )
