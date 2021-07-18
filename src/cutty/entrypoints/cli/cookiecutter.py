@@ -1,4 +1,6 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
+from typing import Optional
+
 import click
 
 from cutty.entrypoints.cli._main import main as _main
@@ -15,6 +17,19 @@ from cutty.services.create import create as service_create
     default=False,
     help="Do not prompt for template variables.",
 )
-def cookiecutter(template: str, extra_context: dict[str, str], no_input: bool) -> None:
+@click.option(
+    "-c",
+    "--checkout",
+    metavar="REV",
+    help="Branch, tag, or commit hash of the template repository.",
+)
+def cookiecutter(
+    template: str,
+    extra_context: dict[str, str],
+    no_input: bool,
+    checkout: Optional[str],
+) -> None:
     """Generate projects from Cookiecutter templates."""
-    service_create(template, extra_context=extra_context, no_input=no_input)
+    service_create(
+        template, extra_context=extra_context, no_input=no_input, checkout=checkout
+    )
