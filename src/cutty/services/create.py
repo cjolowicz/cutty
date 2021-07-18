@@ -36,7 +36,7 @@ def create(
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
     if directory is not None:
-        templatedir = templatedir.joinpath(*directory.parts)  # pragma: no cover
+        templatedir = templatedir.joinpath(*directory.parts)
 
     if outputdir is None:  # pragma: no branch
         outputdir = pathlib.Path.cwd()
