@@ -34,3 +34,14 @@ def test_no_input(runner: CliRunner, repository: Path) -> None:
     )
 
     assert Path("example", "README.md").is_file()
+
+
+def test_extra_context(runner: CliRunner, repository: Path) -> None:
+    """It allows setting variables on the command-line."""
+    runner.invoke(
+        main,
+        ["cookiecutter", str(repository), "project=awesome"],
+        catch_exceptions=False,
+    )
+
+    assert Path("awesome", "README.md").is_file()
