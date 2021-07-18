@@ -7,6 +7,12 @@ from cutty.services.create import create as service_create
 
 @_main.command()
 @click.argument("template")
-def cookiecutter(template: str) -> None:
+@click.option(
+    "--no-input",
+    is_flag=True,
+    default=False,
+    help="Do not prompt for template variables.",
+)
+def cookiecutter(template: str, no_input: bool) -> None:
     """Generate projects from Cookiecutter templates."""
-    service_create(template)
+    service_create(template, no_input=no_input)
