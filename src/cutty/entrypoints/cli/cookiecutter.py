@@ -1,4 +1,5 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
+from pathlib import Path
 from typing import Optional
 
 import click
@@ -23,13 +24,25 @@ from cutty.services.create import create as service_create
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
+@click.option(
+    "-o",
+    "--output-dir",
+    metavar="DIR",
+    type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
+    help="Parent directory of the generated project.",
+)
 def cookiecutter(
     template: str,
     extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
+    output_dir: Optional[Path],
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     service_create(
-        template, extra_context=extra_context, no_input=no_input, checkout=checkout
+        template,
+        extra_context=extra_context,
+        no_input=no_input,
+        checkout=checkout,
+        outputdir=output_dir,
     )
