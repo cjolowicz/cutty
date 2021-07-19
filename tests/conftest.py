@@ -23,7 +23,7 @@ def set_user_cache_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) 
     """Replace the user cache directory by a temporary directory."""
     path = tmp_path / "user_cache_dir"
     path.mkdir(parents=True, exist_ok=True)
-    monkeypatch.setattr("appdirs.user_cache_dir", lambda *args, **kwargs: path)
+    monkeypatch.setattr("platformdirs.user_cache_dir", lambda *args, **kwargs: path)
 
 
 @pytest.fixture(autouse=platform.system() == "Windows")
