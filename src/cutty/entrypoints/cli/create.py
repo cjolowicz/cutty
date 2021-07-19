@@ -91,7 +91,7 @@ def create(
     skip_if_file_exists: bool,
     in_place: bool,
 ) -> None:
-    """cutty."""
+    """Generate projects from Cookiecutter templates."""
     service_create(
         template,
         extra_context=extra_context,
