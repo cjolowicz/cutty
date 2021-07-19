@@ -110,3 +110,18 @@ def test_overwrite(runner: CliRunner, repository: Path) -> None:
 
     assert result.exit_code == 0
     assert Path("example", "README.md").read_text() == "# example\n"
+
+
+def test_skip(runner: CliRunner, repository: Path) -> None:
+    """It skips existing files."""
+    Path("example").mkdir()
+    Path("example", "README.md").touch()
+
+    result = runner.invoke(
+        main,
+        ["cookiecutter", "--skip-if-file-exists", str(repository)],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert Path("example", "README.md").read_text() == ""
