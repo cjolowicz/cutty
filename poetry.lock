@@ -27,7 +27,7 @@ trio = ["trio (>=0.16)"]
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1173,7 +1173,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "06a17fcbbc264437a84b552c5977f3eecd71b8abd15e7406e3ae61e8c851f943"
+content-hash = "5ae0e35a7bb1516a58bcaf5900159a6fb9fd46ddac5319522a6be44a930ed467"
 
 [metadata.files]
 alabaster = [
