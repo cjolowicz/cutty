@@ -4,7 +4,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
-from tests.functional.conftest import move_repository_files_to_subdirectory
+from tests.util.git import move_repository_files_to_subdirectory
 
 
 def test_create_help(runner: CliRunner) -> None:
