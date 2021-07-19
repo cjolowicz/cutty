@@ -87,6 +87,7 @@ show_error_context = true
 module = [
     "binaryornot.*",
     "jinja2_time",
+    "platformdirs",
     "pluggy",
     "pyftpdlib.*",
     "pygit2",
