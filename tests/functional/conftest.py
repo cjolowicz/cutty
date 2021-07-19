@@ -29,6 +29,7 @@ def template_directory(tmp_path: Path) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
 
+    template = tmp_path / "template"
     context = {
         "project": "example",
         "license": ["MIT", "GPL-3.0", "Apache-2.0"],
@@ -36,30 +37,30 @@ def template_directory(tmp_path: Path) -> Path:
         "_extensions": ["jinja2_time.TimeExtension"],
     }
 
-    create(tmp_path / "cookiecutter.json", json.dumps(context))
+    create(template / "cookiecutter.json", json.dumps(context))
 
     create(
-        tmp_path / "{{ cookiecutter.project }}" / "README.md",
+        template / "{{ cookiecutter.project }}" / "README.md",
         """
         # {{ cookiecutter.project }}
         """,
     )
 
     create(
-        tmp_path / "{{ cookiecutter.project }}" / ".cookiecutter.json",
+        template / "{{ cookiecutter.project }}" / ".cookiecutter.json",
         """
         {{ cookiecutter | jsonify }}
         """,
     )
 
     create(
-        tmp_path / "hooks" / "post_gen_project.py",
+        template / "hooks" / "post_gen_project.py",
         """
         open("post_gen_project", mode="w")
         """,
     )
 
-    return tmp_path
+    return template
 
 
 def commit(repository: pygit2.Repository, *, message: str) -> None:
