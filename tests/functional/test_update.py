@@ -22,7 +22,7 @@ def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-    commit(pygit2.Repository(repository), message="Update README.md")
+    commit(repository, message="Update README.md")
 
     # Update the project.
     os.chdir("awesome")
@@ -40,12 +40,12 @@ def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
     # Update README.md in the project.
     path = projectdir / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-    commit(pygit2.Repository(projectdir), message="Update README.md")
+    commit(projectdir, message="Update README.md")
 
     # Add LICENSE in the template.
     path = repository / "{{ cookiecutter.project }}" / "LICENSE"
     path.touch()
-    commit(pygit2.Repository(repository), message="Add LICENSE")
+    commit(repository, message="Add LICENSE")
 
     # Update the project.
     os.chdir(projectdir)
@@ -64,12 +64,12 @@ def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
     # Update README.md in the project.
     path = projectdir / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-    commit(pygit2.Repository(projectdir), message="Update README.md")
+    commit(projectdir, message="Update README.md")
 
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.write_text(path.read_text() + "An excellent project.\n")
-    commit(pygit2.Repository(repository), message="Update README.md")
+    commit(repository, message="Update README.md")
 
     # Update the project.
     os.chdir(projectdir)
@@ -86,7 +86,7 @@ def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
     # Remove README in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.unlink()
-    commit(pygit2.Repository(repository), message="Remove README.md")
+    commit(repository, message="Remove README.md")
 
     # Update the project.
     os.chdir(projectdir)
@@ -118,7 +118,7 @@ def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
     path.write_text(json.dumps(data))
-    commit(pygit2.Repository(repository), message="Add status variable")
+    commit(repository, message="Add status variable")
 
     # Update the project.
     os.chdir("awesome")
@@ -157,7 +157,7 @@ def test_update_extra_context_new_variable(
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
     path.write_text(json.dumps(data))
-    commit(pygit2.Repository(repository), message="Add status variable")
+    commit(repository, message="Add status variable")
 
     # Update the project.
     os.chdir("awesome")
@@ -178,7 +178,7 @@ def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
     path.write_text(json.dumps(data))
-    commit(pygit2.Repository(repository), message="Add status variable")
+    commit(repository, message="Add status variable")
 
     # Update the project.
     os.chdir("awesome")
@@ -201,7 +201,7 @@ def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-    commit(pygit2.Repository(repository), message="Update README.md")
+    commit(repository, message="Update README.md")
 
     # Update the project.
     os.chdir("awesome2")
@@ -218,7 +218,7 @@ def test_update_cwd(runcutty: RunCutty, repository: Path) -> None:
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
     path.write_text(path.read_text() + "An awesome project.\n")
-    commit(pygit2.Repository(repository), message="Update README.md")
+    commit(repository, message="Update README.md")
 
     # Update the project.
     projectdir = Path("awesome")

@@ -50,7 +50,7 @@ def test_checkout(runcutty: RunCutty, repository: Path) -> None:
     # Add LICENSE to the template.
     path = repository / "{{ cookiecutter.project }}" / "LICENSE"
     path.touch()
-    commit(pygit2.Repository(repository), message="Add LICENSE")
+    commit(repository, message="Add LICENSE")
 
     runcutty("cookiecutter", f"--checkout={initial}", str(repository))
 

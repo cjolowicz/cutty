@@ -6,8 +6,9 @@ import pygit2
 from cutty.filestorage.adapters.observers.git import commit as _commit
 
 
-def commit(repository: pygit2.Repository, *, message: str) -> None:
+def commit(repositorypath: Path, *, message: str) -> None:
     """Commit all changes in the repository."""
+    repository = pygit2.Repository(repositorypath)
     signature = pygit2.Signature("you", "you@example.com")
     _commit(repository, message=message, signature=signature)
 
@@ -19,4 +20,5 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
     tree = repository[builder.write()]
     repository.checkout_tree(tree)
-    commit(repository, message=f"Move files to subdirectory {directory}")
+
+    commit(repositorypath, message=f"Move files to subdirectory {directory}")
