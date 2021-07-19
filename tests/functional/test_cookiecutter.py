@@ -28,6 +28,16 @@ def test_create_cookiecutter(runner: CliRunner, repository: Path) -> None:
     assert Path("foobar", ".cookiecutter.json").is_file()
 
 
+def test_no_repository(runner: CliRunner, repository: Path) -> None:
+    """It does not create a git repository for the project."""
+    runner.invoke(
+        main,
+        ["cookiecutter", str(repository)],
+        catch_exceptions=False,
+    )
+    assert not Path("example", ".git").is_dir()
+
+
 def test_no_input(runner: CliRunner, repository: Path) -> None:
     """It does not prompt for variables."""
     runner.invoke(
