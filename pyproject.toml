@@ -86,7 +86,6 @@ show_error_context = true
 
 [[tool.mypy.overrides]]
 module = [
-    "appdirs",
     "binaryornot.*",
     "jinja2_time",
     "pluggy",
