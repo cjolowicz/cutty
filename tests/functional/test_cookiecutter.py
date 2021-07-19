@@ -119,7 +119,12 @@ def test_skip(runner: CliRunner, repository: Path) -> None:
 
     result = runner.invoke(
         main,
-        ["cookiecutter", "--skip-if-file-exists", str(repository)],
+        [
+            "cookiecutter",
+            "--overwrite-if-exists",
+            "--skip-if-file-exists",
+            str(repository),
+        ],
         catch_exceptions=False,
     )
 
