@@ -3,12 +3,15 @@ import json
 from collections.abc import Iterator
 from pathlib import Path
 from textwrap import dedent
+from typing import Optional
+from typing import Protocol
 
 import pygit2
 import pytest
 from click.testing import CliRunner
 
-from cutty.filestorage.adapters.observers.git import commit as _commit
+from cutty.entrypoints.cli import main
+from tests.util.git import commit
 
 
 @pytest.fixture
@@ -17,6 +20,28 @@ def runner() -> Iterator[CliRunner]:
     runner = CliRunner()
     with runner.isolated_filesystem():
         yield runner
+
+
+class RunCutty(Protocol):
+    """Invoke the cutty CLI."""
+
+    def __call__(self, *args: str, input: Optional[str] = None) -> str:
+        """Invoke the cutty CLI."""
+
+
+@pytest.fixture
+def runcutty(runner: CliRunner) -> RunCutty:
+    """Fixture for invoking the cutty CLI."""
+
+    def _run(*args: str, input: Optional[str] = None) -> str:
+        result = runner.invoke(main, args, input=input, catch_exceptions=False)
+
+        if result.exit_code != 0:
+            raise RuntimeError(result)
+
+        return result.output
+
+    return _run
 
 
 @pytest.fixture
@@ -63,25 +88,9 @@ def template_directory(tmp_path: Path) -> Path:
     return template
 
 
-def commit(repository: pygit2.Repository, *, message: str) -> None:
-    """Commit all changes in the repository."""
-    signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message=message, signature=signature)
-
-
 @pytest.fixture
 def repository(template_directory: Path) -> Path:
     """Fixture for a template repository."""
-    repository = pygit2.init_repository(template_directory)
-    commit(repository, message="Initial")
+    pygit2.init_repository(template_directory)
+    commit(template_directory, message="Initial")
     return template_directory
-
-
-def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
-    """Move all files in the repository to the given subdirectory."""
-    repository = pygit2.Repository(repositorypath)
-    builder = repository.TreeBuilder()
-    builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
-    tree = repository[builder.write()]
-    repository.checkout_tree(tree)
-    commit(repository, message=f"Move files to subdirectory {directory}")

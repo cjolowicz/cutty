@@ -9,7 +9,7 @@ from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
 from cutty.services.update import getprojectcontext
 from cutty.services.update import getprojecttemplate
-from tests.functional.conftest import commit
+from tests.util.git import commit
 
 
 def test_getprojecttemplate(tmp_path: Path) -> None:
@@ -35,7 +35,7 @@ def test_createworktree(tmp_path: Path) -> None:
     repositorypath = tmp_path / "repository"
     repository = pygit2.init_repository(repositorypath)
     (tmp_path / "repository" / "README").touch()
-    commit(repository, message="Initial")
+    commit(repositorypath, message="Initial")
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch") as worktree:
@@ -50,7 +50,7 @@ def test_createworktree_no_checkout(tmp_path: Path) -> None:
     repositorypath = tmp_path / "repository"
     repository = pygit2.init_repository(repositorypath)
     (tmp_path / "repository" / "README").touch()
-    commit(repository, message="Initial")
+    commit(repositorypath, message="Initial")
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch", checkout=False) as worktree:
@@ -62,7 +62,7 @@ def test_cherrypick(tmp_path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
     repositorypath = tmp_path / "repository"
     repository = pygit2.init_repository(repositorypath)
-    commit(repository, message="Initial")
+    commit(repositorypath, message="Initial")
 
     currentbranch = repository.references["HEAD"].target
     otherbranch = "mybranch"
@@ -70,7 +70,7 @@ def test_cherrypick(tmp_path: Path) -> None:
     (repositorypath / "README").touch()
     repository.branches.create(otherbranch, repository.head.peel())
     repository.set_head(f"refs/heads/{otherbranch}")
-    commit(repository, message="Add README")
+    commit(repositorypath, message="Add README")
 
     repository.checkout(currentbranch)
     assert not (repositorypath / "README").is_file()
@@ -83,17 +83,17 @@ def test_cherrypick_conflict(tmp_path: Path) -> None:
     """It raises an exception on merge conflicts."""
     repositorypath = tmp_path / "repository"
     repository = pygit2.init_repository(repositorypath)
-    commit(repository, message="Initial")
+    commit(repositorypath, message="Initial")
 
     mainbranch = repository.references[repository.references["HEAD"].target]
     otherbranch = repository.branches.create("mybranch", repository.head.peel())
 
     (repositorypath / "README").write_text("This is the version on the main branch.")
-    commit(repository, message="Add README")
+    commit(repositorypath, message="Add README")
 
     repository.checkout(otherbranch)
     (repositorypath / "README").write_text("This is the version on the other branch.")
-    commit(repository, message="Add README")
+    commit(repositorypath, message="Add README")
 
     repository.checkout(mainbranch)
 
@@ -106,17 +106,17 @@ def test_cherrypick_conflict_deletion(tmp_path: Path) -> None:
     repositorypath = tmp_path / "repository"
     repository = pygit2.init_repository(repositorypath)
     (repositorypath / "README").write_text("This is the initial version.")
-    commit(repository, message="Initial")
+    commit(repositorypath, message="Initial")
 
     mainbranch = repository.references["HEAD"].target
     otherbranch = repository.branches.create("mybranch", repository.head.peel())
 
     (repositorypath / "README").unlink()
-    commit(repository, message="Remove README")
+    commit(repositorypath, message="Remove README")
 
     repository.checkout(otherbranch)
     (repositorypath / "README").write_text("This is the version on the other branch.")
-    commit(repository, message="Update README")
+    commit(repositorypath, message="Update README")
 
     repository.checkout(repository.references[mainbranch])
 
