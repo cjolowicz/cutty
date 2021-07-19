@@ -41,6 +41,13 @@ from cutty.services.create import create as service_create
         "cookiecutter.json file."
     ),
 )
+@click.option(
+    "-f",
+    "--overwrite-if-exists",
+    is_flag=True,
+    default=False,
+    help="Overwrite the contents of the output directory if it already exists.",
+)
 def cookiecutter(
     template: str,
     extra_context: dict[str, str],
@@ -48,6 +55,7 @@ def cookiecutter(
     checkout: Optional[str],
     output_dir: Optional[Path],
     directory: Optional[Path],
+    overwrite_if_exists: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     service_create(
@@ -57,4 +65,5 @@ def cookiecutter(
         checkout=checkout,
         outputdir=output_dir,
         directory=PurePosixPath(directory) if directory is not None else None,
+        overwrite_if_exists=overwrite_if_exists,
     )
