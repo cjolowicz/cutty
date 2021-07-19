@@ -88,7 +88,6 @@ module = [
     "appdirs",
     "binaryornot.*",
     "jinja2_time",
-    "pluggy",
     "pyftpdlib.*",
     "pygit2",
 ]
