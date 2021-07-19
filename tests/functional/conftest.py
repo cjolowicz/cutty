@@ -1,9 +1,12 @@
 """Fixtures for functional tests."""
 import json
+from collections.abc import Callable
 from collections.abc import Iterator
+from collections.abc import Sequence
 from pathlib import Path
 from textwrap import dedent
 
+import click
 import pygit2
 import pytest
 from click.testing import CliRunner
@@ -17,6 +20,20 @@ def runner() -> Iterator[CliRunner]:
     runner = CliRunner()
     with runner.isolated_filesystem():
         yield runner
+
+
+RunFunction = Callable[[click.BaseCommand, Sequence[str]], None]
+
+
+@pytest.fixture
+def run(runner: CliRunner) -> RunFunction:
+    """Fixture for invoking command-line interfaces."""
+
+    def _run(cli: click.BaseCommand, args: Sequence[str]) -> None:
+        result = runner.invoke(cli, args, catch_exceptions=False)
+        assert result.exit_code == 0
+
+    return _run
 
 
 @pytest.fixture
