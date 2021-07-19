@@ -72,6 +72,7 @@ def create(
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
+        createrepository=True,
     ) as storage:
         for projectfile in projectfiles.release():
             if strip:
