@@ -30,6 +30,7 @@ def createcookiecutterstorage(
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     hookfiles: Sequence[File],
+    createrepository: bool = True,
 ) -> FileStorage:
     """Create storage for Cookiecutter project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
@@ -41,6 +42,7 @@ def createcookiecutterstorage(
         )
         storage = observe(storage, observer)
 
-    storage = observe(storage, GitRepositoryObserver(project=project_dir))
+    if createrepository:
+        storage = observe(storage, GitRepositoryObserver(project=project_dir))
 
     return storage
