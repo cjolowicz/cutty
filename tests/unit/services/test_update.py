@@ -9,7 +9,7 @@ from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
 from cutty.services.update import getprojectcontext
 from cutty.services.update import getprojecttemplate
-from tests.functional.conftest import commit
+from tests.util.git import commit
 
 
 def test_getprojecttemplate(tmp_path: Path) -> None:

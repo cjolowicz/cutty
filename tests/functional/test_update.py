@@ -7,7 +7,7 @@ import pygit2
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
-from tests.functional.conftest import commit
+from tests.util.git import commit
 
 
 def test_help(runner: CliRunner) -> None:

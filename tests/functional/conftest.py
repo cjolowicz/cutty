@@ -8,7 +8,7 @@ import pygit2
 import pytest
 from click.testing import CliRunner
 
-from cutty.filestorage.adapters.observers.git import commit as _commit
+from tests.util.git import commit
 
 
 @pytest.fixture
@@ -61,12 +61,6 @@ def template_directory(tmp_path: Path) -> Path:
     )
 
     return template
-
-
-def commit(repository: pygit2.Repository, *, message: str) -> None:
-    """Commit all changes in the repository."""
-    signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message=message, signature=signature)
 
 
 @pytest.fixture
