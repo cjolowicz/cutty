@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Optional
 
-import appdirs
+import platformdirs
 from lazysequence import lazysequence
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
@@ -32,7 +32,7 @@ def create(
     outputdirisproject: bool = False,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
+    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
     if directory is not None:
