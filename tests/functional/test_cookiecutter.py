@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
 from tests.functional.conftest import commit
+from tests.functional.conftest import move_repository_files_to_subdirectory
 
 
 def test_create_help(runner: CliRunner) -> None:
@@ -83,19 +84,6 @@ def test_output_dir(runner: CliRunner, repository: Path, tmp_path: Path) -> None
 
 def test_directory(runner: CliRunner, repository: Path, tmp_path: Path) -> None:
     """It uses the template in the given subdirectory."""
-
-    def move_repository_files_to_subdirectory(
-        repositorypath: Path, directory: str
-    ) -> None:
-        repository = pygit2.Repository(repositorypath)
-        builder = repository.TreeBuilder()
-        builder.insert(
-            directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE
-        )
-        tree = repository[builder.write()]
-        repository.checkout_tree(tree)
-        commit(repository, message=f"Move files to subdirectory {directory}")
-
     directory = "a"
     move_repository_files_to_subdirectory(repository, directory)
 
