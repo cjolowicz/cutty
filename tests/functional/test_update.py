@@ -4,25 +4,20 @@ import os
 from pathlib import Path
 
 import pygit2
-from click.testing import CliRunner
+import pytest
 
-from cutty.entrypoints.cli import main
+from tests.functional.conftest import RunCutty
 from tests.util.git import commit
 
 
-def test_help(runner: CliRunner) -> None:
+def test_help(runcutty: RunCutty) -> None:
     """It exits with a status code of zero."""
-    result = runner.invoke(main, ["update", "--help"])
-    assert result.exit_code == 0
+    runcutty("update", "--help")
 
 
-def test_update_trivial(runner: CliRunner, repository: Path) -> None:
+def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
     """It applies changes from the template."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
@@ -31,18 +26,14 @@ def test_update_trivial(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir("awesome")
-    runner.invoke(main, ["update"], catch_exceptions=False)
+    runcutty("update")
 
     assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_merge(runner: CliRunner, repository: Path) -> None:
+def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
     """It merges changes from the template."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     projectdir = Path("awesome")
 
@@ -58,19 +49,15 @@ def test_update_merge(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir(projectdir)
-    runner.invoke(main, ["update"], catch_exceptions=False)
+    runcutty("update")
 
     assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
     assert Path("LICENSE").is_file()
 
 
-def test_update_conflict(runner: CliRunner, repository: Path) -> None:
+def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     projectdir = Path("awesome")
 
@@ -86,18 +73,13 @@ def test_update_conflict(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir(projectdir)
-    result = runner.invoke(main, ["update"])
+    with pytest.raises(Exception):
+        runcutty("update")
 
-    assert result.exit_code != 0
 
-
-def test_update_remove(runner: CliRunner, repository: Path) -> None:
+def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
     """It applies file deletions from the template."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     projectdir = Path("awesome")
 
@@ -108,36 +90,28 @@ def test_update_remove(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir(projectdir)
-    runner.invoke(main, ["update"], catch_exceptions=False)
+    runcutty("update")
 
     assert not Path("README.md").is_file()
 
 
-def test_update_noop(runner: CliRunner, repository: Path) -> None:
+def test_update_noop(runcutty: RunCutty, repository: Path) -> None:
     """It does nothing if the generated project did not change."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     projectdir = Path("awesome")
     project = pygit2.Repository(projectdir)
     oldhead = project.head.target
 
     os.chdir(projectdir)
-    runner.invoke(main, ["update"], catch_exceptions=False)
+    runcutty("update")
 
     assert oldhead == project.head.target
 
 
-def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
+def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
     """It prompts for variables added after the last project generation."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
@@ -148,7 +122,7 @@ def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir("awesome")
-    runner.invoke(main, ["update"], input="3\n", catch_exceptions=False)
+    runcutty("update", input="3\n")
 
     # Verify that the variable was bound by user input.
     path = Path(".cookiecutter.json")
@@ -156,20 +130,15 @@ def test_update_new_variables(runner: CliRunner, repository: Path) -> None:
     assert "stable" == data["status"]
 
 
-def test_update_extra_context_old_variable(runner: CliRunner, repository: Path) -> None:
+def test_update_extra_context_old_variable(
+    runcutty: RunCutty, repository: Path
+) -> None:
     """It allows setting variables on the command-line."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Update the project.
     os.chdir("awesome")
-    result = runner.invoke(
-        main, ["update", "project=excellent"], catch_exceptions=False
-    )
-    assert result.exit_code == 0
+    runcutty("update", "project=excellent")
 
     # Verify that the variable was bound.
     path = Path(".cookiecutter.json")
@@ -177,13 +146,11 @@ def test_update_extra_context_old_variable(runner: CliRunner, repository: Path) 
     assert "excellent" == data["project"]
 
 
-def test_update_extra_context_new_variable(runner: CliRunner, repository: Path) -> None:
+def test_update_extra_context_new_variable(
+    runcutty: RunCutty, repository: Path
+) -> None:
     """It allows setting variables on the command-line."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
@@ -194,8 +161,7 @@ def test_update_extra_context_new_variable(runner: CliRunner, repository: Path) 
 
     # Update the project.
     os.chdir("awesome")
-    result = runner.invoke(main, ["update", "status=stable"], catch_exceptions=False)
-    assert result.exit_code == 0
+    runcutty("update", "status=stable")
 
     # Verify that the variable was bound.
     path = Path(".cookiecutter.json")
@@ -203,13 +169,9 @@ def test_update_extra_context_new_variable(runner: CliRunner, repository: Path) 
     assert "stable" == data["status"]
 
 
-def test_update_no_input(runner: CliRunner, repository: Path) -> None:
+def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
@@ -220,10 +182,7 @@ def test_update_no_input(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir("awesome")
-    result = runner.invoke(
-        main, ["update", "--no-input"], input="3\n", catch_exceptions=False
-    )
-    assert result.exit_code == 0
+    runcutty("update", "--no-input", input="3\n")
 
     # Verify that the variable was bound using the default.
     path = Path(".cookiecutter.json")
@@ -231,13 +190,9 @@ def test_update_no_input(runner: CliRunner, repository: Path) -> None:
     assert "alpha" == data["status"]
 
 
-def test_update_rename_projectdir(runner: CliRunner, repository: Path) -> None:
+def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
     """It generates the project in the project directory irrespective of its name."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Rename the project directory.
     projectdir = Path("awesome")
@@ -250,19 +205,15 @@ def test_update_rename_projectdir(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     os.chdir("awesome2")
-    runner.invoke(main, ["update"], catch_exceptions=False)
+    runcutty("update")
 
     # Verify that the README was updated.
     assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_cwd(runner: CliRunner, repository: Path) -> None:
+def test_update_cwd(runcutty: RunCutty, repository: Path) -> None:
     """It updates the project in the specified directory."""
-    runner.invoke(
-        main,
-        ["create", "--no-input", str(repository), "project=awesome"],
-        catch_exceptions=False,
-    )
+    runcutty("create", "--no-input", str(repository), "project=awesome")
 
     # Update README.md in the template.
     path = repository / "{{ cookiecutter.project }}" / "README.md"
@@ -271,6 +222,6 @@ def test_update_cwd(runner: CliRunner, repository: Path) -> None:
 
     # Update the project.
     projectdir = Path("awesome")
-    runner.invoke(main, ["update", f"--cwd={projectdir}"], catch_exceptions=False)
+    runcutty("update", f"--cwd={projectdir}")
 
     assert (projectdir / "README.md").read_text() == "# awesome\nAn awesome project.\n"

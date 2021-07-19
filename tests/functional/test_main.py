@@ -1,18 +1,14 @@
 """Functional tests for the cutty CLI."""
 from importlib.metadata import version
 
-from click.testing import CliRunner
-
-from cutty.entrypoints.cli import main
+from tests.functional.conftest import RunCutty
 
 
-def test_help(runner: CliRunner) -> None:
+def test_help(runcutty: RunCutty) -> None:
     """It exits with a status code of zero."""
-    result = runner.invoke(main, ["--help"])
-    assert result.exit_code == 0
+    runcutty("--help")
 
 
-def test_version(runner: CliRunner) -> None:
+def test_version(runcutty: RunCutty) -> None:
     """It displays the version."""
-    result = runner.invoke(main, ["--version"])
-    assert version("cutty") in result.output
+    assert version("cutty") in runcutty("--version")

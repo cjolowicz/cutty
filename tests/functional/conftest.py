@@ -1,16 +1,16 @@
 """Fixtures for functional tests."""
 import json
-from collections.abc import Callable
 from collections.abc import Iterator
-from collections.abc import Sequence
 from pathlib import Path
 from textwrap import dedent
+from typing import Optional
+from typing import Protocol
 
-import click
 import pygit2
 import pytest
 from click.testing import CliRunner
 
+from cutty.entrypoints.cli import main
 from tests.util.git import commit
 
 
@@ -22,16 +22,24 @@ def runner() -> Iterator[CliRunner]:
         yield runner
 
 
-RunFunction = Callable[[click.BaseCommand, Sequence[str]], None]
+class RunCutty(Protocol):
+    """Invoke the cutty CLI."""
+
+    def __call__(self, *args: str, input: Optional[str] = None) -> str:
+        """Invoke the cutty CLI."""
 
 
 @pytest.fixture
-def run(runner: CliRunner) -> RunFunction:
-    """Fixture for invoking command-line interfaces."""
+def runcutty(runner: CliRunner) -> RunCutty:
+    """Fixture for invoking the cutty CLI."""
 
-    def _run(cli: click.BaseCommand, args: Sequence[str]) -> None:
-        result = runner.invoke(cli, args, catch_exceptions=False)
-        assert result.exit_code == 0
+    def _run(*args: str, input: Optional[str] = None) -> str:
+        result = runner.invoke(main, args, input=input, catch_exceptions=False)
+
+        if result.exit_code != 0:
+            raise RuntimeError(result)
+
+        return result.output
 
     return _run
 
