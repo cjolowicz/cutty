@@ -30,6 +30,7 @@ def create(
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
     outputdirisproject: bool = False,
+    createrepository: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(appdirs.user_cache_dir("cutty"))
@@ -38,7 +39,7 @@ def create(
     if directory is not None:
         templatedir = templatedir.joinpath(*directory.parts)
 
-    if outputdir is None:  # pragma: no branch
+    if outputdir is None:
         outputdir = pathlib.Path.cwd()
 
     config = loadcookiecutterconfig(template, templatedir)
@@ -72,6 +73,7 @@ def create(
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
+        createrepository,
     ) as storage:
         for projectfile in projectfiles.release():
             if strip:
