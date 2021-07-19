@@ -95,3 +95,18 @@ def test_directory(runner: CliRunner, repository: Path, tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     assert Path("example", "README.md").is_file()
+
+
+def test_overwrite(runner: CliRunner, repository: Path) -> None:
+    """It overwrites existing files."""
+    Path("example").mkdir()
+    Path("example", "README.md").touch()
+
+    result = runner.invoke(
+        main,
+        ["cookiecutter", "--overwrite-if-exists", str(repository)],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert Path("example", "README.md").read_text() == "# example\n"
