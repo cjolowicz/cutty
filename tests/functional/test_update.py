@@ -187,7 +187,6 @@ def test_update_rename_projectdir(
     with chdir(project2):
         runcutty("update")
 
-    # Verify that the README was updated.
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
