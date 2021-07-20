@@ -1,7 +1,10 @@
 """File utilities."""
+import os
 from pathlib import Path
 from typing import Iterator
 from typing import Union
+
+from cutty.compat.contextlib import contextmanager
 
 
 def _list_files_recursively(path: Path, *, exclude: frozenset[Path]) -> Iterator[Path]:
@@ -40,3 +43,15 @@ def project_files(path: Union[Path, str]) -> frozenset[Path]:
         path = Path(path)
 
     return list_files_recursively(path, exclude=frozenset({path / ".git"}))
+
+
+@contextmanager
+def chdir(path: Union[Path, str]) -> Iterator[None]:
+    """Context manager for changing a directory."""
+    cwd = Path.cwd()
+    os.chdir(path)
+
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
