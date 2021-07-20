@@ -35,6 +35,13 @@ def addprojectvariable(repository: Path, name: str, value: Any) -> None:
     updatefile(path, json.dumps(data))
 
 
+def projectvariable(project: Path, name: str) -> Any:
+    """Return the bound value of a project variable."""
+    path = project / ".cookiecutter.json"
+    data = json.loads(path.read_text())
+    return data[name]
+
+
 def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies changes from the template."""
     updatefile(
@@ -127,10 +134,7 @@ def test_update_new_variables(
     with chdir(project):
         runcutty("update", input="3\n")
 
-    # Verify that the variable was bound by user input.
-    path = project / ".cookiecutter.json"
-    data = json.loads(path.read_text())
-    assert "stable" == data["status"]
+    assert "stable" == projectvariable(project, "status")
 
 
 def test_update_extra_context_old_variable(
@@ -140,10 +144,7 @@ def test_update_extra_context_old_variable(
     with chdir(project):
         runcutty("update", "project=excellent")
 
-    # Verify that the variable was bound.
-    path = project / ".cookiecutter.json"
-    data = json.loads(path.read_text())
-    assert "excellent" == data["project"]
+    assert "excellent" == projectvariable(project, "project")
 
 
 def test_update_extra_context_new_variable(
@@ -155,10 +156,7 @@ def test_update_extra_context_new_variable(
     with chdir(project):
         runcutty("update", "status=stable")
 
-    # Verify that the variable was bound.
-    path = project / ".cookiecutter.json"
-    data = json.loads(path.read_text())
-    assert "stable" == data["status"]
+    assert "stable" == projectvariable(project, "status")
 
 
 def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
@@ -168,10 +166,7 @@ def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) ->
     with chdir(project):
         runcutty("update", "--no-input", input="3\n")
 
-    # Verify that the variable was bound using the default.
-    path = project / ".cookiecutter.json"
-    data = json.loads(path.read_text())
-    assert "alpha" == data["status"]
+    assert "alpha" == projectvariable(project, "status")
 
 
 def test_update_rename_projectdir(
