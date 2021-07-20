@@ -7,7 +7,8 @@ import pygit2
 import pytest
 
 from tests.functional.conftest import RunCutty
-from tests.util.git import commit
+from tests.util.git import removefile
+from tests.util.git import updatefile
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -19,10 +20,13 @@ def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
     """It applies changes from the template."""
     runcutty("create", "--no-input", str(repository), "project=awesome")
 
-    # Update README.md in the template.
-    path = repository / "{{ cookiecutter.project }}" / "README.md"
-    path.write_text(path.read_text() + "An awesome project.\n")
-    commit(repository, message="Update README.md")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "README.md",
+        """
+        # {{ cookiecutter.project }}
+        An awesome project.
+        """,
+    )
 
     # Update the project.
     os.chdir("awesome")
@@ -37,15 +41,18 @@ def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
 
     projectdir = Path("awesome")
 
-    # Update README.md in the project.
-    path = projectdir / "README.md"
-    path.write_text(path.read_text() + "An awesome project.\n")
-    commit(projectdir, message="Update README.md")
+    updatefile(
+        projectdir / "README.md",
+        """
+        # awesome
+        An awesome project.
+        """,
+    )
 
-    # Add LICENSE in the template.
-    path = repository / "{{ cookiecutter.project }}" / "LICENSE"
-    path.touch()
-    commit(repository, message="Add LICENSE")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "LICENSE",
+        "",
+    )
 
     # Update the project.
     os.chdir(projectdir)
@@ -61,15 +68,21 @@ def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
 
     projectdir = Path("awesome")
 
-    # Update README.md in the project.
-    path = projectdir / "README.md"
-    path.write_text(path.read_text() + "An awesome project.\n")
-    commit(projectdir, message="Update README.md")
+    updatefile(
+        projectdir / "README.md",
+        """
+        # awesome
+        An awesome project.
+        """,
+    )
 
-    # Update README.md in the template.
-    path = repository / "{{ cookiecutter.project }}" / "README.md"
-    path.write_text(path.read_text() + "An excellent project.\n")
-    commit(repository, message="Update README.md")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "README.md",
+        """
+        # {{ cookiecutter.project }}
+        An excellent project.
+        """,
+    )
 
     # Update the project.
     os.chdir(projectdir)
@@ -83,10 +96,9 @@ def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
 
     projectdir = Path("awesome")
 
-    # Remove README in the template.
-    path = repository / "{{ cookiecutter.project }}" / "README.md"
-    path.unlink()
-    commit(repository, message="Remove README.md")
+    removefile(
+        repository / "{{ cookiecutter.project }}" / "README.md",
+    )
 
     # Update the project.
     os.chdir(projectdir)
@@ -117,8 +129,7 @@ def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
-    path.write_text(json.dumps(data))
-    commit(repository, message="Add status variable")
+    updatefile(path, json.dumps(data))
 
     # Update the project.
     os.chdir("awesome")
@@ -156,8 +167,7 @@ def test_update_extra_context_new_variable(
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
-    path.write_text(json.dumps(data))
-    commit(repository, message="Add status variable")
+    updatefile(path, json.dumps(data))
 
     # Update the project.
     os.chdir("awesome")
@@ -177,8 +187,7 @@ def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
     data["status"] = ["alpha", "beta", "stable"]
-    path.write_text(json.dumps(data))
-    commit(repository, message="Add status variable")
+    updatefile(path, json.dumps(data))
 
     # Update the project.
     os.chdir("awesome")
@@ -198,10 +207,13 @@ def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
     projectdir = Path("awesome")
     projectdir.rename("awesome2")
 
-    # Update README.md in the template.
-    path = repository / "{{ cookiecutter.project }}" / "README.md"
-    path.write_text(path.read_text() + "An awesome project.\n")
-    commit(repository, message="Update README.md")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "README.md",
+        """
+        # {{ cookiecutter.project }}
+        An awesome project.
+        """,
+    )
 
     # Update the project.
     os.chdir("awesome2")
@@ -215,10 +227,13 @@ def test_update_cwd(runcutty: RunCutty, repository: Path) -> None:
     """It updates the project in the specified directory."""
     runcutty("create", "--no-input", str(repository), "project=awesome")
 
-    # Update README.md in the template.
-    path = repository / "{{ cookiecutter.project }}" / "README.md"
-    path.write_text(path.read_text() + "An awesome project.\n")
-    commit(repository, message="Update README.md")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "README.md",
+        """
+        # {{ cookiecutter.project }}
+        An awesome project.
+        """,
+    )
 
     # Update the project.
     projectdir = Path("awesome")
