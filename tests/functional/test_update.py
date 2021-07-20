@@ -1,12 +1,12 @@
 """Functional tests for the update CLI."""
 import json
-import os
 from pathlib import Path
 
 import pygit2
 import pytest
 
 from tests.functional.conftest import RunCutty
+from tests.util.files import chdir
 from tests.util.git import removefile
 from tests.util.git import updatefile
 
@@ -28,11 +28,10 @@ def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
         """,
     )
 
-    # Update the project.
-    os.chdir("awesome")
-    runcutty("update")
+    with chdir("awesome"):
+        runcutty("update")
 
-    assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
+        assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
 def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
@@ -54,12 +53,11 @@ def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
         "",
     )
 
-    # Update the project.
-    os.chdir(projectdir)
-    runcutty("update")
+    with chdir(projectdir):
+        runcutty("update")
 
-    assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
-    assert Path("LICENSE").is_file()
+        assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
+        assert Path("LICENSE").is_file()
 
 
 def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
@@ -84,10 +82,9 @@ def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
         """,
     )
 
-    # Update the project.
-    os.chdir(projectdir)
-    with pytest.raises(Exception):
-        runcutty("update")
+    with chdir(projectdir):
+        with pytest.raises(Exception):
+            runcutty("update")
 
 
 def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
@@ -100,11 +97,10 @@ def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
         repository / "{{ cookiecutter.project }}" / "README.md",
     )
 
-    # Update the project.
-    os.chdir(projectdir)
-    runcutty("update")
+    with chdir(projectdir):
+        runcutty("update")
 
-    assert not Path("README.md").is_file()
+        assert not Path("README.md").is_file()
 
 
 def test_update_noop(runcutty: RunCutty, repository: Path) -> None:
@@ -115,8 +111,8 @@ def test_update_noop(runcutty: RunCutty, repository: Path) -> None:
     project = pygit2.Repository(projectdir)
     oldhead = project.head.target
 
-    os.chdir(projectdir)
-    runcutty("update")
+    with chdir(projectdir):
+        runcutty("update")
 
     assert oldhead == project.head.target
 
@@ -131,14 +127,13 @@ def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
     data["status"] = ["alpha", "beta", "stable"]
     updatefile(path, json.dumps(data))
 
-    # Update the project.
-    os.chdir("awesome")
-    runcutty("update", input="3\n")
+    with chdir("awesome"):
+        runcutty("update", input="3\n")
 
-    # Verify that the variable was bound by user input.
-    path = Path(".cookiecutter.json")
-    data = json.loads(path.read_text())
-    assert "stable" == data["status"]
+        # Verify that the variable was bound by user input.
+        path = Path(".cookiecutter.json")
+        data = json.loads(path.read_text())
+        assert "stable" == data["status"]
 
 
 def test_update_extra_context_old_variable(
@@ -147,14 +142,13 @@ def test_update_extra_context_old_variable(
     """It allows setting variables on the command-line."""
     runcutty("create", "--no-input", str(repository), "project=awesome")
 
-    # Update the project.
-    os.chdir("awesome")
-    runcutty("update", "project=excellent")
+    with chdir("awesome"):
+        runcutty("update", "project=excellent")
 
-    # Verify that the variable was bound.
-    path = Path(".cookiecutter.json")
-    data = json.loads(path.read_text())
-    assert "excellent" == data["project"]
+        # Verify that the variable was bound.
+        path = Path(".cookiecutter.json")
+        data = json.loads(path.read_text())
+        assert "excellent" == data["project"]
 
 
 def test_update_extra_context_new_variable(
@@ -169,14 +163,13 @@ def test_update_extra_context_new_variable(
     data["status"] = ["alpha", "beta", "stable"]
     updatefile(path, json.dumps(data))
 
-    # Update the project.
-    os.chdir("awesome")
-    runcutty("update", "status=stable")
+    with chdir("awesome"):
+        runcutty("update", "status=stable")
 
-    # Verify that the variable was bound.
-    path = Path(".cookiecutter.json")
-    data = json.loads(path.read_text())
-    assert "stable" == data["status"]
+        # Verify that the variable was bound.
+        path = Path(".cookiecutter.json")
+        data = json.loads(path.read_text())
+        assert "stable" == data["status"]
 
 
 def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
@@ -190,13 +183,13 @@ def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
     updatefile(path, json.dumps(data))
 
     # Update the project.
-    os.chdir("awesome")
-    runcutty("update", "--no-input", input="3\n")
+    with chdir("awesome"):
+        runcutty("update", "--no-input", input="3\n")
 
-    # Verify that the variable was bound using the default.
-    path = Path(".cookiecutter.json")
-    data = json.loads(path.read_text())
-    assert "alpha" == data["status"]
+        # Verify that the variable was bound using the default.
+        path = Path(".cookiecutter.json")
+        data = json.loads(path.read_text())
+        assert "alpha" == data["status"]
 
 
 def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
@@ -215,12 +208,11 @@ def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
         """,
     )
 
-    # Update the project.
-    os.chdir("awesome2")
-    runcutty("update")
+    with chdir("awesome2"):
+        runcutty("update")
 
-    # Verify that the README was updated.
-    assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
+        # Verify that the README was updated.
+        assert Path("README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
 def test_update_cwd(runcutty: RunCutty, repository: Path) -> None:
