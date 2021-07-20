@@ -2,6 +2,8 @@
 from pathlib import Path
 
 from tests.functional.conftest import RunCutty
+from tests.util.files import project_files
+from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
 
 
@@ -35,4 +37,6 @@ def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None
 
     runcutty("create", f"--directory={directory}", str(repository))
 
-    assert Path("example", "README.md").is_file()
+    assert template_files(repository / "a") == project_files("example") - {
+        Path("post_gen_project")
+    }
