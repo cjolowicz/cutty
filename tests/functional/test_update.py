@@ -16,12 +16,18 @@ def test_help(runcutty: RunCutty) -> None:
     runcutty("update", "--help")
 
 
-def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
-    """It applies changes from the template."""
+@pytest.fixture
+def project(runcutty: RunCutty, repository: Path) -> Path:
+    """Fixture for a generated project."""
     project = Path("awesome")
 
     runcutty("create", "--no-input", str(repository), f"project={project.name}")
 
+    return project
+
+
+def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
+    """It applies changes from the template."""
     updatefile(
         repository / "{{ cookiecutter.project }}" / "README.md",
         """
@@ -36,12 +42,8 @@ def test_update_trivial(runcutty: RunCutty, repository: Path) -> None:
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
+def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It merges changes from the template."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     updatefile(
         project / "README.md",
         """
@@ -62,12 +64,8 @@ def test_update_merge(runcutty: RunCutty, repository: Path) -> None:
     assert (project / "LICENSE").is_file()
 
 
-def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
+def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     updatefile(
         project / "README.md",
         """
@@ -89,12 +87,8 @@ def test_update_conflict(runcutty: RunCutty, repository: Path) -> None:
             runcutty("update")
 
 
-def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
+def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies file deletions from the template."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     removefile(
         repository / "{{ cookiecutter.project }}" / "README.md",
     )
@@ -105,12 +99,8 @@ def test_update_remove(runcutty: RunCutty, repository: Path) -> None:
     assert not (project / "README.md").is_file()
 
 
-def test_update_noop(runcutty: RunCutty, repository: Path) -> None:
+def test_update_noop(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     oldhead = pygit2.Repository(project).head.target
 
     with chdir(project):
@@ -119,12 +109,10 @@ def test_update_noop(runcutty: RunCutty, repository: Path) -> None:
     assert oldhead == pygit2.Repository(project).head.target
 
 
-def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
+def test_update_new_variables(
+    runcutty: RunCutty, repository: Path, project: Path
+) -> None:
     """It prompts for variables added after the last project generation."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
@@ -141,13 +129,9 @@ def test_update_new_variables(runcutty: RunCutty, repository: Path) -> None:
 
 
 def test_update_extra_context_old_variable(
-    runcutty: RunCutty, repository: Path
+    runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     with chdir(project):
         runcutty("update", "project=excellent")
 
@@ -158,13 +142,9 @@ def test_update_extra_context_old_variable(
 
 
 def test_update_extra_context_new_variable(
-    runcutty: RunCutty, repository: Path
+    runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
@@ -180,12 +160,8 @@ def test_update_extra_context_new_variable(
     assert "stable" == data["status"]
 
 
-def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
+def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     # Add project variable `status`.
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
@@ -201,13 +177,11 @@ def test_update_no_input(runcutty: RunCutty, repository: Path) -> None:
     assert "alpha" == data["status"]
 
 
-def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
+def test_update_rename_projectdir(
+    runcutty: RunCutty, repository: Path, project: Path
+) -> None:
     """It generates the project in the project directory irrespective of its name."""
-    project = Path("awesome")
     project2 = Path("awesome2")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     project.rename(project2)
 
     updatefile(
@@ -225,12 +199,8 @@ def test_update_rename_projectdir(runcutty: RunCutty, repository: Path) -> None:
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_cwd(runcutty: RunCutty, repository: Path) -> None:
+def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
-    project = Path("awesome")
-
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
-
     updatefile(
         repository / "{{ cookiecutter.project }}" / "README.md",
         """
