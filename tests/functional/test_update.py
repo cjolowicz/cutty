@@ -1,6 +1,7 @@
 """Functional tests for the update CLI."""
 import json
 from pathlib import Path
+from typing import Any
 
 import pygit2
 import pytest
@@ -24,6 +25,14 @@ def project(runcutty: RunCutty, repository: Path) -> Path:
     runcutty("create", "--no-input", str(repository), f"project={project.name}")
 
     return project
+
+
+def addprojectvariable(repository: Path, name: str, value: Any) -> None:
+    """Add a project variable to the template."""
+    path = repository / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    data[name] = value
+    updatefile(path, json.dumps(data))
 
 
 def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
@@ -113,11 +122,7 @@ def test_update_new_variables(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It prompts for variables added after the last project generation."""
-    # Add project variable `status`.
-    path = repository / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    data["status"] = ["alpha", "beta", "stable"]
-    updatefile(path, json.dumps(data))
+    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", input="3\n")
@@ -145,11 +150,7 @@ def test_update_extra_context_new_variable(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    # Add project variable `status`.
-    path = repository / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    data["status"] = ["alpha", "beta", "stable"]
-    updatefile(path, json.dumps(data))
+    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "status=stable")
@@ -162,11 +163,7 @@ def test_update_extra_context_new_variable(
 
 def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    # Add project variable `status`.
-    path = repository / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    data["status"] = ["alpha", "beta", "stable"]
-    updatefile(path, json.dumps(data))
+    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "--no-input", input="3\n")
