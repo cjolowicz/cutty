@@ -4,8 +4,13 @@ from pathlib import Path
 import pygit2
 
 from tests.functional.conftest import RunCutty
+from tests.util.files import project_files
+from tests.util.files import template_files
 from tests.util.git import commit
 from tests.util.git import move_repository_files_to_subdirectory
+
+
+EXTRA = Path("post_gen_project")
 
 
 def test_create_help(runcutty: RunCutty) -> None:
@@ -33,14 +38,14 @@ def test_no_input(runcutty: RunCutty, repository: Path) -> None:
     """It does not prompt for variables."""
     runcutty("cookiecutter", "--no-input", str(repository))
 
-    assert Path("example", "README.md").is_file()
+    assert template_files(repository) == project_files("example") - {EXTRA}
 
 
 def test_extra_context(runcutty: RunCutty, repository: Path) -> None:
     """It allows setting variables on the command-line."""
     runcutty("cookiecutter", str(repository), "project=awesome")
 
-    assert Path("awesome", "README.md").is_file()
+    assert template_files(repository) == project_files("awesome") - {EXTRA}
 
 
 def test_checkout(runcutty: RunCutty, repository: Path) -> None:
@@ -62,7 +67,7 @@ def test_output_dir(runcutty: RunCutty, repository: Path, tmp_path: Path) -> Non
     outputdir = tmp_path / "outputdir"
     runcutty("cookiecutter", f"--output-dir={outputdir}", str(repository))
 
-    assert (outputdir / "example" / "README.md").is_file()
+    assert template_files(repository) == project_files(outputdir / "example") - {EXTRA}
 
 
 def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None:
@@ -72,7 +77,7 @@ def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None
 
     runcutty("cookiecutter", f"--directory={directory}", str(repository))
 
-    assert Path("example", "README.md").is_file()
+    assert template_files(repository / "a") == project_files("example") - {EXTRA}
 
 
 def test_overwrite(runcutty: RunCutty, repository: Path) -> None:
