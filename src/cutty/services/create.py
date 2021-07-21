@@ -36,6 +36,8 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
+    extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
@@ -51,7 +53,7 @@ def create(
         config.variables,
         render,
         interactive=not no_input,
-        bindings=[Binding(key, value) for key, value in extra_context.items()],
+        bindings=extrabindings,
     )
 
     projectfiles = lazysequence(
