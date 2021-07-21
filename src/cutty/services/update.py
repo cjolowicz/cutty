@@ -14,7 +14,8 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
-from cutty.services.create import create
+from cutty.services.create import create2
+from cutty.templates.domain.bindings import Binding
 
 
 def getprojecttemplate(projectdir: Path) -> str:
@@ -100,11 +101,13 @@ def update(
     context = getprojectcontext(projectdir)
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
-        create(
+        extra_context = {**context, **extra_context}
+        extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+        create2(
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            extra_context={**context, **extra_context},
+            extrabindings=extrabindings,
             no_input=no_input,
         )
 
