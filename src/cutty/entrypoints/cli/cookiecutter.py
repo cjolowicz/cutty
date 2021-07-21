@@ -76,4 +76,5 @@ def cookiecutter(
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         createrepository=False,
+        createconfigfile=False,
     )

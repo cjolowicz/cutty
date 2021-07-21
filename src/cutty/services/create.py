@@ -33,6 +33,7 @@ def create(
     skip_if_file_exists: bool = False,
     outputdirisproject: bool = False,
     createrepository: bool = True,
+    createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
@@ -68,8 +69,14 @@ def create(
         projectdir = outputdir / projectfiles[0].path.parts[strip]
 
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
-    projectconfigfile = createprojectconfigfile(
-        PurePath(*projectdir.relative_to(outputdir).parts), config.settings, bindings
+    projectconfigfile = (
+        createprojectconfigfile(
+            PurePath(*projectdir.relative_to(outputdir).parts),
+            config.settings,
+            bindings,
+        )
+        if createconfigfile
+        else None
     )
 
     with createcookiecutterstorage(
@@ -87,6 +94,7 @@ def create(
 
             storage.add(projectfile)
 
-        # FIXME: do not overwrite project config with --overwrite-if-exists
-        with contextlib.suppress(FileExistsError):
-            storage.add(projectconfigfile)
+        if projectconfigfile is not None:
+            # FIXME: do not overwrite project config with --overwrite-if-exists
+            with contextlib.suppress(FileExistsError):
+                storage.add(projectconfigfile)
