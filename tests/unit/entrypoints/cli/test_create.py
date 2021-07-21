@@ -2,12 +2,14 @@
 from typing import Any
 from typing import Callable
 from typing import Protocol
+from typing import Sequence
 
 import click
 import pytest
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli.create import create
+from cutty.templates.domain.bindings import Binding
 
 
 RunnerDecorator = Callable[[Callable[..., None]], Callable[..., None]]
@@ -50,9 +52,9 @@ def test_extra_context_happy(runner: RunnerDecoratorFactory) -> None:
     """It parses additional arguments into key-value pairs."""
 
     @runner(create, monkeypatch="cutty.entrypoints.cli.create.service_create")
-    def invoke(*args: Any, extra_context: dict[str, str], **kwargs: Any) -> None:
+    def invoke(*args: Any, extrabindings: Sequence[Binding], **kwargs: Any) -> None:
         """Main function."""
-        assert extra_context == {"project": "example"}
+        assert extrabindings == [Binding("project", "example")]
 
     invoke("https://example.com/repository.git", "project=example")
 
