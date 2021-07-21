@@ -20,7 +20,7 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
 
 
-def create2(
+def create(
     template: str,
     *,
     extrabindings: Sequence[Binding] = (),
