@@ -23,7 +23,7 @@ from cutty.templates.domain.renderfiles import renderfiles
 def create2(
     template: str,
     *,
-    extrabindings: Sequence[Binding],
+    extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
     outputdir: Optional[pathlib.Path] = None,
