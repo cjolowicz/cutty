@@ -2,6 +2,7 @@
 import contextlib
 import pathlib
 from collections.abc import Mapping
+from collections.abc import Sequence
 from types import MappingProxyType
 from typing import Optional
 
@@ -37,7 +38,36 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+    create2(
+        template,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        outputdir=outputdir,
+        directory=directory,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=outputdirisproject,
+        createrepository=createrepository,
+        createconfigfile=createconfigfile,
+    )
 
+
+def create2(
+    template: str,
+    *,
+    extrabindings: Sequence[Binding],
+    no_input: bool = False,
+    checkout: Optional[str] = None,
+    outputdir: Optional[pathlib.Path] = None,
+    directory: Optional[pathlib.PurePosixPath] = None,
+    overwrite_if_exists: bool = False,
+    skip_if_file_exists: bool = False,
+    outputdirisproject: bool = False,
+    createrepository: bool = True,
+    createconfigfile: bool = True,
+) -> None:
+    """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     templatedir = getdefaultrepositoryprovider(cachedir)(template, revision=checkout)
 
