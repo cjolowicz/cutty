@@ -5,6 +5,7 @@ from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import removefile
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -33,6 +34,15 @@ def test_files(runcutty: RunCutty, repository: Path) -> None:
     assert template_files(repository) == project_files("example") - {
         Path("post_gen_project")
     }
+
+
+def test_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
+    """It always creates .cookiecutter.json."""
+    removefile(repository / "{{ cookiecutter.project }}" / ".cookiecutter.json")
+
+    runcutty("create", str(repository))
+
+    assert Path("example", ".cookiecutter.json").is_file()
 
 
 def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:

@@ -45,7 +45,7 @@ def loadvariable(name: str, value: Any) -> Variable:
 
 
 def loadcookiecutterconfig(template: str, path: Path) -> Config:
-    """Load the configurations for a Cookiecutter template."""
+    """Load the configuration for a Cookiecutter template."""
     text = (path / "cookiecutter.json").read_text()
     data = json.loads(text)
 

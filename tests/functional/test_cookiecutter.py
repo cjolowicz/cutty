@@ -7,6 +7,7 @@ from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import removefile
 from tests.util.git import updatefile
 
 
@@ -32,6 +33,15 @@ def test_no_repository(runcutty: RunCutty, repository: Path) -> None:
     runcutty("cookiecutter", str(repository))
 
     assert not Path("example", ".git").is_dir()
+
+
+def test_no_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
+    """It does not create .cookiecutter.json unless the template provides it."""
+    removefile(repository / "{{ cookiecutter.project }}" / ".cookiecutter.json")
+
+    runcutty("cookiecutter", str(repository))
+
+    assert not Path("example", ".cookiecutter.json").is_file()
 
 
 def test_no_input(runcutty: RunCutty, repository: Path) -> None:
