@@ -6,8 +6,8 @@ import pygit2
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
-from tests.util.git import commit
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import updatefile
 
 
 EXTRA = Path("post_gen_project")
@@ -52,10 +52,10 @@ def test_checkout(runcutty: RunCutty, repository: Path) -> None:
     """It uses the specified revision of the template."""
     initial = pygit2.Repository(repository).head.target
 
-    # Add LICENSE to the template.
-    path = repository / "{{ cookiecutter.project }}" / "LICENSE"
-    path.touch()
-    commit(repository, message="Add LICENSE")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "LICENSE",
+        "",
+    )
 
     runcutty("cookiecutter", f"--checkout={initial}", str(repository))
 
@@ -65,6 +65,7 @@ def test_checkout(runcutty: RunCutty, repository: Path) -> None:
 def test_output_dir(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None:
     """It generates the project under the specified directory."""
     outputdir = tmp_path / "outputdir"
+
     runcutty("cookiecutter", f"--output-dir={outputdir}", str(repository))
 
     assert template_files(repository) == project_files(outputdir / "example") - {EXTRA}
@@ -82,18 +83,20 @@ def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None
 
 def test_overwrite(runcutty: RunCutty, repository: Path) -> None:
     """It overwrites existing files."""
-    Path("example").mkdir()
-    Path("example", "README.md").touch()
+    readme = Path("example", "README.md")
+    readme.parent.mkdir()
+    readme.touch()
 
     runcutty("cookiecutter", "--overwrite-if-exists", str(repository))
 
-    assert Path("example", "README.md").read_text() == "# example\n"
+    assert readme.read_text() == "# example\n"
 
 
 def test_skip(runcutty: RunCutty, repository: Path) -> None:
     """It skips existing files."""
-    Path("example").mkdir()
-    Path("example", "README.md").touch()
+    readme = Path("example", "README.md")
+    readme.parent.mkdir()
+    readme.touch()
 
     runcutty(
         "cookiecutter",
@@ -102,4 +105,4 @@ def test_skip(runcutty: RunCutty, repository: Path) -> None:
         str(repository),
     )
 
-    assert Path("example", "README.md").read_text() == ""
+    assert readme.read_text() == ""

@@ -7,18 +7,32 @@ from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
 
 
-def test_create_help(runcutty: RunCutty) -> None:
+def test_help(runcutty: RunCutty) -> None:
     """It exits with a status code of zero."""
     runcutty("create", "--help")
 
 
-def test_create_cookiecutter(runcutty: RunCutty, repository: Path) -> None:
-    """It generates a project."""
+def test_input(runcutty: RunCutty, repository: Path) -> None:
+    """It binds project variables from user input."""
     runcutty("create", str(repository), input="foobar\n\n\n")
 
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
-    assert Path("foobar", "post_gen_project").is_file()
-    assert Path("foobar", ".cookiecutter.json").is_file()
+
+
+def test_hook(runcutty: RunCutty, repository: Path) -> None:
+    """It runs hooks."""
+    runcutty("create", str(repository))
+
+    assert Path("example", "post_gen_project").is_file()
+
+
+def test_files(runcutty: RunCutty, repository: Path) -> None:
+    """It renders the project files."""
+    runcutty("create", str(repository))
+
+    assert template_files(repository) == project_files("example") - {
+        Path("post_gen_project")
+    }
 
 
 def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
