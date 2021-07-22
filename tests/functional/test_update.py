@@ -203,3 +203,48 @@ def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None
     runcutty("update", f"--cwd={project}")
 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
+
+
+def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
+    """It loads dict variables from the project configuration."""
+    # Add a dict variable with image types to the template.
+    images = {
+        "png": {
+            "name": "Portable Network Graphic",
+            "library": "libpng",
+            "apps": ["GIMP"],
+        },
+        "bmp": {
+            "name": "Bitmap",
+            "library": "libbmp",
+            "apps": ["Paint", "GIMP"],
+        },
+    }
+
+    addprojectvariable(repository, "images", images)
+
+    # Create a project using only PNG images.
+    pngimages = {key: value for key, value in images.items() if key == "png"}
+    userinput = "\n".join(
+        [
+            "",  # project
+            "",  # license
+            "",  # cli
+            json.dumps(pngimages),
+        ]
+    )
+
+    runcutty("create", str(repository), input=userinput)
+
+    # Add LICENSE so update has something to do.
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / "LICENSE",
+        "",
+    )
+
+    # Update the project.
+    project = Path("example")
+
+    runcutty("update", f"--cwd={project}")
+
+    assert pngimages == projectvariable(project, "images")
