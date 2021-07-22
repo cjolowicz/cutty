@@ -3,9 +3,7 @@ import hashlib
 import json
 import tempfile
 from collections.abc import Iterator
-from collections.abc import Mapping
 from pathlib import Path
-from types import MappingProxyType
 from typing import Optional
 from typing import Sequence
 
@@ -86,17 +84,6 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
 
     commit(repository, message=UPDATE_MESSAGE)
     repository.state_cleanup()
-
-
-def update(
-    *,
-    projectdir: Optional[Path] = None,
-    extra_context: Mapping[str, str] = MappingProxyType({}),
-    no_input: bool = False,
-) -> None:
-    """Update a project with changes from its Cookiecutter template."""
-    extrabindings = [Binding(key, value) for key, value in extra_context.items()]
-    update2(projectdir=projectdir, extrabindings=extrabindings, no_input=no_input)
 
 
 def update2(
