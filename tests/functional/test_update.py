@@ -205,7 +205,6 @@ def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     """It loads dict variables from the project configuration."""
     # Add a dict variable with image types to the template.
