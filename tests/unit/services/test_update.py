@@ -21,6 +21,16 @@ def test_getprojecttemplate(tmp_path: Path) -> None:
     assert template == getprojecttemplate(tmp_path)
 
 
+def test_getprojecttemplate_typeerror(tmp_path: Path) -> None:
+    """It checks that `_template` key is a string."""
+    template = None
+    text = json.dumps({"_template": template})
+    (tmp_path / ".cookiecutter.json").write_text(text)
+
+    with pytest.raises(TypeError):
+        getprojecttemplate(tmp_path)
+
+
 def test_getprojectcontext(tmp_path: Path) -> None:
     """It returns the persisted Cookiecutter context."""
     context = {"project": "example"}
