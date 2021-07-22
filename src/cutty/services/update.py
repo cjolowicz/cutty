@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
 from typing import Optional
+from typing import Sequence
 
 import pygit2
 
@@ -95,14 +96,23 @@ def update(
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+    update2(projectdir=projectdir, extrabindings=extrabindings, no_input=no_input)
 
+
+def update2(
+    *,
+    projectdir: Optional[Path] = None,
+    extrabindings: Sequence[Binding] = (),
+    no_input: bool = False,
+) -> None:
+    """Update a project with changes from its Cookiecutter template."""
     if projectdir is None:
         projectdir = Path.cwd()
 
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
     bindings = [Binding(key, value) for key, value in context.items()]
-    extrabindings = bindings + extrabindings
+    extrabindings = bindings + list(extrabindings)
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
