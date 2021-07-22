@@ -4,6 +4,7 @@ import json
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 from typing import Optional
 from typing import Sequence
 
@@ -20,18 +21,15 @@ from cutty.templates.domain.bindings import Binding
 def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
     context = getprojectcontext(projectdir)
-    return context["_template"]
+    result: str = context["_template"]
+    return result
 
 
-def getprojectcontext(projectdir: Path) -> dict[str, str]:
+def getprojectcontext(projectdir: Path) -> dict[str, Any]:
     """Return the Cookiecutter context of the project."""
     text = (projectdir / ".cookiecutter.json").read_text()
     data = json.loads(text)
-    return {
-        key: value
-        for key, value in data.items()
-        if isinstance(key, str) and isinstance(value, str)
-    }
+    return {key: value for key, value in data.items() if isinstance(key, str)}
 
 
 def getprojectbindings(projectdir: Path) -> Sequence[Binding]:
