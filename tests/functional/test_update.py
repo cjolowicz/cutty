@@ -248,3 +248,17 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     runcutty("update", f"--cwd={project}")
 
     assert pngimages == projectvariable(project, "images")
+
+
+def test_update_private_variables(
+    runcutty: RunCutty, repository: Path, project: Path
+) -> None:
+    """It does not bind private variables from the project configuration."""
+    # Add another Jinja extension to `_extensions`.
+    extensions: list[str] = projectvariable(project, "_extensions")
+    extensions.append("jinja2.ext.i18n")
+    updateprojectvariable(repository, "_extensions", extensions)
+
+    runcutty("update", f"--cwd={project}")
+
+    assert extensions == projectvariable(project, "_extensions")
