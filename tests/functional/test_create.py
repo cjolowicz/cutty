@@ -8,6 +8,9 @@ from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import removefile
 
 
+EXTRA = {Path("post_gen_project")}
+
+
 def test_help(runcutty: RunCutty) -> None:
     """It exits with a status code of zero."""
     runcutty("create", "--help")
@@ -31,9 +34,7 @@ def test_files(runcutty: RunCutty, repository: Path) -> None:
     """It renders the project files."""
     runcutty("create", str(repository))
 
-    assert template_files(repository) == project_files("example") - {
-        Path("post_gen_project")
-    }
+    assert template_files(repository) == project_files("example") - EXTRA
 
 
 def test_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
@@ -61,6 +62,4 @@ def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None
 
     runcutty("create", f"--directory={directory}", str(repository))
 
-    assert template_files(repository / "a") == project_files("example") - {
-        Path("post_gen_project")
-    }
+    assert template_files(repository / "a") == project_files("example") - EXTRA
