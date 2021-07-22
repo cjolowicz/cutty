@@ -27,8 +27,8 @@ def project(runcutty: RunCutty, repository: Path) -> Path:
     return project
 
 
-def addprojectvariable(repository: Path, name: str, value: Any) -> None:
-    """Add a project variable to the template."""
+def updateprojectvariable(repository: Path, name: str, value: Any) -> None:
+    """Add or update a project variable in the template."""
     path = repository / "cookiecutter.json"
     data = json.loads(path.read_text())
     data[name] = value
@@ -129,7 +129,7 @@ def test_update_new_variables(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It prompts for variables added after the last project generation."""
-    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", input="3\n")
@@ -151,7 +151,7 @@ def test_update_extra_context_new_variable(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "status=stable")
@@ -161,7 +161,7 @@ def test_update_extra_context_new_variable(
 
 def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    addprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "--no-input", input="3\n")
@@ -221,7 +221,7 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
         },
     }
 
-    addprojectvariable(repository, "images", images)
+    updateprojectvariable(repository, "images", images)
 
     # Create a project using only PNG images.
     pngimages = {key: value for key, value in images.items() if key == "png"}
@@ -248,3 +248,17 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     runcutty("update", f"--cwd={project}")
 
     assert pngimages == projectvariable(project, "images")
+
+
+def test_update_private_variables(
+    runcutty: RunCutty, repository: Path, project: Path
+) -> None:
+    """It does not bind private variables from the project configuration."""
+    # Add another Jinja extension to `_extensions`.
+    extensions: list[str] = projectvariable(project, "_extensions")
+    extensions.append("jinja2.ext.i18n")
+    updateprojectvariable(repository, "_extensions", extensions)
+
+    runcutty("update", f"--cwd={project}")
+
+    assert extensions == projectvariable(project, "_extensions")
