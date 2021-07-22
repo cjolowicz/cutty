@@ -7,15 +7,11 @@ from cutty.templates.domain.bindings import Binding
 
 
 def test_createprojectconfigfile() -> None:
-    """It creates a JSON file with the settings and bindings."""
+    """It creates a JSON file with the bindings."""
     project = PurePath("example")
-    settings = {
-        "_template": "https://example.com/repository.git",
-        "_extensions": ["jinja2_time.TimeExtension"],
-    }
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
 
-    file = createprojectconfigfile(project, settings, bindings)
+    file = createprojectconfigfile(project, bindings)
 
     data = json.loads(file.blob.decode())
-    assert data.keys() == settings.keys() | {binding.name for binding in bindings}
+    assert data.keys() == {binding.name for binding in bindings}
