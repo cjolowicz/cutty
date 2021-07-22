@@ -11,7 +11,7 @@ def createprojectconfigfile(
     project: PurePath, bindings: Iterable[Binding]
 ) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
-    path = project / ".cookiecutter.json"
+    path = project / "cutty.json"
     data = {binding.name: binding.value for binding in bindings}
     blob = json.dumps(data).encode()
 
