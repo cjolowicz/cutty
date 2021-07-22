@@ -34,6 +34,12 @@ def getprojectcontext(projectdir: Path) -> dict[str, str]:
     }
 
 
+def getprojectbindings(projectdir: Path) -> Sequence[Binding]:
+    """Return the variable bindings of the project."""
+    context = getprojectcontext(projectdir)
+    return [Binding(key, value) for key, value in context.items()]
+
+
 def checkoutemptytree(repositorypath: Path) -> None:
     """Check out an empty tree from the repository."""
     repository = pygit2.Repository(repositorypath)
@@ -97,9 +103,8 @@ def update(
         projectdir = Path.cwd()
 
     template = getprojecttemplate(projectdir)
-    context = getprojectcontext(projectdir)
-    bindings = [Binding(key, value) for key, value in context.items()]
-    extrabindings = bindings + list(extrabindings)
+    bindings = getprojectbindings(projectdir)
+    extrabindings = list(bindings) + list(extrabindings)
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
