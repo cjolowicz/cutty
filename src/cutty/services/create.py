@@ -1,5 +1,4 @@
 """Create a project from a Cookiecutter template."""
-import contextlib
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -92,6 +91,4 @@ def create(
             storage.add(projectfile)
 
         if projectconfigfile is not None:
-            # FIXME: do not overwrite project config with --overwrite-if-exists
-            with contextlib.suppress(FileExistsError):
-                storage.add(projectconfigfile)
+            storage.add(projectconfigfile)
