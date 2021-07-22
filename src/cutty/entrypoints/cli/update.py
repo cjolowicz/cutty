@@ -6,7 +6,8 @@ import click
 
 from cutty.entrypoints.cli._main import main as _main
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.update import update as service_update
+from cutty.services.update import update2 as service_update
+from cutty.templates.domain.bindings import Binding
 
 
 @_main.command()
@@ -32,4 +33,5 @@ def update(
     cwd: Optional[pathlib.Path],
 ) -> None:
     """Update a project with changes from its template."""
-    service_update(extra_context=extra_context, no_input=no_input, projectdir=cwd)
+    extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+    service_update(extrabindings=extrabindings, no_input=no_input, projectdir=cwd)
