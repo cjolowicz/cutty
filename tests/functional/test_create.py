@@ -1,11 +1,16 @@
 """Functional tests for the create CLI."""
 from pathlib import Path
 
+import pytest
+
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
-from tests.util.git import removefile
+from tests.util.git import updatefile
+
+
+EXTRA = {Path("post_gen_project"), Path("cutty.json")}
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -31,18 +36,22 @@ def test_files(runcutty: RunCutty, repository: Path) -> None:
     """It renders the project files."""
     runcutty("create", str(repository))
 
-    assert template_files(repository) == project_files("example") - {
-        Path("post_gen_project")
-    }
+    assert template_files(repository) == project_files("example") - EXTRA
 
 
-def test_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
-    """It always creates .cookiecutter.json."""
-    removefile(repository / "{{ cookiecutter.project }}" / ".cookiecutter.json")
-
+def test_cutty_json(runcutty: RunCutty, repository: Path) -> None:
+    """It creates a cutty.json file."""
     runcutty("create", str(repository))
 
-    assert Path("example", ".cookiecutter.json").is_file()
+    assert Path("example", "cutty.json").is_file()
+
+
+def test_cutty_json_already_exists(runcutty: RunCutty, repository: Path) -> None:
+    """It raises an exception."""
+    updatefile(repository / "{{ cookiecutter.project }}" / "cutty.json", "")
+
+    with pytest.raises(FileExistsError):
+        runcutty("create", str(repository))
 
 
 def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
@@ -61,6 +70,4 @@ def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None
 
     runcutty("create", f"--directory={directory}", str(repository))
 
-    assert template_files(repository / "a") == project_files("example") - {
-        Path("post_gen_project")
-    }
+    assert template_files(repository / "a") == project_files("example") - EXTRA
