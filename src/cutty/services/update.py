@@ -21,7 +21,9 @@ from cutty.templates.domain.bindings import Binding
 def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
     context = getprojectcontext(projectdir)
-    result: str = context["_template"]
+    result = context["_template"]
+    if not isinstance(result, str):
+        raise TypeError(f"{projectdir}: _template must be 'str', got {result!r}")
     return result
 
 
