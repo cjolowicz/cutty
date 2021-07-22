@@ -86,7 +86,7 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
     repository.state_cleanup()
 
 
-def update2(
+def update(
     *,
     projectdir: Optional[Path] = None,
     extrabindings: Sequence[Binding] = (),

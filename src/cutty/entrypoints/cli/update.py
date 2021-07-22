@@ -6,7 +6,7 @@ import click
 
 from cutty.entrypoints.cli._main import main as _main
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.update import update2 as service_update
+from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
 
