@@ -1,10 +1,13 @@
 """Functional tests for the create CLI."""
 from pathlib import Path
 
+import pytest
+
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import updatefile
 
 
 EXTRA = {Path("post_gen_project"), Path("cutty.json")}
@@ -41,6 +44,14 @@ def test_cutty_json(runcutty: RunCutty, repository: Path) -> None:
     runcutty("create", str(repository))
 
     assert Path("example", "cutty.json").is_file()
+
+
+def test_cutty_json_already_exists(runcutty: RunCutty, repository: Path) -> None:
+    """It raises an exception."""
+    updatefile(repository / "{{ cookiecutter.project }}" / "cutty.json", "")
+
+    with pytest.raises(FileExistsError):
+        runcutty("create", str(repository))
 
 
 def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
