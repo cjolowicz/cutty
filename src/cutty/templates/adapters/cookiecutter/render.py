@@ -17,7 +17,6 @@ from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
-from cutty.templates.domain.render import T
 
 
 def is_binary(blob: bytes) -> bool:
@@ -35,16 +34,20 @@ def asstringlist(settings: dict[str, Any], name: str) -> list[str]:
     return value
 
 
+# Avoid generic render functions for lists and dicts.
+# https://github.com/agronholm/typeguard/issues/196
+
+
 def renderlist(
-    values: list[T], bindings: Sequence[Binding], render: Renderer
-) -> list[T]:
+    values: list[Any], bindings: Sequence[Binding], render: Renderer
+) -> list[Any]:
     """Render a list."""
     return [render(value, bindings) for value in values]
 
 
 def renderdict(
-    mapping: dict[str, T], bindings: Sequence[Binding], render: Renderer
-) -> dict[str, T]:
+    mapping: dict[str, Any], bindings: Sequence[Binding], render: Renderer
+) -> dict[str, Any]:
     """Render a dictionary."""
     return {
         render(key, bindings): render(value, bindings) for key, value in mapping.items()

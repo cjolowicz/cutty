@@ -3,10 +3,10 @@ import hashlib
 import json
 import tempfile
 from collections.abc import Iterator
-from collections.abc import Mapping
 from pathlib import Path
-from types import MappingProxyType
+from typing import Any
 from typing import Optional
+from typing import Sequence
 
 import pygit2
 
@@ -15,23 +15,29 @@ from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
+from cutty.templates.domain.bindings import Binding
 
 
 def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
     context = getprojectcontext(projectdir)
-    return context["_template"]
+    result = context["_template"]
+    if not isinstance(result, str):
+        raise TypeError(f"{projectdir}: _template must be 'str', got {result!r}")
+    return result
 
 
-def getprojectcontext(projectdir: Path) -> dict[str, str]:
+def getprojectcontext(projectdir: Path) -> dict[str, Any]:
     """Return the Cookiecutter context of the project."""
     text = (projectdir / ".cookiecutter.json").read_text()
     data = json.loads(text)
-    return {
-        key: value
-        for key, value in data.items()
-        if isinstance(key, str) and isinstance(value, str)
-    }
+    return {key: value for key, value in data.items() if isinstance(key, str)}
+
+
+def getprojectbindings(projectdir: Path) -> Sequence[Binding]:
+    """Return the variable bindings of the project."""
+    context = getprojectcontext(projectdir)
+    return [Binding(key, value) for key, value in context.items()]
 
 
 def checkoutemptytree(repositorypath: Path) -> None:
@@ -89,7 +95,7 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
 def update(
     *,
     projectdir: Optional[Path] = None,
-    extra_context: Mapping[str, str] = MappingProxyType({}),
+    extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
@@ -97,14 +103,15 @@ def update(
         projectdir = Path.cwd()
 
     template = getprojecttemplate(projectdir)
-    context = getprojectcontext(projectdir)
+    bindings = getprojectbindings(projectdir)
+    extrabindings = list(bindings) + list(extrabindings)
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            extra_context={**context, **extra_context},
+            extrabindings=extrabindings,
             no_input=no_input,
         )
 

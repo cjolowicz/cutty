@@ -1,8 +1,7 @@
 """Create a project from a Cookiecutter template."""
 import contextlib
 import pathlib
-from collections.abc import Mapping
-from types import MappingProxyType
+from collections.abc import Sequence
 from typing import Optional
 
 import platformdirs
@@ -24,7 +23,7 @@ from cutty.templates.domain.renderfiles import renderfiles
 def create(
     template: str,
     *,
-    extra_context: Mapping[str, str] = MappingProxyType({}),
+    extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
     outputdir: Optional[pathlib.Path] = None,
@@ -51,7 +50,7 @@ def create(
         config.variables,
         render,
         interactive=not no_input,
-        bindings=[Binding(key, value) for key, value in extra_context.items()],
+        bindings=extrabindings,
     )
 
     projectfiles = lazysequence(
