@@ -99,8 +99,9 @@ def update(
 
     template = getprojecttemplate(projectdir)
     context = getprojectcontext(projectdir)
-    extra_context = {**context, **extra_context}
+    bindings = [Binding(key, value) for key, value in context.items()]
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+    extrabindings = bindings + extrabindings
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
