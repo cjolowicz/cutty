@@ -15,3 +15,14 @@ def test_createprojectconfigfile_bindings() -> None:
 
     data = json.loads(file.blob.decode())
     assert all(binding.name in data for binding in bindings)
+
+
+def test_createprojectconfigfile_template() -> None:
+    """It creates a JSON file containing the template location."""
+    template = "https://example.com/repository.git"
+    project = PurePath("example")
+    bindings = [Binding("Project", "example")]
+
+    file = createprojectconfigfile(project, bindings, template)
+
+    assert "_template" in json.loads(file.blob.decode())
