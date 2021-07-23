@@ -37,7 +37,7 @@ def updateprojectvariable(repository: Path, name: str, value: Any) -> None:
 
 def projectvariable(project: Path, name: str) -> Any:
     """Return the bound value of a project variable."""
-    path = project / ".cookiecutter.json"
+    path = project / "cutty.json"
     data = json.loads(path.read_text())
     return data[name]
 
