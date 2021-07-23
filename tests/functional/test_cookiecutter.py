@@ -18,13 +18,18 @@ def test_create_help(runcutty: RunCutty) -> None:
     runcutty("cookiecutter", "--help")
 
 
-def test_create_cookiecutter(runcutty: RunCutty, repository: Path) -> None:
+def test_default(runcutty: RunCutty, repository: Path) -> None:
+    """It generates a project."""
+    runcutty("cookiecutter", str(repository))
+
+    assert template_files(repository) == project_files("example") - {EXTRA}
+
+
+def test_input(runcutty: RunCutty, repository: Path) -> None:
     """It generates a project."""
     runcutty("cookiecutter", str(repository), input="foobar\n\n\n")
 
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
-    assert Path("foobar", "post_gen_project").is_file()
-    assert Path("foobar", ".cookiecutter.json").is_file()
 
 
 def test_no_repository(runcutty: RunCutty, repository: Path) -> None:
