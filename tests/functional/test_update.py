@@ -255,13 +255,15 @@ def test_update_private_variables(
 ) -> None:
     """It does not bind private variables from the project configuration."""
     # Add another Jinja extension to `_extensions`.
-    extensions: list[str] = projectvariable(project, "_extensions")
+    context = json.loads((project / ".cookiecutter.json").read_text())
+    extensions: list[str] = context["_extensions"]
     extensions.append("jinja2.ext.i18n")
     updateprojectvariable(repository, "_extensions", extensions)
 
     runcutty("update", f"--cwd={project}")
 
-    assert extensions == projectvariable(project, "_extensions")
+    context = json.loads((project / ".cookiecutter.json").read_text())
+    assert extensions == context["_extensions"]
 
 
 def test_update_no_dot_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
