@@ -8,7 +8,7 @@ from cutty.templates.domain.bindings import Binding
 
 
 def createprojectconfigfile(
-    project: PurePath, bindings: Iterable[Binding], template: str = ""
+    project: PurePath, bindings: Iterable[Binding], template: str
 ) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
     path = project / "cutty.json"

@@ -8,10 +8,11 @@ from cutty.templates.domain.bindings import Binding
 
 def test_createprojectconfigfile_bindings() -> None:
     """It creates a JSON file with the bindings."""
+    template = "https://example.com/repository.git"
     project = PurePath("example")
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
 
-    file = createprojectconfigfile(project, bindings)
+    file = createprojectconfigfile(project, bindings, template)
 
     data = json.loads(file.blob.decode())
     assert all(binding.name in data for binding in bindings)
