@@ -3,6 +3,7 @@ import json
 import pathlib
 from collections.abc import Iterable
 from typing import Any
+from typing import Sequence
 
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
@@ -36,3 +37,9 @@ def getprojecttemplate(project: pathlib.Path) -> str:
     if not isinstance(result, str):
         raise TypeError(f"{project}: _template must be 'str', got {result!r}")
     return result
+
+
+def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
+    """Return the variable bindings of the project."""
+    context = readprojectconfigfile(project)
+    return [Binding(key, value) for key, value in context.items()]

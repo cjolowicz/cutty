@@ -13,15 +13,9 @@ from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import getprojectbindings
 from cutty.templates.adapters.cookiecutter.projectconfig import getprojecttemplate
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-
-
-def getprojectbindings(projectdir: Path) -> Sequence[Binding]:
-    """Return the variable bindings of the project."""
-    context = readprojectconfigfile(projectdir)
-    return [Binding(key, value) for key, value in context.items()]
 
 
 def checkoutemptytree(repositorypath: Path) -> None:
