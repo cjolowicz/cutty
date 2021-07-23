@@ -264,16 +264,3 @@ def test_update_private_variables(
 
     context = json.loads((project / ".cookiecutter.json").read_text())
     assert extensions == context["_extensions"]
-
-
-def test_update_no_dot_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
-    """It does not require .cookiecutter.json in the project."""
-    removefile(repository / "{{ cookiecutter.project }}" / ".cookiecutter.json")
-
-    project = Path("example")
-
-    runcutty("create", str(repository))
-
-    updatefile(repository / "{{ cookiecutter.project }}" / "LICENSE", "")
-
-    runcutty("update", f"--cwd={project}")
