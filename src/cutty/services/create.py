@@ -69,7 +69,7 @@ def create(
     hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
     projectconfigfile = (
         createprojectconfigfile(
-            PurePath(*projectdir.relative_to(outputdir).parts), bindings
+            PurePath(*projectdir.relative_to(outputdir).parts), bindings, template
         )
         if createconfigfile
         else None
