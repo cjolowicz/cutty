@@ -105,9 +105,8 @@ def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) ->
 
 def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies file deletions from the template."""
-    removefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
-    )
+    removefile(repository / "{{ cookiecutter.project }}" / "README.md")
+    updatefile(repository / "{{ cookiecutter.project }}" / ".keep", "")
 
     with chdir(project):
         runcutty("update")
@@ -250,10 +249,19 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     assert pngimages == projectvariable(project, "images")
 
 
-def test_update_private_variables(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_update_private_variables(runcutty: RunCutty, repository: Path) -> None:
     """It does not bind private variables from the project configuration."""
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",
+        """
+        {{ cookiecutter | jsonify }}
+        """,
+    )
+
+    project = Path("example")
+
+    runcutty("create", str(repository))
+
     # Add another Jinja extension to `_extensions`.
     context = json.loads((project / ".cookiecutter.json").read_text())
     extensions: list[str] = context["_extensions"]
