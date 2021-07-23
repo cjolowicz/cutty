@@ -37,7 +37,7 @@ def updateprojectvariable(repository: Path, name: str, value: Any) -> None:
 
 def projectvariable(project: Path, name: str) -> Any:
     """Return the bound value of a project variable."""
-    path = project / ".cookiecutter.json"
+    path = project / "cutty.json"
     data = json.loads(path.read_text())
     return data[name]
 
@@ -105,9 +105,8 @@ def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) ->
 
 def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies file deletions from the template."""
-    removefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
-    )
+    removefile(repository / "{{ cookiecutter.project }}" / "README.md")
+    updatefile(repository / "{{ cookiecutter.project }}" / ".keep", "")
 
     with chdir(project):
         runcutty("update")
@@ -250,28 +249,26 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     assert pngimages == projectvariable(project, "images")
 
 
-def test_update_private_variables(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_update_private_variables(runcutty: RunCutty, repository: Path) -> None:
     """It does not bind private variables from the project configuration."""
-    # Add another Jinja extension to `_extensions`.
-    extensions: list[str] = projectvariable(project, "_extensions")
-    extensions.append("jinja2.ext.i18n")
-    updateprojectvariable(repository, "_extensions", extensions)
-
-    runcutty("update", f"--cwd={project}")
-
-    assert extensions == projectvariable(project, "_extensions")
-
-
-def test_update_no_dot_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
-    """It does not require .cookiecutter.json in the project."""
-    removefile(repository / "{{ cookiecutter.project }}" / ".cookiecutter.json")
+    updatefile(
+        repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",
+        """
+        {{ cookiecutter | jsonify }}
+        """,
+    )
 
     project = Path("example")
 
     runcutty("create", str(repository))
 
-    updatefile(repository / "{{ cookiecutter.project }}" / "LICENSE", "")
+    # Add another Jinja extension to `_extensions`.
+    context = json.loads((project / ".cookiecutter.json").read_text())
+    extensions: list[str] = context["_extensions"]
+    extensions.append("jinja2.ext.i18n")
+    updateprojectvariable(repository, "_extensions", extensions)
 
     runcutty("update", f"--cwd={project}")
+
+    context = json.loads((project / ".cookiecutter.json").read_text())
+    assert extensions == context["_extensions"]
