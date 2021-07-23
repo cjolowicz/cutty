@@ -6,7 +6,7 @@ from cutty.templates.adapters.cookiecutter.projectconfig import createprojectcon
 from cutty.templates.domain.bindings import Binding
 
 
-def test_createprojectconfigfile() -> None:
+def test_createprojectconfigfile_bindings() -> None:
     """It creates a JSON file with the bindings."""
     project = PurePath("example")
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
@@ -14,4 +14,4 @@ def test_createprojectconfigfile() -> None:
     file = createprojectconfigfile(project, bindings)
 
     data = json.loads(file.blob.decode())
-    assert data.keys() == {binding.name for binding in bindings}
+    assert all(binding.name in data for binding in bindings)
