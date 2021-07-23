@@ -13,17 +13,9 @@ from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import getprojecttemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-
-
-def getprojecttemplate(projectdir: Path) -> str:
-    """Return the location of the project template."""
-    context = readprojectconfigfile(projectdir)
-    result = context["_template"]
-    if not isinstance(result, str):
-        raise TypeError(f"{projectdir}: _template must be 'str', got {result!r}")
-    return result
 
 
 def getprojectbindings(projectdir: Path) -> Sequence[Binding]:

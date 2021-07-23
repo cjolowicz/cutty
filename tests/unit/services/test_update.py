@@ -1,5 +1,4 @@
 """Unit tests for cutty.services.update."""
-import json
 from pathlib import Path
 
 import pygit2
@@ -7,27 +6,7 @@ import pytest
 
 from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
-from cutty.services.update import getprojecttemplate
 from tests.util.git import commit
-
-
-def test_getprojecttemplate(tmp_path: Path) -> None:
-    """It returns the `_template` key from cutty.json."""
-    template = "https://example.com/repository.git"
-    text = json.dumps({"_template": template})
-    (tmp_path / "cutty.json").write_text(text)
-
-    assert template == getprojecttemplate(tmp_path)
-
-
-def test_getprojecttemplate_typeerror(tmp_path: Path) -> None:
-    """It checks that `_template` key is a string."""
-    template = None
-    text = json.dumps({"_template": template})
-    (tmp_path / "cutty.json").write_text(text)
-
-    with pytest.raises(TypeError):
-        getprojecttemplate(tmp_path)
 
 
 def test_createworktree(tmp_path: Path) -> None:
