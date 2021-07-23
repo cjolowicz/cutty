@@ -7,7 +7,6 @@ import pytest
 
 from cutty.services.update import cherrypick
 from cutty.services.update import createworktree
-from cutty.services.update import getprojectcontext
 from cutty.services.update import getprojecttemplate
 from tests.util.git import commit
 
@@ -29,15 +28,6 @@ def test_getprojecttemplate_typeerror(tmp_path: Path) -> None:
 
     with pytest.raises(TypeError):
         getprojecttemplate(tmp_path)
-
-
-def test_getprojectcontext(tmp_path: Path) -> None:
-    """It returns the persisted Cookiecutter context."""
-    context = {"project": "example"}
-    text = json.dumps(context)
-    (tmp_path / "cutty.json").write_text(text)
-
-    assert context == getprojectcontext(tmp_path)
 
 
 def test_createworktree(tmp_path: Path) -> None:

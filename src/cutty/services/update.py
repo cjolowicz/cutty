@@ -1,10 +1,8 @@
 """Update a project with changes from its Cookiecutter template."""
 import hashlib
-import json
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 from typing import Optional
 from typing import Sequence
 
@@ -15,28 +13,22 @@ from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
 
 def getprojecttemplate(projectdir: Path) -> str:
     """Return the location of the project template."""
-    context = getprojectcontext(projectdir)
+    context = readprojectconfigfile(projectdir)
     result = context["_template"]
     if not isinstance(result, str):
         raise TypeError(f"{projectdir}: _template must be 'str', got {result!r}")
     return result
 
 
-def getprojectcontext(projectdir: Path) -> dict[str, Any]:
-    """Return the Cookiecutter context of the project."""
-    text = (projectdir / "cutty.json").read_text()
-    data = json.loads(text)
-    return {key: value for key, value in data.items() if isinstance(key, str)}
-
-
 def getprojectbindings(projectdir: Path) -> Sequence[Binding]:
     """Return the variable bindings of the project."""
-    context = getprojectcontext(projectdir)
+    context = readprojectconfigfile(projectdir)
     return [Binding(key, value) for key, value in context.items()]
 
 
