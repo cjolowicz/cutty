@@ -44,6 +44,13 @@ def test_no_cookiecutter_json(runcutty: RunCutty, repository: Path) -> None:
     assert not Path("example", ".cookiecutter.json").is_file()
 
 
+def test_no_cutty_json(runcutty: RunCutty, repository: Path) -> None:
+    """It does not create a cutty.json file."""
+    runcutty("cookiecutter", str(repository))
+
+    assert not Path("example", "cutty.json").is_file()
+
+
 def test_no_input(runcutty: RunCutty, repository: Path) -> None:
     """It does not prompt for variables."""
     runcutty("cookiecutter", "--no-input", str(repository))
