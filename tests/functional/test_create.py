@@ -58,9 +58,7 @@ def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
     """It generates the project files in the current directory."""
     runcutty("create", "--no-input", "--in-place", str(repository))
 
-    assert Path("README.md").read_text() == "# example\n"
-    assert Path("post_gen_project").is_file()
-    assert Path(".cookiecutter.json").is_file()
+    assert template_files(repository) == project_files(".") - EXTRA
 
 
 def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None:
