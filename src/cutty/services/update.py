@@ -29,7 +29,7 @@ def getprojecttemplate(projectdir: Path) -> str:
 
 def getprojectcontext(projectdir: Path) -> dict[str, Any]:
     """Return the Cookiecutter context of the project."""
-    text = (projectdir / ".cookiecutter.json").read_text()
+    text = (projectdir / "cutty.json").read_text()
     data = json.loads(text)
     return {key: value for key, value in data.items() if isinstance(key, str)}
 
