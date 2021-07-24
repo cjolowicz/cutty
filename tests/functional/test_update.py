@@ -270,6 +270,7 @@ def test_private_variables(runcutty: RunCutty, template: Path) -> None:
     assert extensions == privatevariable(project, "_extensions")
 
 
+@pytest.mark.xfail(reason="TODO")
 def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
     """It uses the template in the subdirectory specified on creation."""
     project = Path("example")
