@@ -56,6 +56,9 @@ def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
 
 def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
-    template = getprojecttemplate(project)
+    context = readprojectconfigfile(project)
+    template = context["_template"]
+    if not isinstance(template, str):
+        raise TypeError(f"{project}: _template must be 'str', got {template!r}")
     bindings = getprojectbindings(project)
     return ProjectConfig(template, bindings)
