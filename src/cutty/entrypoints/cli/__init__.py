@@ -1,10 +1,10 @@
 """Command-line interface."""
-# noreorder
-from . import create
-from . import update
-from . import cookiecutter
-from ._main import main as main
+from cutty.entrypoints.cli._main import main as main
+from cutty.entrypoints.cli.cookiecutter import cookiecutter
+from cutty.entrypoints.cli.create import create
+from cutty.entrypoints.cli.update import update
 
-main.command()(create.create)
-main.command()(update.update)
-main.command()(cookiecutter.cookiecutter)
+
+main.command()(create)
+main.command()(update)
+main.command()(cookiecutter)
