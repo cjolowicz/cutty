@@ -35,7 +35,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
     text = (project / PROJECT_CONFIG_FILE).read_text()
     data = json.loads(text)
-    context = {key: value for key, value in data.items() if isinstance(key, str)}
+    context = {key: value for key, value in data.items()}
     template = context.pop("_template")
 
     if not isinstance(template, str):
