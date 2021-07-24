@@ -15,7 +15,7 @@ from tests.util.git import updatefile
 EXTRA = Path("post_gen_project")
 
 
-def test_create_help(runcutty: RunCutty) -> None:
+def test_help(runcutty: RunCutty) -> None:
     """It exits with a status code of zero."""
     runcutty("cookiecutter", "--help")
 
