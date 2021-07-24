@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
@@ -10,7 +11,7 @@ from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import updatefile
 
 
-EXTRA = {Path("post_gen_project"), Path("cutty.json")}
+EXTRA = {Path("post_gen_project"), Path(PROJECT_CONFIG_FILE)}
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -43,12 +44,12 @@ def test_cutty_json(runcutty: RunCutty, repository: Path) -> None:
     """It creates a cutty.json file."""
     runcutty("create", str(repository))
 
-    assert Path("example", "cutty.json").is_file()
+    assert Path("example", PROJECT_CONFIG_FILE).is_file()
 
 
 def test_cutty_json_already_exists(runcutty: RunCutty, repository: Path) -> None:
     """It raises an exception."""
-    updatefile(repository / "{{ cookiecutter.project }}" / "cutty.json", "")
+    updatefile(repository / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE, "")
 
     with pytest.raises(FileExistsError):
         runcutty("create", str(repository))
