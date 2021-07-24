@@ -33,7 +33,7 @@ def discoverrepository(path: Path) -> Path:
     return Path(pygit2.discover_repository(path))
 
 
-def updatefile(path: Path, text: str) -> None:
+def updatefile(path: Path, text: str = "") -> None:
     """Add or update a repository file."""
     repository = discoverrepository(path)
 

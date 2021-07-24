@@ -69,10 +69,7 @@ def test_merge(runcutty: RunCutty, template: Path, project: Path) -> None:
         """,
     )
 
-    updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
-        "",
-    )
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     with chdir(project):
         runcutty("update")
@@ -107,7 +104,7 @@ def test_conflict(runcutty: RunCutty, template: Path, project: Path) -> None:
 def test_remove(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It applies file deletions from the template."""
     removefile(template / "{{ cookiecutter.project }}" / "README.md")
-    updatefile(template / "{{ cookiecutter.project }}" / ".keep", "")
+    updatefile(template / "{{ cookiecutter.project }}" / ".keep")
 
     with chdir(project):
         runcutty("update")
@@ -233,10 +230,7 @@ def test_dictvariable(runcutty: RunCutty, template: Path) -> None:
     runcutty("create", str(template), input=userinput)
 
     # Add LICENSE so update has something to do.
-    updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
-        "",
-    )
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     # Update the project.
     project = Path("example")

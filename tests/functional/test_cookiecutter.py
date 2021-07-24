@@ -65,10 +65,7 @@ def test_checkout(runcutty: RunCutty, template: Path) -> None:
     """It uses the specified revision of the template."""
     initial = pygit2.Repository(template).head.target
 
-    updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
-        "",
-    )
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     runcutty("cookiecutter", f"--checkout={initial}", str(template))
 
