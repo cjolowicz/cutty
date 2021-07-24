@@ -19,54 +19,54 @@ def test_help(runcutty: RunCutty) -> None:
     runcutty("create", "--help")
 
 
-def test_input(runcutty: RunCutty, repository: Path) -> None:
+def test_input(runcutty: RunCutty, template: Path) -> None:
     """It binds project variables from user input."""
-    runcutty("create", str(repository), input="foobar\n\n\n")
+    runcutty("create", str(template), input="foobar\n\n\n")
 
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
 
 
-def test_hook(runcutty: RunCutty, repository: Path) -> None:
+def test_hook(runcutty: RunCutty, template: Path) -> None:
     """It runs hooks."""
-    runcutty("create", str(repository))
+    runcutty("create", str(template))
 
     assert Path("example", "post_gen_project").is_file()
 
 
-def test_files(runcutty: RunCutty, repository: Path) -> None:
+def test_files(runcutty: RunCutty, template: Path) -> None:
     """It renders the project files."""
-    runcutty("create", str(repository))
+    runcutty("create", str(template))
 
-    assert template_files(repository) == project_files("example") - EXTRA
+    assert template_files(template) == project_files("example") - EXTRA
 
 
-def test_cutty_json(runcutty: RunCutty, repository: Path) -> None:
+def test_cutty_json(runcutty: RunCutty, template: Path) -> None:
     """It creates a cutty.json file."""
-    runcutty("create", str(repository))
+    runcutty("create", str(template))
 
     assert Path("example", PROJECT_CONFIG_FILE).is_file()
 
 
-def test_cutty_json_already_exists(runcutty: RunCutty, repository: Path) -> None:
+def test_cutty_json_already_exists(runcutty: RunCutty, template: Path) -> None:
     """It raises an exception."""
-    updatefile(repository / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE, "")
+    updatefile(template / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE)
 
     with pytest.raises(FileExistsError):
-        runcutty("create", str(repository))
+        runcutty("create", str(template))
 
 
-def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
+def test_inplace(runcutty: RunCutty, template: Path) -> None:
     """It generates the project files in the current directory."""
-    runcutty("create", "--no-input", "--in-place", str(repository))
+    runcutty("create", "--no-input", "--in-place", str(template))
 
-    assert template_files(repository) == project_files(".") - EXTRA
+    assert template_files(template) == project_files(".") - EXTRA
 
 
-def test_directory(runcutty: RunCutty, repository: Path, tmp_path: Path) -> None:
+def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
     """It uses the template in the given subdirectory."""
     directory = "a"
-    move_repository_files_to_subdirectory(repository, directory)
+    move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--directory={directory}", str(repository))
+    runcutty("create", f"--directory={directory}", str(template))
 
-    assert template_files(repository / "a") == project_files("example") - EXTRA
+    assert template_files(template / "a") == project_files("example") - EXTRA

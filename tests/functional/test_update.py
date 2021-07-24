@@ -19,18 +19,18 @@ def test_help(runcutty: RunCutty) -> None:
 
 
 @pytest.fixture
-def project(runcutty: RunCutty, repository: Path) -> Path:
+def project(runcutty: RunCutty, template: Path) -> Path:
     """Fixture for a generated project."""
     project = Path("awesome")
 
-    runcutty("create", "--no-input", str(repository), f"project={project.name}")
+    runcutty("create", "--no-input", str(template), f"project={project.name}")
 
     return project
 
 
-def updateprojectvariable(repository: Path, name: str, value: Any) -> None:
+def updateprojectvariable(template: Path, name: str, value: Any) -> None:
     """Add or update a project variable in the template."""
-    path = repository / "cookiecutter.json"
+    path = template / "cookiecutter.json"
     data = json.loads(path.read_text())
     data[name] = value
     updatefile(path, json.dumps(data))
@@ -43,10 +43,10 @@ def projectvariable(project: Path, name: str) -> Any:
     return data[name]
 
 
-def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_trivial(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It applies changes from the template."""
     updatefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
+        template / "{{ cookiecutter.project }}" / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -59,7 +59,7 @@ def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_merge(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It merges changes from the template."""
     updatefile(
         project / "README.md",
@@ -69,10 +69,7 @@ def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> No
         """,
     )
 
-    updatefile(
-        repository / "{{ cookiecutter.project }}" / "LICENSE",
-        "",
-    )
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     with chdir(project):
         runcutty("update")
@@ -81,7 +78,7 @@ def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> No
     assert (project / "LICENSE").is_file()
 
 
-def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_conflict(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
     updatefile(
         project / "README.md",
@@ -92,7 +89,7 @@ def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) ->
     )
 
     updatefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
+        template / "{{ cookiecutter.project }}" / "README.md",
         """
         # {{ cookiecutter.project }}
         An excellent project.
@@ -104,10 +101,10 @@ def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) ->
             runcutty("update")
 
 
-def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_remove(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It applies file deletions from the template."""
-    removefile(repository / "{{ cookiecutter.project }}" / "README.md")
-    updatefile(repository / "{{ cookiecutter.project }}" / ".keep", "")
+    removefile(template / "{{ cookiecutter.project }}" / "README.md")
+    updatefile(template / "{{ cookiecutter.project }}" / ".keep")
 
     with chdir(project):
         runcutty("update")
@@ -115,7 +112,7 @@ def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> N
     assert not (project / "README.md").is_file()
 
 
-def test_update_noop(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
     oldhead = pygit2.Repository(project).head.target
 
@@ -125,11 +122,9 @@ def test_update_noop(runcutty: RunCutty, repository: Path, project: Path) -> Non
     assert oldhead == pygit2.Repository(project).head.target
 
 
-def test_update_new_variables(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It prompts for variables added after the last project generation."""
-    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", input="3\n")
@@ -137,8 +132,8 @@ def test_update_new_variables(
     assert "stable" == projectvariable(project, "status")
 
 
-def test_update_extra_context_old_variable(
-    runcutty: RunCutty, repository: Path, project: Path
+def test_extra_context_old_variable(
+    runcutty: RunCutty, template: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
     with chdir(project):
@@ -147,11 +142,11 @@ def test_update_extra_context_old_variable(
     assert "excellent" == projectvariable(project, "project")
 
 
-def test_update_extra_context_new_variable(
-    runcutty: RunCutty, repository: Path, project: Path
+def test_extra_context_new_variable(
+    runcutty: RunCutty, template: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "status=stable")
@@ -159,9 +154,9 @@ def test_update_extra_context_new_variable(
     assert "stable" == projectvariable(project, "status")
 
 
-def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_no_input(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
+    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "--no-input", input="3\n")
@@ -169,15 +164,13 @@ def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) ->
     assert "alpha" == projectvariable(project, "status")
 
 
-def test_update_rename_projectdir(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_rename_projectdir(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It generates the project in the project directory irrespective of its name."""
     project2 = Path("awesome2")
     project.rename(project2)
 
     updatefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
+        template / "{{ cookiecutter.project }}" / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -190,10 +183,10 @@ def test_update_rename_projectdir(
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_cwd(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
     updatefile(
-        repository / "{{ cookiecutter.project }}" / "README.md",
+        template / "{{ cookiecutter.project }}" / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -205,7 +198,7 @@ def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
+def test_dictvariable(runcutty: RunCutty, template: Path) -> None:
     """It loads dict variables from the project configuration."""
     # Add a dict variable with image types to the template.
     images = {
@@ -221,7 +214,7 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
         },
     }
 
-    updateprojectvariable(repository, "images", images)
+    updateprojectvariable(template, "images", images)
 
     # Create a project using only PNG images.
     pngimages = {key: value for key, value in images.items() if key == "png"}
@@ -234,13 +227,10 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
         ]
     )
 
-    runcutty("create", str(repository), input=userinput)
+    runcutty("create", str(template), input=userinput)
 
     # Add LICENSE so update has something to do.
-    updatefile(
-        repository / "{{ cookiecutter.project }}" / "LICENSE",
-        "",
-    )
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     # Update the project.
     project = Path("example")
@@ -250,26 +240,31 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     assert pngimages == projectvariable(project, "images")
 
 
-def test_update_private_variables(runcutty: RunCutty, repository: Path) -> None:
+def test_private_variables(runcutty: RunCutty, template: Path) -> None:
     """It does not bind private variables from the project configuration."""
-    updatefile(
-        repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",
-        """
-        {{ cookiecutter | jsonify }}
-        """,
-    )
+
+    def adddotcookiecutterjson(template: Path) -> None:
+        """Add .cookiecutter.json file to the template."""
+        path = template / "{{ cookiecutter.project }}" / ".cookiecutter.json"
+        text = "{{ cookiecutter | jsonify }}"
+        updatefile(path, text)
+
+    def privatevariable(project: Path, variable: str) -> Any:
+        """Return any variable from the Cookiecutter context of a generated project."""
+        context = json.loads((project / ".cookiecutter.json").read_text())
+        return context[variable]
+
+    adddotcookiecutterjson(template)
 
     project = Path("example")
 
-    runcutty("create", str(repository))
+    runcutty("create", str(template))
 
     # Add another Jinja extension to `_extensions`.
-    context = json.loads((project / ".cookiecutter.json").read_text())
-    extensions: list[str] = context["_extensions"]
+    extensions: list[str] = privatevariable(project, "_extensions")
     extensions.append("jinja2.ext.i18n")
-    updateprojectvariable(repository, "_extensions", extensions)
+    updateprojectvariable(template, "_extensions", extensions)
 
     runcutty("update", f"--cwd={project}")
 
-    context = json.loads((project / ".cookiecutter.json").read_text())
-    assert extensions == context["_extensions"]
+    assert extensions == privatevariable(project, "_extensions")
