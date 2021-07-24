@@ -6,7 +6,7 @@ from typing import Any
 import pygit2
 import pytest
 
-from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import removefile
@@ -38,9 +38,8 @@ def updateprojectvariable(template: Path, name: str, value: Any) -> None:
 
 def projectvariable(project: Path, name: str) -> Any:
     """Return the bound value of a project variable."""
-    path = project / PROJECT_CONFIG_FILE
-    data = json.loads(path.read_text())
-    return data[name]
+    config = readprojectconfigfile(project)
+    return next(binding.value for binding in config.bindings if binding.name == name)
 
 
 def test_trivial(runcutty: RunCutty, template: Path, project: Path) -> None:
