@@ -31,7 +31,7 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
 def test_readprojectconfigfile(
     storage: DiskFileStorage, projectconfig: ProjectConfig
 ) -> None:
-    """It returns the persisted Cookiecutter context."""
+    """It returns the persisted project configuration."""
     file = createprojectconfigfile(PurePath(), projectconfig)
 
     with storage:
