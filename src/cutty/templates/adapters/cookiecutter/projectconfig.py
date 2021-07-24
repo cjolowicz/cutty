@@ -41,12 +41,11 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     if not isinstance(data, dict):
         raise TypeError(f"{path}: project configuration must be 'dict', got {data!r}")
 
-    context = {key: value for key, value in data.items()}
-    template = context["template"]["location"]
+    template = data["template"]["location"]
 
     if not isinstance(template, str):
         raise TypeError(f"{path}: template location must be 'str', got {template!r}")
 
-    bindings = [Binding(key, value) for key, value in context["bindings"].items()]
+    bindings = [Binding(key, value) for key, value in data["bindings"].items()]
 
     return ProjectConfig(template, bindings)
