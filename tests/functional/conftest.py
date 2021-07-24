@@ -82,7 +82,7 @@ def template_directory(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def repository(template_directory: Path) -> Path:
+def template(template_directory: Path) -> Path:
     """Fixture for a template repository."""
     pygit2.init_repository(template_directory)
     commit(template_directory, message="Initial")
