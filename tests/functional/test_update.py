@@ -281,3 +281,14 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
     runcutty("update", f"--cwd={project}")
 
     assert (project / "LICENSE").is_file()
+
+
+def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It uses the template directory specified when updating."""
+    directory = "a"
+    move_repository_files_to_subdirectory(template, directory)
+
+    runcutty("update", f"--cwd={project}", f"--directory={directory}")
+
+    config = readprojectconfigfile(project)
+    assert directory == str(config.directory)
