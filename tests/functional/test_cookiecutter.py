@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import pygit2
+import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from tests.functional.conftest import RunCutty
@@ -59,6 +60,12 @@ def test_extra_context(runcutty: RunCutty, template: Path) -> None:
     runcutty("cookiecutter", str(template), "project=awesome")
 
     assert template_files(template) == project_files("awesome") - {EXTRA}
+
+
+def test_extra_context_invalid(runcutty: RunCutty, template: Path) -> None:
+    """It raises an exception if additional arguments cannot be parsed."""
+    with pytest.raises(Exception):
+        runcutty("cookiecutter", str(template), "invalid")
 
 
 def test_checkout(runcutty: RunCutty, template: Path) -> None:
