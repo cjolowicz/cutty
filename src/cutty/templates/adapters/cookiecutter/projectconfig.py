@@ -1,8 +1,7 @@
 """Configuration for projects generated from Cookiecutter templates."""
 import json
 import pathlib
-from collections.abc import Iterable
-from typing import Any
+from dataclasses import dataclass
 from typing import Sequence
 
 from cutty.filestorage.domain.files import RegularFile
@@ -13,36 +12,35 @@ from cutty.templates.domain.bindings import Binding
 PROJECT_CONFIG_FILE = "cutty.json"
 
 
-def createprojectconfigfile(
-    project: PurePath, bindings: Iterable[Binding], template: str
-) -> RegularFile:
+@dataclass
+class ProjectConfig:
+    """Project configuration."""
+
+    template: str
+    bindings: Sequence[Binding]
+
+
+def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
     path = project / PROJECT_CONFIG_FILE
-    data = {binding.name: binding.value for binding in bindings} | {
-        "_template": template
+    data = {binding.name: binding.value for binding in config.bindings} | {
+        "_template": config.template
     }
     blob = json.dumps(data).encode()
 
     return RegularFile(path, blob)
 
 
-def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
-    """Return the Cookiecutter context of the project."""
+def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
+    """Load the project configuration."""
     text = (project / PROJECT_CONFIG_FILE).read_text()
     data = json.loads(text)
-    return {key: value for key, value in data.items() if isinstance(key, str)}
+    context = {key: value for key, value in data.items()}
+    template = context.pop("_template")
 
+    if not isinstance(template, str):
+        raise TypeError(f"{project}: _template must be 'str', got {template!r}")
 
-def getprojecttemplate(project: pathlib.Path) -> str:
-    """Return the location of the project template."""
-    context = readprojectconfigfile(project)
-    result = context["_template"]
-    if not isinstance(result, str):
-        raise TypeError(f"{project}: _template must be 'str', got {result!r}")
-    return result
+    bindings = [Binding(key, value) for key, value in context.items()]
 
-
-def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
-    """Return the variable bindings of the project."""
-    context = readprojectconfigfile(project)
-    return [Binding(key, value) for key, value in context.items()]
+    return ProjectConfig(template, bindings)
