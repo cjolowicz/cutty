@@ -57,20 +57,6 @@ def test_readprojectconfigfile(
     assert projectconfig == readprojectconfigfile(storage.root)
 
 
-def test_readprojectconfigfile_template(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
-) -> None:
-    """It returns the `_template` key from cutty.json."""
-    file = createprojectconfigfile(PurePath(), projectconfig)
-
-    with storage:
-        storage.add(file)
-
-    projectconfig2 = readprojectconfigfile(storage.root)
-
-    assert projectconfig.template == projectconfig2.template
-
-
 def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
     """It checks that `_template` key is a string."""
     template = None
