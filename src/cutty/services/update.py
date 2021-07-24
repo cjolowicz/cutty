@@ -11,6 +11,7 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -91,4 +92,4 @@ def update(
             no_input=no_input,
         )
 
-    cherrypick(projectdir, f"refs/heads/{LATEST_BRANCH}")
+    cherrypick(projectdir, LATEST_BRANCH_REF)
