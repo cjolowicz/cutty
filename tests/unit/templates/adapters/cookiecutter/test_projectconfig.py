@@ -19,7 +19,7 @@ def projectconfig() -> ProjectConfig:
     template = "https://example.com/repository.git"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
 
-    return ProjectConfig(template, bindings)
+    return ProjectConfig(template, bindings, directory=pathlib.PurePosixPath("a"))
 
 
 @pytest.fixture
@@ -61,6 +61,24 @@ def test_readprojectconfigfile_template_typeerror(
     # Replace the template location with `None` in the JSON record.
     data = json.loads(file.blob.decode())
     data["template"]["location"] = None
+    file = dataclasses.replace(file, blob=json.dumps(data).encode())
+
+    with storage:
+        storage.add(file)
+
+    with pytest.raises(TypeError):
+        readprojectconfigfile(storage.root)
+
+
+def test_readprojectconfigfile_directory_typeerror(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It checks that the template directory is a string or None."""
+    file = createprojectconfigfile(PurePath(), projectconfig)
+
+    # Replace the template location with 42 in the JSON record.
+    data = json.loads(file.blob.decode())
+    data["template"]["directory"] = 42
     file = dataclasses.replace(file, blob=json.dumps(data).encode())
 
     with storage:
