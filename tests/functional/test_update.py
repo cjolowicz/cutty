@@ -270,8 +270,8 @@ def test_private_variables(runcutty: RunCutty, template: Path) -> None:
     assert extensions == privatevariable(project, "_extensions")
 
 
-def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
-    """It uses the template in the subdirectory specified on creation."""
+def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
+    """It uses the template directory specified in the project configuration."""
     project = Path("example")
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
