@@ -34,13 +34,14 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
 
 def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
-    text = (project / PROJECT_CONFIG_FILE).read_text()
+    path = project / PROJECT_CONFIG_FILE
+    text = path.read_text()
     data = json.loads(text)
     context = {key: value for key, value in data.items()}
     template = context["template"]["location"]
 
     if not isinstance(template, str):
-        raise TypeError(f"{project}: template location must be 'str', got {template!r}")
+        raise TypeError(f"{path}: template location must be 'str', got {template!r}")
 
     bindings = [Binding(key, value) for key, value in context["bindings"].items()]
 
