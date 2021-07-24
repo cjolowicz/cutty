@@ -8,6 +8,7 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.observers.git import commit as _commit
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
@@ -128,7 +129,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = pygit2.Repository(project)
-    reference = repository.references[f"refs/heads/{LATEST_BRANCH}"]
+    reference = repository.references[LATEST_BRANCH_REF]
     assert repository.head.peel() == reference.peel()
 
 
@@ -140,7 +141,7 @@ def test_branch_not_checked_out(
         storage.add(file)
 
     repository = pygit2.Repository(project)
-    assert repository.references["HEAD"].target != f"refs/heads/{LATEST_BRANCH}"
+    assert repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 
 def test_existing_branch(
@@ -150,7 +151,7 @@ def test_existing_branch(
     repository = pygit2.init_repository(project)
     commit(repository)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+    repository.set_head(LATEST_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -180,7 +181,7 @@ def test_existing_branch_commit_message(
     repository = pygit2.init_repository(project)
     commit(repository)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+    repository.set_head(LATEST_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -197,7 +198,7 @@ def test_existing_branch_no_changes(
     commit(repository)
 
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(f"refs/heads/{LATEST_BRANCH}")
+    repository.set_head(LATEST_BRANCH_REF)
     oldhead = repository.head.target
 
     with storage:
