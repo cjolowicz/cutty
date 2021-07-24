@@ -5,7 +5,6 @@ from typing import Optional
 
 import click
 
-from cutty.entrypoints.cli._main import main as _main
 from cutty.services.create import create as service_create
 from cutty.templates.domain.bindings import Binding
 
@@ -29,7 +28,6 @@ def extra_context_callback(
     return dict(_generate())
 
 
-@_main.command()
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
