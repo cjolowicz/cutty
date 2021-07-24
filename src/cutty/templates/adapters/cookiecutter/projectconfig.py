@@ -52,3 +52,10 @@ def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
     """Return the variable bindings of the project."""
     context = readprojectconfigfile(project)
     return [Binding(key, value) for key, value in context.items()]
+
+
+def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
+    """Load the project configuration."""
+    template = getprojecttemplate(project)
+    bindings = getprojectbindings(project)
+    return ProjectConfig(template, bindings)
