@@ -40,7 +40,8 @@ def test_createprojectconfigfile_template() -> None:
 
 def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
     """It returns the persisted Cookiecutter context."""
-    context = {"project": "example"}
+    template = "https://example.com/repository.git"
+    context = {"_template": template, "project": "example"}
     text = json.dumps(context)
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
