@@ -1,4 +1,5 @@
 """Unit tests for cutty.templates.adapters.cookiecutter.projectconfig."""
+import dataclasses
 import json
 import pathlib
 
@@ -35,6 +36,20 @@ def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> No
         storage.add(file)
 
     assert projectconfig == readprojectconfigfile(storage.root)
+
+
+def test_readprojectconfigfile_typeerror(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It checks that the template location is a string."""
+    file = createprojectconfigfile(PurePath(), projectconfig)
+    file = dataclasses.replace(file, blob=json.dumps("teapot").encode())
+
+    with storage:
+        storage.add(file)
+
+    with pytest.raises(TypeError):
+        readprojectconfigfile(storage.root)
 
 
 def test_readprojectconfigfile_template_typeerror(
