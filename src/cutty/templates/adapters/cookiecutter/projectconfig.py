@@ -2,6 +2,7 @@
 import json
 import pathlib
 from collections.abc import Iterable
+from dataclasses import dataclass
 from typing import Any
 from typing import Sequence
 
@@ -11,6 +12,14 @@ from cutty.templates.domain.bindings import Binding
 
 
 PROJECT_CONFIG_FILE = "cutty.json"
+
+
+@dataclass
+class ProjectConfig:
+    """Project configuration."""
+
+    template: str
+    bindings: Sequence[Binding]
 
 
 def createprojectconfigfile(
