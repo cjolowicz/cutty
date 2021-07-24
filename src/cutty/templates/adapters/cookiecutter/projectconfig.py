@@ -24,9 +24,10 @@ class ProjectConfig:
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
+    directory = str(config.directory) if config.directory is not None else None
     path = project / PROJECT_CONFIG_FILE
     data = {
-        "template": {"location": config.template},
+        "template": {"location": config.template, "directory": directory},
         "bindings": {binding.name: binding.value for binding in config.bindings},
     }
     blob = json.dumps(data).encode()
@@ -48,6 +49,11 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     if not isinstance(template, str):
         raise TypeError(f"{path}: template location must be 'str', got {template!r}")
 
+    directory = data["template"]["directory"]
     bindings = [Binding(key, value) for key, value in data["bindings"].items()]
 
-    return ProjectConfig(template, bindings)
+    return ProjectConfig(
+        template,
+        bindings,
+        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+    )
