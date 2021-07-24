@@ -23,8 +23,9 @@ class ProjectConfig:
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
     path = project / PROJECT_CONFIG_FILE
-    data = {binding.name: binding.value for binding in config.bindings} | {
-        "_template": config.template
+    data = {
+        "template": {"location": config.template},
+        "bindings": {binding.name: binding.value for binding in config.bindings},
     }
     blob = json.dumps(data).encode()
 
@@ -33,14 +34,18 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
 
 def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
-    text = (project / PROJECT_CONFIG_FILE).read_text()
+    path = project / PROJECT_CONFIG_FILE
+    text = path.read_text()
     data = json.loads(text)
-    context = {key: value for key, value in data.items()}
-    template = context.pop("_template")
+
+    if not isinstance(data, dict):
+        raise TypeError(f"{path}: project configuration must be 'dict', got {data!r}")
+
+    template = data["template"]["location"]
 
     if not isinstance(template, str):
-        raise TypeError(f"{project}: _template must be 'str', got {template!r}")
+        raise TypeError(f"{path}: template location must be 'str', got {template!r}")
 
-    bindings = [Binding(key, value) for key, value in context.items()]
+    bindings = [Binding(key, value) for key, value in data["bindings"].items()]
 
     return ProjectConfig(template, bindings)
