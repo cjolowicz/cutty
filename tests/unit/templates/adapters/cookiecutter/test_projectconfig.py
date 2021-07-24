@@ -64,4 +64,4 @@ def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> Non
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
     with pytest.raises(TypeError):
-        readprojectconfigfile(tmp_path).template
+        readprojectconfigfile(tmp_path)
