@@ -10,8 +10,8 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
+from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
-from cutty.templates.adapters.cookiecutter.config import findhooks
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
@@ -66,7 +66,9 @@ def create(
     else:
         projectdir = outputdir / projectfiles[0].path.parts[strip]
 
-    hookfiles = lazysequence(renderfiles(findhooks(templatedir), render, bindings))
+    hookfiles = lazysequence(
+        renderfiles(findcookiecutterhooks(templatedir), render, bindings)
+    )
     projectconfigfile = (
         createprojectconfigfile(
             PurePath(*projectdir.relative_to(outputdir).parts), bindings, template

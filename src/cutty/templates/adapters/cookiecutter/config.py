@@ -77,7 +77,7 @@ def findcookiecutterpaths(path: Path, config: Config) -> Iterator[Path]:
     yield template_dir
 
 
-def findhooks(path: Path) -> Iterator[Path]:
+def findcookiecutterhooks(path: Path) -> Iterator[Path]:
     """Load hooks in a Cookiecutter template."""
     hooks = {"pre_gen_project", "post_gen_project"}
     hookdir = path / "hooks"
