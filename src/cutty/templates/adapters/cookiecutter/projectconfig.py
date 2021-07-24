@@ -50,6 +50,12 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
         raise TypeError(f"{path}: template location must be 'str', got {template!r}")
 
     directory = data["template"]["directory"]
+
+    if not (directory is None or isinstance(directory, str)):
+        raise TypeError(
+            f"{path}: template directory must be 'str' or 'None', got {template!r}"
+        )
+
     bindings = [Binding(key, value) for key, value in data["bindings"].items()]
 
     return ProjectConfig(
