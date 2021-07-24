@@ -13,7 +13,7 @@ from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile2
+from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
 
@@ -79,7 +79,7 @@ def update(
     if projectdir is None:
         projectdir = Path.cwd()
 
-    projectconfig = readprojectconfigfile2(projectdir)
+    projectconfig = readprojectconfigfile(projectdir)
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:

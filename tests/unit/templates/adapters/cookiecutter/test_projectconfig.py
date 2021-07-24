@@ -8,7 +8,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile2
+from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
 
@@ -45,7 +45,7 @@ def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
     file = createprojectconfigfile(PurePath(), config)
     tmp_path.joinpath(*file.path.parts).write_bytes(file.blob)
 
-    assert config == readprojectconfigfile2(tmp_path)
+    assert config == readprojectconfigfile(tmp_path)
 
 
 def test_getprojecttemplate(tmp_path: pathlib.Path) -> None:
@@ -54,7 +54,7 @@ def test_getprojecttemplate(tmp_path: pathlib.Path) -> None:
     text = json.dumps({"_template": template})
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
-    assert template == readprojectconfigfile2(tmp_path).template
+    assert template == readprojectconfigfile(tmp_path).template
 
 
 def test_getprojecttemplate_typeerror(tmp_path: pathlib.Path) -> None:
@@ -64,4 +64,4 @@ def test_getprojecttemplate_typeerror(tmp_path: pathlib.Path) -> None:
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
     with pytest.raises(TypeError):
-        readprojectconfigfile2(tmp_path).template
+        readprojectconfigfile(tmp_path).template

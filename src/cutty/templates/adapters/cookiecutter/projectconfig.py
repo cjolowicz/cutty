@@ -31,7 +31,7 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
     return RegularFile(path, blob)
 
 
-def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
+def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
     text = (project / PROJECT_CONFIG_FILE).read_text()
     data = json.loads(text)
