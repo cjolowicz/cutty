@@ -28,9 +28,7 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     return DiskFileStorage(tmp_path / "storage")
 
 
-def test_readprojectconfigfile(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
-) -> None:
+def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> None:
     """It returns the persisted project configuration."""
     file = createprojectconfigfile(PurePath(), projectconfig)
 
