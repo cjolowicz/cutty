@@ -249,17 +249,18 @@ def test_dictvariable(runcutty: RunCutty, repository: Path) -> None:
 def test_private_variables(runcutty: RunCutty, repository: Path) -> None:
     """It does not bind private variables from the project configuration."""
 
+    def adddotcookiecutterjson(repository: Path) -> None:
+        """Add .cookiecutter.json file to the template."""
+        path = repository / "{{ cookiecutter.project }}" / ".cookiecutter.json"
+        text = "{{ cookiecutter | jsonify }}"
+        updatefile(path, text)
+
     def privatevariable(project: Path, variable: str) -> Any:
         """Return any variable from the Cookiecutter context of a generated project."""
         context = json.loads((project / ".cookiecutter.json").read_text())
         return context[variable]
 
-    updatefile(
-        repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",
-        """
-        {{ cookiecutter | jsonify }}
-        """,
-    )
+    adddotcookiecutterjson(repository)
 
     project = Path("example")
 
