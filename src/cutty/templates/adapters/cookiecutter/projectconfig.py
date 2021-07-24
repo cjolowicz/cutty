@@ -4,7 +4,10 @@ import pathlib
 from dataclasses import dataclass
 from typing import Sequence
 
+from cutty.filestorage.domain.files import loadfile
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filesystems.adapters.disk import DiskFilesystem
+from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 
@@ -33,8 +36,12 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
 
 def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
-    text = (project / PROJECT_CONFIG_FILE).read_text()
-    data = json.loads(text)
+    path = Path(filesystem=DiskFilesystem(project))
+    file = loadfile(path / PROJECT_CONFIG_FILE)
+
+    assert isinstance(file, RegularFile)  # noqa: S101
+
+    data = json.loads(file.blob.decode())
     context = {key: value for key, value in data.items()}
     template = context.pop("_template")
 
