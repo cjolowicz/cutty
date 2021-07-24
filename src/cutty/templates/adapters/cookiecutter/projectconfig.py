@@ -47,7 +47,6 @@ def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
     if not isinstance(template, str):
         raise TypeError(f"{project}: _template must be 'str', got {template!r}")
 
-    context = readprojectconfigfile(project)
     bindings = [Binding(key, value) for key, value in context.items()]
 
     return ProjectConfig(template, bindings)
