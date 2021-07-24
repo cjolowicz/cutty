@@ -2,7 +2,6 @@
 import json
 import pathlib
 from dataclasses import dataclass
-from typing import Any
 from typing import Sequence
 
 from cutty.filestorage.domain.files import RegularFile
@@ -32,16 +31,11 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
     return RegularFile(path, blob)
 
 
-def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
-    """Return the Cookiecutter context of the project."""
-    text = (project / PROJECT_CONFIG_FILE).read_text()
-    data = json.loads(text)
-    return {key: value for key, value in data.items() if isinstance(key, str)}
-
-
 def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
-    context = readprojectconfigfile(project)
+    text = (project / PROJECT_CONFIG_FILE).read_text()
+    data = json.loads(text)
+    context = {key: value for key, value in data.items() if isinstance(key, str)}
     template = context.pop("_template")
 
     if not isinstance(template, str):
