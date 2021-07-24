@@ -22,27 +22,19 @@ def projectconfig() -> ProjectConfig:
     return ProjectConfig(template, bindings)
 
 
-def test_createprojectconfigfile_bindings() -> None:
+def test_createprojectconfigfile_bindings(projectconfig: ProjectConfig) -> None:
     """It creates a JSON file with the bindings."""
-    template = "https://example.com/repository.git"
     project = PurePath("example")
-    bindings = [Binding("project", "example"), Binding("license", "MIT")]
-
-    config = ProjectConfig(template, bindings)
-    file = createprojectconfigfile(project, config)
+    file = createprojectconfigfile(project, projectconfig)
 
     data = json.loads(file.blob.decode())
-    assert all(binding.name in data for binding in bindings)
+    assert all(binding.name in data for binding in projectconfig.bindings)
 
 
-def test_createprojectconfigfile_template() -> None:
+def test_createprojectconfigfile_template(projectconfig: ProjectConfig) -> None:
     """It creates a JSON file containing the template location."""
-    template = "https://example.com/repository.git"
     project = PurePath("example")
-    bindings = [Binding("Project", "example")]
-
-    config = ProjectConfig(template, bindings)
-    file = createprojectconfigfile(project, config)
+    file = createprojectconfigfile(project, projectconfig)
 
     assert "_template" in json.loads(file.blob.decode())
 
@@ -53,32 +45,30 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     return DiskFileStorage(tmp_path / "storage")
 
 
-def test_readprojectconfigfile(storage: DiskFileStorage) -> None:
+def test_readprojectconfigfile(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
     """It returns the persisted Cookiecutter context."""
-    template = "https://example.com/repository.git"
-    bindings = [Binding("project", "example")]
-    config = ProjectConfig(template, bindings)
-    file = createprojectconfigfile(PurePath(), config)
+    file = createprojectconfigfile(PurePath(), projectconfig)
 
     with storage:
         storage.add(file)
 
-    assert config == readprojectconfigfile(storage.root)
+    assert projectconfig == readprojectconfigfile(storage.root)
 
 
-def test_readprojectconfigfile_template(storage: DiskFileStorage) -> None:
+def test_readprojectconfigfile_template(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
     """It returns the `_template` key from cutty.json."""
-    template = "https://example.com/repository.git"
-    bindings = [Binding("project", "example")]
-    config = ProjectConfig(template, bindings)
-    file = createprojectconfigfile(PurePath(), config)
+    file = createprojectconfigfile(PurePath(), projectconfig)
 
     with storage:
         storage.add(file)
 
-    config = readprojectconfigfile(storage.root)
+    projectconfig2 = readprojectconfigfile(storage.root)
 
-    assert template == config.template
+    assert projectconfig.template == projectconfig2.template
 
 
 def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
