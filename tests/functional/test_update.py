@@ -9,6 +9,7 @@ import pytest
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
+from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import removefile
 from tests.util.git import updatefile
 
@@ -267,3 +268,16 @@ def test_private_variables(runcutty: RunCutty, template: Path) -> None:
     runcutty("update", f"--cwd={project}")
 
     assert extensions == privatevariable(project, "_extensions")
+
+
+def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
+    """It uses the template in the subdirectory specified on creation."""
+    project = Path("example")
+    directory = "a"
+    move_repository_files_to_subdirectory(template, directory)
+
+    runcutty("create", f"--directory={directory}", str(template))
+    updatefile(template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
+    runcutty("update", f"--cwd={project}")
+
+    assert (project / "LICENSE").is_file()
