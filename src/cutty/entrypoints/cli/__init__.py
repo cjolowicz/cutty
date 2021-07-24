@@ -1,9 +1,9 @@
 """Command-line interface."""
 # noreorder
-from . import create  # noqa: F401
-from . import update  # noqa: F401
-from . import cookiecutter  # noqa: F401
-from ._main import main as main  # noqa: F401
+from . import create
+from . import update
+from . import cookiecutter
+from ._main import main as main
 
 main.command()(create.create)
 main.command()(update.update)
