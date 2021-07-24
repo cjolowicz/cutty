@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pygit2
 
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
@@ -43,7 +44,7 @@ def test_no_cutty_json(runcutty: RunCutty, repository: Path) -> None:
     """It does not create a cutty.json file."""
     runcutty("cookiecutter", str(repository))
 
-    assert not Path("example", "cutty.json").is_file()
+    assert not Path("example", PROJECT_CONFIG_FILE).is_file()
 
 
 def test_no_input(runcutty: RunCutty, repository: Path) -> None:

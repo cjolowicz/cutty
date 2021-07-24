@@ -6,6 +6,7 @@ from typing import Any
 import pygit2
 import pytest
 
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import removefile
@@ -37,7 +38,7 @@ def updateprojectvariable(repository: Path, name: str, value: Any) -> None:
 
 def projectvariable(project: Path, name: str) -> Any:
     """Return the bound value of a project variable."""
-    path = project / "cutty.json"
+    path = project / PROJECT_CONFIG_FILE
     data = json.loads(path.read_text())
     return data[name]
 
