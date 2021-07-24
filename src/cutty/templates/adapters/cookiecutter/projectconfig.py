@@ -41,11 +41,7 @@ def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
 
 def getprojecttemplate(project: pathlib.Path) -> str:
     """Return the location of the project template."""
-    context = readprojectconfigfile(project)
-    result = context["_template"]
-    if not isinstance(result, str):
-        raise TypeError(f"{project}: _template must be 'str', got {result!r}")
-    return result
+    return readprojectconfigfile2(project).template
 
 
 def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
