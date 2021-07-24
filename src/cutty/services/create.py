@@ -73,7 +73,7 @@ def create(
     projectconfigfile = (
         createprojectconfigfile(
             PurePath(*projectdir.relative_to(outputdir).parts),
-            ProjectConfig(template, bindings),
+            ProjectConfig(template, bindings, directory=directory),
         )
         if createconfigfile
         else None
