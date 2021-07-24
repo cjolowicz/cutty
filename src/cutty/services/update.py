@@ -90,6 +90,7 @@ def update(
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
+            directory=projectconfig.directory,
         )
 
     cherrypick(projectdir, LATEST_BRANCH_REF)
