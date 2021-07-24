@@ -10,8 +10,8 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
+from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import findhooks
-from cutty.templates.adapters.cookiecutter.config import findpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
@@ -53,7 +53,7 @@ def create(
     )
 
     projectfiles = lazysequence(
-        renderfiles(findpaths(templatedir, config), render, bindings)
+        renderfiles(findcookiecutterpaths(templatedir, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
         return
