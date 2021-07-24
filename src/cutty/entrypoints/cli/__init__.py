@@ -1,6 +1,15 @@
 """Command-line interface."""
-# noreorder
-from . import create  # noqa: F401
-from . import update  # noqa: F401
-from . import cookiecutter  # noqa: F401
-from ._main import main as main  # noqa: F401
+from cutty.entrypoints.cli._main import main
+from cutty.entrypoints.cli.cookiecutter import cookiecutter
+from cutty.entrypoints.cli.create import create
+from cutty.entrypoints.cli.update import update
+
+
+registercommand = main.command()
+
+registercommand(create)
+registercommand(update)
+registercommand(cookiecutter)
+
+
+__all__ = ["main"]

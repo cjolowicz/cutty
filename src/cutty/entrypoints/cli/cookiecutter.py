@@ -5,13 +5,11 @@ from typing import Optional
 
 import click
 
-from cutty.entrypoints.cli._main import main as _main
 from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.services.create import create as service_create
 from cutty.templates.domain.bindings import Binding
 
 
-@_main.command()
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
