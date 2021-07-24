@@ -7,7 +7,6 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
-from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
@@ -38,10 +37,19 @@ def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> No
     assert projectconfig == readprojectconfigfile(storage.root)
 
 
-def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
-    """It checks that `_template` key is a string."""
-    text = json.dumps({"template": {"location": None}, "bindings": []})
-    (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
+def test_readprojectconfigfile_template_typeerror(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It checks that the template location is a string."""
+    file = createprojectconfigfile(PurePath(), projectconfig)
+
+    # Replace the template location with `None` in the JSON record.
+    data = json.loads(file.blob.decode())
+    data["template"]["location"] = None
+    file = dataclasses.replace(file, blob=json.dumps(data).encode())
+
+    with storage:
+        storage.add(file)
 
     with pytest.raises(TypeError):
-        readprojectconfigfile(tmp_path)
+        readprojectconfigfile(storage.root)
