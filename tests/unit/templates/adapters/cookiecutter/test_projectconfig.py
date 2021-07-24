@@ -22,23 +22,6 @@ def projectconfig() -> ProjectConfig:
     return ProjectConfig(template, bindings)
 
 
-def test_createprojectconfigfile_bindings(projectconfig: ProjectConfig) -> None:
-    """It creates a JSON file with the bindings."""
-    project = PurePath("example")
-    file = createprojectconfigfile(project, projectconfig)
-
-    data = json.loads(file.blob.decode())
-    assert all(binding.name in data for binding in projectconfig.bindings)
-
-
-def test_createprojectconfigfile_template(projectconfig: ProjectConfig) -> None:
-    """It creates a JSON file containing the template location."""
-    project = PurePath("example")
-    file = createprojectconfigfile(project, projectconfig)
-
-    assert "_template" in json.loads(file.blob.decode())
-
-
 @pytest.fixture
 def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     """Fixture for disk file storage."""
