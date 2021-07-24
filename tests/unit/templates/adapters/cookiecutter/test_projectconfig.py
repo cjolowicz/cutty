@@ -54,7 +54,9 @@ def test_readprojectconfigfile_template(tmp_path: pathlib.Path) -> None:
     text = json.dumps({"_template": template})
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
-    assert template == readprojectconfigfile(tmp_path).template
+    config = readprojectconfigfile(tmp_path)
+
+    assert template == config.template
 
 
 def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
