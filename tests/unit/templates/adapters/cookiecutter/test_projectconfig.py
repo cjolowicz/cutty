@@ -4,6 +4,7 @@ import pathlib
 
 import pytest
 
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -35,6 +36,12 @@ def test_createprojectconfigfile_template() -> None:
     file = createprojectconfigfile(project, config)
 
     assert "_template" in json.loads(file.blob.decode())
+
+
+@pytest.fixture
+def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
+    """Fixture for disk file storage."""
+    return DiskFileStorage(tmp_path / "storage")
 
 
 def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
