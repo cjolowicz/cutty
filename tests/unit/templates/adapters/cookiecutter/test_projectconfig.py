@@ -51,8 +51,11 @@ def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
 def test_readprojectconfigfile_template(tmp_path: pathlib.Path) -> None:
     """It returns the `_template` key from cutty.json."""
     template = "https://example.com/repository.git"
-    text = json.dumps({"_template": template})
-    (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
+    bindings = [Binding("project", "example")]
+    config = ProjectConfig(template, bindings)
+    file = createprojectconfigfile(PurePath(), config)
+
+    (tmp_path.joinpath(*file.path.parts)).write_text(file.blob.decode())
 
     config = readprojectconfigfile(tmp_path)
 
