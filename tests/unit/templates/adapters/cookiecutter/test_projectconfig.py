@@ -40,8 +40,7 @@ def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> No
 
 def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
     """It checks that `_template` key is a string."""
-    template = None
-    text = json.dumps({"_template": template})
+    text = json.dumps({"template": {"location": None}, "bindings": []})
     (tmp_path / PROJECT_CONFIG_FILE).write_text(text)
 
     with pytest.raises(TypeError):
