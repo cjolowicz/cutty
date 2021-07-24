@@ -39,11 +39,6 @@ def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
     return {key: value for key, value in data.items() if isinstance(key, str)}
 
 
-def getprojecttemplate(project: pathlib.Path) -> str:
-    """Return the location of the project template."""
-    return readprojectconfigfile2(project).template
-
-
 def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
     """Return the variable bindings of the project."""
     context = readprojectconfigfile(project)
