@@ -248,6 +248,12 @@ def test_dictvariable(runcutty: RunCutty, repository: Path) -> None:
 
 def test_private_variables(runcutty: RunCutty, repository: Path) -> None:
     """It does not bind private variables from the project configuration."""
+
+    def privatevariable(project: Path, variable: str) -> Any:
+        """Return any variable from the Cookiecutter context of a generated project."""
+        context = json.loads((project / ".cookiecutter.json").read_text())
+        return context[variable]
+
     updatefile(
         repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",
         """
@@ -260,12 +266,10 @@ def test_private_variables(runcutty: RunCutty, repository: Path) -> None:
     runcutty("create", str(repository))
 
     # Add another Jinja extension to `_extensions`.
-    context = json.loads((project / ".cookiecutter.json").read_text())
-    extensions: list[str] = context["_extensions"]
+    extensions: list[str] = privatevariable(project, "_extensions")
     extensions.append("jinja2.ext.i18n")
     updateprojectvariable(repository, "_extensions", extensions)
 
     runcutty("update", f"--cwd={project}")
 
-    context = json.loads((project / ".cookiecutter.json").read_text())
-    assert extensions == context["_extensions"]
+    assert extensions == privatevariable(project, "_extensions")
