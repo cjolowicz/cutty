@@ -42,7 +42,7 @@ def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
 def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
     context = readprojectconfigfile(project)
-    template = context["_template"]
+    template = context.pop("_template")
 
     if not isinstance(template, str):
         raise TypeError(f"{project}: _template must be 'str', got {template!r}")
