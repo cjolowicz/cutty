@@ -2,6 +2,7 @@
 import json
 import pathlib
 from dataclasses import dataclass
+from typing import Optional
 from typing import Sequence
 
 from cutty.filestorage.domain.files import RegularFile
@@ -18,6 +19,7 @@ class ProjectConfig:
 
     template: str
     bindings: Sequence[Binding]
+    directory: Optional[pathlib.PurePosixPath] = None
 
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
