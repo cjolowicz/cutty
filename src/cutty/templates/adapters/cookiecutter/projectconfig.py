@@ -39,17 +39,15 @@ def readprojectconfigfile(project: pathlib.Path) -> dict[str, Any]:
     return {key: value for key, value in data.items() if isinstance(key, str)}
 
 
-def getprojectbindings(project: pathlib.Path) -> Sequence[Binding]:
-    """Return the variable bindings of the project."""
-    context = readprojectconfigfile(project)
-    return [Binding(key, value) for key, value in context.items()]
-
-
 def readprojectconfigfile2(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration."""
     context = readprojectconfigfile(project)
     template = context["_template"]
+
     if not isinstance(template, str):
         raise TypeError(f"{project}: _template must be 'str', got {template!r}")
-    bindings = getprojectbindings(project)
+
+    context = readprojectconfigfile(project)
+    bindings = [Binding(key, value) for key, value in context.items()]
+
     return ProjectConfig(template, bindings)
