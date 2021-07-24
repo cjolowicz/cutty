@@ -13,6 +13,15 @@ from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfi
 from cutty.templates.domain.bindings import Binding
 
 
+@pytest.fixture
+def projectconfig() -> ProjectConfig:
+    """Fixture for a project configuration."""
+    template = "https://example.com/repository.git"
+    bindings = [Binding("project", "example"), Binding("license", "MIT")]
+
+    return ProjectConfig(template, bindings)
+
+
 def test_createprojectconfigfile_bindings() -> None:
     """It creates a JSON file with the bindings."""
     template = "https://example.com/repository.git"
