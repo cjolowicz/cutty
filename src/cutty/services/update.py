@@ -3,6 +3,7 @@ import hashlib
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Optional
 from typing import Sequence
 
@@ -75,6 +76,7 @@ def update(
     projectdir: Optional[Path] = None,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
+    directory: Optional[PurePosixPath] = None,
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     if projectdir is None:
@@ -83,6 +85,9 @@ def update(
     projectconfig = readprojectconfigfile(projectdir)
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
+    if directory is None:
+        directory = projectconfig.directory
+
     with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
@@ -90,7 +95,7 @@ def update(
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
-            directory=projectconfig.directory,
+            directory=directory,
         )
 
     cherrypick(projectdir, LATEST_BRANCH_REF)
