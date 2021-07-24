@@ -43,7 +43,7 @@ def projectvariable(project: Path, name: str) -> Any:
     return data[name]
 
 
-def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_trivial(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies changes from the template."""
     updatefile(
         repository / "{{ cookiecutter.project }}" / "README.md",
@@ -59,7 +59,7 @@ def test_update_trivial(runcutty: RunCutty, repository: Path, project: Path) -> 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_merge(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It merges changes from the template."""
     updatefile(
         project / "README.md",
@@ -81,7 +81,7 @@ def test_update_merge(runcutty: RunCutty, repository: Path, project: Path) -> No
     assert (project / "LICENSE").is_file()
 
 
-def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_conflict(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
     updatefile(
         project / "README.md",
@@ -104,7 +104,7 @@ def test_update_conflict(runcutty: RunCutty, repository: Path, project: Path) ->
             runcutty("update")
 
 
-def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_remove(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It applies file deletions from the template."""
     removefile(repository / "{{ cookiecutter.project }}" / "README.md")
     updatefile(repository / "{{ cookiecutter.project }}" / ".keep", "")
@@ -115,7 +115,7 @@ def test_update_remove(runcutty: RunCutty, repository: Path, project: Path) -> N
     assert not (project / "README.md").is_file()
 
 
-def test_update_noop(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_noop(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
     oldhead = pygit2.Repository(project).head.target
 
@@ -125,9 +125,7 @@ def test_update_noop(runcutty: RunCutty, repository: Path, project: Path) -> Non
     assert oldhead == pygit2.Repository(project).head.target
 
 
-def test_update_new_variables(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_new_variables(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It prompts for variables added after the last project generation."""
     updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
@@ -137,7 +135,7 @@ def test_update_new_variables(
     assert "stable" == projectvariable(project, "status")
 
 
-def test_update_extra_context_old_variable(
+def test_extra_context_old_variable(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
@@ -147,7 +145,7 @@ def test_update_extra_context_old_variable(
     assert "excellent" == projectvariable(project, "project")
 
 
-def test_update_extra_context_new_variable(
+def test_extra_context_new_variable(
     runcutty: RunCutty, repository: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
@@ -159,7 +157,7 @@ def test_update_extra_context_new_variable(
     assert "stable" == projectvariable(project, "status")
 
 
-def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_no_input(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
     updateprojectvariable(repository, "status", ["alpha", "beta", "stable"])
 
@@ -169,9 +167,7 @@ def test_update_no_input(runcutty: RunCutty, repository: Path, project: Path) ->
     assert "alpha" == projectvariable(project, "status")
 
 
-def test_update_rename_projectdir(
-    runcutty: RunCutty, repository: Path, project: Path
-) -> None:
+def test_rename_projectdir(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It generates the project in the project directory irrespective of its name."""
     project2 = Path("awesome2")
     project.rename(project2)
@@ -190,7 +186,7 @@ def test_update_rename_projectdir(
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None:
+def test_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
     updatefile(
         repository / "{{ cookiecutter.project }}" / "README.md",
@@ -205,7 +201,7 @@ def test_update_cwd(runcutty: RunCutty, repository: Path, project: Path) -> None
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
+def test_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     """It loads dict variables from the project configuration."""
     # Add a dict variable with image types to the template.
     images = {
@@ -250,7 +246,7 @@ def test_update_dictvariable(runcutty: RunCutty, repository: Path) -> None:
     assert pngimages == projectvariable(project, "images")
 
 
-def test_update_private_variables(runcutty: RunCutty, repository: Path) -> None:
+def test_private_variables(runcutty: RunCutty, repository: Path) -> None:
     """It does not bind private variables from the project configuration."""
     updatefile(
         repository / "{{ cookiecutter.project }}" / ".cookiecutter.json",

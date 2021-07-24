@@ -55,7 +55,7 @@ def test_cutty_json_already_exists(runcutty: RunCutty, repository: Path) -> None
         runcutty("create", str(repository))
 
 
-def test_create_inplace(runcutty: RunCutty, repository: Path) -> None:
+def test_inplace(runcutty: RunCutty, repository: Path) -> None:
     """It generates the project files in the current directory."""
     runcutty("create", "--no-input", "--in-place", str(repository))
 
