@@ -1,7 +1,6 @@
 """Configuration for projects generated from Cookiecutter templates."""
 import json
 import pathlib
-from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 from typing import Sequence
@@ -22,13 +21,11 @@ class ProjectConfig:
     bindings: Sequence[Binding]
 
 
-def createprojectconfigfile(
-    project: PurePath, bindings: Iterable[Binding], template: str
-) -> RegularFile:
+def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
     path = project / PROJECT_CONFIG_FILE
-    data = {binding.name: binding.value for binding in bindings} | {
-        "_template": template
+    data = {binding.name: binding.value for binding in config.bindings} | {
+        "_template": config.template
     }
     blob = json.dumps(data).encode()
 

@@ -8,6 +8,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.projectconfig import getprojecttemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
@@ -18,7 +19,8 @@ def test_createprojectconfigfile_bindings() -> None:
     project = PurePath("example")
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
 
-    file = createprojectconfigfile(project, bindings, template)
+    config = ProjectConfig(template, bindings)
+    file = createprojectconfigfile(project, config)
 
     data = json.loads(file.blob.decode())
     assert all(binding.name in data for binding in bindings)
@@ -30,7 +32,8 @@ def test_createprojectconfigfile_template() -> None:
     project = PurePath("example")
     bindings = [Binding("Project", "example")]
 
-    file = createprojectconfigfile(project, bindings, template)
+    config = ProjectConfig(template, bindings)
+    file = createprojectconfigfile(project, config)
 
     assert "_template" in json.loads(file.blob.decode())
 

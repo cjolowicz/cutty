@@ -14,6 +14,7 @@ from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
+from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
@@ -71,7 +72,8 @@ def create(
     )
     projectconfigfile = (
         createprojectconfigfile(
-            PurePath(*projectdir.relative_to(outputdir).parts), bindings, template
+            PurePath(*projectdir.relative_to(outputdir).parts),
+            ProjectConfig(template, bindings),
         )
         if createconfigfile
         else None
