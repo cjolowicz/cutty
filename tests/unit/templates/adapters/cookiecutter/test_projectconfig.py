@@ -48,7 +48,7 @@ def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
     assert config == readprojectconfigfile(tmp_path)
 
 
-def test_getprojecttemplate(tmp_path: pathlib.Path) -> None:
+def test_readprojectconfigfile_template(tmp_path: pathlib.Path) -> None:
     """It returns the `_template` key from cutty.json."""
     template = "https://example.com/repository.git"
     text = json.dumps({"_template": template})
@@ -57,7 +57,7 @@ def test_getprojecttemplate(tmp_path: pathlib.Path) -> None:
     assert template == readprojectconfigfile(tmp_path).template
 
 
-def test_getprojecttemplate_typeerror(tmp_path: pathlib.Path) -> None:
+def test_readprojectconfigfile_template_typeerror(tmp_path: pathlib.Path) -> None:
     """It checks that `_template` key is a string."""
     template = None
     text = json.dumps({"_template": template})
