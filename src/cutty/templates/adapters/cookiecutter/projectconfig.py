@@ -37,6 +37,10 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     path = project / PROJECT_CONFIG_FILE
     text = path.read_text()
     data = json.loads(text)
+
+    if not isinstance(data, dict):
+        raise TypeError(f"{path}: project configuration must be 'dict', got {data!r}")
+
     context = {key: value for key, value in data.items()}
     template = context["template"]["location"]
 
