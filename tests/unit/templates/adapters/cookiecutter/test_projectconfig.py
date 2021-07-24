@@ -44,27 +44,30 @@ def storage(tmp_path: pathlib.Path) -> DiskFileStorage:
     return DiskFileStorage(tmp_path / "storage")
 
 
-def test_readprojectconfigfile(tmp_path: pathlib.Path) -> None:
+def test_readprojectconfigfile(storage: DiskFileStorage) -> None:
     """It returns the persisted Cookiecutter context."""
     template = "https://example.com/repository.git"
     bindings = [Binding("project", "example")]
     config = ProjectConfig(template, bindings)
     file = createprojectconfigfile(PurePath(), config)
-    tmp_path.joinpath(*file.path.parts).write_bytes(file.blob)
 
-    assert config == readprojectconfigfile(tmp_path)
+    with storage:
+        storage.add(file)
+
+    assert config == readprojectconfigfile(storage.root)
 
 
-def test_readprojectconfigfile_template(tmp_path: pathlib.Path) -> None:
+def test_readprojectconfigfile_template(storage: DiskFileStorage) -> None:
     """It returns the `_template` key from cutty.json."""
     template = "https://example.com/repository.git"
     bindings = [Binding("project", "example")]
     config = ProjectConfig(template, bindings)
     file = createprojectconfigfile(PurePath(), config)
 
-    (tmp_path.joinpath(*file.path.parts)).write_text(file.blob.decode())
+    with storage:
+        storage.add(file)
 
-    config = readprojectconfigfile(tmp_path)
+    config = readprojectconfigfile(storage.root)
 
     assert template == config.template
 
