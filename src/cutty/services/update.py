@@ -73,6 +73,15 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
     repository.state_cleanup()
 
 
+def createbranch(
+    repositorypath: Path, branch: str, *, target: str, force: bool = False
+) -> None:
+    """Create a branch pointing to the given target, another branch."""
+    repository = pygit2.Repository(repositorypath)
+    commit = repository.branches[target].peel()
+    repository.branches.create(branch, commit, force=force)
+
+
 def update(
     *,
     projectdir: Optional[Path] = None,
@@ -91,9 +100,7 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = pygit2.Repository(projectdir)
-    latest = repository.branches[LATEST_BRANCH].peel()
-    repository.branches.create(UPDATE_BRANCH, latest, force=True)
+    createbranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
     with createworktree(projectdir, UPDATE_BRANCH, checkout=False) as worktree:
         create(
@@ -108,6 +115,7 @@ def update(
 
     cherrypick(projectdir, UPDATE_BRANCH_REF)
 
+    repository = pygit2.Repository(projectdir)
     repository.branches[LATEST_BRANCH].set_target(
         repository.branches[UPDATE_BRANCH].peel().id
     )
