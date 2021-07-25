@@ -76,6 +76,7 @@ def update(
     projectdir: Optional[Path] = None,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
+    checkout: Optional[str] = None,
     directory: Optional[PurePosixPath] = None,
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
@@ -95,6 +96,7 @@ def update(
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
+            checkout=checkout,
             directory=directory,
         )
 

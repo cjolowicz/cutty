@@ -53,5 +53,6 @@ def update(
         extrabindings=extrabindings,
         no_input=no_input,
         projectdir=cwd,
+        checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
