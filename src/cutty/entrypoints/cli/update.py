@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
+from cutty.services.update import continueupdate
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
@@ -40,14 +41,26 @@ from cutty.templates.domain.bindings import Binding
         "cookiecutter.json file."
     ),
 )
+@click.option(
+    "continue_",
+    "--continue",
+    is_flag=True,
+    default=False,
+    help="Resume updating after conflict resolution.",
+)
 def update(
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
     checkout: Optional[str],
     directory: Optional[pathlib.Path],
+    continue_: bool = False,
 ) -> None:
     """Update a project with changes from its template."""
+    if continue_:
+        continueupdate(projectdir=cwd)
+        return
+
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
     service_update(
         extrabindings=extrabindings,

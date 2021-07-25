@@ -11,6 +11,8 @@ from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import removefile
+from tests.util.git import resolveconflicts
+from tests.util.git import Side
 from tests.util.git import updatefile
 
 
@@ -328,3 +330,21 @@ def test_conflict_abort(runcutty: RunCutty, template: Path, project: Path) -> No
     # Repeat the update, it should fail again.
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
+
+
+def test_continue(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It continues the update after the conflicts have been resolved."""
+    updatefile(project / "LICENSE", "this is the version in the project")
+    updatefile(
+        template / "{{ cookiecutter.project }}" / "LICENSE",
+        "this is the version in the template",
+    )
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("update", f"--cwd={project}")
+
+    resolveconflicts(project, project / "LICENSE", Side.THEIRS)
+
+    runcutty("update", f"--cwd={project}", "--continue")
+
+    assert (project / "LICENSE").read_text() == "this is the version in the template"

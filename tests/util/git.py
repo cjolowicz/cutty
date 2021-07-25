@@ -1,4 +1,5 @@
 """Git utilities."""
+import enum
 from pathlib import Path
 from textwrap import dedent
 
@@ -51,3 +52,25 @@ def removefile(path: Path) -> None:
     path.unlink()
 
     commit(repository, message=f"Remove {path.name}")
+
+
+class Side(enum.Enum):
+    """The side of a conflict."""
+
+    ANCESTOR = 0
+    OURS = 1
+    THEIRS = 2
+
+
+def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
+    """Resolve the conflicts."""
+    repository = pygit2.Repository(repositorypath)
+    pathstr = str(path.relative_to(repositorypath))
+    ancestor, ours, theirs = repository.index.conflicts[pathstr]
+    resolution = (ancestor, ours, theirs)[side.value]
+
+    del repository.index.conflicts[pathstr]
+
+    repository.index.add(resolution)
+    repository.index.write()
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
