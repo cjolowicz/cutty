@@ -12,7 +12,8 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -90,7 +91,11 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
+    repository = pygit2.Repository(projectdir)
+    latest = repository.branches[LATEST_BRANCH].peel()
+    repository.branches.create(UPDATE_BRANCH, latest, force=True)
+
+    with createworktree(projectdir, UPDATE_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
@@ -101,4 +106,8 @@ def update(
             directory=directory,
         )
 
-    cherrypick(projectdir, LATEST_BRANCH_REF)
+    cherrypick(projectdir, UPDATE_BRANCH_REF)
+
+    repository.branches[LATEST_BRANCH].set_target(
+        repository.branches[UPDATE_BRANCH].peel().id
+    )
