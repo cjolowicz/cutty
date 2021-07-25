@@ -123,3 +123,12 @@ def update(
     cherrypick(projectdir, UPDATE_BRANCH_REF)
 
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+
+
+def continueupdate(*, projectdir: Optional[Path] = None) -> None:
+    """Continue an update after conflict resolution."""
+    if projectdir is None:
+        projectdir = Path.cwd()
+
+    commit(pygit2.Repository(projectdir), message=UPDATE_MESSAGE)
+    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
