@@ -307,7 +307,6 @@ def test_checkout(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "LICENSE").read_text() == "first version"
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_conflict_abort(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does not skip changes when a previous update was aborted."""
     updatefile(project / "LICENSE", "this is the version in the project")
