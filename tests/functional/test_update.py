@@ -292,3 +292,16 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)
+
+
+def test_checkout(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It uses the specified revision of the template."""
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE", "first version")
+
+    revision = pygit2.Repository(template).head.target
+
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE", "second version")
+
+    runcutty("update", f"--cwd={project}", f"--checkout={revision}")
+
+    assert (project / "LICENSE").read_text() == "first version"
