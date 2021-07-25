@@ -82,6 +82,13 @@ def createbranch(
     repository.branches.create(branch, commit, force=force)
 
 
+def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
+    """Update a branch to the given target, another branch."""
+    repository = pygit2.Repository(repositorypath)
+    commit = repository.branches[target].peel()
+    repository.branches[branch].set_target(commit.id)
+
+
 def update(
     *,
     projectdir: Optional[Path] = None,
@@ -115,7 +122,4 @@ def update(
 
     cherrypick(projectdir, UPDATE_BRANCH_REF)
 
-    repository = pygit2.Repository(projectdir)
-    repository.branches[LATEST_BRANCH].set_target(
-        repository.branches[UPDATE_BRANCH].peel().id
-    )
+    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
