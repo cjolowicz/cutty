@@ -40,12 +40,20 @@ from cutty.templates.domain.bindings import Binding
         "cookiecutter.json file."
     ),
 )
+@click.option(
+    "continue_",
+    "--continue",
+    is_flag=True,
+    default=False,
+    help="Resume updating after conflict resolution.",
+)
 def update(
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
     checkout: Optional[str],
     directory: Optional[pathlib.Path],
+    continue_: bool = False,
 ) -> None:
     """Update a project with changes from its template."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
