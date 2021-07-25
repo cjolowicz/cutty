@@ -9,6 +9,8 @@ from cutty.filestorage.adapters.observers.git import commit as _commit
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
@@ -147,11 +149,11 @@ def test_branch_not_checked_out(
 def test_existing_branch(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
-    """It updates the `latest` branch if it exists."""
+    """It updates the `update` branch if it exists."""
     repository = pygit2.init_repository(project)
     commit(repository)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(LATEST_BRANCH_REF)
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -162,10 +164,10 @@ def test_existing_branch(
 def test_existing_branch_not_head(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
-    """It raises an exception if `latest` exists but HEAD points elsewhere."""
+    """It raises an exception if `update` exists but HEAD points elsewhere."""
     repository = pygit2.init_repository(project)
     commit(repository)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
         with storage:
@@ -181,7 +183,8 @@ def test_existing_branch_commit_message(
     repository = pygit2.init_repository(project)
     commit(repository)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(LATEST_BRANCH_REF)
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -197,8 +200,8 @@ def test_existing_branch_no_changes(
     repository = pygit2.init_repository(project)
     commit(repository)
 
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.set_head(LATEST_BRANCH_REF)
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
     oldhead = repository.head.target
 
     with storage:
