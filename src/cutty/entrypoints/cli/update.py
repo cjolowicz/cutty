@@ -26,6 +26,12 @@ from cutty.templates.domain.bindings import Binding
     help="Directory of the generated project.",
 )
 @click.option(
+    "-c",
+    "--checkout",
+    metavar="REV",
+    help="Branch, tag, or commit hash of the template repository.",
+)
+@click.option(
     "--directory",
     metavar="DIR",
     type=click.Path(path_type=pathlib.Path),
@@ -38,6 +44,7 @@ def update(
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
+    checkout: Optional[str],
     directory: Optional[pathlib.Path],
 ) -> None:
     """Update a project with changes from its template."""
@@ -46,5 +53,6 @@ def update(
         extrabindings=extrabindings,
         no_input=no_input,
         projectdir=cwd,
+        checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
