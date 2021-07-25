@@ -43,6 +43,7 @@ def createworktree(
 
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
+            # https://github.com/libgit2/libgit2/issues/5949
             checkoutemptytree(path)
 
         yield path
