@@ -11,6 +11,8 @@ from cutty.filestorage.domain.observers import FileStorageObserver
 
 LATEST_BRANCH = "cutty/latest"
 LATEST_BRANCH_REF = f"refs/heads/{LATEST_BRANCH}"
+UPDATE_BRANCH = "cutty/update"
+UPDATE_BRANCH_REF = f"refs/heads/{UPDATE_BRANCH}"
 CREATE_MESSAGE = "Initial import"
 UPDATE_MESSAGE = "Update project template"
 
@@ -64,10 +66,10 @@ class GitRepositoryObserver(FileStorageObserver):
         except pygit2.GitError:
             repository = pygit2.init_repository(self.project)
 
-        if LATEST_BRANCH in repository.branches:
-            # HEAD must point to latest branch if it exists.
+        if UPDATE_BRANCH in repository.branches:
+            # HEAD must point to update branch if it exists.
             head = repository.references["HEAD"].target
-            if head != LATEST_BRANCH_REF:
+            if head != UPDATE_BRANCH_REF:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (

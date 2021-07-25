@@ -12,7 +12,8 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -43,6 +44,7 @@ def createworktree(
 
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
+            # https://github.com/libgit2/libgit2/issues/5949
             checkoutemptytree(path)
 
         yield path
@@ -71,6 +73,22 @@ def cherrypick(repositorypath: Path, reference: str) -> None:
     repository.state_cleanup()
 
 
+def createbranch(
+    repositorypath: Path, branch: str, *, target: str, force: bool = False
+) -> None:
+    """Create a branch pointing to the given target, another branch."""
+    repository = pygit2.Repository(repositorypath)
+    commit = repository.branches[target].peel()
+    repository.branches.create(branch, commit, force=force)
+
+
+def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
+    """Update a branch to the given target, another branch."""
+    repository = pygit2.Repository(repositorypath)
+    commit = repository.branches[target].peel()
+    repository.branches[branch].set_target(commit.id)
+
+
 def update(
     *,
     projectdir: Optional[Path] = None,
@@ -89,7 +107,9 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    with createworktree(projectdir, LATEST_BRANCH, checkout=False) as worktree:
+    createbranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
+
+    with createworktree(projectdir, UPDATE_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
@@ -100,4 +120,6 @@ def update(
             directory=directory,
         )
 
-    cherrypick(projectdir, LATEST_BRANCH_REF)
+    cherrypick(projectdir, UPDATE_BRANCH_REF)
+
+    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
