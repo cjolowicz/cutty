@@ -65,10 +65,10 @@ class GitRepositoryObserver(FileStorageObserver):
         except pygit2.GitError:
             repository = pygit2.init_repository(self.project)
 
-        if LATEST_BRANCH in repository.branches:
-            # HEAD must point to latest branch if it exists.
+        if UPDATE_BRANCH in repository.branches:
+            # HEAD must point to update branch if it exists.
             head = repository.references["HEAD"].target
-            if head != LATEST_BRANCH_REF:
+            if head != UPDATE_BRANCH_REF:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
