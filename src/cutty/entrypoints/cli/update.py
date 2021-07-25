@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
+from cutty.services.update import continueupdate
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
@@ -56,6 +57,10 @@ def update(
     continue_: bool = False,
 ) -> None:
     """Update a project with changes from its template."""
+    if continue_:
+        continueupdate(projectdir=cwd)
+        return
+
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
     service_update(
         extrabindings=extrabindings,
