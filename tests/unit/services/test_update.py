@@ -9,6 +9,7 @@ from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
 from cutty.services.update import createworktree
+from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import resolveconflicts
@@ -170,3 +171,21 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, update.name)
+
+
+def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
+    """It fast-forwards the latest branch to the tip of the update branch."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    branches = pygit2.Repository(repositorypath).branches
+    updatehead = branches[UPDATE_BRANCH].peel()
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert branches[LATEST_BRANCH].peel() == updatehead
