@@ -13,6 +13,7 @@ from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
+from tests.util.git import updatefile
 
 
 def test_createworktree(tmp_path: Path) -> None:
@@ -150,3 +151,22 @@ def repositorypath(tmp_path: Path) -> Path:
     repositorypath = tmp_path / "repository"
     pygit2.init_repository(repositorypath)
     return repositorypath
+
+
+def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
+    """Fixture for an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    repository.checkout(update)
+    updatefile(path, text1)
+
+    repository.checkout(main)
+    updatefile(path, text2)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name)
