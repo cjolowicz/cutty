@@ -9,10 +9,12 @@ from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
 from cutty.services.update import createworktree
+from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
+from tests.util.git import updatefile
 
 
 def test_createworktree(tmp_path: Path) -> None:
@@ -142,3 +144,108 @@ def test_continueupdate(tmp_path: Path) -> None:
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
     )
+
+
+@pytest.fixture
+def repositorypath(tmp_path: Path) -> Path:
+    """Fixture for a repository."""
+    repositorypath = tmp_path / "repository"
+    pygit2.init_repository(repositorypath)
+    return repositorypath
+
+
+def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
+    """Fixture for an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    repository.checkout(update)
+    updatefile(path, text1)
+
+    repository.checkout(main)
+    updatefile(path, text2)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name)
+
+
+def test_skipupdate_restores_files_with_conflicts(repositorypath: Path) -> None:
+    """It restores the conflicting files in the working tree to our version."""
+    path = repositorypath / "README"
+    createconflict(
+        repositorypath,
+        path,
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert path.read_text() == "This is the version on the main branch."
+
+
+def test_skipupdate_restores_files_without_conflict(repositorypath: Path) -> None:
+    """It restores non-conflicting files in the working tree to our version."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    readme = repositorypath / "README"
+    license = repositorypath / "LICENSE"
+
+    repository.checkout(update)
+    updatefile(license)
+    updatefile(readme, "This is the version on the update branch.")
+
+    repository.checkout(main)
+    updatefile(readme, "This is the version on the main branch.")
+
+    with pytest.raises(Exception, match=readme.name):
+        cherrypick(repositorypath, update.name)
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert not license.exists()
+
+
+def test_skipupdate_resets_index(repositorypath: Path) -> None:
+    """It resets the index to HEAD, removing conflicts."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    repository = pygit2.Repository(repositorypath)
+    assert repository.index.write_tree() == repository.head.peel().tree.id
+
+
+def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
+    """It fast-forwards the latest branch to the tip of the update branch."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    branches = pygit2.Repository(repositorypath).branches
+    updatehead = branches[UPDATE_BRANCH].peel()
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert branches[LATEST_BRANCH].peel() == updatehead
