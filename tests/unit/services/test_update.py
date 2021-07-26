@@ -173,6 +173,22 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
         cherrypick(repositorypath, update.name)
 
 
+def test_skipupdate_resets_index(repositorypath: Path) -> None:
+    """It resets the index to HEAD, removing conflicts."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    repository = pygit2.Repository(repositorypath)
+    assert repository.index.write_tree() == repository.head.peel().tree.id
+
+
 def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(
