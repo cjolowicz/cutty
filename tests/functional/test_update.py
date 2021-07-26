@@ -350,7 +350,6 @@ def test_continue(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "LICENSE").read_text() == "this is the version in the template"
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_skip(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It skips the update."""
     updatefile(project / "LICENSE", "this is the version in the project")
