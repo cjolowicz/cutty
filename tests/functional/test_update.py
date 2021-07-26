@@ -348,3 +348,25 @@ def test_continue(runcutty: RunCutty, template: Path, project: Path) -> None:
     runcutty("update", f"--cwd={project}", "--continue")
 
     assert (project / "LICENSE").read_text() == "this is the version in the template"
+
+
+def test_skip(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It skips the update."""
+    updatefile(project / "LICENSE", "this is the version in the project")
+    updatefile(
+        template / "{{ cookiecutter.project }}" / "LICENSE",
+        "this is the version in the template",
+    )
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("update", f"--cwd={project}")
+
+    runcutty("update", f"--cwd={project}", "--skip")
+
+    # Update the template with an unproblematic change.
+    updatefile(template / "{{ cookiecutter.project }}" / "INSTALL")
+
+    runcutty("update", f"--cwd={project}")
+
+    assert (project / "LICENSE").read_text() == "this is the version in the project"
+    assert (project / "INSTALL").is_file()
