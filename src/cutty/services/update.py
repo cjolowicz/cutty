@@ -132,3 +132,11 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
 
     commit(pygit2.Repository(projectdir), message=UPDATE_MESSAGE)
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+
+
+def skipupdate(*, projectdir: Optional[Path] = None) -> None:
+    """Skip an update with conflicts."""
+    if projectdir is None:
+        projectdir = Path.cwd()
+
+    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
