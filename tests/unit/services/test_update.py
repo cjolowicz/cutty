@@ -173,6 +173,22 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
         cherrypick(repositorypath, update.name)
 
 
+def test_skipupdate_restores_files_with_conflicts(repositorypath: Path) -> None:
+    """It restores the conflicting files in the working tree to our version."""
+    path = repositorypath / "README"
+    createconflict(
+        repositorypath,
+        path,
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert path.read_text() == "This is the version on the main branch."
+
+
 def test_skipupdate_resets_index(repositorypath: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(
