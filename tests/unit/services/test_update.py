@@ -142,3 +142,11 @@ def test_continueupdate(tmp_path: Path) -> None:
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
     )
+
+
+@pytest.fixture
+def repositorypath(tmp_path: Path) -> Path:
+    """Fixture for a repository."""
+    repositorypath = tmp_path / "repository"
+    pygit2.init_repository(repositorypath)
+    return repositorypath
