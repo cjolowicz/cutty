@@ -189,6 +189,34 @@ def test_skipupdate_restores_files_with_conflicts(repositorypath: Path) -> None:
     assert path.read_text() == "This is the version on the main branch."
 
 
+def test_skipupdate_restores_files_without_conflict(repositorypath: Path) -> None:
+    """It restores non-conflicting files in the working tree to our version."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    readme = repositorypath / "README"
+    license = repositorypath / "LICENSE"
+
+    repository.checkout(update)
+    updatefile(license)
+    updatefile(readme, "This is the version on the update branch.")
+
+    repository.checkout(main)
+    updatefile(readme, "This is the version on the main branch.")
+
+    with pytest.raises(Exception, match=readme.name):
+        cherrypick(repositorypath, update.name)
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert not license.exists()
+
+
 def test_skipupdate_resets_index(repositorypath: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(
