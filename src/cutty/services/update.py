@@ -142,4 +142,6 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     repository = pygit2.Repository(projectdir)
     repository.index.read_tree(repository.head.peel().tree)
     repository.index.write()
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE)
+
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
