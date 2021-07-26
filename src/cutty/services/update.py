@@ -139,4 +139,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
+    repository = pygit2.Repository(projectdir)
+    repository.index.read_tree(repository.head.peel().tree)
+    repository.index.write()
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
