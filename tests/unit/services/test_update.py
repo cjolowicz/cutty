@@ -85,7 +85,7 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
     commit(repositorypath)
 
     currentbranch = repository.references["HEAD"].target
-    otherbranch = "mybranch"
+    otherbranch = "branch"
 
     (repositorypath / "README").touch()
     repository.branches.create(otherbranch, repository.head.peel())
