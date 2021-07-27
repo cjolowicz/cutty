@@ -85,17 +85,16 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
     commit(repositorypath)
 
     currentbranch = repository.references["HEAD"].target
-    otherbranch = "branch"
 
     (repositorypath / "README").touch()
-    repository.branches.create(otherbranch, repository.head.peel())
-    repository.set_head(f"refs/heads/{otherbranch}")
+    repository.branches.create("branch", repository.head.peel())
+    repository.set_head("refs/heads/branch")
     commit(repositorypath, message="Add README")
 
     repository.checkout(currentbranch)
     assert not (repositorypath / "README").is_file()
 
-    cherrypick(repositorypath, f"refs/heads/{otherbranch}")
+    cherrypick(repositorypath, "refs/heads/branch")
     assert (repositorypath / "README").is_file()
 
 
