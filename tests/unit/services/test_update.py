@@ -84,13 +84,13 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
     """It cherry-picks the commit onto the current branch."""
     commit(repositorypath)
 
-    currentbranch = repository.references["HEAD"].target
-
+    main = repository.references[repository.references["HEAD"].target]
     branch = repository.branches.create("branch", repository.head.peel())
+
     repository.checkout(branch)
     updatefile(repositorypath / "README")
 
-    repository.checkout(currentbranch)
+    repository.checkout(main)
     assert not (repositorypath / "README").is_file()
 
     cherrypick(repositorypath, "refs/heads/branch")
