@@ -195,16 +195,11 @@ def test_continueupdate_fastforwards_latest(
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
     path = repositorypath / "README"
-    createconflict(
-        repositorypath,
-        path,
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
 
+    createconflict(repositorypath, path, "a", "b")
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert path.read_text() == "This is the version on the main branch."
+    assert path.read_text() == "b"
 
 
 def test_resetmerge_restores_files_without_conflict(repositorypath: Path) -> None:
