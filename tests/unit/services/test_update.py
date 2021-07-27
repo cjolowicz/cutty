@@ -126,7 +126,7 @@ def test_cherrypick_conflict_deletion(
 ) -> None:
     """It does not crash when the merge conflict involves file deletions."""
     path = repositorypath / "README"
-    updatefile(path, "This is the initial version.")
+    updatefile(path, "a")
 
     main = repository.references["HEAD"].target
     branch = repository.branches.create("branch", repository.head.peel())
@@ -134,7 +134,7 @@ def test_cherrypick_conflict_deletion(
     removefile(path)
 
     repository.checkout(branch)
-    updatefile(path, "This is the version on the other branch.")
+    updatefile(path, "b")
 
     repository.checkout(main)
 
