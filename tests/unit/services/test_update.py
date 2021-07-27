@@ -100,10 +100,10 @@ def test_cherrypick_adds_file(
     assert path.is_file()
 
 
-def test_cherrypick_conflict(tmp_path: Path) -> None:
+def test_cherrypick_conflict(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It raises an exception on merge conflicts."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     mainbranch = repository.references[repository.references["HEAD"].target]
