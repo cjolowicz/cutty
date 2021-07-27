@@ -131,12 +131,11 @@ def test_cherrypick_conflict_deletion(
     main = repository.references["HEAD"].target
     branch = repository.branches.create("branch", repository.head.peel())
 
-    removefile(path)
-
     repository.checkout(branch)
     updatefile(path, "b")
 
     repository.checkout(main)
+    removefile(path)
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, branch.name)
