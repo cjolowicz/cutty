@@ -145,21 +145,21 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
     """It commits the changes and updates the latest branch."""
     commit(repositorypath)
 
-    mainbranch = repository.references[repository.references["HEAD"].target]
+    main = repository.references[repository.references["HEAD"].target]
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    updatebranch = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     (repositorypath / "README").write_text("This is the version on the main branch.")
     commit(repositorypath, message="Add README")
 
-    repository.checkout(updatebranch)
+    repository.checkout(update)
     (repositorypath / "README").write_text("This is the version on the update branch.")
     commit(repositorypath, message="Add README")
 
-    repository.checkout(mainbranch)
+    repository.checkout(main)
 
     with pytest.raises(Exception, match="README"):
-        cherrypick(repositorypath, updatebranch.name)
+        cherrypick(repositorypath, update.name)
 
     resolveconflicts(repositorypath, repositorypath / "README", Side.THEIRS)
 
