@@ -120,10 +120,10 @@ def test_cherrypick_conflict(
         cherrypick(repositorypath, branch.name)
 
 
-def test_cherrypick_conflict_deletion(tmp_path: Path) -> None:
+def test_cherrypick_conflict_deletion(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It does not crash when the merge conflict involves file deletions."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
     (repositorypath / "README").write_text("This is the initial version.")
     commit(repositorypath, message="Initial")
 
