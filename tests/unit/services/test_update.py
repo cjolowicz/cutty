@@ -117,7 +117,7 @@ def test_cherrypick_conflict(
 
     repository.checkout(main)
 
-    with pytest.raises(Exception, match="README"):
+    with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, branch.name)
 
 
