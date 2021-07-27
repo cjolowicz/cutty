@@ -216,10 +216,10 @@ def test_resetmerge_restores_files_without_conflict(
     license = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefiles({license: "", readme: "This is the version on the update branch."})
+    updatefiles({license: "", readme: "a"})
 
     repository.checkout(main)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(readme, "b")
 
     with pytest.raises(Exception, match=readme.name):
         cherrypick(repositorypath, update.name)
