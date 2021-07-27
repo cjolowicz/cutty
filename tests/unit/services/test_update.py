@@ -124,22 +124,23 @@ def test_cherrypick_conflict_deletion(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It does not crash when the merge conflict involves file deletions."""
-    (repositorypath / "README").write_text("This is the initial version.")
+    path = repositorypath / "README"
+    path.write_text("This is the initial version.")
     commit(repositorypath, message="Initial")
 
     mainbranch = repository.references["HEAD"].target
     otherbranch = repository.branches.create("mybranch", repository.head.peel())
 
-    (repositorypath / "README").unlink()
+    path.unlink()
     commit(repositorypath, message="Remove README")
 
     repository.checkout(otherbranch)
-    (repositorypath / "README").write_text("This is the version on the other branch.")
+    path.write_text("This is the version on the other branch.")
     commit(repositorypath, message="Update README")
 
     repository.checkout(repository.references[mainbranch])
 
-    with pytest.raises(Exception, match="README"):
+    with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, otherbranch.name)
 
 
