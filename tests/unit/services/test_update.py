@@ -101,7 +101,7 @@ def test_cherrypick_adds_file(
     assert path.is_file()
 
 
-def test_cherrypick_conflict(
+def test_cherrypick_conflict_edit(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception on merge conflicts."""
