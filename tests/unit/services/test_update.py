@@ -128,7 +128,7 @@ def test_cherrypick_conflict_deletion(
     updatefile(path, "This is the initial version.")
 
     main = repository.references["HEAD"].target
-    branch = repository.branches.create("mybranch", repository.head.peel())
+    branch = repository.branches.create("branch", repository.head.peel())
 
     path.unlink()
     commit(repositorypath, message="Remove README")
