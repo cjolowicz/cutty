@@ -134,24 +134,31 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
-def skipupdate(*, projectdir: Optional[Path] = None) -> None:
-    """Skip an update with conflicts."""
-    if projectdir is None:
-        projectdir = Path.cwd()
+def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
+    """Reset only files that were touched by a cherry-pick.
 
-    repository = pygit2.Repository(projectdir)
+    This emulates `git reset --merge HEAD` by performing a hard reset on the
+    files that were updated by the cherry-picked commit, and resetting the index
+    to HEAD.
+    """
+    repository = pygit2.Repository(repositorypath)
     repository.index.read_tree(repository.head.peel().tree)
     repository.index.write()
 
-    # Emulate `git reset --merge` using a hard reset on the files that were
-    # updated by the cherry-picked commit.
-    latesttree = repository.branches[LATEST_BRANCH].peel(pygit2.Tree)
-    updatetree = repository.branches[UPDATE_BRANCH].peel(pygit2.Tree)
-    diff = updatetree.diff_to_tree(latesttree)
+    parenttree = repository.branches[parent].peel(pygit2.Tree)
+    cherrytree = repository.branches[cherry].peel(pygit2.Tree)
+    diff = cherrytree.diff_to_tree(parenttree)
     paths = [
         file.path for delta in diff.deltas for file in (delta.old_file, delta.new_file)
     ]
 
     repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=paths)
 
+
+def skipupdate(*, projectdir: Optional[Path] = None) -> None:
+    """Skip an update with conflicts."""
+    if projectdir is None:
+        projectdir = Path.cwd()
+
+    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
