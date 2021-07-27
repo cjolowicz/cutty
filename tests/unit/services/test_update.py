@@ -106,20 +106,20 @@ def test_cherrypick_conflict(
     """It raises an exception on merge conflicts."""
     commit(repositorypath)
 
-    mainbranch = repository.references[repository.references["HEAD"].target]
-    otherbranch = repository.branches.create("mybranch", repository.head.peel())
+    main = repository.references[repository.references["HEAD"].target]
+    branch = repository.branches.create("mybranch", repository.head.peel())
 
     (repositorypath / "README").write_text("This is the version on the main branch.")
     commit(repositorypath, message="Add README")
 
-    repository.checkout(otherbranch)
+    repository.checkout(branch)
     (repositorypath / "README").write_text("This is the version on the other branch.")
     commit(repositorypath, message="Add README")
 
-    repository.checkout(mainbranch)
+    repository.checkout(main)
 
     with pytest.raises(Exception, match="README"):
-        cherrypick(repositorypath, otherbranch.name)
+        cherrypick(repositorypath, branch.name)
 
 
 def test_cherrypick_conflict_deletion(tmp_path: Path) -> None:
