@@ -141,6 +141,25 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
+def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
+    """Fixture for an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    repository.checkout(update)
+    updatefile(path, text1)
+
+    repository.checkout(main)
+    updatefile(path, text2)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name)
+
+
 def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
@@ -199,25 +218,6 @@ def test_continueupdate_fastforwards_latest(
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
     )
-
-
-def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
-    """Fixture for an update conflict."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-
-    repository.checkout(update)
-    updatefile(path, text1)
-
-    repository.checkout(main)
-    updatefile(path, text2)
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name)
 
 
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
