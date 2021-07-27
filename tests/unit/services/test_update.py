@@ -153,8 +153,7 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
     updatefile(path, "This is the version on the main branch.")
 
     repository.checkout(update)
-    path.write_text("This is the version on the update branch.")
-    commit(repositorypath, message="Add README")
+    updatefile(path, "This is the version on the update branch.")
 
     repository.checkout(main)
 
