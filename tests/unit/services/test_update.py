@@ -34,16 +34,39 @@ def repository(repositorypath: Path) -> pygit2.Repository:
     return pygit2.Repository(repositorypath)
 
 
-def test_createworktree(repository: pygit2.Repository, repositorypath: Path) -> None:
-    """It returns a path to the worktree."""
+def test_createworktree_creates_worktree(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It creates a worktree."""
     updatefile(repositorypath / "README")
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch") as worktree:
         assert (worktree / ".git").is_file()
-        assert (worktree / "README").is_file()
+
+
+def test_createworktree_removes_worktree_on_exit(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It removes the worktree on exit."""
+    updatefile(repositorypath / "README")
+    repository.branches.create("mybranch", repository.head.peel())
+
+    with createworktree(repositorypath, "mybranch") as worktree:
+        pass
 
     assert not worktree.is_dir()
+
+
+def test_createworktree_does_checkout(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It checks out a working tree."""
+    updatefile(repositorypath / "README")
+    repository.branches.create("mybranch", repository.head.peel())
+
+    with createworktree(repositorypath, "mybranch") as worktree:
+        assert (worktree / "README").is_file()
 
 
 def test_createworktree_no_checkout(tmp_path: Path) -> None:
