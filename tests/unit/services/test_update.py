@@ -80,10 +80,8 @@ def test_createworktree_no_checkout(
         assert not (worktree / "README").is_file()
 
 
-def test_cherrypick(tmp_path: Path) -> None:
+def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     currentbranch = repository.references["HEAD"].target
