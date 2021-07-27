@@ -141,8 +141,10 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
-def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> None:
-    """It commits the changes and updates the latest branch."""
+def test_continueupdate_commits_changes(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It commits the changes."""
     commit(repositorypath)
 
     main = repository.references[repository.references["HEAD"].target]
@@ -166,6 +168,33 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
 
     blob = repository.head.peel().tree / "README"
     assert blob.data == b"a"
+
+
+def test_continueupdate_fastforwards_latest(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It updates the latest branch to the tip of the update branch."""
+    commit(repositorypath)
+
+    main = repository.references[repository.references["HEAD"].target]
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    path = repositorypath / "README"
+
+    repository.checkout(update)
+    updatefile(path, "a")
+
+    repository.checkout(main)
+    updatefile(path, "b")
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name)
+
+    resolveconflicts(repositorypath, path, Side.THEIRS)
+
+    with chdir(repositorypath):
+        continueupdate()
+
     assert (
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
