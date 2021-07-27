@@ -104,7 +104,7 @@ def test_cherrypick_adds_file(
 def test_cherrypick_conflict_edit(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
-    """It raises an exception on merge conflicts."""
+    """It raises an exception when both sides modified the file."""
     commit(repositorypath)
 
     main = repository.references["HEAD"].target
@@ -124,7 +124,7 @@ def test_cherrypick_conflict_edit(
 def test_cherrypick_conflict_deletion(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
-    """It does not crash when the merge conflict involves file deletions."""
+    """It raises an exception when one side modified and the other deleted the file."""
     path = repositorypath / "README"
     updatefile(path, "a")
 
