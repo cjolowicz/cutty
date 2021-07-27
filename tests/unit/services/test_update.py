@@ -74,9 +74,9 @@ def test_createworktree_no_checkout(
 ) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(repositorypath / "README")
-    repository.branches.create("mybranch", repository.head.peel())
+    repository.branches.create("branch", repository.head.peel())
 
-    with createworktree(repositorypath, "mybranch", checkout=False) as worktree:
+    with createworktree(repositorypath, "branch", checkout=False) as worktree:
         assert (worktree / ".git").is_file()
         assert not (worktree / "README").is_file()
 
