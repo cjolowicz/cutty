@@ -309,7 +309,7 @@ def test_checkout(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "LICENSE").read_text() == "first version"
 
 
-def test_conflict_abort(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_abort(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does not skip changes when a previous update was aborted."""
     updatefile(project / "LICENSE", "this is the version in the project")
     updatefile(
@@ -320,9 +320,8 @@ def test_conflict_abort(runcutty: RunCutty, template: Path, project: Path) -> No
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
 
-    # Abort the cherry-pick, unceremoniously.
-    repository = pygit2.Repository(project)
-    repository.reset(repository.head.target, pygit2.GIT_RESET_HARD)
+    # Abort the update.
+    runcutty("update", f"--cwd={project}", "--abort")
 
     # Update the template with an unproblematic change.
     updatefile(template / "{{ cookiecutter.project }}" / "INSTALL")
