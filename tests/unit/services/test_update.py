@@ -6,6 +6,7 @@ import pytest
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
+from cutty.services.update import abortupdate
 from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
 from cutty.services.update import createworktree
@@ -333,3 +334,23 @@ def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
         skipupdate()
 
     assert branches[LATEST_BRANCH].peel() == updatehead
+
+
+def test_abortupdate_rewinds_update_branch(repositorypath: Path) -> None:
+    """It resets the update branch to the tip of the latest branch."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    branches = pygit2.Repository(repositorypath).branches
+    latesthead = branches[LATEST_BRANCH].peel()
+
+    with chdir(repositorypath):
+        abortupdate()
+
+    assert (
+        branches[LATEST_BRANCH].peel() == latesthead == branches[UPDATE_BRANCH].peel()
+    )
