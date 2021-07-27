@@ -142,7 +142,7 @@ def test_cherrypick_conflict_deletion(
 
 
 def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
-    """Fixture for an update conflict."""
+    """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath)
 
