@@ -8,7 +8,7 @@ import pygit2
 from cutty.filestorage.adapters.observers.git import commit as _commit
 
 
-def commit(repositorypath: Path, *, message: str) -> None:
+def commit(repositorypath: Path, *, message: str = "") -> None:
     """Commit all changes in the repository."""
     repository = pygit2.Repository(repositorypath)
     signature = pygit2.Signature("you", "you@example.com")
