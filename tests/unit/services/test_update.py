@@ -134,8 +134,7 @@ def test_cherrypick_conflict_deletion(
     removefile(path)
 
     repository.checkout(branch)
-    path.write_text("This is the version on the other branch.")
-    commit(repositorypath, message="Update README")
+    updatefile(path, "This is the version on the other branch.")
 
     repository.checkout(repository.references[main])
 
