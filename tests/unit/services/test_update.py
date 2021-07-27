@@ -87,7 +87,7 @@ def test_cherrypick_adds_file(
     """It cherry-picks the commit onto the current branch."""
     commit(repositorypath)
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.references["HEAD"].target
     branch = repository.branches.create("branch", repository.head.peel())
     path = repositorypath / "README"
 
@@ -107,7 +107,7 @@ def test_cherrypick_conflict(
     """It raises an exception on merge conflicts."""
     commit(repositorypath)
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.references["HEAD"].target
     branch = repository.branches.create("branch", repository.head.peel())
     path = repositorypath / "README"
 
@@ -136,7 +136,7 @@ def test_cherrypick_conflict_deletion(
     repository.checkout(branch)
     updatefile(path, "This is the version on the other branch.")
 
-    repository.checkout(repository.references[main])
+    repository.checkout(main)
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, branch.name)
