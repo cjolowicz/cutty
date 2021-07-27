@@ -88,8 +88,7 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
 
     repository.branches.create("branch", repository.head.peel())
     repository.set_head("refs/heads/branch")
-    (repositorypath / "README").touch()
-    commit(repositorypath, message="Add README")
+    updatefile(repositorypath / "README")
 
     repository.checkout(currentbranch)
     assert not (repositorypath / "README").is_file()
