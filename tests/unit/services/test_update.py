@@ -86,8 +86,8 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
 
     currentbranch = repository.references["HEAD"].target
 
-    repository.branches.create("branch", repository.head.peel())
-    repository.set_head("refs/heads/branch")
+    branch = repository.branches.create("branch", repository.head.peel())
+    repository.checkout(branch)
     updatefile(repositorypath / "README")
 
     repository.checkout(currentbranch)
