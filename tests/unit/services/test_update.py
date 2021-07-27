@@ -6,9 +6,11 @@ import pytest
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
+from cutty.services.update import abortupdate
 from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
 from cutty.services.update import createworktree
+from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
@@ -173,7 +175,7 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
         cherrypick(repositorypath, update.name)
 
 
-def test_skipupdate_restores_files_with_conflicts(repositorypath: Path) -> None:
+def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
     path = repositorypath / "README"
     createconflict(
@@ -183,13 +185,12 @@ def test_skipupdate_restores_files_with_conflicts(repositorypath: Path) -> None:
         "This is the version on the main branch.",
     )
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert path.read_text() == "This is the version on the main branch."
 
 
-def test_skipupdate_restores_files_without_conflict(repositorypath: Path) -> None:
+def test_resetmerge_restores_files_without_conflict(repositorypath: Path) -> None:
     """It restores non-conflicting files in the working tree to our version."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
@@ -211,13 +212,12 @@ def test_skipupdate_restores_files_without_conflict(repositorypath: Path) -> Non
     with pytest.raises(Exception, match=readme.name):
         cherrypick(repositorypath, update.name)
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert not license.exists()
 
 
-def test_skipupdate_keeps_unrelated_additions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_additions(repositorypath: Path) -> None:
     """It keeps additions of files that did not change in the update."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
@@ -240,13 +240,12 @@ def test_skipupdate_keeps_unrelated_additions(repositorypath: Path) -> None:
     with pytest.raises(Exception, match=readme.name):
         cherrypick(repositorypath, update.name)
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert license.exists()
 
 
-def test_skipupdate_keeps_unrelated_changes(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_changes(repositorypath: Path) -> None:
     """It keeps modifications to files that did not change in the update."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
@@ -270,13 +269,12 @@ def test_skipupdate_keeps_unrelated_changes(repositorypath: Path) -> None:
     with pytest.raises(Exception, match=readme.name):
         cherrypick(repositorypath, update.name)
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert license.read_text() == "This is an unstaged change."
 
 
-def test_skipupdate_keeps_unrelated_deletions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_deletions(repositorypath: Path) -> None:
     """It keeps deletions of files that did not change in the update."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
@@ -300,13 +298,12 @@ def test_skipupdate_keeps_unrelated_deletions(repositorypath: Path) -> None:
     with pytest.raises(Exception, match=readme.name):
         cherrypick(repositorypath, update.name)
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert not license.exists()
 
 
-def test_skipupdate_resets_index(repositorypath: Path) -> None:
+def test_resetmerge_resets_index(repositorypath: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(
         repositorypath,
@@ -315,8 +312,7 @@ def test_skipupdate_resets_index(repositorypath: Path) -> None:
         "This is the version on the main branch.",
     )
 
-    with chdir(repositorypath):
-        skipupdate()
+    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     repository = pygit2.Repository(repositorypath)
     assert repository.index.write_tree() == repository.head.peel().tree.id
@@ -338,3 +334,23 @@ def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
         skipupdate()
 
     assert branches[LATEST_BRANCH].peel() == updatehead
+
+
+def test_abortupdate_rewinds_update_branch(repositorypath: Path) -> None:
+    """It resets the update branch to the tip of the latest branch."""
+    createconflict(
+        repositorypath,
+        repositorypath / "README",
+        "This is the version on the update branch.",
+        "This is the version on the main branch.",
+    )
+
+    branches = pygit2.Repository(repositorypath).branches
+    latesthead = branches[LATEST_BRANCH].peel()
+
+    with chdir(repositorypath):
+        abortupdate()
+
+    assert (
+        branches[LATEST_BRANCH].peel() == latesthead == branches[UPDATE_BRANCH].peel()
+    )

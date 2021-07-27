@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
+from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.services.update import update as service_update
@@ -55,6 +56,12 @@ from cutty.templates.domain.bindings import Binding
     default=False,
     help="Skip the current update.",
 )
+@click.option(
+    "--abort",
+    is_flag=True,
+    default=False,
+    help="Abort the current update.",
+)
 def update(
     extra_context: dict[str, str],
     no_input: bool,
@@ -63,6 +70,7 @@ def update(
     directory: Optional[pathlib.Path],
     continue_: bool,
     skip: bool,
+    abort: bool,
 ) -> None:
     """Update a project with changes from its template."""
     if continue_:
@@ -71,6 +79,10 @@ def update(
 
     if skip:
         skipupdate(projectdir=cwd)
+        return
+
+    if abort:
+        abortupdate(projectdir=cwd)
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
