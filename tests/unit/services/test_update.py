@@ -151,10 +151,10 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
     path = repositorypath / "README"
 
     repository.checkout(update)
-    updatefile(path, "This is the version on the update branch.")
+    updatefile(path, "a")
 
     repository.checkout(main)
-    updatefile(path, "This is the version on the main branch.")
+    updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, update.name)
@@ -165,7 +165,7 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
         continueupdate()
 
     blob = repository.head.peel().tree / "README"
-    assert blob.data == b"This is the version on the update branch."
+    assert blob.data == b"a"
     assert (
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
