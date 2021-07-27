@@ -212,21 +212,21 @@ def test_resetmerge_restores_files_without_conflict(
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    path1 = repositorypath / "README"
+    path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefiles({license: "", readme: "a"})
+    updatefiles({path1: "a", path2: ""})
 
     repository.checkout(main)
-    updatefile(readme, "b")
+    updatefile(path1, "b")
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert not license.exists()
+    assert not path2.exists()
 
 
 def test_resetmerge_keeps_unrelated_additions(repositorypath: Path) -> None:
