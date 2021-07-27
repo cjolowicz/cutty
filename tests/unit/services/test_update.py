@@ -144,7 +144,7 @@ def test_cherrypick_conflict_deletion(
 def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
     """Fixture for an update conflict."""
     repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
+    commit(repositorypath)
 
     main = repository.references[repository.references["HEAD"].target]
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
