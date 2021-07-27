@@ -202,9 +202,10 @@ def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     assert path.read_text() == "b"
 
 
-def test_resetmerge_restores_files_without_conflict(repositorypath: Path) -> None:
+def test_resetmerge_restores_files_without_conflict(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It restores non-conflicting files in the working tree to our version."""
-    repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     main = repository.references[repository.references["HEAD"].target]
