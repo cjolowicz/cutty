@@ -142,6 +142,16 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     repository = pygit2.Repository(projectdir)
     repository.index.read_tree(repository.head.peel().tree)
     repository.index.write()
-    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE)
+
+    # Emulate `git reset --merge` using a hard reset on the files that were
+    # updated by the cherry-picked commit.
+    latesttree = repository.branches[LATEST_BRANCH].peel(pygit2.Tree)
+    updatetree = repository.branches[UPDATE_BRANCH].peel(pygit2.Tree)
+    diff = updatetree.diff_to_tree(latesttree)
+    paths = [
+        file.path for delta in diff.deltas for file in (delta.old_file, delta.new_file)
+    ]
+
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=paths)
 
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
