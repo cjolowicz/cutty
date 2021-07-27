@@ -45,6 +45,22 @@ def updatefile(path: Path, text: str = "") -> None:
     commit(repository, message=f"{verb} {path.name}")
 
 
+def updatefiles(paths: dict[Path, str]) -> None:
+    """Add or update repository files."""
+    verb = "Add"
+
+    for path, text in paths.items():
+        repository = discoverrepository(path)
+
+        if path.exists():
+            verb = "Update"
+
+        path.write_text(dedent(text).lstrip())
+
+    pathlist = " and ".join(path.name for path in paths)
+    commit(repository, message=f"{verb} {pathlist}")
+
+
 def removefile(path: Path) -> None:
     """Remove a repository file."""
     repository = discoverrepository(path)
