@@ -86,15 +86,16 @@ def test_cherrypick(repository: pygit2.Repository, repositorypath: Path) -> None
 
     main = repository.references[repository.references["HEAD"].target]
     branch = repository.branches.create("branch", repository.head.peel())
+    path = repositorypath / "README"
 
     repository.checkout(branch)
-    updatefile(repositorypath / "README")
+    updatefile(path)
 
     repository.checkout(main)
-    assert not (repositorypath / "README").is_file()
+    assert not path.is_file()
 
     cherrypick(repositorypath, "refs/heads/branch")
-    assert (repositorypath / "README").is_file()
+    assert path.is_file()
 
 
 def test_cherrypick_conflict(tmp_path: Path) -> None:
