@@ -73,8 +73,7 @@ def test_createworktree_no_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree without checking out the files."""
-    (repositorypath / "README").touch()
-    commit(repositorypath, message="Initial")
+    updatefile(repositorypath / "README")
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch", checkout=False) as worktree:
