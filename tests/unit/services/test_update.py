@@ -150,12 +150,11 @@ def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> 
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     path = repositorypath / "README"
 
-    updatefile(path, "This is the version on the main branch.")
-
     repository.checkout(update)
     updatefile(path, "This is the version on the update branch.")
 
     repository.checkout(main)
+    updatefile(path, "This is the version on the main branch.")
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, update.name)
