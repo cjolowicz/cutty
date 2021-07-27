@@ -107,7 +107,7 @@ def test_cherrypick_conflict(
     commit(repositorypath)
 
     main = repository.references[repository.references["HEAD"].target]
-    branch = repository.branches.create("mybranch", repository.head.peel())
+    branch = repository.branches.create("branch", repository.head.peel())
     path = repositorypath / "README"
 
     updatefile(path, "This is the version on the main branch.")
