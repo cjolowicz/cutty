@@ -104,7 +104,7 @@ def test_cherrypick_conflict(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception on merge conflicts."""
-    commit(repositorypath, message="Initial")
+    commit(repositorypath)
 
     mainbranch = repository.references[repository.references["HEAD"].target]
     otherbranch = repository.branches.create("mybranch", repository.head.peel())
