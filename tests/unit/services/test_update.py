@@ -39,9 +39,9 @@ def test_createworktree_creates_worktree(
 ) -> None:
     """It creates a worktree."""
     commit(repositorypath)
-    repository.branches.create("mybranch", repository.head.peel())
+    repository.branches.create("branch", repository.head.peel())
 
-    with createworktree(repositorypath, "mybranch") as worktree:
+    with createworktree(repositorypath, "branch") as worktree:
         assert (worktree / ".git").is_file()
 
 
@@ -50,9 +50,9 @@ def test_createworktree_removes_worktree_on_exit(
 ) -> None:
     """It removes the worktree on exit."""
     commit(repositorypath)
-    repository.branches.create("mybranch", repository.head.peel())
+    repository.branches.create("branch", repository.head.peel())
 
-    with createworktree(repositorypath, "mybranch") as worktree:
+    with createworktree(repositorypath, "branch") as worktree:
         pass
 
     assert not worktree.is_dir()
@@ -63,9 +63,9 @@ def test_createworktree_does_checkout(
 ) -> None:
     """It checks out a working tree."""
     updatefile(repositorypath / "README")
-    repository.branches.create("mybranch", repository.head.peel())
+    repository.branches.create("branch", repository.head.peel())
 
-    with createworktree(repositorypath, "mybranch") as worktree:
+    with createworktree(repositorypath, "branch") as worktree:
         assert (worktree / "README").is_file()
 
 
