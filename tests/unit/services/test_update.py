@@ -172,7 +172,7 @@ def test_continueupdate_commits_changes(
     with chdir(repositorypath):
         continueupdate()
 
-    blob = repository.head.peel().tree / "README"
+    blob = repository.head.peel().tree / path.name
     assert blob.data == b"a"
 
 
