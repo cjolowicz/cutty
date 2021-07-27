@@ -14,6 +14,7 @@ from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
+from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -130,8 +131,7 @@ def test_cherrypick_conflict_deletion(
     main = repository.references["HEAD"].target
     branch = repository.branches.create("branch", repository.head.peel())
 
-    path.unlink()
-    commit(repositorypath, message="Remove README")
+    removefile(path)
 
     repository.checkout(branch)
     path.write_text("This is the version on the other branch.")
