@@ -164,22 +164,9 @@ def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It commits the changes."""
-    commit(repositorypath)
-
-    main = repository.references[repository.references["HEAD"].target]
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     path = repositorypath / "README"
 
-    repository.checkout(update)
-    updatefile(path, "a")
-
-    repository.checkout(main)
-    updatefile(path, "b")
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name)
-
+    createconflict(repositorypath, path, "a", "b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
@@ -193,22 +180,9 @@ def test_continueupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    commit(repositorypath)
-
-    main = repository.references[repository.references["HEAD"].target]
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     path = repositorypath / "README"
 
-    repository.checkout(update)
-    updatefile(path, "a")
-
-    repository.checkout(main)
-    updatefile(path, "b")
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name)
-
+    createconflict(repositorypath, path, "a", "b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
