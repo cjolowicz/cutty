@@ -127,20 +127,20 @@ def test_cherrypick_conflict_deletion(
     path = repositorypath / "README"
     updatefile(path, "This is the initial version.")
 
-    mainbranch = repository.references["HEAD"].target
-    otherbranch = repository.branches.create("mybranch", repository.head.peel())
+    main = repository.references["HEAD"].target
+    branch = repository.branches.create("mybranch", repository.head.peel())
 
     path.unlink()
     commit(repositorypath, message="Remove README")
 
-    repository.checkout(otherbranch)
+    repository.checkout(branch)
     path.write_text("This is the version on the other branch.")
     commit(repositorypath, message="Update README")
 
-    repository.checkout(repository.references[mainbranch])
+    repository.checkout(repository.references[main])
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, otherbranch.name)
+        cherrypick(repositorypath, branch.name)
 
 
 def test_continueupdate(tmp_path: Path) -> None:
