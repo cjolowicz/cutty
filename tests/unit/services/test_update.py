@@ -141,10 +141,8 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
-def test_continueupdate(tmp_path: Path) -> None:
+def test_continueupdate(repository: pygit2.Repository, repositorypath: Path) -> None:
     """It commits the changes and updates the latest branch."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     mainbranch = repository.references[repository.references["HEAD"].target]
