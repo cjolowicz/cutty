@@ -110,12 +110,11 @@ def test_cherrypick_conflict(
     branch = repository.branches.create("branch", repository.head.peel())
     path = repositorypath / "README"
 
-    updatefile(path, "This is the version on the main branch.")
-
     repository.checkout(branch)
     updatefile(path, "This is the version on the other branch.")
 
     repository.checkout(main)
+    updatefile(path, "This is the version on the main branch.")
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, branch.name)
