@@ -188,10 +188,8 @@ def test_continueupdate_fastforwards_latest(
     with chdir(repositorypath):
         continueupdate()
 
-    assert (
-        repository.branches[LATEST_BRANCH].peel()
-        == repository.branches[UPDATE_BRANCH].peel()
-    )
+    branches = repository.branches
+    assert branches[LATEST_BRANCH].peel() == branches[UPDATE_BRANCH].peel()
 
 
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
