@@ -108,12 +108,13 @@ def test_cherrypick_conflict(
 
     main = repository.references[repository.references["HEAD"].target]
     branch = repository.branches.create("mybranch", repository.head.peel())
+    path = repositorypath / "README"
 
-    (repositorypath / "README").write_text("This is the version on the main branch.")
+    path.write_text("This is the version on the main branch.")
     commit(repositorypath, message="Add README")
 
     repository.checkout(branch)
-    (repositorypath / "README").write_text("This is the version on the other branch.")
+    path.write_text("This is the version on the other branch.")
     commit(repositorypath, message="Add README")
 
     repository.checkout(main)
