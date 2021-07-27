@@ -38,7 +38,7 @@ def test_createworktree_creates_worktree(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree."""
-    updatefile(repositorypath / "README")
+    commit(repositorypath)
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch") as worktree:
@@ -49,7 +49,7 @@ def test_createworktree_removes_worktree_on_exit(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It removes the worktree on exit."""
-    updatefile(repositorypath / "README")
+    commit(repositorypath)
     repository.branches.create("mybranch", repository.head.peel())
 
     with createworktree(repositorypath, "mybranch") as worktree:
