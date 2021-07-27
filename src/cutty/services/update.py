@@ -162,3 +162,12 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
 
     resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+
+
+def abortupdate(*, projectdir: Optional[Path] = None) -> None:
+    """Abort an update with conflicts."""
+    if projectdir is None:
+        projectdir = Path.cwd()
+
+    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    updatebranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH)
