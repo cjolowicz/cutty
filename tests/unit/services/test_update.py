@@ -28,6 +28,12 @@ def repositorypath(tmp_path: Path) -> Path:
     return repositorypath
 
 
+@pytest.fixture
+def repository(repositorypath: Path) -> pygit2.Repository:
+    """Fixture for a repository."""
+    return pygit2.Repository(repositorypath)
+
+
 def test_createworktree(tmp_path: Path) -> None:
     """It returns a path to the worktree."""
     repositorypath = tmp_path / "repository"
