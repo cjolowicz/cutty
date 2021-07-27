@@ -217,6 +217,95 @@ def test_skipupdate_restores_files_without_conflict(repositorypath: Path) -> Non
     assert not license.exists()
 
 
+def test_skipupdate_keeps_unrelated_additions(repositorypath: Path) -> None:
+    """It keeps additions of files that did not change in the update."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    readme = repositorypath / "README"
+    license = repositorypath / "LICENSE"
+
+    repository.checkout(update)
+    updatefile(readme, "This is the version on the update branch.")
+
+    repository.checkout(main)
+    updatefile(readme, "This is the version on the main branch.")
+
+    license.touch()
+
+    with pytest.raises(Exception, match=readme.name):
+        cherrypick(repositorypath, update.name)
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert license.exists()
+
+
+def test_skipupdate_keeps_unrelated_changes(repositorypath: Path) -> None:
+    """It keeps modifications to files that did not change in the update."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    readme = repositorypath / "README"
+    license = repositorypath / "LICENSE"
+
+    repository.checkout(update)
+    updatefile(readme, "This is the version on the update branch.")
+
+    repository.checkout(main)
+    updatefile(license)
+    updatefile(readme, "This is the version on the main branch.")
+
+    license.write_text("This is an unstaged change.")
+
+    with pytest.raises(Exception, match=readme.name):
+        cherrypick(repositorypath, update.name)
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert license.read_text() == "This is an unstaged change."
+
+
+def test_skipupdate_keeps_unrelated_deletions(repositorypath: Path) -> None:
+    """It keeps deletions of files that did not change in the update."""
+    repository = pygit2.Repository(repositorypath)
+    commit(repositorypath, message="Initial")
+
+    main = repository.references[repository.references["HEAD"].target]
+    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+
+    readme = repositorypath / "README"
+    license = repositorypath / "LICENSE"
+
+    repository.checkout(update)
+    updatefile(readme, "This is the version on the update branch.")
+
+    repository.checkout(main)
+    updatefile(license)
+    updatefile(readme, "This is the version on the main branch.")
+
+    license.unlink()
+
+    with pytest.raises(Exception, match=readme.name):
+        cherrypick(repositorypath, update.name)
+
+    with chdir(repositorypath):
+        skipupdate()
+
+    assert not license.exists()
+
+
 def test_skipupdate_resets_index(repositorypath: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(
