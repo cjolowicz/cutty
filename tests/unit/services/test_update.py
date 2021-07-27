@@ -69,11 +69,11 @@ def test_createworktree_does_checkout(
         assert (worktree / "README").is_file()
 
 
-def test_createworktree_no_checkout(tmp_path: Path) -> None:
+def test_createworktree_no_checkout(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It creates a worktree without checking out the files."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    (tmp_path / "repository" / "README").touch()
+    (repositorypath / "README").touch()
     commit(repositorypath, message="Initial")
     repository.branches.create("mybranch", repository.head.peel())
 
