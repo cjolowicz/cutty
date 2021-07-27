@@ -34,11 +34,9 @@ def repository(repositorypath: Path) -> pygit2.Repository:
     return pygit2.Repository(repositorypath)
 
 
-def test_createworktree(tmp_path: Path) -> None:
+def test_createworktree(repository: pygit2.Repository, repositorypath: Path) -> None:
     """It returns a path to the worktree."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    (tmp_path / "repository" / "README").touch()
+    (repositorypath / "README").touch()
     commit(repositorypath, message="Initial")
     repository.branches.create("mybranch", repository.head.peel())
 
