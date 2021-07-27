@@ -20,6 +20,14 @@ from tests.util.git import updatefile
 from tests.util.git import updatefiles
 
 
+@pytest.fixture
+def repositorypath(tmp_path: Path) -> Path:
+    """Fixture for a repository."""
+    repositorypath = tmp_path / "repository"
+    pygit2.init_repository(repositorypath)
+    return repositorypath
+
+
 def test_createworktree(tmp_path: Path) -> None:
     """It returns a path to the worktree."""
     repositorypath = tmp_path / "repository"
@@ -147,14 +155,6 @@ def test_continueupdate(tmp_path: Path) -> None:
         repository.branches[LATEST_BRANCH].peel()
         == repository.branches[UPDATE_BRANCH].peel()
     )
-
-
-@pytest.fixture
-def repositorypath(tmp_path: Path) -> Path:
-    """Fixture for a repository."""
-    repositorypath = tmp_path / "repository"
-    pygit2.init_repository(repositorypath)
-    return repositorypath
 
 
 def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
