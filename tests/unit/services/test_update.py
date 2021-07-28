@@ -68,6 +68,7 @@ def test_createworktree_does_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It checks out a working tree."""
+    commit(repositorypath)
     updatefile(repositorypath / "README")
     createbranch(repository, "branch")
 
@@ -79,6 +80,7 @@ def test_createworktree_no_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree without checking out the files."""
+    commit(repositorypath)
     updatefile(repositorypath / "README")
     createbranch(repository, "branch")
 
@@ -130,6 +132,8 @@ def test_cherrypick_conflict_deletion(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
+    commit(repositorypath)
+
     path = repositorypath / "README"
     updatefile(path, "a")
 
