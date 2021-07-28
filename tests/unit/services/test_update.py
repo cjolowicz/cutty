@@ -127,6 +127,7 @@ def test_cherrypick_conflict_deletion(
     """It raises an exception when one side modified and the other deleted the file."""
     path = repositorypath / "README"
     updatefile(path, "a")
+
     main = repository.head
     branch = createbranch(repository, "branch")
 
