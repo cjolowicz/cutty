@@ -146,7 +146,7 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
-def createconflict(repositorypath: Path, path: Path, theirs: str, ours: str) -> None:
+def createconflict(repositorypath: Path, path: Path, *, theirs: str, ours: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath)
@@ -171,7 +171,7 @@ def test_continueupdate_commits_changes(
     """It commits the changes."""
     path = repositorypath / "README"
 
-    createconflict(repositorypath, path, "a", "b")
+    createconflict(repositorypath, path, theirs="a", ours="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
@@ -187,7 +187,7 @@ def test_continueupdate_fastforwards_latest(
     """It updates the latest branch to the tip of the update branch."""
     path = repositorypath / "README"
 
-    createconflict(repositorypath, path, "a", "b")
+    createconflict(repositorypath, path, theirs="a", ours="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
@@ -201,7 +201,7 @@ def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
     path = repositorypath / "README"
 
-    createconflict(repositorypath, path, "a", "b")
+    createconflict(repositorypath, path, theirs="a", ours="b")
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
     assert path.read_text() == "b"
@@ -327,7 +327,7 @@ def test_resetmerge_resets_index(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repositorypath, repositorypath / "README", "a", "b")
+    createconflict(repositorypath, repositorypath / "README", theirs="a", ours="b")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
@@ -338,7 +338,7 @@ def test_skipupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(repositorypath, repositorypath / "README", "a", "b")
+    createconflict(repositorypath, repositorypath / "README", theirs="a", ours="b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
 
@@ -352,7 +352,7 @@ def test_abortupdate_rewinds_update_branch(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(repositorypath, repositorypath / "README", "a", "b")
+    createconflict(repositorypath, repositorypath / "README", theirs="a", ours="b")
 
     branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
