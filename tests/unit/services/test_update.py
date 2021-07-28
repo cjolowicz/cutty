@@ -141,12 +141,20 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
+def cuttybranches(
+    repository: pygit2.Repository,
+) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
+    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
+    main = repository.head
+    update = createbranch(repository, UPDATE_BRANCH)
+    latest = createbranch(repository, LATEST_BRANCH)
+    return main, update, latest
+
+
 def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    createbranch(repository, LATEST_BRANCH)
+    main, update, _ = cuttybranches(repository)
 
     repository.checkout(update)
     updatefile(path, theirs)
@@ -204,9 +212,7 @@ def test_resetmerge_restores_files_without_conflict(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It restores non-conflicting files in the working tree to our version."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    createbranch(repository, LATEST_BRANCH)
+    main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -229,9 +235,7 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    createbranch(repository, LATEST_BRANCH)
+    main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -256,9 +260,7 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    createbranch(repository, LATEST_BRANCH)
+    main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -284,9 +286,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    createbranch(repository, LATEST_BRANCH)
+    main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
