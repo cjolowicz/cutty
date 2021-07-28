@@ -345,12 +345,7 @@ def test_skipupdate_fastforwards_latest(
 
 def test_abortupdate_rewinds_update_branch(repositorypath: Path) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, repositorypath / "README", "a", "b")
 
     branches = pygit2.Repository(repositorypath).branches
     latesthead = branches[LATEST_BRANCH].peel()
