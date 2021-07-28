@@ -302,11 +302,11 @@ def test_resetmerge_keeps_unrelated_deletions(
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(path1, "This is the version on the update branch.")
+    updatefile(path1, "a")
 
     repository.checkout(main)
     updatefile(path2)
-    updatefile(path1, "This is the version on the main branch.")
+    updatefile(path1, "b")
 
     path2.unlink()
 
