@@ -92,14 +92,14 @@ def test_cherrypick_adds_file(
     """It cherry-picks the commit onto the current branch."""
     commit(repositorypath)
 
-    mainref = repository.references["HEAD"].target
+    main = repository.head
     branch = createbranch(repository, "branch")
     path = repositorypath / "README"
 
     repository.checkout(branch)
     updatefile(path)
 
-    repository.checkout(mainref)
+    repository.checkout(main)
     assert not path.is_file()
 
     cherrypick(repositorypath, branch.name)
@@ -112,14 +112,14 @@ def test_cherrypick_conflict_edit(
     """It raises an exception when both sides modified the file."""
     commit(repositorypath)
 
-    mainref = repository.references["HEAD"].target
+    main = repository.head
     branch = createbranch(repository, "branch")
     path = repositorypath / "README"
 
     repository.checkout(branch)
     updatefile(path, "a")
 
-    repository.checkout(mainref)
+    repository.checkout(main)
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
@@ -133,13 +133,13 @@ def test_cherrypick_conflict_deletion(
     path = repositorypath / "README"
     updatefile(path, "a")
 
-    mainref = repository.references["HEAD"].target
+    main = repository.head
     branch = createbranch(repository, "branch")
 
     repository.checkout(branch)
     updatefile(path, "b")
 
-    repository.checkout(mainref)
+    repository.checkout(main)
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
