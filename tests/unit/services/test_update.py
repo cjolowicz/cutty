@@ -295,8 +295,8 @@ def test_resetmerge_keeps_unrelated_deletions(
     updatefile(path1, "a")
 
     repository.checkout(main)
-    updatefile(path2)
     updatefile(path1, "b")
+    updatefile(path2)
 
     path2.unlink()
 
