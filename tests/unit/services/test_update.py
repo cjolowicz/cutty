@@ -17,6 +17,7 @@ from tests.util.git import commit
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.git import updatefiles
 
 
 def test_createworktree(tmp_path: Path) -> None:
@@ -203,8 +204,7 @@ def test_resetmerge_restores_files_without_conflict(repositorypath: Path) -> Non
     license = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(license)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefiles({license: "", readme: "This is the version on the update branch."})
 
     repository.checkout(main)
     updatefile(readme, "This is the version on the main branch.")
