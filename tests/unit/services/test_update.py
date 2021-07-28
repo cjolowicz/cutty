@@ -333,12 +333,7 @@ def test_skipupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, repositorypath / "README", "a", "b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
 
