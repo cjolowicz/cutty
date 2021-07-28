@@ -1,4 +1,6 @@
 """Unit tests for cutty.services.update."""
+import string
+from collections.abc import Iterator
 from pathlib import Path
 
 import pygit2
@@ -28,6 +30,12 @@ def repositorypath(tmp_path: Path) -> Path:
     pygit2.init_repository(repositorypath)
     commit(repositorypath)
     return repositorypath
+
+
+@pytest.fixture
+def repositorypaths(repositorypath: Path) -> Iterator[Path]:
+    """Return an arbitrary path in the repository."""
+    return (repositorypath / letter for letter in string.ascii_letters)
 
 
 @pytest.fixture
@@ -209,13 +217,11 @@ def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
 
 
 def test_resetmerge_restores_files_without_conflict(
-    repository: pygit2.Repository, repositorypath: Path
+    repository: pygit2.Repository, repositorypath: Path, repositorypaths: Iterator[Path]
 ) -> None:
     """It restores non-conflicting files in the working tree to our version."""
     main, update, _ = cuttybranches(repository)
-
-    path1 = repositorypath / "a"
-    path2 = repositorypath / "b"
+    path1, path2 = next(repositorypaths), next(repositorypaths)
 
     repository.checkout(update)
     updatefiles({path1: "a", path2: ""})
@@ -232,13 +238,11 @@ def test_resetmerge_restores_files_without_conflict(
 
 
 def test_resetmerge_keeps_unrelated_additions(
-    repository: pygit2.Repository, repositorypath: Path
+    repository: pygit2.Repository, repositorypath: Path, repositorypaths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
-
-    path1 = repositorypath / "a"
-    path2 = repositorypath / "b"
+    path1, path2 = next(repositorypaths), next(repositorypaths)
 
     repository.checkout(update)
     updatefile(path1, "a")
@@ -257,13 +261,11 @@ def test_resetmerge_keeps_unrelated_additions(
 
 
 def test_resetmerge_keeps_unrelated_changes(
-    repository: pygit2.Repository, repositorypath: Path
+    repository: pygit2.Repository, repositorypath: Path, repositorypaths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
-
-    path1 = repositorypath / "a"
-    path2 = repositorypath / "b"
+    path1, path2 = next(repositorypaths), next(repositorypaths)
 
     repository.checkout(update)
     updatefile(path1, "a")
@@ -283,13 +285,11 @@ def test_resetmerge_keeps_unrelated_changes(
 
 
 def test_resetmerge_keeps_unrelated_deletions(
-    repository: pygit2.Repository, repositorypath: Path
+    repository: pygit2.Repository, repositorypath: Path, repositorypaths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
-
-    path1 = repositorypath / "a"
-    path2 = repositorypath / "b"
+    path1, path2 = next(repositorypaths), next(repositorypaths)
 
     repository.checkout(update)
     updatefile(path1, "a")
