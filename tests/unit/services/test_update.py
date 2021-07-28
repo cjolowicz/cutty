@@ -153,7 +153,7 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    createbranch(repository, LATEST_BRANCH)
 
     repository.checkout(update)
     updatefile(path, text1)
@@ -215,7 +215,7 @@ def test_resetmerge_restores_files_without_conflict(
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    createbranch(repository, LATEST_BRANCH)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -242,7 +242,7 @@ def test_resetmerge_keeps_unrelated_additions(
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    createbranch(repository, LATEST_BRANCH)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -271,7 +271,7 @@ def test_resetmerge_keeps_unrelated_changes(
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    createbranch(repository, LATEST_BRANCH)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
@@ -301,7 +301,7 @@ def test_resetmerge_keeps_unrelated_deletions(
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    createbranch(repository, LATEST_BRANCH)
 
     path1 = repositorypath / "README"
     path2 = repositorypath / "LICENSE"
