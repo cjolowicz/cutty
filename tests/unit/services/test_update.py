@@ -322,12 +322,7 @@ def test_resetmerge_resets_index(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, repositorypath / "README", "a", "b")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
