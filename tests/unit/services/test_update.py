@@ -146,7 +146,7 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
-def createconflict(repositorypath: Path, path: Path, *, theirs: str, ours: str) -> None:
+def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath)
