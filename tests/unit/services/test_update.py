@@ -67,22 +67,22 @@ def test_createworktree_does_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It checks out a working tree."""
-    updatefile(repositorypath / "README")
+    updatefile(repositorypath / "a")
     createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
-        assert (worktree / "README").is_file()
+        assert (worktree / "a").is_file()
 
 
 def test_createworktree_no_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree without checking out the files."""
-    updatefile(repositorypath / "README")
+    updatefile(repositorypath / "a")
     createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch", checkout=False) as worktree:
-        assert not (worktree / "README").is_file()
+        assert not (worktree / "a").is_file()
 
 
 def test_cherrypick_adds_file(
@@ -91,7 +91,7 @@ def test_cherrypick_adds_file(
     """It cherry-picks the commit onto the current branch."""
     main = repository.head
     branch = createbranch(repository, "branch")
-    path = repositorypath / "README"
+    path = repositorypath / "a"
 
     repository.checkout(branch)
     updatefile(path)
@@ -109,7 +109,7 @@ def test_cherrypick_conflict_edit(
     """It raises an exception when both sides modified the file."""
     main = repository.head
     branch = createbranch(repository, "branch")
-    path = repositorypath / "README"
+    path = repositorypath / "a"
 
     repository.checkout(branch)
     updatefile(path, "a")
@@ -125,7 +125,7 @@ def test_cherrypick_conflict_deletion(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
-    path = repositorypath / "README"
+    path = repositorypath / "a"
     updatefile(path, "a")
 
     main = repository.head
@@ -170,7 +170,7 @@ def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It commits the changes."""
-    path = repositorypath / "README"
+    path = repositorypath / "a"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
@@ -186,7 +186,7 @@ def test_continueupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    path = repositorypath / "README"
+    path = repositorypath / "a"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
@@ -200,7 +200,7 @@ def test_continueupdate_fastforwards_latest(
 
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    path = repositorypath / "README"
+    path = repositorypath / "a"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
@@ -214,7 +214,7 @@ def test_resetmerge_restores_files_without_conflict(
     """It restores non-conflicting files in the working tree to our version."""
     main, update, _ = cuttybranches(repository)
 
-    path1 = repositorypath / "README"
+    path1 = repositorypath / "a"
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
@@ -237,7 +237,7 @@ def test_resetmerge_keeps_unrelated_additions(
     """It keeps additions of files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
 
-    path1 = repositorypath / "README"
+    path1 = repositorypath / "a"
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
@@ -262,7 +262,7 @@ def test_resetmerge_keeps_unrelated_changes(
     """It keeps modifications to files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
 
-    path1 = repositorypath / "README"
+    path1 = repositorypath / "a"
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
@@ -288,7 +288,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     """It keeps deletions of files that did not change in the update."""
     main, update, _ = cuttybranches(repository)
 
-    path1 = repositorypath / "README"
+    path1 = repositorypath / "a"
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
@@ -312,7 +312,7 @@ def test_resetmerge_resets_index(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
+    createconflict(repositorypath, repositorypath / "a", ours="a", theirs="b")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
@@ -323,7 +323,7 @@ def test_skipupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
+    createconflict(repositorypath, repositorypath / "a", ours="a", theirs="b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
 
@@ -337,7 +337,7 @@ def test_abortupdate_rewinds_update_branch(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
+    createconflict(repositorypath, repositorypath / "a", ours="a", theirs="b")
 
     branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
