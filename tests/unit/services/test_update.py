@@ -215,10 +215,10 @@ def test_resetmerge_restores_files_with_conflicts(
     assert path.read_text() == "a"
 
 
-def test_resetmerge_restores_files_without_conflict(
+def test_resetmerge_removes_added_files(
     repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
 ) -> None:
-    """It restores non-conflicting files in the working tree to our version."""
+    """It removes files added by the cherry-picked commit."""
     main, update, _ = cuttybranches(repository)
     path1, path2 = next(paths), next(paths)
 
