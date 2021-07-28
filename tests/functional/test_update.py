@@ -45,10 +45,16 @@ def projectvariable(project: Path, name: str) -> Any:
     return next(binding.value for binding in config.bindings if binding.name == name)
 
 
-def test_trivial(runcutty: RunCutty, template: Path, project: Path) -> None:
+@pytest.fixture
+def templateproject(template: Path) -> Path:
+    """Return the project directory in the template."""
+    return template / "{{ cookiecutter.project }}"
+
+
+def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It applies changes from the template."""
     updatefile(
-        template / "{{ cookiecutter.project }}" / "README.md",
+        templateproject / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -61,7 +67,7 @@ def test_trivial(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_merge(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It merges changes from the template."""
     updatefile(
         project / "README.md",
@@ -71,7 +77,7 @@ def test_merge(runcutty: RunCutty, template: Path, project: Path) -> None:
         """,
     )
 
-    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+    updatefile(templateproject / "LICENSE")
 
     with chdir(project):
         runcutty("update")
@@ -80,7 +86,7 @@ def test_merge(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "LICENSE").is_file()
 
 
-def test_conflict(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
     updatefile(
         project / "README.md",
@@ -91,7 +97,7 @@ def test_conflict(runcutty: RunCutty, template: Path, project: Path) -> None:
     )
 
     updatefile(
-        template / "{{ cookiecutter.project }}" / "README.md",
+        templateproject / "README.md",
         """
         # {{ cookiecutter.project }}
         An excellent project.
@@ -103,10 +109,10 @@ def test_conflict(runcutty: RunCutty, template: Path, project: Path) -> None:
             runcutty("update")
 
 
-def test_remove(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It applies file deletions from the template."""
-    removefile(template / "{{ cookiecutter.project }}" / "README.md")
-    updatefile(template / "{{ cookiecutter.project }}" / ".keep")
+    removefile(templateproject / "README.md")
+    updatefile(templateproject / ".keep")
 
     with chdir(project):
         runcutty("update")
@@ -166,13 +172,15 @@ def test_no_input(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert "alpha" == projectvariable(project, "status")
 
 
-def test_rename_projectdir(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_rename_projectdir(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
     """It generates the project in the project directory irrespective of its name."""
     project2 = Path("awesome2")
     project.rename(project2)
 
     updatefile(
-        template / "{{ cookiecutter.project }}" / "README.md",
+        templateproject / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -185,10 +193,10 @@ def test_rename_projectdir(runcutty: RunCutty, template: Path, project: Path) ->
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_cwd(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_cwd(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
     updatefile(
-        template / "{{ cookiecutter.project }}" / "README.md",
+        templateproject / "README.md",
         """
         # {{ cookiecutter.project }}
         An awesome project.
@@ -200,7 +208,9 @@ def test_cwd(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
 
-def test_dictvariable(runcutty: RunCutty, template: Path) -> None:
+def test_dictvariable(
+    runcutty: RunCutty, template: Path, templateproject: Path
+) -> None:
     """It loads dict variables from the project configuration."""
     # Add a dict variable with image types to the template.
     images = {
@@ -232,7 +242,7 @@ def test_dictvariable(runcutty: RunCutty, template: Path) -> None:
     runcutty("create", str(template), input=userinput)
 
     # Add LICENSE so update has something to do.
-    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+    updatefile(templateproject / "LICENSE")
 
     # Update the project.
     project = Path("example")
@@ -242,12 +252,14 @@ def test_dictvariable(runcutty: RunCutty, template: Path) -> None:
     assert pngimages == projectvariable(project, "images")
 
 
-def test_private_variables(runcutty: RunCutty, template: Path) -> None:
+def test_private_variables(
+    runcutty: RunCutty, template: Path, templateproject: Path
+) -> None:
     """It does not bind private variables from the project configuration."""
 
     def adddotcookiecutterjson(template: Path) -> None:
         """Add .cookiecutter.json file to the template."""
-        path = template / "{{ cookiecutter.project }}" / ".cookiecutter.json"
+        path = templateproject / ".cookiecutter.json"
         text = "{{ cookiecutter | jsonify }}"
         updatefile(path, text)
 
@@ -296,24 +308,26 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
     assert directory == str(config.directory)
 
 
-def test_checkout(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_checkout(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
     """It uses the specified revision of the template."""
-    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE", "first version")
+    updatefile(templateproject / "LICENSE", "first version")
 
     revision = pygit2.Repository(template).head.target
 
-    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE", "second version")
+    updatefile(templateproject / "LICENSE", "second version")
 
     runcutty("update", f"--cwd={project}", f"--checkout={revision}")
 
     assert (project / "LICENSE").read_text() == "first version"
 
 
-def test_abort(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It does not skip changes when a previous update was aborted."""
     updatefile(project / "LICENSE", "this is the version in the project")
     updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
+        templateproject / "LICENSE",
         "this is the version in the template",
     )
 
@@ -324,18 +338,18 @@ def test_abort(runcutty: RunCutty, template: Path, project: Path) -> None:
     runcutty("update", f"--cwd={project}", "--abort")
 
     # Update the template with an unproblematic change.
-    updatefile(template / "{{ cookiecutter.project }}" / "INSTALL")
+    updatefile(templateproject / "INSTALL")
 
     # Repeat the update, it should fail again.
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
 
 
-def test_continue(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It continues the update after the conflicts have been resolved."""
     updatefile(project / "LICENSE", "this is the version in the project")
     updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
+        templateproject / "LICENSE",
         "this is the version in the template",
     )
 
@@ -349,11 +363,11 @@ def test_continue(runcutty: RunCutty, template: Path, project: Path) -> None:
     assert (project / "LICENSE").read_text() == "this is the version in the template"
 
 
-def test_skip(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It skips the update."""
     updatefile(project / "LICENSE", "this is the version in the project")
     updatefile(
-        template / "{{ cookiecutter.project }}" / "LICENSE",
+        templateproject / "LICENSE",
         "this is the version in the template",
     )
 
@@ -363,7 +377,7 @@ def test_skip(runcutty: RunCutty, template: Path, project: Path) -> None:
     runcutty("update", f"--cwd={project}", "--skip")
 
     # Update the template with an unproblematic change.
-    updatefile(template / "{{ cookiecutter.project }}" / "INSTALL")
+    updatefile(templateproject / "INSTALL")
 
     runcutty("update", f"--cwd={project}")
 
