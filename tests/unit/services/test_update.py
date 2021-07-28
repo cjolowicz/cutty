@@ -239,23 +239,23 @@ def test_resetmerge_keeps_unrelated_additions(
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    path1 = repositorypath / "README"
+    path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "This is the version on the update branch.")
 
     repository.checkout(main)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path1, "This is the version on the main branch.")
 
-    license.touch()
+    path2.touch()
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert license.exists()
+    assert path2.exists()
 
 
 def test_resetmerge_keeps_unrelated_changes(repositorypath: Path) -> None:
