@@ -152,7 +152,10 @@ def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
         file.path for delta in diff.deltas for file in (delta.old_file, delta.new_file)
     ]
 
-    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=paths)
+    repository.checkout(
+        strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
+        paths=paths,
+    )
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
