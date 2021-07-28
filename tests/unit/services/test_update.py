@@ -340,13 +340,12 @@ def test_skipupdate_fastforwards_latest(
         "This is the version on the main branch.",
     )
 
-    branches = repository.branches
-    updatehead = branches[UPDATE_BRANCH].peel()
+    updatehead = repository.branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
         skipupdate()
 
-    assert branches[LATEST_BRANCH].peel() == updatehead
+    assert repository.branches[LATEST_BRANCH].peel() == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(repositorypath: Path) -> None:
