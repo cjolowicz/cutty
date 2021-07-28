@@ -146,7 +146,7 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath)
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.head
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
@@ -208,7 +208,7 @@ def test_resetmerge_restores_files_without_conflict(
     """It restores non-conflicting files in the working tree to our version."""
     commit(repositorypath, message="Initial")
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.head
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
@@ -235,7 +235,7 @@ def test_resetmerge_keeps_unrelated_additions(
     """It keeps additions of files that did not change in the update."""
     commit(repositorypath)
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.head
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
@@ -264,7 +264,7 @@ def test_resetmerge_keeps_unrelated_changes(
     """It keeps modifications to files that did not change in the update."""
     commit(repositorypath, message="Initial")
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.head
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
@@ -294,7 +294,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     """It keeps deletions of files that did not change in the update."""
     commit(repositorypath)
 
-    main = repository.references[repository.references["HEAD"].target]
+    main = repository.head
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
