@@ -146,7 +146,7 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name)
 
 
-def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
+def createconflict(repositorypath: Path, path: Path, theirs: str, ours: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
     commit(repositorypath)
@@ -156,10 +156,10 @@ def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> 
     createbranch(repository, LATEST_BRANCH)
 
     repository.checkout(update)
-    updatefile(path, text1)
+    updatefile(path, theirs)
 
     repository.checkout(main)
-    updatefile(path, text2)
+    updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, update.name)
