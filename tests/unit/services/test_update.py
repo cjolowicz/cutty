@@ -215,7 +215,7 @@ def test_resetmerge_restores_files_without_conflict(
     main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "a"
-    path2 = repositorypath / "LICENSE"
+    path2 = repositorypath / "b"
 
     repository.checkout(update)
     updatefiles({path1: "a", path2: ""})
@@ -238,7 +238,7 @@ def test_resetmerge_keeps_unrelated_additions(
     main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "a"
-    path2 = repositorypath / "LICENSE"
+    path2 = repositorypath / "b"
 
     repository.checkout(update)
     updatefile(path1, "a")
@@ -263,7 +263,7 @@ def test_resetmerge_keeps_unrelated_changes(
     main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "a"
-    path2 = repositorypath / "LICENSE"
+    path2 = repositorypath / "b"
 
     repository.checkout(update)
     updatefile(path1, "a")
@@ -289,7 +289,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     main, update, _ = cuttybranches(repository)
 
     path1 = repositorypath / "a"
-    path2 = repositorypath / "LICENSE"
+    path2 = repositorypath / "b"
 
     repository.checkout(update)
     updatefile(path1, "a")
