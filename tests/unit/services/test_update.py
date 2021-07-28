@@ -318,7 +318,9 @@ def test_resetmerge_keeps_unrelated_deletions(
     assert not path2.exists()
 
 
-def test_resetmerge_resets_index(repositorypath: Path) -> None:
+def test_resetmerge_resets_index(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(
         repositorypath,
@@ -329,7 +331,6 @@ def test_resetmerge_resets_index(repositorypath: Path) -> None:
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    repository = pygit2.Repository(repositorypath)
     assert repository.index.write_tree() == repository.head.peel().tree.id
 
 
