@@ -26,6 +26,7 @@ def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
     pygit2.init_repository(repositorypath)
+    commit(repositorypath)
     return repositorypath
 
 
@@ -44,7 +45,6 @@ def test_createworktree_creates_worktree(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree."""
-    commit(repositorypath)
     createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
@@ -55,7 +55,6 @@ def test_createworktree_removes_worktree_on_exit(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It removes the worktree on exit."""
-    commit(repositorypath)
     createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
@@ -68,7 +67,6 @@ def test_createworktree_does_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It checks out a working tree."""
-    commit(repositorypath)
     updatefile(repositorypath / "README")
     createbranch(repository, "branch")
 
@@ -80,7 +78,6 @@ def test_createworktree_no_checkout(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree without checking out the files."""
-    commit(repositorypath)
     updatefile(repositorypath / "README")
     createbranch(repository, "branch")
 
@@ -92,8 +89,6 @@ def test_cherrypick_adds_file(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It cherry-picks the commit onto the current branch."""
-    commit(repositorypath)
-
     main = repository.head
     branch = createbranch(repository, "branch")
     path = repositorypath / "README"
@@ -112,8 +107,6 @@ def test_cherrypick_conflict_edit(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception when both sides modified the file."""
-    commit(repositorypath)
-
     main = repository.head
     branch = createbranch(repository, "branch")
     path = repositorypath / "README"
@@ -132,11 +125,8 @@ def test_cherrypick_conflict_deletion(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
-    commit(repositorypath)
-
     path = repositorypath / "README"
     updatefile(path, "a")
-
     main = repository.head
     branch = createbranch(repository, "branch")
 
@@ -153,7 +143,6 @@ def test_cherrypick_conflict_deletion(
 def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
-
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
     createbranch(repository, LATEST_BRANCH)
@@ -172,7 +161,6 @@ def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It commits the changes."""
-    commit(repositorypath)
     path = repositorypath / "README"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
@@ -189,7 +177,6 @@ def test_continueupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    commit(repositorypath)
     path = repositorypath / "README"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
@@ -204,7 +191,6 @@ def test_continueupdate_fastforwards_latest(
 
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    commit(repositorypath)
     path = repositorypath / "README"
 
     createconflict(repositorypath, path, ours="a", theirs="b")
@@ -217,8 +203,6 @@ def test_resetmerge_restores_files_without_conflict(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It restores non-conflicting files in the working tree to our version."""
-    commit(repositorypath)
-
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
     createbranch(repository, LATEST_BRANCH)
@@ -244,8 +228,6 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    commit(repositorypath)
-
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
     createbranch(repository, LATEST_BRANCH)
@@ -273,8 +255,6 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    commit(repositorypath)
-
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
     createbranch(repository, LATEST_BRANCH)
@@ -303,8 +283,6 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    commit(repositorypath)
-
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
     createbranch(repository, LATEST_BRANCH)
@@ -333,7 +311,6 @@ def test_resetmerge_resets_index(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    commit(repositorypath)
     createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
@@ -345,7 +322,6 @@ def test_skipupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    commit(repositorypath)
     createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
@@ -360,7 +336,6 @@ def test_abortupdate_rewinds_update_branch(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    commit(repositorypath)
     createconflict(repositorypath, repositorypath / "README", ours="a", theirs="b")
 
     branches = repository.branches
