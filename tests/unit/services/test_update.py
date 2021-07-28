@@ -298,24 +298,24 @@ def test_resetmerge_keeps_unrelated_deletions(
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    path1 = repositorypath / "README"
+    path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "This is the version on the update branch.")
 
     repository.checkout(main)
-    updatefile(license)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path2)
+    updatefile(path1, "This is the version on the main branch.")
 
-    license.unlink()
+    path2.unlink()
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert not license.exists()
+    assert not path2.exists()
 
 
 def test_resetmerge_resets_index(repositorypath: Path) -> None:
