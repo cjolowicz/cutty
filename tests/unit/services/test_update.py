@@ -211,7 +211,7 @@ def test_resetmerge_restores_files_without_conflict(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It restores non-conflicting files in the working tree to our version."""
-    commit(repositorypath, message="Initial")
+    commit(repositorypath)
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
@@ -267,7 +267,7 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    commit(repositorypath, message="Initial")
+    commit(repositorypath)
 
     main = repository.head
     update = createbranch(repository, UPDATE_BRANCH)
