@@ -329,7 +329,9 @@ def test_resetmerge_resets_index(
     assert repository.index.write_tree() == repository.head.peel().tree.id
 
 
-def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
+def test_skipupdate_fastforwards_latest(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(
         repositorypath,
@@ -338,7 +340,7 @@ def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
         "This is the version on the main branch.",
     )
 
-    branches = pygit2.Repository(repositorypath).branches
+    branches = repository.branches
     updatehead = branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
