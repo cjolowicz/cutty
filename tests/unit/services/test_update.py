@@ -288,9 +288,10 @@ def test_resetmerge_keeps_unrelated_changes(
     assert path2.read_text() == "c"
 
 
-def test_resetmerge_keeps_unrelated_deletions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_deletions(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It keeps deletions of files that did not change in the update."""
-    repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     main = repository.references[repository.references["HEAD"].target]
