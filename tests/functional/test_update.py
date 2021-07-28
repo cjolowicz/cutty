@@ -313,15 +313,15 @@ def test_checkout(
     runcutty: RunCutty, template: Path, templateproject: Path, project: Path
 ) -> None:
     """It uses the specified revision of the template."""
-    updatefile(templateproject / "LICENSE", "first version")
+    updatefile(templateproject / "LICENSE", "a")
 
     revision = pygit2.Repository(template).head.target
 
-    updatefile(templateproject / "LICENSE", "second version")
+    updatefile(templateproject / "LICENSE", "b")
 
     runcutty("update", f"--cwd={project}", f"--checkout={revision}")
 
-    assert (project / "LICENSE").read_text() == "first version"
+    assert (project / "LICENSE").read_text() == "a"
 
 
 def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
