@@ -172,9 +172,9 @@ def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It commits the changes."""
+    commit(repositorypath)
     path = repositorypath / "README"
 
-    commit(repositorypath)
     createconflict(repositorypath, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
@@ -189,9 +189,9 @@ def test_continueupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
+    commit(repositorypath)
     path = repositorypath / "README"
 
-    commit(repositorypath)
     createconflict(repositorypath, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
@@ -204,9 +204,9 @@ def test_continueupdate_fastforwards_latest(
 
 def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
     """It restores the conflicting files in the working tree to our version."""
+    commit(repositorypath)
     path = repositorypath / "README"
 
-    commit(repositorypath)
     createconflict(repositorypath, path, ours="a", theirs="b")
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
