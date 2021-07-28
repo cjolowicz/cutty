@@ -292,7 +292,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    commit(repositorypath, message="Initial")
+    commit(repositorypath)
 
     main = repository.references[repository.references["HEAD"].target]
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
