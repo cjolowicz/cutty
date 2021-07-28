@@ -243,10 +243,10 @@ def test_resetmerge_keeps_unrelated_additions(
     path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(path1, "This is the version on the update branch.")
+    updatefile(path1, "a")
 
     repository.checkout(main)
-    updatefile(path1, "This is the version on the main branch.")
+    updatefile(path1, "b")
 
     path2.touch()
 
