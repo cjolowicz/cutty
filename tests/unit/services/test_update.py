@@ -33,15 +33,15 @@ def repositorypath(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def path(repositorypath: Path) -> Path:
-    """Return an arbitrary path in the repository."""
-    return repositorypath / "a"
-
-
-@pytest.fixture
 def repositorypaths(repositorypath: Path) -> Iterator[Path]:
     """Return arbitrary paths in the repository."""
     return (repositorypath / letter for letter in string.ascii_letters)
+
+
+@pytest.fixture
+def path(repositorypaths: Iterator[Path]) -> Path:
+    """Return an arbitrary path in the repository."""
+    return next(repositorypaths)
 
 
 @pytest.fixture
