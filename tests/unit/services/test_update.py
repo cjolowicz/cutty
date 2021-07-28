@@ -35,12 +35,17 @@ def repository(repositorypath: Path) -> pygit2.Repository:
     return pygit2.Repository(repositorypath)
 
 
+def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
+    """Create a branch at HEAD."""
+    return repository.branches.create(name, repository.head.peel())
+
+
 def test_createworktree_creates_worktree(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It creates a worktree."""
     commit(repositorypath)
-    repository.branches.create("branch", repository.head.peel())
+    createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
         assert (worktree / ".git").is_file()
@@ -51,7 +56,7 @@ def test_createworktree_removes_worktree_on_exit(
 ) -> None:
     """It removes the worktree on exit."""
     commit(repositorypath)
-    repository.branches.create("branch", repository.head.peel())
+    createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
         pass
@@ -64,7 +69,7 @@ def test_createworktree_does_checkout(
 ) -> None:
     """It checks out a working tree."""
     updatefile(repositorypath / "README")
-    repository.branches.create("branch", repository.head.peel())
+    createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch") as worktree:
         assert (worktree / "README").is_file()
@@ -75,7 +80,7 @@ def test_createworktree_no_checkout(
 ) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(repositorypath / "README")
-    repository.branches.create("branch", repository.head.peel())
+    createbranch(repository, "branch")
 
     with createworktree(repositorypath, "branch", checkout=False) as worktree:
         assert not (worktree / "README").is_file()
@@ -88,7 +93,7 @@ def test_cherrypick_adds_file(
     commit(repositorypath)
 
     mainref = repository.references["HEAD"].target
-    branch = repository.branches.create("branch", repository.head.peel())
+    branch = createbranch(repository, "branch")
     path = repositorypath / "README"
 
     repository.checkout(branch)
@@ -108,7 +113,7 @@ def test_cherrypick_conflict_edit(
     commit(repositorypath)
 
     mainref = repository.references["HEAD"].target
-    branch = repository.branches.create("branch", repository.head.peel())
+    branch = createbranch(repository, "branch")
     path = repositorypath / "README"
 
     repository.checkout(branch)
@@ -129,7 +134,7 @@ def test_cherrypick_conflict_deletion(
     updatefile(path, "a")
 
     mainref = repository.references["HEAD"].target
-    branch = repository.branches.create("branch", repository.head.peel())
+    branch = createbranch(repository, "branch")
 
     repository.checkout(branch)
     updatefile(path, "b")
