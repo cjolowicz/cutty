@@ -325,11 +325,8 @@ def test_checkout(
 
 def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It does not skip changes when a previous update was aborted."""
-    updatefile(project / "LICENSE", "this is the version in the project")
-    updatefile(
-        templateproject / "LICENSE",
-        "this is the version in the template",
-    )
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
@@ -347,11 +344,8 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
 
 def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It continues the update after the conflicts have been resolved."""
-    updatefile(project / "LICENSE", "this is the version in the project")
-    updatefile(
-        templateproject / "LICENSE",
-        "this is the version in the template",
-    )
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
@@ -360,16 +354,13 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
 
     runcutty("update", f"--cwd={project}", "--continue")
 
-    assert (project / "LICENSE").read_text() == "this is the version in the template"
+    assert (project / "LICENSE").read_text() == "b"
 
 
 def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It skips the update."""
-    updatefile(project / "LICENSE", "this is the version in the project")
-    updatefile(
-        templateproject / "LICENSE",
-        "this is the version in the template",
-    )
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
@@ -381,5 +372,5 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
 
     runcutty("update", f"--cwd={project}")
 
-    assert (project / "LICENSE").read_text() == "this is the version in the project"
+    assert (project / "LICENSE").read_text() == "a"
     assert (project / "INSTALL").is_file()
