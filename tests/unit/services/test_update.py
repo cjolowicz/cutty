@@ -1,4 +1,6 @@
 """Unit tests for cutty.services.update."""
+import string
+from collections.abc import Iterator
 from pathlib import Path
 
 import pygit2
@@ -14,139 +16,11 @@ from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
+from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
 from tests.util.git import updatefiles
-
-
-def test_createworktree(tmp_path: Path) -> None:
-    """It returns a path to the worktree."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    (tmp_path / "repository" / "README").touch()
-    commit(repositorypath, message="Initial")
-    repository.branches.create("mybranch", repository.head.peel())
-
-    with createworktree(repositorypath, "mybranch") as worktree:
-        assert (worktree / ".git").is_file()
-        assert (worktree / "README").is_file()
-
-    assert not worktree.is_dir()
-
-
-def test_createworktree_no_checkout(tmp_path: Path) -> None:
-    """It creates a worktree without checking out the files."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    (tmp_path / "repository" / "README").touch()
-    commit(repositorypath, message="Initial")
-    repository.branches.create("mybranch", repository.head.peel())
-
-    with createworktree(repositorypath, "mybranch", checkout=False) as worktree:
-        assert (worktree / ".git").is_file()
-        assert not (worktree / "README").is_file()
-
-
-def test_cherrypick(tmp_path: Path) -> None:
-    """It cherry-picks the commit onto the current branch."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    currentbranch = repository.references["HEAD"].target
-    otherbranch = "mybranch"
-
-    (repositorypath / "README").touch()
-    repository.branches.create(otherbranch, repository.head.peel())
-    repository.set_head(f"refs/heads/{otherbranch}")
-    commit(repositorypath, message="Add README")
-
-    repository.checkout(currentbranch)
-    assert not (repositorypath / "README").is_file()
-
-    cherrypick(repositorypath, f"refs/heads/{otherbranch}")
-    assert (repositorypath / "README").is_file()
-
-
-def test_cherrypick_conflict(tmp_path: Path) -> None:
-    """It raises an exception on merge conflicts."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    mainbranch = repository.references[repository.references["HEAD"].target]
-    otherbranch = repository.branches.create("mybranch", repository.head.peel())
-
-    (repositorypath / "README").write_text("This is the version on the main branch.")
-    commit(repositorypath, message="Add README")
-
-    repository.checkout(otherbranch)
-    (repositorypath / "README").write_text("This is the version on the other branch.")
-    commit(repositorypath, message="Add README")
-
-    repository.checkout(mainbranch)
-
-    with pytest.raises(Exception, match="README"):
-        cherrypick(repositorypath, otherbranch.name)
-
-
-def test_cherrypick_conflict_deletion(tmp_path: Path) -> None:
-    """It does not crash when the merge conflict involves file deletions."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    (repositorypath / "README").write_text("This is the initial version.")
-    commit(repositorypath, message="Initial")
-
-    mainbranch = repository.references["HEAD"].target
-    otherbranch = repository.branches.create("mybranch", repository.head.peel())
-
-    (repositorypath / "README").unlink()
-    commit(repositorypath, message="Remove README")
-
-    repository.checkout(otherbranch)
-    (repositorypath / "README").write_text("This is the version on the other branch.")
-    commit(repositorypath, message="Update README")
-
-    repository.checkout(repository.references[mainbranch])
-
-    with pytest.raises(Exception, match="README"):
-        cherrypick(repositorypath, otherbranch.name)
-
-
-def test_continueupdate(tmp_path: Path) -> None:
-    """It commits the changes and updates the latest branch."""
-    repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    mainbranch = repository.references[repository.references["HEAD"].target]
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    updatebranch = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-
-    (repositorypath / "README").write_text("This is the version on the main branch.")
-    commit(repositorypath, message="Add README")
-
-    repository.checkout(updatebranch)
-    (repositorypath / "README").write_text("This is the version on the update branch.")
-    commit(repositorypath, message="Add README")
-
-    repository.checkout(mainbranch)
-
-    with pytest.raises(Exception, match="README"):
-        cherrypick(repositorypath, updatebranch.name)
-
-    resolveconflicts(repositorypath, repositorypath / "README", Side.THEIRS)
-
-    with chdir(repositorypath):
-        continueupdate()
-
-    blob = repository.head.peel().tree / "README"
-    assert blob.data == b"This is the version on the update branch."
-    assert (
-        repository.branches[LATEST_BRANCH].peel()
-        == repository.branches[UPDATE_BRANCH].peel()
-    )
 
 
 @pytest.fixture
@@ -154,198 +28,317 @@ def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
     pygit2.init_repository(repositorypath)
+    commit(repositorypath)
     return repositorypath
 
 
-def createconflict(repositorypath: Path, path: Path, text1: str, text2: str) -> None:
-    """Fixture for an update conflict."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
+@pytest.fixture
+def paths(repositorypath: Path) -> Iterator[Path]:
+    """Return arbitrary paths in the repository."""
+    return (repositorypath / letter for letter in string.ascii_letters)
 
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
-    repository.checkout(update)
-    updatefile(path, text1)
+@pytest.fixture
+def path(paths: Iterator[Path]) -> Path:
+    """Return an arbitrary path in the repository."""
+    return next(paths)
+
+
+@pytest.fixture
+def repository(repositorypath: Path) -> pygit2.Repository:
+    """Fixture for a repository."""
+    return pygit2.Repository(repositorypath)
+
+
+def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
+    """Create a branch at HEAD."""
+    return repository.branches.create(name, repository.head.peel())
+
+
+def test_createworktree_creates_worktree(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It creates a worktree."""
+    createbranch(repository, "branch")
+
+    with createworktree(repositorypath, "branch") as worktree:
+        assert (worktree / ".git").is_file()
+
+
+def test_createworktree_removes_worktree_on_exit(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It removes the worktree on exit."""
+    createbranch(repository, "branch")
+
+    with createworktree(repositorypath, "branch") as worktree:
+        pass
+
+    assert not worktree.is_dir()
+
+
+def test_createworktree_does_checkout(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It checks out a working tree."""
+    updatefile(path)
+    createbranch(repository, "branch")
+
+    with createworktree(repositorypath, "branch") as worktree:
+        assert (worktree / path.name).is_file()
+
+
+def test_createworktree_no_checkout(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It creates a worktree without checking out the files."""
+    updatefile(path)
+    createbranch(repository, "branch")
+
+    with createworktree(repositorypath, "branch", checkout=False) as worktree:
+        assert not (worktree / path.name).is_file()
+
+
+def test_cherrypick_adds_file(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It cherry-picks the commit onto the current branch."""
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path)
 
     repository.checkout(main)
-    updatefile(path, text2)
+    assert not path.is_file()
+
+    cherrypick(repositorypath, branch.name)
+    assert path.is_file()
+
+
+def test_cherrypick_conflict_edit(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It raises an exception when both sides modified the file."""
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path, "a")
+
+    repository.checkout(main)
+    updatefile(path, "b")
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, branch.name)
+
+
+def test_cherrypick_conflict_deletion(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It raises an exception when one side modified and the other deleted the file."""
+    updatefile(path, "a")
+
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path, "b")
+
+    repository.checkout(main)
+    removefile(path)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, branch.name)
+
+
+def cuttybranches(
+    repository: pygit2.Repository,
+) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
+    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
+    main = repository.head
+    update = createbranch(repository, UPDATE_BRANCH)
+    latest = createbranch(repository, LATEST_BRANCH)
+    return main, update, latest
+
+
+def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+    """Create an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    main, update, _ = cuttybranches(repository)
+
+    repository.checkout(update)
+    updatefile(path, theirs)
+
+    repository.checkout(main)
+    updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, update.name)
 
 
-def test_resetmerge_restores_files_with_conflicts(repositorypath: Path) -> None:
+def test_continueupdate_commits_changes(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It commits the changes."""
+    createconflict(repositorypath, path, ours="a", theirs="b")
+    resolveconflicts(repositorypath, path, Side.THEIRS)
+
+    with chdir(repositorypath):
+        continueupdate()
+
+    blob = repository.head.peel().tree / path.name
+    assert blob.data == b"b"
+
+
+def test_continueupdate_fastforwards_latest(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It updates the latest branch to the tip of the update branch."""
+    createconflict(repositorypath, path, ours="a", theirs="b")
+    resolveconflicts(repositorypath, path, Side.THEIRS)
+
+    with chdir(repositorypath):
+        continueupdate()
+
+    branches = repository.branches
+    assert branches[LATEST_BRANCH].peel() == branches[UPDATE_BRANCH].peel()
+
+
+def test_resetmerge_restores_files_with_conflicts(
+    repositorypath: Path, path: Path
+) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    path = repositorypath / "README"
-    createconflict(
-        repositorypath,
-        path,
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
-
+    createconflict(repositorypath, path, ours="a", theirs="b")
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert path.read_text() == "This is the version on the main branch."
+    assert path.read_text() == "a"
 
 
-def test_resetmerge_restores_files_without_conflict(repositorypath: Path) -> None:
-    """It restores non-conflicting files in the working tree to our version."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+def test_resetmerge_removes_added_files(
+    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+) -> None:
+    """It removes files added by the cherry-picked commit."""
+    main, update, _ = cuttybranches(repository)
+    path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
-    updatefiles({license: "", readme: "This is the version on the update branch."})
+    updatefiles({path1: "a", path2: ""})
 
     repository.checkout(main)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path1, "b")
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert not license.exists()
+    assert not path2.exists()
 
 
-def test_resetmerge_keeps_unrelated_additions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_additions(
+    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+) -> None:
     """It keeps additions of files that did not change in the update."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    main, update, _ = cuttybranches(repository)
+    path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "a")
 
     repository.checkout(main)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path1, "b")
 
-    license.touch()
+    path2.touch()
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert license.exists()
+    assert path2.exists()
 
 
-def test_resetmerge_keeps_unrelated_changes(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_changes(
+    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+) -> None:
     """It keeps modifications to files that did not change in the update."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    main, update, _ = cuttybranches(repository)
+    path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "a")
 
     repository.checkout(main)
-    updatefile(license)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path1, "b")
+    updatefile(path2)
 
-    license.write_text("This is an unstaged change.")
+    path2.write_text("c")
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert license.read_text() == "This is an unstaged change."
+    assert path2.read_text() == "c"
 
 
-def test_resetmerge_keeps_unrelated_deletions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_deletions(
+    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+) -> None:
     """It keeps deletions of files that did not change in the update."""
-    repository = pygit2.Repository(repositorypath)
-    commit(repositorypath, message="Initial")
-
-    main = repository.references[repository.references["HEAD"].target]
-    update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    main, update, _ = cuttybranches(repository)
+    path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "a")
 
     repository.checkout(main)
-    updatefile(license)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path1, "b")
+    updatefile(path2)
 
-    license.unlink()
+    path2.unlink()
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert not license.exists()
+    assert not path2.exists()
 
 
-def test_resetmerge_resets_index(repositorypath: Path) -> None:
+def test_resetmerge_resets_index(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, path, ours="a", theirs="b")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    repository = pygit2.Repository(repositorypath)
     assert repository.index.write_tree() == repository.head.peel().tree.id
 
 
-def test_skipupdate_fastforwards_latest(repositorypath: Path) -> None:
+def test_skipupdate_fastforwards_latest(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, path, ours="a", theirs="b")
 
-    branches = pygit2.Repository(repositorypath).branches
-    updatehead = branches[UPDATE_BRANCH].peel()
+    updatehead = repository.branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
         skipupdate()
 
-    assert branches[LATEST_BRANCH].peel() == updatehead
+    assert repository.branches[LATEST_BRANCH].peel() == updatehead
 
 
-def test_abortupdate_rewinds_update_branch(repositorypath: Path) -> None:
+def test_abortupdate_rewinds_update_branch(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(
-        repositorypath,
-        repositorypath / "README",
-        "This is the version on the update branch.",
-        "This is the version on the main branch.",
-    )
+    createconflict(repositorypath, path, ours="a", theirs="b")
 
-    branches = pygit2.Repository(repositorypath).branches
+    branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
 
     with chdir(repositorypath):
