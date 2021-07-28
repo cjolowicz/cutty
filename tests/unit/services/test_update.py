@@ -268,24 +268,24 @@ def test_resetmerge_keeps_unrelated_changes(
     update = repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
 
-    readme = repositorypath / "README"
-    license = repositorypath / "LICENSE"
+    path1 = repositorypath / "README"
+    path2 = repositorypath / "LICENSE"
 
     repository.checkout(update)
-    updatefile(readme, "This is the version on the update branch.")
+    updatefile(path1, "This is the version on the update branch.")
 
     repository.checkout(main)
-    updatefile(license)
-    updatefile(readme, "This is the version on the main branch.")
+    updatefile(path2)
+    updatefile(path1, "This is the version on the main branch.")
 
-    license.write_text("This is an unstaged change.")
+    path2.write_text("This is an unstaged change.")
 
-    with pytest.raises(Exception, match=readme.name):
+    with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name)
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
-    assert license.read_text() == "This is an unstaged change."
+    assert path2.read_text() == "This is an unstaged change."
 
 
 def test_resetmerge_keeps_unrelated_deletions(repositorypath: Path) -> None:
