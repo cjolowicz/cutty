@@ -102,7 +102,7 @@ def test_cherrypick_adds_file(
     repository.checkout(mainref)
     assert not path.is_file()
 
-    cherrypick(repositorypath, "refs/heads/branch")
+    cherrypick(repositorypath, branch.name)
     assert path.is_file()
 
 
