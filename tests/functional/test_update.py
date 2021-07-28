@@ -249,6 +249,7 @@ def test_dictvariable(
 
     runcutty("update", f"--cwd={project}")
 
+    # Check that the project still uses only PNG images.
     assert pngimages == projectvariable(project, "images")
 
 
