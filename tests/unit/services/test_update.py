@@ -229,9 +229,10 @@ def test_resetmerge_restores_files_without_conflict(
     assert not path2.exists()
 
 
-def test_resetmerge_keeps_unrelated_additions(repositorypath: Path) -> None:
+def test_resetmerge_keeps_unrelated_additions(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
     """It keeps additions of files that did not change in the update."""
-    repository = pygit2.Repository(repositorypath)
     commit(repositorypath, message="Initial")
 
     main = repository.references[repository.references["HEAD"].target]
