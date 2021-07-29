@@ -109,7 +109,7 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
 def commit(repository: pygit2.Repository) -> None:
     """Create an initial empty commit."""
     signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message="Initial", signature=signature)
+    _commit(repository, message="", signature=signature)
 
 
 def test_existing_repository(
