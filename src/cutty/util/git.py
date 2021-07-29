@@ -98,10 +98,18 @@ def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -
 
 
 def createbranch(
-    repository: pygit2.Repository, branch: str, *, target: str, force: bool = False
+    repository: pygit2.Repository,
+    branch: str,
+    *,
+    target: str = "HEAD",
+    force: bool = False,
 ) -> None:
-    """Create a branch pointing to the given target, another branch."""
-    commit = repository.branches[target].peel()
+    """Create a branch pointing to the given target."""
+    commit = (
+        repository.branches[target].peel()
+        if target != "HEAD"
+        else repository.head.peel()
+    )
     repository.branches.create(branch, commit, force=force)
 
 
