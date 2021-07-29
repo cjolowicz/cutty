@@ -183,20 +183,22 @@ def test_dictvariable(
 ) -> None:
     """It loads dict variables from the project configuration."""
     # Add a dict variable with image types to the template.
-    images = {
-        "png": {
-            "name": "Portable Network Graphic",
-            "library": "libpng",
-            "apps": ["GIMP"],
+    updatetemplatevariable(
+        template,
+        "images",
+        {
+            "png": {
+                "name": "Portable Network Graphic",
+                "library": "libpng",
+                "apps": ["GIMP"],
+            },
+            "bmp": {
+                "name": "Bitmap",
+                "library": "libbmp",
+                "apps": ["Paint", "GIMP"],
+            },
         },
-        "bmp": {
-            "name": "Bitmap",
-            "library": "libbmp",
-            "apps": ["Paint", "GIMP"],
-        },
-    }
-
-    updatetemplatevariable(template, "images", images)
+    )
 
     # Create a project using only PNG images.
     pngimages = {
