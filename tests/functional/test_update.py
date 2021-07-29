@@ -51,15 +51,14 @@ def templateproject(template: Path) -> Path:
     return template / "{{ cookiecutter.project }}"
 
 
+def appendfile(path: Path, text: str) -> None:
+    """Append text to a repository file."""
+    updatefile(path, path.read_text() + text)
+
+
 def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It applies changes from the template."""
-    updatefile(
-        templateproject / "README.md",
-        """
-        # {{ cookiecutter.project }}
-        An awesome project.
-        """,
-    )
+    appendfile(templateproject / "README.md", "An awesome project.\n")
 
     with chdir(project):
         runcutty("update")
@@ -69,13 +68,7 @@ def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> No
 
 def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It merges changes from the template."""
-    updatefile(
-        project / "README.md",
-        """
-        # awesome
-        An awesome project.
-        """,
-    )
+    appendfile(project / "README.md", "An awesome project.\n")
 
     updatefile(templateproject / "LICENSE")
 
@@ -88,21 +81,8 @@ def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None
 
 def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It exits with a non-zero status on merge conflicts."""
-    updatefile(
-        project / "README.md",
-        """
-        # awesome
-        An awesome project.
-        """,
-    )
-
-    updatefile(
-        templateproject / "README.md",
-        """
-        # {{ cookiecutter.project }}
-        An excellent project.
-        """,
-    )
+    appendfile(project / "README.md", "An awesome project.\n")
+    appendfile(templateproject / "README.md", "An excellent project.\n")
 
     with chdir(project):
         with pytest.raises(Exception):
@@ -179,13 +159,7 @@ def test_rename_projectdir(
     project2 = Path("awesome2")
     project.rename(project2)
 
-    updatefile(
-        templateproject / "README.md",
-        """
-        # {{ cookiecutter.project }}
-        An awesome project.
-        """,
-    )
+    appendfile(templateproject / "README.md", "An awesome project.\n")
 
     with chdir(project2):
         runcutty("update")
@@ -195,13 +169,7 @@ def test_rename_projectdir(
 
 def test_cwd(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
-    updatefile(
-        templateproject / "README.md",
-        """
-        # {{ cookiecutter.project }}
-        An awesome project.
-        """,
-    )
+    appendfile(templateproject / "README.md", "An awesome project.\n")
 
     runcutty("update", f"--cwd={project}")
 
