@@ -9,6 +9,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import createbranch as createbranch_
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
+from tests.util.git import commit
 from tests.util.git import removefile
 from tests.util.git import updatefile
 from tests.util.git import updatefiles
@@ -27,6 +28,23 @@ def test_createbranch_target_default(repository: pygit2.Repository) -> None:
 def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
     """Create a branch at HEAD."""
     return repository.branches.create(name, repository.head.peel())
+
+
+def test_createbranch_target_branch(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It creates the branch at the head of the given branch."""
+    main = repository.head
+    branch1 = createbranch(repository, "branch1")
+
+    repository.checkout(branch1)
+    commit(repositorypath)
+
+    repository.checkout(main)
+    createbranch_(repository, "branch2", target="branch1")
+    branch2 = repository.branches["branch2"]
+
+    assert branch1.peel() == branch2.peel()
 
 
 def createbranches(
