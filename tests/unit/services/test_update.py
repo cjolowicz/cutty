@@ -15,7 +15,6 @@ from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
 from tests.util.files import chdir
 from tests.util.git import commit
-from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -52,59 +51,6 @@ def repository(repositorypath: Path) -> pygit2.Repository:
 def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
     """Create a branch at HEAD."""
     return repository.branches.create(name, repository.head.peel())
-
-
-def test_cherrypick_adds_file(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
-    """It cherry-picks the commit onto the current branch."""
-    main = repository.head
-    branch = createbranch(repository, "branch")
-
-    repository.checkout(branch)
-    updatefile(path)
-
-    repository.checkout(main)
-    assert not path.is_file()
-
-    cherrypick(repositorypath, branch.name)
-    assert path.is_file()
-
-
-def test_cherrypick_conflict_edit(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
-    """It raises an exception when both sides modified the file."""
-    main = repository.head
-    branch = createbranch(repository, "branch")
-
-    repository.checkout(branch)
-    updatefile(path, "a")
-
-    repository.checkout(main)
-    updatefile(path, "b")
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name)
-
-
-def test_cherrypick_conflict_deletion(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
-    """It raises an exception when one side modified and the other deleted the file."""
-    updatefile(path, "a")
-
-    main = repository.head
-    branch = createbranch(repository, "branch")
-
-    repository.checkout(branch)
-    updatefile(path, "b")
-
-    repository.checkout(main)
-    removefile(path)
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name)
 
 
 def cuttybranches(

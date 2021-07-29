@@ -6,8 +6,10 @@ from pathlib import Path
 import pygit2
 import pytest
 
+from cutty.services.update import cherrypick
 from cutty.util.git import createworktree
 from tests.util.git import commit
+from tests.util.git import removefile
 from tests.util.git import updatefile
 
 
@@ -85,3 +87,56 @@ def test_createworktree_no_checkout(
 
     with createworktree(repositorypath, "branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
+
+
+def test_cherrypick_adds_file(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It cherry-picks the commit onto the current branch."""
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path)
+
+    repository.checkout(main)
+    assert not path.is_file()
+
+    cherrypick(repositorypath, branch.name)
+    assert path.is_file()
+
+
+def test_cherrypick_conflict_edit(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It raises an exception when both sides modified the file."""
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path, "a")
+
+    repository.checkout(main)
+    updatefile(path, "b")
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, branch.name)
+
+
+def test_cherrypick_conflict_deletion(
+    repository: pygit2.Repository, repositorypath: Path, path: Path
+) -> None:
+    """It raises an exception when one side modified and the other deleted the file."""
+    updatefile(path, "a")
+
+    main = repository.head
+    branch = createbranch(repository, "branch")
+
+    repository.checkout(branch)
+    updatefile(path, "b")
+
+    repository.checkout(main)
+    removefile(path)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, branch.name)
