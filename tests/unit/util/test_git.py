@@ -6,8 +6,6 @@ from pathlib import Path
 import pygit2
 import pytest
 
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.util.git import cherrypick
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
@@ -47,6 +45,29 @@ def path(paths: Iterator[Path]) -> Path:
 def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
     """Create a branch at HEAD."""
     return repository.branches.create(name, repository.head.peel())
+
+
+def createbranches(
+    repository: pygit2.Repository, *names: str
+) -> tuple[pygit2.Branch, ...]:
+    """Create a branch at HEAD."""
+    return tuple(createbranch(repository, name) for name in names)
+
+
+def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+    """Create an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    main = repository.head
+    update, _ = createbranches(repository, "update", "latest")
+
+    repository.checkout(update)
+    updatefile(path, theirs)
+
+    repository.checkout(main)
+    updatefile(path, ours)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name, message="")
 
 
 def test_createworktree_creates_worktree(
@@ -146,37 +167,12 @@ def test_cherrypick_conflict_deletion(
         cherrypick(repositorypath, branch.name, message="")
 
 
-def cuttybranches(
-    repository: pygit2.Repository,
-) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
-    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    latest = createbranch(repository, LATEST_BRANCH)
-    return main, update, latest
-
-
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
-    """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
-    main, update, _ = cuttybranches(repository)
-
-    repository.checkout(update)
-    updatefile(path, theirs)
-
-    repository.checkout(main)
-    updatefile(path, ours)
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name, message="")
-
-
 def test_resetmerge_restores_files_with_conflicts(
     repositorypath: Path, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
     createconflict(repositorypath, path, ours="a", theirs="b")
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert path.read_text() == "a"
 
@@ -185,7 +181,8 @@ def test_resetmerge_removes_added_files(
     repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -197,7 +194,7 @@ def test_resetmerge_removes_added_files(
     with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name, message="")
 
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -206,7 +203,8 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -220,7 +218,7 @@ def test_resetmerge_keeps_unrelated_additions(
     with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name, message="")
 
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert path2.exists()
 
@@ -229,7 +227,8 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -244,7 +243,7 @@ def test_resetmerge_keeps_unrelated_changes(
     with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name, message="")
 
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert path2.read_text() == "c"
 
@@ -253,7 +252,8 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -268,7 +268,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     with pytest.raises(Exception, match=path1.name):
         cherrypick(repositorypath, update.name, message="")
 
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -279,6 +279,6 @@ def test_resetmerge_resets_index(
     """It resets the index to HEAD, removing conflicts."""
     createconflict(repositorypath, path, ours="a", theirs="b")
 
-    resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repositorypath, parent="latest", cherry="update")
 
     assert repository.index.write_tree() == repository.head.peel().tree.id
