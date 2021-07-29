@@ -15,13 +15,6 @@ CREATE_MESSAGE = "Initial import"
 UPDATE_MESSAGE = "Update project template"
 
 
-def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
-    """Return the default signature."""
-    from cutty.util.git import default_signature
-
-    return default_signature(repository)
-
-
 def commit(
     repository: pygit2.Repository,
     *,
