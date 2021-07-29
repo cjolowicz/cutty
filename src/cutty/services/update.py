@@ -13,15 +13,9 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
+from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createworktree
-
-
-def cherrypick(repositorypath: Path, reference: str) -> None:
-    """Cherry-pick the commit onto the current branch."""
-    from cutty.util.git import cherrypick as _cherrypick
-
-    return _cherrypick(repositorypath, reference, message=UPDATE_MESSAGE)
 
 
 def createbranch(
@@ -71,7 +65,7 @@ def update(
             directory=directory,
         )
 
-    cherrypick(projectdir, UPDATE_BRANCH_REF)
+    cherrypick(projectdir, UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
 
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
 
