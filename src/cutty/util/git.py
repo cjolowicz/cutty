@@ -79,3 +79,22 @@ def createworktree(
     # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
     # https://github.com/libgit2/libgit2/issues/5280
     worktree.prune(True)
+
+
+def cherrypick(repositorypath: Path, reference: str, *, message: str) -> None:
+    """Cherry-pick the commit onto the current branch."""
+    repository = pygit2.Repository(repositorypath)
+    oid = repository.references[reference].resolve().target
+    repository.cherrypick(oid)
+
+    if repository.index.conflicts:
+        paths = {
+            side.path
+            for _, ours, theirs in repository.index.conflicts
+            for side in (ours, theirs)
+            if side is not None
+        }
+        raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
+
+    commit(repository, message=message)
+    repository.state_cleanup()
