@@ -6,7 +6,7 @@ from pathlib import Path
 import pygit2
 import pytest
 
-from cutty.services.update import cherrypick
+from cutty.util.git import cherrypick
 from cutty.util.git import createworktree
 from tests.util.git import commit
 from tests.util.git import removefile
@@ -102,7 +102,7 @@ def test_cherrypick_adds_file(
     repository.checkout(main)
     assert not path.is_file()
 
-    cherrypick(repositorypath, branch.name)
+    cherrypick(repositorypath, branch.name, message="")
     assert path.is_file()
 
 
@@ -120,7 +120,7 @@ def test_cherrypick_conflict_edit(
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name)
+        cherrypick(repositorypath, branch.name, message="")
 
 
 def test_cherrypick_conflict_deletion(
@@ -139,4 +139,4 @@ def test_cherrypick_conflict_deletion(
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name)
+        cherrypick(repositorypath, branch.name, message="")
