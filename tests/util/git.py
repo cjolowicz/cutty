@@ -88,7 +88,7 @@ def resolveconflicts(repository: pygit2.Repository, path: Path, side: Side) -> N
     repositorypath = Path(
         repository.workdir if repository.workdir is not None else repository.path
     )
-    pathstr = str(path.resolve().relative_to(repositorypath))
+    pathstr = str(path.resolve().relative_to(repositorypath.resolve()))
     ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
 
