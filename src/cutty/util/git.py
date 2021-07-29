@@ -1,6 +1,7 @@
 """Git utilities."""
 import contextlib
 import os
+from pathlib import Path
 from typing import Optional
 
 import pygit2
@@ -39,3 +40,10 @@ def commit(
 
     parents = [] if repository.head_is_unborn else [repository.head.target]
     repository.create_commit("HEAD", signature, signature, message, tree, parents)
+
+
+def checkoutemptytree(repositorypath: Path) -> None:
+    """Check out an empty tree from the repository."""
+    repository = pygit2.Repository(repositorypath)
+    oid = repository.TreeBuilder().write()
+    repository.checkout_tree(repository[oid])

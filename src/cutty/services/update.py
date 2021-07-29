@@ -17,14 +17,8 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
+from cutty.util.git import checkoutemptytree
 from cutty.util.git import commit
-
-
-def checkoutemptytree(repositorypath: Path) -> None:
-    """Check out an empty tree from the repository."""
-    repository = pygit2.Repository(repositorypath)
-    oid = repository.TreeBuilder().write()
-    repository.checkout_tree(repository[oid])
 
 
 @contextmanager
