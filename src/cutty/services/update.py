@@ -2,10 +2,10 @@
 import hashlib
 import tempfile
 from collections.abc import Iterator
+from collections.abc import Sequence
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
-from typing import Sequence
 
 import pygit2
 
