@@ -47,9 +47,8 @@ def commit(
     repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
 
-def checkoutemptytree(repositorypath: Path) -> None:
+def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
-    repository = pygit2.Repository(repositorypath)
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
 
@@ -72,7 +71,8 @@ def createworktree(
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
             # https://github.com/libgit2/libgit2/issues/5949
-            checkoutemptytree(path)
+            worktreerepository = pygit2.Repository(path)
+            checkoutemptytree(worktreerepository)
 
         yield path
 
