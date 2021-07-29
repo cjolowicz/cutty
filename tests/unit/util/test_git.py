@@ -41,7 +41,7 @@ def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) 
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
 
 def test_createworktree_creates_worktree(
@@ -50,7 +50,7 @@ def test_createworktree_creates_worktree(
     """It creates a worktree."""
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         assert (worktree / ".git").is_file()
 
 
@@ -60,7 +60,7 @@ def test_createworktree_removes_worktree_on_exit(
     """It removes the worktree on exit."""
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         pass
 
     assert not worktree.is_dir()
@@ -73,7 +73,7 @@ def test_createworktree_does_checkout(
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         assert (worktree / path.name).is_file()
 
 
@@ -84,7 +84,7 @@ def test_createworktree_no_checkout(
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch", checkout=False) as worktree:
+    with createworktree(repository, "branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
 
 
@@ -101,7 +101,7 @@ def test_cherrypick_adds_file(
     repository.checkout(main)
     assert not path.is_file()
 
-    cherrypick(repositorypath, branch.name, message="")
+    cherrypick(repository, branch.name, message="")
     assert path.is_file()
 
 
@@ -119,7 +119,7 @@ def test_cherrypick_conflict_edit(
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name, message="")
+        cherrypick(repository, branch.name, message="")
 
 
 def test_cherrypick_conflict_deletion(
@@ -138,15 +138,15 @@ def test_cherrypick_conflict_deletion(
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, branch.name, message="")
+        cherrypick(repository, branch.name, message="")
 
 
 def test_resetmerge_restores_files_with_conflicts(
-    repositorypath: Path, path: Path
+    repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
     createconflict(repositorypath, path, ours="a", theirs="b")
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert path.read_text() == "a"
 
@@ -166,9 +166,9 @@ def test_resetmerge_removes_added_files(
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -190,9 +190,9 @@ def test_resetmerge_keeps_unrelated_additions(
     path2.touch()
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert path2.exists()
 
@@ -215,9 +215,9 @@ def test_resetmerge_keeps_unrelated_changes(
     path2.write_text("c")
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert path2.read_text() == "c"
 
@@ -240,9 +240,9 @@ def test_resetmerge_keeps_unrelated_deletions(
     path2.unlink()
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -253,6 +253,6 @@ def test_resetmerge_resets_index(
     """It resets the index to HEAD, removing conflicts."""
     createconflict(repositorypath, path, ours="a", theirs="b")
 
-    resetmerge(repositorypath, parent="latest", cherry="update")
+    resetmerge(repository, parent="latest", cherry="update")
 
     assert repository.index.write_tree() == repository.head.peel().tree.id

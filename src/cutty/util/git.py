@@ -47,23 +47,20 @@ def commit(
     repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
 
-def checkoutemptytree(repositorypath: Path) -> None:
+def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
-    repository = pygit2.Repository(repositorypath)
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
 
 
 @contextmanager
 def createworktree(
-    repositorypath: Path,
+    repository: pygit2.Repository,
     branch: str,
     *,
     checkout: bool = True,
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
-    repository = pygit2.Repository(repositorypath)
-
     with tempfile.TemporaryDirectory() as directory:
         name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
         path = Path(directory) / name
@@ -72,7 +69,8 @@ def createworktree(
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
             # https://github.com/libgit2/libgit2/issues/5949
-            checkoutemptytree(path)
+            worktreerepository = pygit2.Repository(path)
+            checkoutemptytree(worktreerepository)
 
         yield path
 
@@ -81,9 +79,8 @@ def createworktree(
     worktree.prune(True)
 
 
-def cherrypick(repositorypath: Path, reference: str, *, message: str) -> None:
+def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -> None:
     """Cherry-pick the commit onto the current branch."""
-    repository = pygit2.Repository(repositorypath)
     oid = repository.references[reference].resolve().target
     repository.cherrypick(oid)
 
@@ -101,29 +98,26 @@ def cherrypick(repositorypath: Path, reference: str, *, message: str) -> None:
 
 
 def createbranch(
-    repositorypath: Path, branch: str, *, target: str, force: bool = False
+    repository: pygit2.Repository, branch: str, *, target: str, force: bool = False
 ) -> None:
     """Create a branch pointing to the given target, another branch."""
-    repository = pygit2.Repository(repositorypath)
     commit = repository.branches[target].peel()
     repository.branches.create(branch, commit, force=force)
 
 
-def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
+def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:
     """Update a branch to the given target, another branch."""
-    repository = pygit2.Repository(repositorypath)
     commit = repository.branches[target].peel()
     repository.branches[branch].set_target(commit.id)
 
 
-def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
+def resetmerge(repository: pygit2.Repository, parent: str, cherry: str) -> None:
     """Reset only files that were touched by a cherry-pick.
 
     This emulates `git reset --merge HEAD` by performing a hard reset on the
     files that were updated by the cherry-picked commit, and resetting the index
     to HEAD.
     """
-    repository = pygit2.Repository(repositorypath)
     repository.index.read_tree(repository.head.peel().tree)
     repository.index.write()
 

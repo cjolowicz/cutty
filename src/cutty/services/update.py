@@ -39,9 +39,10 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    createbranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
+    repository = pygit2.Repository(projectdir)
+    createbranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
-    with createworktree(projectdir, UPDATE_BRANCH, checkout=False) as worktree:
+    with createworktree(repository, UPDATE_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
@@ -52,8 +53,8 @@ def update(
             directory=directory,
         )
 
-    cherrypick(projectdir, UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
-    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+    cherrypick(repository, UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
+    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -61,8 +62,9 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    commit(pygit2.Repository(projectdir), message=UPDATE_MESSAGE)
-    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository = pygit2.Repository(projectdir)
+    commit(repository, message=UPDATE_MESSAGE)
+    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -70,8 +72,9 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository = pygit2.Repository(projectdir)
+    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def abortupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -79,5 +82,6 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    updatebranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH)
+    repository = pygit2.Repository(projectdir)
+    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    updatebranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH)
