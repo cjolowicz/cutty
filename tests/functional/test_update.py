@@ -204,16 +204,18 @@ def test_dictvariable(
         images = templatevariable(template, "images")
         return {key: value for key, value in images.items() if key == "png"}
 
-    userinput = "\n".join(
-        [
-            "",  # project
-            "",  # license
-            "",  # cli
-            json.dumps(pngimages(template)),
-        ]
+    runcutty(
+        "create",
+        str(template),
+        input="\n".join(
+            [
+                "",  # project
+                "",  # license
+                "",  # cli
+                json.dumps(pngimages(template)),
+            ]
+        ),
     )
-
-    runcutty("create", str(template), input=userinput)
 
     updatefile(templateproject / "LICENSE")
 
