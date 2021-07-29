@@ -1,10 +1,15 @@
 """Git utilities."""
 import contextlib
+import hashlib
 import os
+import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Optional
 
 import pygit2
+
+from cutty.compat.contextlib import contextmanager
 
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
@@ -47,3 +52,30 @@ def checkoutemptytree(repositorypath: Path) -> None:
     repository = pygit2.Repository(repositorypath)
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
+
+
+@contextmanager
+def createworktree(
+    repositorypath: Path,
+    branch: str,
+    *,
+    checkout: bool = True,
+) -> Iterator[Path]:
+    """Create a worktree for the branch in the repository."""
+    repository = pygit2.Repository(repositorypath)
+
+    with tempfile.TemporaryDirectory() as directory:
+        name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
+        path = Path(directory) / name
+        worktree = repository.add_worktree(name, path, repository.branches[branch])
+
+        if not checkout:
+            # Emulate `--no-checkout` by checking out an empty tree after the fact.
+            # https://github.com/libgit2/libgit2/issues/5949
+            checkoutemptytree(path)
+
+        yield path
+
+    # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
+    # https://github.com/libgit2/libgit2/issues/5280
+    worktree.prune(True)
