@@ -11,9 +11,9 @@ from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
 from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
-from cutty.services.update import createworktree
 from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
+from cutty.util.git import createworktree
 from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import removefile

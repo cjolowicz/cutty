@@ -1,6 +1,5 @@
 """Update a project with changes from its Cookiecutter template."""
 from collections.abc import Sequence
-from contextlib import AbstractContextManager
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
@@ -15,18 +14,7 @@ from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import commit
-
-
-def createworktree(
-    repositorypath: Path,
-    branch: str,
-    *,
-    checkout: bool = True,
-) -> AbstractContextManager[Path]:
-    """Create a worktree for the branch in the repository."""
-    from cutty.util.git import createworktree
-
-    return createworktree(repositorypath, branch, checkout=checkout)
+from cutty.util.git import createworktree
 
 
 def cherrypick(repositorypath: Path, reference: str) -> None:
