@@ -15,16 +15,8 @@ from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfi
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import cherrypick
 from cutty.util.git import commit
+from cutty.util.git import createbranch
 from cutty.util.git import createworktree
-
-
-def createbranch(
-    repositorypath: Path, branch: str, *, target: str, force: bool = False
-) -> None:
-    """Create a branch pointing to the given target, another branch."""
-    from cutty.util.git import createbranch
-
-    return createbranch(repositorypath, branch, target=target, force=force)
 
 
 def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
