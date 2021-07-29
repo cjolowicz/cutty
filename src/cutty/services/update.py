@@ -41,7 +41,8 @@ def update(
 
     createbranch(projectdir, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
-    with createworktree(projectdir, UPDATE_BRANCH, checkout=False) as worktree:
+    repository = pygit2.Repository(projectdir)
+    with createworktree(repository, UPDATE_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,

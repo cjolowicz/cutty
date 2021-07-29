@@ -55,14 +55,12 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
 
 @contextmanager
 def createworktree(
-    repositorypath: Path,
+    repository: pygit2.Repository,
     branch: str,
     *,
     checkout: bool = True,
 ) -> Iterator[Path]:
     """Create a worktree for the branch in the repository."""
-    repository = pygit2.Repository(repositorypath)
-
     with tempfile.TemporaryDirectory() as directory:
         name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
         path = Path(directory) / name

@@ -50,7 +50,7 @@ def test_createworktree_creates_worktree(
     """It creates a worktree."""
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         assert (worktree / ".git").is_file()
 
 
@@ -60,7 +60,7 @@ def test_createworktree_removes_worktree_on_exit(
     """It removes the worktree on exit."""
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         pass
 
     assert not worktree.is_dir()
@@ -73,7 +73,7 @@ def test_createworktree_does_checkout(
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch") as worktree:
+    with createworktree(repository, "branch") as worktree:
         assert (worktree / path.name).is_file()
 
 
@@ -84,7 +84,7 @@ def test_createworktree_no_checkout(
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repositorypath, "branch", checkout=False) as worktree:
+    with createworktree(repository, "branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
 
 
