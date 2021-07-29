@@ -34,9 +34,10 @@ def cuttybranches(
     return main, update, latest
 
 
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+def createconflict(
+    repository: pygit2.Repository, path: Path, *, ours: str, theirs: str
+) -> None:
     """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
     main, update, _ = cuttybranches(repository)
 
     repository.checkout(update)
@@ -53,7 +54,7 @@ def test_continueupdate_commits_changes(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It commits the changes."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository, path, Side.THEIRS)
 
     with chdir(repositorypath):
@@ -67,7 +68,7 @@ def test_continueupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository, path, Side.THEIRS)
 
     with chdir(repositorypath):
@@ -81,7 +82,7 @@ def test_skipupdate_fastforwards_latest(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
 
@@ -95,7 +96,7 @@ def test_abortupdate_rewinds_update_branch(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()

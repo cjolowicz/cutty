@@ -28,9 +28,10 @@ def createbranches(
     return tuple(createbranch(repository, name) for name in names)
 
 
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+def createconflict(
+    repository: pygit2.Repository, path: Path, *, ours: str, theirs: str
+) -> None:
     """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
     main = repository.head
     update, _ = createbranches(repository, "update", "latest")
 
@@ -145,7 +146,7 @@ def test_resetmerge_restores_files_with_conflicts(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     resetmerge(repository, parent="latest", cherry="update")
 
     assert path.read_text() == "a"
@@ -251,7 +252,7 @@ def test_resetmerge_resets_index(
     repository: pygit2.Repository, repositorypath: Path, path: Path
 ) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     resetmerge(repository, parent="latest", cherry="update")
 
