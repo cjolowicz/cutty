@@ -32,19 +32,9 @@ def commit(
 
     If there are no changes relative to the parent, this is a noop.
     """
-    repository.index.add_all()
+    from cutty.util.git import commit
 
-    tree = repository.index.write_tree()
-    if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
-        return
-
-    repository.index.write()
-
-    if signature is None:
-        signature = default_signature(repository)
-
-    parents = [] if repository.head_is_unborn else [repository.head.target]
-    repository.create_commit("HEAD", signature, signature, message, tree, parents)
+    commit(repository, message=message, signature=signature)
 
 
 class GitRepositoryObserver(FileStorageObserver):
