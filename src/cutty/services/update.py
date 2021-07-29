@@ -73,7 +73,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = pygit2.Repository(projectdir)
-    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
@@ -83,5 +83,5 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = pygit2.Repository(projectdir)
-    resetmerge(projectdir, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH)

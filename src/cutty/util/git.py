@@ -111,14 +111,13 @@ def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> 
     repository.branches[branch].set_target(commit.id)
 
 
-def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
+def resetmerge(repository: pygit2.Repository, parent: str, cherry: str) -> None:
     """Reset only files that were touched by a cherry-pick.
 
     This emulates `git reset --merge HEAD` by performing a hard reset on the
     files that were updated by the cherry-picked commit, and resetting the index
     to HEAD.
     """
-    repository = pygit2.Repository(repositorypath)
     repository.index.read_tree(repository.head.peel().tree)
     repository.index.write()
 
