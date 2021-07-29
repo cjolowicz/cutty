@@ -47,13 +47,19 @@ def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
     return repository.branches.create(name, repository.head.peel())
 
 
+def createbranches(
+    repository: pygit2.Repository, *names: str
+) -> tuple[pygit2.Branch, ...]:
+    """Create a branch at HEAD."""
+    return tuple(createbranch(repository, name) for name in names)
+
+
 def createbranchesandgetmain(
     repository: pygit2.Repository,
 ) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
     """Return the current branch and create two new ones."""
     main = repository.head
-    update = createbranch(repository, "update")
-    latest = createbranch(repository, "latest")
+    update, latest = createbranches(repository, "update", "latest")
     return main, update, latest
 
 
