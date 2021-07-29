@@ -107,3 +107,10 @@ def createbranch(
     repository = pygit2.Repository(repositorypath)
     commit = repository.branches[target].peel()
     repository.branches.create(branch, commit, force=force)
+
+
+def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
+    """Update a branch to the given target, another branch."""
+    repository = pygit2.Repository(repositorypath)
+    commit = repository.branches[target].peel()
+    repository.branches[branch].set_target(commit.id)

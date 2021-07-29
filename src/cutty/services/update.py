@@ -17,13 +17,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
-
-
-def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
-    """Update a branch to the given target, another branch."""
-    repository = pygit2.Repository(repositorypath)
-    commit = repository.branches[target].peel()
-    repository.branches[branch].set_target(commit.id)
+from cutty.util.git import updatebranch
 
 
 def update(
