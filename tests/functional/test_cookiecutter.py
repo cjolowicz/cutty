@@ -91,7 +91,7 @@ def test_output_dir(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
 def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
     """It uses the template in the given subdirectory."""
     directory = "a"
-    move_repository_files_to_subdirectory(template, directory)
+    move_repository_files_to_subdirectory(pygit2.Repository(template), directory)
 
     runcutty("cookiecutter", f"--directory={directory}", str(template))
 

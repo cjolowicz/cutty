@@ -1,6 +1,7 @@
 """Functional tests for the create CLI."""
 from pathlib import Path
 
+import pygit2
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -65,7 +66,7 @@ def test_inplace(runcutty: RunCutty, template: Path) -> None:
 def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
     """It uses the template in the given subdirectory."""
     directory = "a"
-    move_repository_files_to_subdirectory(template, directory)
+    move_repository_files_to_subdirectory(pygit2.Repository(template), directory)
 
     runcutty("create", f"--directory={directory}", str(template))
 

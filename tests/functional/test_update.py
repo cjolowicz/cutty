@@ -262,7 +262,7 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
     """It uses the template directory specified in the project configuration."""
     project = Path("example")
     directory = "a"
-    move_repository_files_to_subdirectory(template, directory)
+    move_repository_files_to_subdirectory(pygit2.Repository(template), directory)
 
     runcutty("create", f"--directory={directory}", str(template))
     updatefile(template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
@@ -274,7 +274,7 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
 def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It uses the template directory specified when updating."""
     directory = "a"
-    move_repository_files_to_subdirectory(template, directory)
+    move_repository_files_to_subdirectory(pygit2.Repository(template), directory)
 
     runcutty("update", f"--cwd={project}", f"--directory={directory}")
 
