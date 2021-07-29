@@ -6,6 +6,7 @@ import pygit2
 import pytest
 
 from cutty.util.git import cherrypick
+from cutty.util.git import createbranch as createbranch_
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
 from tests.util.git import removefile
@@ -14,6 +15,13 @@ from tests.util.git import updatefiles
 
 
 pytest_plugins = ["tests.fixtures.git"]
+
+
+def test_createbranch_target_default(repository: pygit2.Repository) -> None:
+    """It creates the branch at HEAD by default."""
+    createbranch_(repository, "branch")
+
+    assert repository.branches["branch"].peel() == repository.head.peel()
 
 
 def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
