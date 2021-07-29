@@ -22,9 +22,9 @@ def createbranch(
     repositorypath: Path, branch: str, *, target: str, force: bool = False
 ) -> None:
     """Create a branch pointing to the given target, another branch."""
-    repository = pygit2.Repository(repositorypath)
-    commit = repository.branches[target].peel()
-    repository.branches.create(branch, commit, force=force)
+    from cutty.util.git import createbranch
+
+    return createbranch(repositorypath, branch, target=target, force=force)
 
 
 def updatebranch(repositorypath: Path, branch: str, *, target: str) -> None:
