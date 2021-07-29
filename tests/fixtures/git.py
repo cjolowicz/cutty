@@ -13,8 +13,8 @@ from tests.util.git import commit
 def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
-    pygit2.init_repository(repositorypath)
-    commit(repositorypath)
+    repository = pygit2.init_repository(repositorypath)
+    commit(repository)
     return repositorypath
 
 
