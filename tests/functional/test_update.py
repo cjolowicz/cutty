@@ -182,7 +182,6 @@ def test_dictvariable(
     runcutty: RunCutty, template: Path, templateproject: Path
 ) -> None:
     """It loads dict variables from the project configuration."""
-    # Add a dict variable with image types to the template.
     updatetemplatevariable(
         template,
         "images",
@@ -200,7 +199,6 @@ def test_dictvariable(
         },
     )
 
-    # Create a project using only PNG images.
     def pngimages(template: Path) -> Any:
         """Filter the `images` dict variable to contain only PNG."""
         images = templatevariable(template, "images")
@@ -217,15 +215,12 @@ def test_dictvariable(
 
     runcutty("create", str(template), input=userinput)
 
-    # Add LICENSE so update has something to do.
     updatefile(templateproject / "LICENSE")
 
-    # Update the project.
     project = Path("example")
 
     runcutty("update", f"--cwd={project}")
 
-    # Check that the project still uses only PNG images.
     assert pngimages(template) == projectvariable(project, "images")
 
 
