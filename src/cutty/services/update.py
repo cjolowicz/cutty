@@ -72,21 +72,9 @@ def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
     files that were updated by the cherry-picked commit, and resetting the index
     to HEAD.
     """
-    repository = pygit2.Repository(repositorypath)
-    repository.index.read_tree(repository.head.peel().tree)
-    repository.index.write()
+    from cutty.util.git import resetmerge
 
-    parenttree = repository.branches[parent].peel(pygit2.Tree)
-    cherrytree = repository.branches[cherry].peel(pygit2.Tree)
-    diff = cherrytree.diff_to_tree(parenttree)
-    paths = [
-        file.path for delta in diff.deltas for file in (delta.old_file, delta.new_file)
-    ]
-
-    repository.checkout(
-        strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
-        paths=paths,
-    )
+    resetmerge(repositorypath, parent, cherry)
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
