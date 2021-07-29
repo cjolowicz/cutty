@@ -47,6 +47,31 @@ def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
     return repository.branches.create(name, repository.head.peel())
 
 
+def cuttybranches(
+    repository: pygit2.Repository,
+) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
+    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
+    main = repository.head
+    update = createbranch(repository, "theirs")
+    latest = createbranch(repository, "ancestor")
+    return main, update, latest
+
+
+def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+    """Create an update conflict."""
+    repository = pygit2.Repository(repositorypath)
+    main, update, _ = cuttybranches(repository)
+
+    repository.checkout(update)
+    updatefile(path, theirs)
+
+    repository.checkout(main)
+    updatefile(path, ours)
+
+    with pytest.raises(Exception, match=path.name):
+        cherrypick(repositorypath, update.name, message="")
+
+
 def test_createworktree_creates_worktree(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
@@ -142,31 +167,6 @@ def test_cherrypick_conflict_deletion(
 
     with pytest.raises(Exception, match=path.name):
         cherrypick(repositorypath, branch.name, message="")
-
-
-def cuttybranches(
-    repository: pygit2.Repository,
-) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
-    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
-    main = repository.head
-    update = createbranch(repository, "theirs")
-    latest = createbranch(repository, "ancestor")
-    return main, update, latest
-
-
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
-    """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
-    main, update, _ = cuttybranches(repository)
-
-    repository.checkout(update)
-    updatefile(path, theirs)
-
-    repository.checkout(main)
-    updatefile(path, ours)
-
-    with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name, message="")
 
 
 def test_resetmerge_restores_files_with_conflicts(
