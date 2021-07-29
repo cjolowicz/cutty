@@ -201,17 +201,17 @@ def test_dictvariable(
     )
 
     # Create a project using only PNG images.
-    pngimages = {
-        key: value
-        for key, value in templatevariable(template, "images").items()
-        if key == "png"
-    }
+    def pngimages(template: Path) -> Any:
+        """Filter the `images` dict variable to contain only PNG."""
+        images = templatevariable(template, "images")
+        return {key: value for key, value in images.items() if key == "png"}
+
     userinput = "\n".join(
         [
             "",  # project
             "",  # license
             "",  # cli
-            json.dumps(pngimages),
+            json.dumps(pngimages(template)),
         ]
     )
 
@@ -226,7 +226,7 @@ def test_dictvariable(
     runcutty("update", f"--cwd={project}")
 
     # Check that the project still uses only PNG images.
-    assert pngimages == projectvariable(project, "images")
+    assert pngimages(template) == projectvariable(project, "images")
 
 
 def test_private_variables(
