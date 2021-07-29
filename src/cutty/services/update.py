@@ -1,15 +1,12 @@
 """Update a project with changes from its Cookiecutter template."""
-import hashlib
-import tempfile
-from collections.abc import Iterator
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
 import pygit2
 
-from cutty.compat.contextlib import contextmanager
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
@@ -17,35 +14,19 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import checkoutemptytree
 from cutty.util.git import commit
 
 
-@contextmanager
 def createworktree(
     repositorypath: Path,
     branch: str,
     *,
     checkout: bool = True,
-) -> Iterator[Path]:
+) -> AbstractContextManager[Path]:
     """Create a worktree for the branch in the repository."""
-    repository = pygit2.Repository(repositorypath)
+    from cutty.util.git import createworktree
 
-    with tempfile.TemporaryDirectory() as directory:
-        name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
-        path = Path(directory) / name
-        worktree = repository.add_worktree(name, path, repository.branches[branch])
-
-        if not checkout:
-            # Emulate `--no-checkout` by checking out an empty tree after the fact.
-            # https://github.com/libgit2/libgit2/issues/5949
-            checkoutemptytree(path)
-
-        yield path
-
-    # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
-    # https://github.com/libgit2/libgit2/issues/5280
-    worktree.prune(True)
+    return createworktree(repositorypath, branch, checkout=checkout)
 
 
 def cherrypick(repositorypath: Path, reference: str) -> None:
