@@ -14,7 +14,7 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.util.git import commit as _commit
+from tests.util.git import commit
 
 
 @pytest.fixture
@@ -106,18 +106,12 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
     assert "marker" in tree(repository)
 
 
-def commit(repository: pygit2.Repository) -> None:
-    """Create an initial empty commit."""
-    signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message="", signature=signature)
-
-
 def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates the commit in an existing repository."""
     repository = pygit2.init_repository(project)
-    commit(repository)
+    commit(project)
 
     with storage:
         storage.add(file)
@@ -151,7 +145,7 @@ def test_existing_branch(
 ) -> None:
     """It updates the `update` branch if it exists."""
     repository = pygit2.init_repository(project)
-    commit(repository)
+    commit(project)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
 
@@ -166,7 +160,7 @@ def test_existing_branch_not_head(
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
     repository = pygit2.init_repository(project)
-    commit(repository)
+    commit(project)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
@@ -181,7 +175,7 @@ def test_existing_branch_commit_message(
 ) -> None:
     """It uses a different commit message on updates."""
     repository = pygit2.init_repository(project)
-    commit(repository)
+    commit(project)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
@@ -198,7 +192,7 @@ def test_existing_branch_no_changes(
 ) -> None:
     """It does not create an empty commit."""
     repository = pygit2.init_repository(project)
-    commit(repository)
+    commit(project)
 
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
