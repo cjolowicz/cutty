@@ -32,6 +32,13 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     return project
 
 
+def templatevariable(template: Path, name: str) -> Any:
+    """Return the value of a template variable."""
+    path = template / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    return data[name]
+
+
 def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
     """Add or update a template variable."""
     path = template / "cookiecutter.json"
@@ -192,7 +199,11 @@ def test_dictvariable(
     updatetemplatevariable(template, "images", images)
 
     # Create a project using only PNG images.
-    pngimages = {key: value for key, value in images.items() if key == "png"}
+    pngimages = {
+        key: value
+        for key, value in templatevariable(template, "images").items()
+        if key == "png"
+    }
     userinput = "\n".join(
         [
             "",  # project
