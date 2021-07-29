@@ -17,6 +17,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
+from cutty.util.git import resetmerge
 from cutty.util.git import updatebranch
 
 
@@ -63,18 +64,6 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
 
     commit(pygit2.Repository(projectdir), message=UPDATE_MESSAGE)
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
-
-
-def resetmerge(repositorypath: Path, parent: str, cherry: str) -> None:
-    """Reset only files that were touched by a cherry-pick.
-
-    This emulates `git reset --merge HEAD` by performing a hard reset on the
-    files that were updated by the cherry-picked commit, and resetting the index
-    to HEAD.
-    """
-    from cutty.util.git import resetmerge
-
-    resetmerge(repositorypath, parent, cherry)
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:

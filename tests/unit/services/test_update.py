@@ -10,9 +10,9 @@ from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
-from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
 from cutty.util.git import cherrypick
+from cutty.util.git import resetmerge
 from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import resolveconflicts
