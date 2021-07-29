@@ -44,9 +44,7 @@ def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) 
         cherrypick(repository, update.name, message="")
 
 
-def test_createworktree_creates_worktree(
-    repository: pygit2.Repository, repositorypath: Path
-) -> None:
+def test_createworktree_creates_worktree(repository: pygit2.Repository) -> None:
     """It creates a worktree."""
     createbranch(repository, "branch")
 
@@ -54,9 +52,7 @@ def test_createworktree_creates_worktree(
         assert (worktree / ".git").is_file()
 
 
-def test_createworktree_removes_worktree_on_exit(
-    repository: pygit2.Repository, repositorypath: Path
-) -> None:
+def test_createworktree_removes_worktree_on_exit(repository: pygit2.Repository) -> None:
     """It removes the worktree on exit."""
     createbranch(repository, "branch")
 
@@ -67,7 +63,7 @@ def test_createworktree_removes_worktree_on_exit(
 
 
 def test_createworktree_does_checkout(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository: pygit2.Repository, path: Path
 ) -> None:
     """It checks out a working tree."""
     updatefile(path)
@@ -77,9 +73,7 @@ def test_createworktree_does_checkout(
         assert (worktree / path.name).is_file()
 
 
-def test_createworktree_no_checkout(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
+def test_createworktree_no_checkout(repository: pygit2.Repository, path: Path) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(path)
     createbranch(repository, "branch")
@@ -88,9 +82,7 @@ def test_createworktree_no_checkout(
         assert not (worktree / path.name).is_file()
 
 
-def test_cherrypick_adds_file(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
+def test_cherrypick_adds_file(repository: pygit2.Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
     main = repository.head
     branch = createbranch(repository, "branch")
@@ -105,9 +97,7 @@ def test_cherrypick_adds_file(
     assert path.is_file()
 
 
-def test_cherrypick_conflict_edit(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
+def test_cherrypick_conflict_edit(repository: pygit2.Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
     branch = createbranch(repository, "branch")
@@ -123,7 +113,7 @@ def test_cherrypick_conflict_edit(
 
 
 def test_cherrypick_conflict_deletion(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository: pygit2.Repository, path: Path
 ) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
@@ -152,7 +142,7 @@ def test_resetmerge_restores_files_with_conflicts(
 
 
 def test_resetmerge_removes_added_files(
-    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+    repository: pygit2.Repository, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
     main = repository.head
@@ -174,7 +164,7 @@ def test_resetmerge_removes_added_files(
 
 
 def test_resetmerge_keeps_unrelated_additions(
-    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+    repository: pygit2.Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main = repository.head
@@ -198,7 +188,7 @@ def test_resetmerge_keeps_unrelated_additions(
 
 
 def test_resetmerge_keeps_unrelated_changes(
-    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+    repository: pygit2.Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main = repository.head
@@ -223,7 +213,7 @@ def test_resetmerge_keeps_unrelated_changes(
 
 
 def test_resetmerge_keeps_unrelated_deletions(
-    repository: pygit2.Repository, repositorypath: Path, paths: Iterator[Path]
+    repository: pygit2.Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main = repository.head
