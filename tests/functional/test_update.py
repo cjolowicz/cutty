@@ -32,8 +32,8 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     return project
 
 
-def updateprojectvariable(template: Path, name: str, value: Any) -> None:
-    """Add or update a project variable in the template."""
+def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
+    """Add or update a template variable."""
     path = template / "cookiecutter.json"
     data = json.loads(path.read_text())
     data[name] = value
@@ -107,7 +107,7 @@ def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
 
 def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It prompts for variables added after the last project generation."""
-    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", input="3\n")
@@ -129,7 +129,7 @@ def test_extra_context_new_variable(
     runcutty: RunCutty, template: Path, project: Path
 ) -> None:
     """It allows setting variables on the command-line."""
-    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "status=stable")
@@ -139,7 +139,7 @@ def test_extra_context_new_variable(
 
 def test_no_input(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
-    updateprojectvariable(template, "status", ["alpha", "beta", "stable"])
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
         runcutty("update", "--no-input", input="3\n")
@@ -189,7 +189,7 @@ def test_dictvariable(
         },
     }
 
-    updateprojectvariable(template, "images", images)
+    updatetemplatevariable(template, "images", images)
 
     # Create a project using only PNG images.
     pngimages = {key: value for key, value in images.items() if key == "png"}
@@ -241,7 +241,7 @@ def test_private_variables(
     # Add another Jinja extension to `_extensions`.
     extensions: list[str] = privatevariable(project, "_extensions")
     extensions.append("jinja2.ext.i18n")
-    updateprojectvariable(template, "_extensions", extensions)
+    updatetemplatevariable(template, "_extensions", extensions)
 
     runcutty("update", f"--cwd={project}")
 
