@@ -79,9 +79,8 @@ def createworktree(
     worktree.prune(True)
 
 
-def cherrypick(repositorypath: Path, reference: str, *, message: str) -> None:
+def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -> None:
     """Cherry-pick the commit onto the current branch."""
-    repository = pygit2.Repository(repositorypath)
     oid = repository.references[reference].resolve().target
     repository.cherrypick(oid)
 

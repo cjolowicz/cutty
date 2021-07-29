@@ -46,7 +46,7 @@ def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) 
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name, message="")
+        cherrypick(repository, update.name, message="")
 
 
 def test_continueupdate_commits_changes(
