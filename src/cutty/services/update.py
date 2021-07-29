@@ -19,21 +19,9 @@ from cutty.util.git import createworktree
 
 def cherrypick(repositorypath: Path, reference: str) -> None:
     """Cherry-pick the commit onto the current branch."""
-    repository = pygit2.Repository(repositorypath)
-    oid = repository.references[reference].resolve().target
-    repository.cherrypick(oid)
+    from cutty.util.git import cherrypick as _cherrypick
 
-    if repository.index.conflicts:
-        paths = {
-            side.path
-            for _, ours, theirs in repository.index.conflicts
-            for side in (ours, theirs)
-            if side is not None
-        }
-        raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
-
-    commit(repository, message=UPDATE_MESSAGE)
-    repository.state_cleanup()
+    return _cherrypick(repositorypath, reference, message=UPDATE_MESSAGE)
 
 
 def createbranch(
