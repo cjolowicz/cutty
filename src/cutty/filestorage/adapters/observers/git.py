@@ -1,12 +1,10 @@
 """Storing files in a Git repository."""
-import contextlib
-import os
 import pathlib
-from typing import Optional
 
 import pygit2
 
 from cutty.filestorage.domain.observers import FileStorageObserver
+from cutty.util.git import commit
 
 
 LATEST_BRANCH = "cutty/latest"
@@ -15,41 +13,6 @@ UPDATE_BRANCH = "cutty/update"
 UPDATE_BRANCH_REF = f"refs/heads/{UPDATE_BRANCH}"
 CREATE_MESSAGE = "Initial import"
 UPDATE_MESSAGE = "Update project template"
-
-
-def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
-    """Return the default signature."""
-    with contextlib.suppress(KeyError):
-        return pygit2.Signature(
-            os.environ["GIT_AUTHOR_NAME"],
-            os.environ["GIT_AUTHOR_EMAIL"],
-        )
-    return repository.default_signature  # pragma: no cover
-
-
-def commit(
-    repository: pygit2.Repository,
-    *,
-    message: str,
-    signature: Optional[pygit2.Signature] = None,
-) -> None:
-    """Commit all changes in the repository.
-
-    If there are no changes relative to the parent, this is a noop.
-    """
-    repository.index.add_all()
-
-    tree = repository.index.write_tree()
-    if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
-        return
-
-    repository.index.write()
-
-    if signature is None:
-        signature = default_signature(repository)
-
-    parents = [] if repository.head_is_unborn else [repository.head.target]
-    repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
 
 class GitRepositoryObserver(FileStorageObserver):
