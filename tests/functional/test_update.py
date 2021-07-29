@@ -9,6 +9,7 @@ import pytest
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
+from tests.util.git import appendfile
 from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import removefile
 from tests.util.git import resolveconflicts
@@ -49,11 +50,6 @@ def projectvariable(project: Path, name: str) -> Any:
 def templateproject(template: Path) -> Path:
     """Return the project directory in the template."""
     return template / "{{ cookiecutter.project }}"
-
-
-def appendfile(path: Path, text: str) -> None:
-    """Append text to a repository file."""
-    updatefile(path, path.read_text() + text)
 
 
 def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
