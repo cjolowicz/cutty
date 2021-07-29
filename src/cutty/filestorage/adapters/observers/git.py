@@ -1,10 +1,10 @@
 """Storing files in a Git repository."""
 import pathlib
-from typing import Optional
 
 import pygit2
 
 from cutty.filestorage.domain.observers import FileStorageObserver
+from cutty.util.git import commit
 
 
 LATEST_BRANCH = "cutty/latest"
@@ -13,21 +13,6 @@ UPDATE_BRANCH = "cutty/update"
 UPDATE_BRANCH_REF = f"refs/heads/{UPDATE_BRANCH}"
 CREATE_MESSAGE = "Initial import"
 UPDATE_MESSAGE = "Update project template"
-
-
-def commit(
-    repository: pygit2.Repository,
-    *,
-    message: str,
-    signature: Optional[pygit2.Signature] = None,
-) -> None:
-    """Commit all changes in the repository.
-
-    If there are no changes relative to the parent, this is a noop.
-    """
-    from cutty.util.git import commit
-
-    commit(repository, message=message, signature=signature)
 
 
 class GitRepositoryObserver(FileStorageObserver):

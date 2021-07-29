@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.filestorage.adapters.observers.git import commit as _commit
+from cutty.util.git import commit as _commit
 
 
 def commit(repositorypath: Path, *, message: str = "") -> None:

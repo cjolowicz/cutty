@@ -10,7 +10,6 @@ from typing import Sequence
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
-from cutty.filestorage.adapters.observers.git import commit
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
@@ -18,6 +17,7 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
+from cutty.util.git import commit
 
 
 def checkoutemptytree(repositorypath: Path) -> None:
