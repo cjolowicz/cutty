@@ -53,7 +53,6 @@ def update(
         )
 
     cherrypick(projectdir, UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
-
     updatebranch(projectdir, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
