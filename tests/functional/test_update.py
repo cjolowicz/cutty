@@ -69,7 +69,6 @@ def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> No
 def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It merges changes from the template."""
     appendfile(project / "README.md", "An awesome project.\n")
-
     updatefile(templateproject / "LICENSE")
 
     with chdir(project):
@@ -336,7 +335,6 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
 
     runcutty("update", f"--cwd={project}", "--skip")
 
-    # Update the template with an unproblematic change.
     updatefile(templateproject / "INSTALL")
 
     runcutty("update", f"--cwd={project}")
