@@ -83,10 +83,12 @@ class Side(enum.Enum):
     THEIRS = 2
 
 
-def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
+def resolveconflicts(repository: pygit2.Repository, path: Path, side: Side) -> None:
     """Resolve the conflicts."""
-    repository = pygit2.Repository(repositorypath)
-    pathstr = str(path.relative_to(repositorypath))
+    repositorypath = Path(
+        repository.workdir if repository.workdir is not None else repository.path
+    )
+    pathstr = str(path.resolve().relative_to(repositorypath))
     ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
 

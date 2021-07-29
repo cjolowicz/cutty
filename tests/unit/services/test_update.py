@@ -54,7 +54,7 @@ def test_continueupdate_commits_changes(
 ) -> None:
     """It commits the changes."""
     createconflict(repositorypath, path, ours="a", theirs="b")
-    resolveconflicts(repositorypath, path, Side.THEIRS)
+    resolveconflicts(repository, path, Side.THEIRS)
 
     with chdir(repositorypath):
         continueupdate()
@@ -68,7 +68,7 @@ def test_continueupdate_fastforwards_latest(
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
     createconflict(repositorypath, path, ours="a", theirs="b")
-    resolveconflicts(repositorypath, path, Side.THEIRS)
+    resolveconflicts(repository, path, Side.THEIRS)
 
     with chdir(repositorypath):
         continueupdate()

@@ -324,7 +324,7 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
 
-    resolveconflicts(project, project / "LICENSE", Side.THEIRS)
+    resolveconflicts(pygit2.Repository(project), project / "LICENSE", Side.THEIRS)
 
     runcutty("update", f"--cwd={project}", "--continue")
 
