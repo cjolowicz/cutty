@@ -61,6 +61,11 @@ def updatefiles(paths: dict[Path, str]) -> None:
     commit(repository, message=f"{verb} {pathlist}")
 
 
+def appendfile(path: Path, text: str) -> None:
+    """Append text to a repository file."""
+    updatefile(path, path.read_text() + text)
+
+
 def removefile(path: Path) -> None:
     """Remove a repository file."""
     repository = discoverrepository(path)
