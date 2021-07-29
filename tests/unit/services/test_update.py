@@ -9,10 +9,10 @@ import pytest
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
-from cutty.services.update import cherrypick
 from cutty.services.update import continueupdate
 from cutty.services.update import resetmerge
 from cutty.services.update import skipupdate
+from cutty.util.git import cherrypick
 from tests.util.files import chdir
 from tests.util.git import commit
 from tests.util.git import resolveconflicts
@@ -75,7 +75,7 @@ def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) 
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repositorypath, update.name)
+        cherrypick(repositorypath, update.name, message="")
 
 
 def test_continueupdate_commits_changes(
@@ -130,7 +130,7 @@ def test_resetmerge_removes_added_files(
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name)
+        cherrypick(repositorypath, update.name, message="")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
@@ -153,7 +153,7 @@ def test_resetmerge_keeps_unrelated_additions(
     path2.touch()
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name)
+        cherrypick(repositorypath, update.name, message="")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
@@ -177,7 +177,7 @@ def test_resetmerge_keeps_unrelated_changes(
     path2.write_text("c")
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name)
+        cherrypick(repositorypath, update.name, message="")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
@@ -201,7 +201,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     path2.unlink()
 
     with pytest.raises(Exception, match=path1.name):
-        cherrypick(repositorypath, update.name)
+        cherrypick(repositorypath, update.name, message="")
 
     resetmerge(repositorypath, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
 
