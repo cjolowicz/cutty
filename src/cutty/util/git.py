@@ -104,7 +104,20 @@ class Repository:
 
     def cherrypick(self, reference: str, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
-        cherrypick(self.repository, reference, message=message)
+        oid = self.repository.references[reference].resolve().target
+        self.repository.cherrypick(oid)
+
+        if self.repository.index.conflicts:
+            paths = {
+                side.path
+                for _, ours, theirs in self.repository.index.conflicts
+                for side in (ours, theirs)
+                if side is not None
+            }
+            raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
+
+        self.commit(message=message)
+        self.repository.state_cleanup()
 
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
@@ -142,24 +155,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
-
-
-def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -> None:
-    """Cherry-pick the commit onto the current branch."""
-    oid = repository.references[reference].resolve().target
-    repository.cherrypick(oid)
-
-    if repository.index.conflicts:
-        paths = {
-            side.path
-            for _, ours, theirs in repository.index.conflicts
-            for side in (ours, theirs)
-            if side is not None
-        }
-        raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
-
-    Repository(repository).commit(message=message)
-    repository.state_cleanup()
 
 
 def createbranch(
