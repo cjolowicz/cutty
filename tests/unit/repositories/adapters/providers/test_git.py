@@ -25,34 +25,34 @@ def url(tmp_path: pathlib.Path) -> URL:
     path.mkdir()
     (path / "marker").write_text("Lorem")
 
-    repository = Repository.init(path).repository
-    repository.index.add("marker")
-    repository.create_commit(
+    repository = Repository.init(path)
+    repository.repository.index.add("marker")
+    repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.index.write_tree(),
+        repository.repository.index.write_tree(),
         [],
     )
 
-    repository.create_tag(
+    repository.repository.create_tag(
         "v1.0",
-        repository.head.target,
+        repository.repository.head.target,
         pygit2.GIT_OBJ_COMMIT,
         signature,
         "Release v1.0",
     )
 
     (path / "marker").write_text("Ipsum")
-    repository.index.add("marker")
-    repository.create_commit(
+    repository.repository.index.add("marker")
+    repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Update marker",
-        repository.index.write_tree(),
-        [repository.head.target],
+        repository.repository.index.write_tree(),
+        [repository.repository.head.target],
     )
 
     return asurl(path)
