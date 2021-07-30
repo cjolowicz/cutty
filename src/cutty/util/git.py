@@ -24,13 +24,8 @@ class Repository:
     @classmethod
     def open(cls, path: Path) -> Repository:
         """Open an existing repository."""
-        repository = openrepository(path)
+        repository = pygit2.Repository(path)
         return cls(repository)
-
-
-def openrepository(path: Path) -> pygit2.Repository:
-    """Return an existing repository."""
-    return pygit2.Repository(path)
 
 
 def initrepository(path: Path, *, head: Optional[str] = None) -> pygit2.Repository:
