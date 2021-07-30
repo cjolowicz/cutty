@@ -11,7 +11,6 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import cherrypick
 from cutty.util.git import createbranch
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
@@ -52,7 +51,7 @@ def update(
             directory=directory,
         )
 
-    cherrypick(repository, UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
+    Repository(repository).cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 

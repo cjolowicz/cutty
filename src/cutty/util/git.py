@@ -102,6 +102,10 @@ class Repository:
         # https://github.com/libgit2/libgit2/issues/5280
         worktree.prune(True)
 
+    def cherrypick(self, reference: str, *, message: str) -> None:
+        """Cherry-pick the commit onto the current branch."""
+        cherrypick(self.repository, reference, message=message)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.

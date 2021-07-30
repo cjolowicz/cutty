@@ -9,7 +9,7 @@ from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
-from cutty.util.git import cherrypick
+from cutty.util.git import Repository
 from tests.util.files import chdir
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -34,7 +34,7 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        cherrypick(repository, update.name, message="")
+        Repository(repository).cherrypick(update.name, message="")
 
 
 def test_continueupdate_commits_changes(
