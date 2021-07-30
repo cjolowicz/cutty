@@ -83,8 +83,24 @@ class Repository:
     @contextmanager
     def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
-        with createworktree(self.repository, branch, checkout=checkout) as path:
+        with tempfile.TemporaryDirectory() as directory:
+            name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
+            path = Path(directory) / name
+            worktree = self.repository.add_worktree(
+                name, path, self.repository.branches[branch]
+            )
+
+            if not checkout:
+                # Emulate `--no-checkout` by checking out an empty tree after the fact.
+                # https://github.com/libgit2/libgit2/issues/5949
+                worktreerepository = Repository.open(path).repository
+                checkoutemptytree(worktreerepository)
+
             yield path
+
+        # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
+        # https://github.com/libgit2/libgit2/issues/5280
+        worktree.prune(True)
 
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
@@ -122,32 +138,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
-
-
-@contextmanager
-def createworktree(
-    repository: pygit2.Repository,
-    branch: str,
-    *,
-    checkout: bool = True,
-) -> Iterator[Path]:
-    """Create a worktree for the branch in the repository."""
-    with tempfile.TemporaryDirectory() as directory:
-        name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
-        path = Path(directory) / name
-        worktree = repository.add_worktree(name, path, repository.branches[branch])
-
-        if not checkout:
-            # Emulate `--no-checkout` by checking out an empty tree after the fact.
-            # https://github.com/libgit2/libgit2/issues/5949
-            worktreerepository = Repository.open(path).repository
-            checkoutemptytree(worktreerepository)
-
-        yield path
-
-    # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
-    # https://github.com/libgit2/libgit2/issues/5280
-    worktree.prune(True)
 
 
 def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -> None:
