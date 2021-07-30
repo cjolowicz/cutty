@@ -15,7 +15,7 @@ from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 from cutty.util.git import initrepository
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 
 
 signature = pygit2.Signature("you", "you@example.com")
@@ -64,7 +64,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
-    repository = openrepository(aspath(url))
+    repository = Repository.open(aspath(url)).repository
     tree = repository.head.peel(pygit2.Tree)
     repository.index.read_tree(tree)
     repository.index.remove("marker")
@@ -125,7 +125,7 @@ def test_broken_head_after_clone(
     """It works around a bug in libgit2 resulting in a broken HEAD reference."""
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
     assert destination is not None
-    repository = openrepository(destination)
+    repository = Repository.open(destination).repository
     head = repository.references["HEAD"]
     assert head.target != f"refs/heads/{custom_default_branch}"
 

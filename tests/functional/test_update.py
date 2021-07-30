@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import appendfile
@@ -104,12 +104,12 @@ def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
 
 def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
-    oldhead = openrepository(project).head.target
+    oldhead = Repository.open(project).repository.head.target
 
     with chdir(project):
         runcutty("update")
 
-    assert oldhead == openrepository(project).head.target
+    assert oldhead == Repository.open(project).repository.head.target
 
 
 def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
@@ -288,7 +288,7 @@ def test_checkout(
     """It uses the specified revision of the template."""
     updatefile(templateproject / "LICENSE", "a")
 
-    revision = openrepository(template).head.target
+    revision = Repository.open(template).repository.head.target
 
     updatefile(templateproject / "LICENSE", "b")
 

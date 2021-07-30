@@ -1,4 +1,6 @@
 """Git utilities."""
+from __future__ import annotations
+
 import contextlib
 import hashlib
 import os
@@ -18,6 +20,12 @@ class Repository:
     """Git repository."""
 
     repository: pygit2.Repository
+
+    @classmethod
+    def open(cls, path: Path) -> Repository:
+        """Open an existing repository."""
+        repository = openrepository(path)
+        return cls(repository)
 
 
 def openrepository(path: Path) -> pygit2.Repository:
@@ -125,7 +133,7 @@ def createworktree(
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
             # https://github.com/libgit2/libgit2/issues/5949
-            worktreerepository = openrepository(path)
+            worktreerepository = Repository.open(path).repository
             checkoutemptytree(worktreerepository)
 
         yield path

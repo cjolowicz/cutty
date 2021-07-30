@@ -16,7 +16,7 @@ from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.util.git import commit
 from cutty.util.git import initrepository
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def test_repository(
     with storage:
         storage.add(file)
 
-    openrepository(project)  # does not raise
+    Repository.open(project).repository  # does not raise
 
 
 def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -55,7 +55,7 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     repository.head  # does not raise
 
 
@@ -64,7 +64,7 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
     with storage:
         storage.add(file)
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     assert file.path.name in repository.index
 
 
@@ -81,7 +81,7 @@ def test_hook_edits(
         storage.add(file)
         (project / file.path.name).write_bytes(b"teapot")
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     blob = tree(repository) / file.path.name
     assert b"teapot" == blob.data
 
@@ -94,7 +94,7 @@ def test_hook_deletes(
         storage.add(file)
         (project / file.path.name).unlink()
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     assert file.path.name not in tree(repository)
 
 
@@ -104,7 +104,7 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
         project.mkdir()
         (project / "marker").touch()
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     assert "marker" in tree(repository)
 
 
@@ -126,7 +126,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     reference = repository.references[LATEST_BRANCH_REF]
     assert repository.head.peel() == reference.peel()
 
@@ -138,7 +138,7 @@ def test_branch_not_checked_out(
     with storage:
         storage.add(file)
 
-    repository = openrepository(project)
+    repository = Repository.open(project).repository
     assert repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 

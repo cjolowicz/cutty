@@ -6,7 +6,7 @@ import pygit2
 from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.util.git import commit
 from cutty.util.git import initrepository
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 
 
 LATEST_BRANCH = "cutty/latest"
@@ -27,7 +27,7 @@ class GitRepositoryObserver(FileStorageObserver):
     def commit(self) -> None:
         """A storage transaction was completed."""
         try:
-            repository = openrepository(self.project)
+            repository = Repository.open(self.project).repository
         except pygit2.GitError:
             repository = initrepository(self.project)
 
