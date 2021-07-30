@@ -5,7 +5,6 @@ from pathlib import Path
 import pygit2
 import pytest
 
-from cutty.util.git import createbranch
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
 from tests.util.git import createbranches
@@ -64,7 +63,7 @@ def test_commit_message_default(
 
 def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     """It creates the branch at HEAD by default."""
-    createbranch(repository, "branch")
+    Repository(repository).createbranch("branch")
 
     assert repository.branches["branch"].peel() == repository.head.peel()
 
@@ -72,13 +71,13 @@ def test_createbranch_target_default(repository: pygit2.Repository) -> None:
 def test_createbranch_target_branch(repository: pygit2.Repository) -> None:
     """It creates the branch at the head of the given branch."""
     main = repository.head
-    branch1 = createbranch(repository, "branch1")
+    branch1 = Repository(repository).createbranch("branch1")
 
     repository.checkout(branch1)
     Repository(repository).commit()
 
     repository.checkout(main)
-    createbranch(repository, "branch2", target="branch1")
+    Repository(repository).createbranch("branch2", target="branch1")
     branch2 = repository.branches["branch2"]
 
     assert branch1.peel() == branch2.peel()
@@ -91,7 +90,7 @@ def test_createbranch_target_oid(repository: pygit2.Repository) -> None:
 
     Repository(repository).commit()
 
-    createbranch(repository, "branch", target=str(oid))
+    Repository(repository).createbranch("branch", target=str(oid))
     branch = repository.branches["branch"]
 
     assert oid == branch.peel().id
@@ -99,7 +98,7 @@ def test_createbranch_target_oid(repository: pygit2.Repository) -> None:
 
 def test_createbranch_returns_branch(repository: pygit2.Repository) -> None:
     """It returns the branch object."""
-    branch = createbranch(repository, "branch")
+    branch = Repository(repository).createbranch("branch")
     assert branch == repository.branches["branch"]
 
 
@@ -122,7 +121,7 @@ def createconflict(
 
 def test_createworktree_creates_worktree(repository: pygit2.Repository) -> None:
     """It creates a worktree."""
-    createbranch(repository, "branch")
+    Repository(repository).createbranch("branch")
 
     with Repository(repository).createworktree("branch") as worktree:
         assert (worktree / ".git").is_file()
@@ -130,7 +129,7 @@ def test_createworktree_creates_worktree(repository: pygit2.Repository) -> None:
 
 def test_createworktree_removes_worktree_on_exit(repository: pygit2.Repository) -> None:
     """It removes the worktree on exit."""
-    createbranch(repository, "branch")
+    Repository(repository).createbranch("branch")
 
     with Repository(repository).createworktree("branch") as worktree:
         pass
@@ -143,7 +142,7 @@ def test_createworktree_does_checkout(
 ) -> None:
     """It checks out a working tree."""
     updatefile(path)
-    createbranch(repository, "branch")
+    Repository(repository).createbranch("branch")
 
     with Repository(repository).createworktree("branch") as worktree:
         assert (worktree / path.name).is_file()
@@ -152,7 +151,7 @@ def test_createworktree_does_checkout(
 def test_createworktree_no_checkout(repository: pygit2.Repository, path: Path) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(path)
-    createbranch(repository, "branch")
+    Repository(repository).createbranch("branch")
 
     with Repository(repository).createworktree("branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
@@ -161,7 +160,7 @@ def test_createworktree_no_checkout(repository: pygit2.Repository, path: Path) -
 def test_cherrypick_adds_file(repository: pygit2.Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
     main = repository.head
-    branch = createbranch(repository, "branch")
+    branch = Repository(repository).createbranch("branch")
 
     repository.checkout(branch)
     updatefile(path)
@@ -176,7 +175,7 @@ def test_cherrypick_adds_file(repository: pygit2.Repository, path: Path) -> None
 def test_cherrypick_conflict_edit(repository: pygit2.Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
-    branch = createbranch(repository, "branch")
+    branch = Repository(repository).createbranch("branch")
 
     repository.checkout(branch)
     updatefile(path, "a")
@@ -195,7 +194,7 @@ def test_cherrypick_conflict_deletion(
     updatefile(path, "a")
 
     main = repository.head
-    branch = createbranch(repository, "branch")
+    branch = Repository(repository).createbranch("branch")
 
     repository.checkout(branch)
     updatefile(path, "b")

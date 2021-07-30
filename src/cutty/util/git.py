@@ -119,6 +119,13 @@ class Repository:
         self.commit(message=message)
         self.repository.state_cleanup()
 
+    def createbranch(
+        self, branch: str, *, target: str = "HEAD", force: bool = False
+    ) -> pygit2.Branch:
+        """Create a branch pointing to the given target."""
+        commit = self.repository.revparse_single(target)
+        return self.repository.branches.create(branch, commit, force=force)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
@@ -155,18 +162,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
-
-
-def createbranch(
-    repository: pygit2.Repository,
-    branch: str,
-    *,
-    target: str = "HEAD",
-    force: bool = False,
-) -> pygit2.Branch:
-    """Create a branch pointing to the given target."""
-    commit = repository.revparse_single(target)
-    return repository.branches.create(branch, commit, force=force)
 
 
 def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:

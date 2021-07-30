@@ -5,7 +5,6 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.util.git import createbranch
 from cutty.util.git import Repository
 
 
@@ -13,7 +12,8 @@ def createbranches(
     repository: pygit2.Repository, *names: str
 ) -> tuple[pygit2.Branch, ...]:
     """Create branches at HEAD."""
-    return tuple(createbranch(repository, name) for name in names)
+    repository2 = Repository(repository)
+    return tuple(repository2.createbranch(name) for name in names)
 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
