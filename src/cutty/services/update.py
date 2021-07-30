@@ -32,12 +32,10 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = Repository.open(projectdir).repository
-    Repository(repository).createbranch(UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
+    repository = Repository.open(projectdir)
+    repository.createbranch(UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
-    with Repository(repository).createworktree(
-        UPDATE_BRANCH, checkout=False
-    ) as worktree:
+    with repository.createworktree(UPDATE_BRANCH, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
@@ -48,8 +46,8 @@ def update(
             directory=directory,
         )
 
-    Repository(repository).cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
-    Repository(repository).updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository.cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
+    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -67,9 +65,9 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = Repository.open(projectdir).repository
-    Repository(repository).resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    Repository(repository).updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository = Repository.open(projectdir)
+    repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def abortupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -77,6 +75,6 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = Repository.open(projectdir).repository
-    Repository(repository).resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    Repository(repository).updatebranch(UPDATE_BRANCH, target=LATEST_BRANCH)
+    repository = Repository.open(projectdir)
+    repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    repository.updatebranch(UPDATE_BRANCH, target=LATEST_BRANCH)
