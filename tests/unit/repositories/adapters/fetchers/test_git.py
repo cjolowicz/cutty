@@ -14,7 +14,6 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
-from cutty.util.git import initrepository
 from cutty.util.git import Repository
 
 
@@ -28,7 +27,7 @@ def url(tmp_path: pathlib.Path) -> URL:
     path.mkdir()
     (path / "marker").write_text("Lorem")
 
-    repository = initrepository(path)
+    repository = Repository.init(path).repository
     repository.index.add("marker")
     repository.create_commit(
         "HEAD",
@@ -137,7 +136,7 @@ def test_broken_head_after_clone_unexpected_branch(
     path = tmp_path / "repository"
     path.mkdir()
 
-    repository = initrepository(path, head="refs/heads/whoops")
+    repository = Repository.init(path, head="refs/heads/whoops").repository
     repository.create_commit(
         "HEAD",
         signature,

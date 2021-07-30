@@ -27,6 +27,12 @@ class Repository:
         repository = pygit2.Repository(path)
         return cls(repository)
 
+    @classmethod
+    def init(cls, path: Path, *, head: Optional[str] = None) -> Repository:
+        """Create a repository."""
+        repository = initrepository(path, head=head)
+        return cls(repository)
+
 
 def initrepository(path: Path, *, head: Optional[str] = None) -> pygit2.Repository:
     """Create a repository."""
