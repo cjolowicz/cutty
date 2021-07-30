@@ -7,6 +7,7 @@ import pytest
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.util.git import initrepository
 
 
 @pytest.fixture
@@ -29,7 +30,7 @@ def filesystem(tmp_path: Path) -> GitFilesystem:
         builder.insert(name, tree.write(), pygit2.GIT_FILEMODE_TREE)
 
     signature = pygit2.Signature("you", "you@example.com")
-    repository = pygit2.init_repository(tmp_path)
+    repository = initrepository(tmp_path)
 
     root = repository.TreeBuilder()
     root_dir = repository.TreeBuilder()

@@ -7,6 +7,7 @@ import pygit2
 
 from cutty.util.git import commit
 from cutty.util.git import createbranch
+from cutty.util.git import openrepository
 
 
 def createbranches(
@@ -18,7 +19,7 @@ def createbranches(
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
-    repository = pygit2.Repository(repositorypath)
+    repository = openrepository(repositorypath)
     builder = repository.TreeBuilder()
     builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
     tree = repository[builder.write()]
@@ -32,7 +33,9 @@ def discoverrepository(path: Path) -> pygit2.Repository:
     while path.name and not path.exists():
         path = path.parent
 
-    return pygit2.Repository(pygit2.discover_repository(path))
+    repositorypath = pygit2.discover_repository(path)
+    assert repositorypath is not None
+    return openrepository(Path(repositorypath))
 
 
 def updatefile(path: Path, text: str = "") -> None:
@@ -86,7 +89,7 @@ class Side(enum.Enum):
 
 def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     """Resolve the conflicts."""
-    repository = pygit2.Repository(repositorypath)
+    repository = openrepository(repositorypath)
     pathstr = str(path.relative_to(repositorypath))
     ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]

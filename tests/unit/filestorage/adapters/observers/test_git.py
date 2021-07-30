@@ -15,6 +15,8 @@ from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.util.git import commit
+from cutty.util.git import initrepository
+from cutty.util.git import openrepository
 
 
 @pytest.fixture
@@ -45,7 +47,7 @@ def test_repository(
     with storage:
         storage.add(file)
 
-    pygit2.Repository(project)  # does not raise
+    openrepository(project)  # does not raise
 
 
 def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -53,7 +55,7 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     repository.head  # does not raise
 
 
@@ -62,7 +64,7 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
     with storage:
         storage.add(file)
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     assert file.path.name in repository.index
 
 
@@ -79,7 +81,7 @@ def test_hook_edits(
         storage.add(file)
         (project / file.path.name).write_bytes(b"teapot")
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     blob = tree(repository) / file.path.name
     assert b"teapot" == blob.data
 
@@ -92,7 +94,7 @@ def test_hook_deletes(
         storage.add(file)
         (project / file.path.name).unlink()
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     assert file.path.name not in tree(repository)
 
 
@@ -102,7 +104,7 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
         project.mkdir()
         (project / "marker").touch()
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     assert "marker" in tree(repository)
 
 
@@ -110,7 +112,7 @@ def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates the commit in an existing repository."""
-    repository = pygit2.init_repository(project)
+    repository = initrepository(project)
     commit(repository)
 
     with storage:
@@ -124,7 +126,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     reference = repository.references[LATEST_BRANCH_REF]
     assert repository.head.peel() == reference.peel()
 
@@ -136,7 +138,7 @@ def test_branch_not_checked_out(
     with storage:
         storage.add(file)
 
-    repository = pygit2.Repository(project)
+    repository = openrepository(project)
     assert repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 
@@ -144,7 +146,7 @@ def test_existing_branch(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It updates the `update` branch if it exists."""
-    repository = pygit2.init_repository(project)
+    repository = initrepository(project)
     commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
@@ -159,7 +161,7 @@ def test_existing_branch_not_head(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
-    repository = pygit2.init_repository(project)
+    repository = initrepository(project)
     commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
@@ -174,7 +176,7 @@ def test_existing_branch_commit_message(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It uses a different commit message on updates."""
-    repository = pygit2.init_repository(project)
+    repository = initrepository(project)
     commit(repository)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
@@ -191,7 +193,7 @@ def test_existing_branch_no_changes(
     storage: FileStorage, project: pathlib.Path
 ) -> None:
     """It does not create an empty commit."""
-    repository = pygit2.init_repository(project)
+    repository = initrepository(project)
     commit(repository)
 
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())

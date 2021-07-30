@@ -7,13 +7,15 @@ import pygit2
 import pytest
 
 from cutty.util.git import commit
+from cutty.util.git import initrepository
+from cutty.util.git import openrepository
 
 
 @pytest.fixture
 def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
+    repository = initrepository(repositorypath)
     commit(repository)
     return repositorypath
 
@@ -21,7 +23,7 @@ def repositorypath(tmp_path: Path) -> Path:
 @pytest.fixture
 def repository(repositorypath: Path) -> pygit2.Repository:
     """Fixture for a repository."""
-    return pygit2.Repository(repositorypath)
+    return openrepository(repositorypath)
 
 
 @pytest.fixture

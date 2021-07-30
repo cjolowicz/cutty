@@ -4,8 +4,6 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-import pygit2
-
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
@@ -17,6 +15,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
+from cutty.util.git import openrepository
 from cutty.util.git import resetmerge
 from cutty.util.git import updatebranch
 
@@ -39,7 +38,7 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = pygit2.Repository(projectdir)
+    repository = openrepository(projectdir)
     createbranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
     with createworktree(repository, UPDATE_BRANCH, checkout=False) as worktree:
@@ -62,7 +61,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = pygit2.Repository(projectdir)
+    repository = openrepository(projectdir)
     commit(repository, message=UPDATE_MESSAGE)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
@@ -72,7 +71,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = pygit2.Repository(projectdir)
+    repository = openrepository(projectdir)
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
@@ -82,6 +81,6 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = pygit2.Repository(projectdir)
+    repository = openrepository(projectdir)
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH)
