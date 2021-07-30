@@ -20,6 +20,13 @@ def test_discover_fail(tmp_path: Path) -> None:
     assert None is Repository.discover(tmp_path)
 
 
+def test_path(tmp_path: Path) -> None:
+    """It returns the path to the repository."""
+    path = tmp_path / "repository"
+    repository = Repository.init(path)
+    assert path == repository.path
+
+
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
     repository = Repository.init(tmp_path / "repository")
