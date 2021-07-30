@@ -126,6 +126,11 @@ class Repository:
         commit = self.repository.revparse_single(target)
         return self.repository.branches.create(branch, commit, force=force)
 
+    def updatebranch(self, branch: str, *, target: str) -> None:
+        """Update a branch to the given target, another branch."""
+        commit = self.repository.branches[target].peel()
+        self.repository.branches[branch].set_target(commit.id)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
@@ -162,12 +167,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
-
-
-def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:
-    """Update a branch to the given target, another branch."""
-    commit = repository.branches[target].peel()
-    repository.branches[branch].set_target(commit.id)
 
 
 def resetmerge(repository: pygit2.Repository, parent: str, cherry: str) -> None:
