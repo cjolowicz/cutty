@@ -53,6 +53,20 @@ def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
+def test_commit_message_default(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It uses an empty message by default."""
+    from cutty.util.git import commit as commit_
+
+    (repositorypath / "a").touch()
+
+    commit_(repository)
+
+    head = repository.head.peel()
+    assert "" == head.message
+
+
 def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     """It creates the branch at HEAD by default."""
     createbranch(repository, "branch")
