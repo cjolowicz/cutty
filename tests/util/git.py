@@ -19,8 +19,7 @@ def createbranches(
 def commit(repositorypath: Path, *, message: str = "") -> None:
     """Commit all changes in the repository."""
     repository = pygit2.Repository(repositorypath)
-    signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message=message, signature=signature)
+    _commit(repository, message=message)
 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
