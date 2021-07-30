@@ -21,12 +21,13 @@ class Repository:
     """Git repository."""
 
     _repository: pygit2.Repository
+    path: Path
 
     @classmethod
     def open(cls, path: Path) -> Repository:
         """Open an existing repository."""
         repository = pygit2.Repository(path)
-        return cls(repository)
+        return cls(repository, path)
 
     @classmethod
     def discover(cls, path: Path) -> Optional[Repository]:
@@ -40,7 +41,7 @@ class Repository:
     def init(cls, path: Path, *, head: Optional[str] = None) -> Repository:
         """Create a repository."""
         repository = pygit2.init_repository(path, initial_head=head)
-        return cls(repository)
+        return cls(repository, path)
 
     @classmethod
     def clone(cls, url: str, destination: Path) -> None:
