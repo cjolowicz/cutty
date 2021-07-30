@@ -27,14 +27,14 @@ def url(tmp_path: pathlib.Path) -> URL:
     path.mkdir()
     (path / "marker").write_text("Lorem")
 
-    repository = Repository.init(path).repository
-    repository.index.add("marker")
-    repository.create_commit(
+    repository = Repository.init(path)
+    repository.repository.index.add("marker")
+    repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.index.write_tree(),
+        repository.repository.index.write_tree(),
         [],
     )
 
@@ -63,17 +63,17 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
-    repository = Repository.open(aspath(url)).repository
-    tree = repository.head.peel(pygit2.Tree)
-    repository.index.read_tree(tree)
-    repository.index.remove("marker")
-    repository.create_commit(
+    repository = Repository.open(aspath(url))
+    tree = repository.repository.head.peel(pygit2.Tree)
+    repository.repository.index.read_tree(tree)
+    repository.repository.index.remove("marker")
+    repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Remove the marker file",
-        repository.index.write_tree(),
-        [repository.head.target],
+        repository.repository.index.write_tree(),
+        [repository.repository.head.target],
     )
 
     # Second fetch.
@@ -124,8 +124,8 @@ def test_broken_head_after_clone(
     """It works around a bug in libgit2 resulting in a broken HEAD reference."""
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
     assert destination is not None
-    repository = Repository.open(destination).repository
-    head = repository.references["HEAD"]
+    repository = Repository.open(destination)
+    head = repository.repository.references["HEAD"]
     assert head.target != f"refs/heads/{custom_default_branch}"
 
 
@@ -136,13 +136,13 @@ def test_broken_head_after_clone_unexpected_branch(
     path = tmp_path / "repository"
     path.mkdir()
 
-    repository = Repository.init(path, head="refs/heads/whoops").repository
-    repository.create_commit(
+    repository = Repository.init(path, head="refs/heads/whoops")
+    repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.index.write_tree(),
+        repository.repository.index.write_tree(),
         [],
     )
 

@@ -8,23 +8,22 @@ import pygit2
 from cutty.util.git import Repository
 
 
-def createbranches(
-    repository: pygit2.Repository, *names: str
-) -> tuple[pygit2.Branch, ...]:
+def createbranches(repository: Repository, *names: str) -> tuple[pygit2.Branch, ...]:
     """Create branches at HEAD."""
-    repository2 = Repository(repository)
-    return tuple(repository2.createbranch(name) for name in names)
+    return tuple(repository.createbranch(name) for name in names)
 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
-    repository = Repository.open(repositorypath).repository
-    builder = repository.TreeBuilder()
-    builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
-    tree = repository[builder.write()]
-    repository.checkout_tree(tree)
+    repository = Repository.open(repositorypath)
+    builder = repository.repository.TreeBuilder()
+    builder.insert(
+        directory, repository.repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE
+    )
+    tree = repository.repository[builder.write()]
+    repository.repository.checkout_tree(tree)
 
-    Repository(repository).commit(message=f"Move files to subdirectory {directory}")
+    repository.commit(message=f"Move files to subdirectory {directory}")
 
 
 def locaterepository(path: Path) -> Repository:
@@ -91,13 +90,13 @@ class Side(enum.Enum):
 
 def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     """Resolve the conflicts."""
-    repository = Repository.open(repositorypath).repository
+    repository = Repository.open(repositorypath)
     pathstr = str(path.relative_to(repositorypath))
-    ancestor, ours, theirs = repository.index.conflicts[pathstr]
+    ancestor, ours, theirs = repository.repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
 
-    del repository.index.conflicts[pathstr]
+    del repository.repository.index.conflicts[pathstr]
 
-    repository.index.add(resolution)
-    repository.index.write()
-    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
+    repository.repository.index.add(resolution)
+    repository.repository.index.write()
+    repository.repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])

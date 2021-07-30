@@ -103,20 +103,20 @@ def test_createbranch_returns_branch(repository: Repository) -> None:
 
 
 def createconflict(
-    repository: pygit2.Repository, path: Path, *, ours: str, theirs: str
+    repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.head
+    main = repository.repository.head
     update, _ = createbranches(repository, "update", "latest")
 
-    repository.checkout(update)
+    repository.repository.checkout(update)
     updatefile(path, theirs)
 
-    repository.checkout(main)
+    repository.repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        Repository(repository).cherrypick(update.name, message="")
+        repository.cherrypick(update.name, message="")
 
 
 def test_createworktree_creates_worktree(repository: Repository) -> None:
@@ -206,7 +206,7 @@ def test_resetmerge_restores_files_with_conflicts(
     repository: Repository, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    createconflict(repository.repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     repository.resetmerge(parent="latest", cherry="update")
 
     assert path.read_text() == "a"
@@ -217,7 +217,7 @@ def test_resetmerge_removes_added_files(
 ) -> None:
     """It removes files added by the cherry-picked commit."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -239,7 +239,7 @@ def test_resetmerge_keeps_unrelated_additions(
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -263,7 +263,7 @@ def test_resetmerge_keeps_unrelated_changes(
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -288,7 +288,7 @@ def test_resetmerge_keeps_unrelated_deletions(
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -310,7 +310,7 @@ def test_resetmerge_keeps_unrelated_deletions(
 
 def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repository.repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     repository.resetmerge(parent="latest", cherry="update")
 
