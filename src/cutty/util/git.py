@@ -17,6 +17,11 @@ def openrepository(path: Path) -> pygit2.Repository:
     return pygit2.Repository(path)
 
 
+def initrepository(path: Path, *, head: Optional[str] = None) -> pygit2.Repository:
+    """Create a repository."""
+    return pygit2.init_repository(path, initial_head=head)
+
+
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     """Return the default signature."""
     with contextlib.suppress(KeyError):

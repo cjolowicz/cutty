@@ -5,6 +5,7 @@ import pygit2
 
 from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.util.git import commit
+from cutty.util.git import initrepository
 from cutty.util.git import openrepository
 
 
@@ -28,7 +29,7 @@ class GitRepositoryObserver(FileStorageObserver):
         try:
             repository = openrepository(self.project)
         except pygit2.GitError:
-            repository = pygit2.init_repository(self.project)
+            repository = initrepository(self.project)
 
         if UPDATE_BRANCH in repository.branches:
             # HEAD must point to update branch if it exists.

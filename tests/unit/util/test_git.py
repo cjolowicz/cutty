@@ -9,6 +9,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
+from cutty.util.git import initrepository
 from cutty.util.git import resetmerge
 from tests.util.git import createbranches
 from tests.util.git import removefile
@@ -21,7 +22,7 @@ pytest_plugins = ["tests.fixtures.git"]
 
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
-    repository = pygit2.init_repository(tmp_path / "repository")
+    repository = initrepository(tmp_path / "repository")
     commit(repository, message="initial")
 
     assert not repository.head.peel().parents

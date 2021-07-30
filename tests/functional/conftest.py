@@ -6,12 +6,12 @@ from textwrap import dedent
 from typing import Optional
 from typing import Protocol
 
-import pygit2
 import pytest
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
 from cutty.util.git import commit
+from cutty.util.git import initrepository
 
 
 @pytest.fixture
@@ -84,6 +84,6 @@ def template_directory(tmp_path: Path) -> Path:
 @pytest.fixture
 def template(template_directory: Path) -> Path:
     """Fixture for a template repository."""
-    repository = pygit2.init_repository(template_directory)
+    repository = initrepository(template_directory)
     commit(repository, message="Initial")
     return template_directory

@@ -12,6 +12,7 @@ from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
+from cutty.util.git import initrepository
 
 
 signature = pygit2.Signature("you", "you@example.com")
@@ -24,7 +25,7 @@ def url(tmp_path: pathlib.Path) -> URL:
     path.mkdir()
     (path / "marker").write_text("Lorem")
 
-    repository = pygit2.init_repository(path)
+    repository = initrepository(path)
     repository.index.add("marker")
     repository.create_commit(
         "HEAD",

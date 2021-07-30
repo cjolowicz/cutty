@@ -7,6 +7,7 @@ import pygit2
 import pytest
 
 from cutty.util.git import commit
+from cutty.util.git import initrepository
 from cutty.util.git import openrepository
 
 
@@ -14,7 +15,7 @@ from cutty.util.git import openrepository
 def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
-    repository = pygit2.init_repository(repositorypath)
+    repository = initrepository(repositorypath)
     commit(repository)
     return repositorypath
 
