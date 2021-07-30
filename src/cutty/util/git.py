@@ -28,6 +28,14 @@ class Repository:
         return cls(repository)
 
     @classmethod
+    def discover(cls, path: Path) -> Optional[Repository]:
+        """Discover an existing repository."""
+        repositorypath = pygit2.discover_repository(path)
+        if repositorypath is None:
+            return None
+        return cls.open(Path(repositorypath))
+
+    @classmethod
     def init(cls, path: Path, *, head: Optional[str] = None) -> Repository:
         """Create a repository."""
         repository = pygit2.init_repository(path, initial_head=head)

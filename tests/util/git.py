@@ -33,9 +33,9 @@ def discoverrepository(path: Path) -> pygit2.Repository:
     while path.name and not path.exists():
         path = path.parent
 
-    repositorypath = pygit2.discover_repository(path)
-    assert repositorypath is not None
-    return Repository.open(Path(repositorypath)).repository
+    repository = Repository.discover(path)
+    assert repository is not None
+    return repository.repository
 
 
 def updatefile(path: Path, text: str = "") -> None:
