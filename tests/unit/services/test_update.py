@@ -38,9 +38,10 @@ def createconflict(
 
 
 def test_continueupdate_commits_changes(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It commits the changes."""
+    repository = repository2.repository
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
@@ -52,9 +53,10 @@ def test_continueupdate_commits_changes(
 
 
 def test_continueupdate_fastforwards_latest(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
+    repository = repository2.repository
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
@@ -66,9 +68,10 @@ def test_continueupdate_fastforwards_latest(
 
 
 def test_skipupdate_fastforwards_latest(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
+    repository = repository2.repository
     createconflict(repository, path, ours="a", theirs="b")
 
     updatehead = repository.branches[UPDATE_BRANCH].peel()
@@ -80,9 +83,10 @@ def test_skipupdate_fastforwards_latest(
 
 
 def test_abortupdate_rewinds_update_branch(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
+    repository = repository2.repository
     createconflict(repository, path, ours="a", theirs="b")
 
     branches = repository.branches
