@@ -19,6 +19,12 @@ def repositorypath(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def repository2(repositorypath: Path) -> Repository:
+    """Fixture for a repository."""
+    return Repository.open(repositorypath)
+
+
+@pytest.fixture
 def repository(repositorypath: Path) -> pygit2.Repository:
     """Fixture for a repository."""
     return Repository.open(repositorypath).repository
