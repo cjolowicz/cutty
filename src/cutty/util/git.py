@@ -58,6 +58,11 @@ class Repository:
 
         _fix_repository_head(repository)
 
+    @property
+    def index(self) -> pygit2.Index:
+        """Return the repository index."""
+        return self.repository.index
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
