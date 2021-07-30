@@ -10,6 +10,7 @@ from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.util.git import cherrypick
+from cutty.util.git import createbranch
 from tests.util.files import chdir
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
@@ -17,11 +18,6 @@ from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
-
-
-def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
-    """Create a branch at HEAD."""
-    return repository.branches.create(name, repository.head.peel())
 
 
 def cuttybranches(
