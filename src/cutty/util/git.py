@@ -63,6 +63,11 @@ class Repository:
         """Return the repository index."""
         return self.repository.index
 
+    @property
+    def head(self) -> pygit2.Reference:
+        """Return the repository head."""
+        return self.repository.head
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
