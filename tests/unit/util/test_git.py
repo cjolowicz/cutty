@@ -10,6 +10,7 @@ from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
 from tests.util.git import commit
+from tests.util.git import createbranches
 from tests.util.git import removefile
 from tests.util.git import updatefile
 from tests.util.git import updatefiles
@@ -63,13 +64,6 @@ def test_createbranch_returns_branch(
     """It returns the branch object."""
     branch = createbranch(repository, "branch")
     assert branch == repository.branches["branch"]
-
-
-def createbranches(
-    repository: pygit2.Repository, *names: str
-) -> tuple[pygit2.Branch, ...]:
-    """Create branches at HEAD."""
-    return tuple(createbranch(repository, name) for name in names)
 
 
 def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
