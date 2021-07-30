@@ -76,6 +76,6 @@ class GitFilesystem(NodeFilesystem):
 
     def __init__(self, repository: pathlib.Path, ref: str = "HEAD") -> None:
         """Inititalize."""
-        repo = Repository.open(repository).repository
-        tree = repo.revparse_single(ref).peel(pygit2.Tree)
+        repo = Repository.open(repository)
+        tree = repo.repository.revparse_single(ref).peel(pygit2.Tree)
         self.root = GitFilesystemNode(tree)
