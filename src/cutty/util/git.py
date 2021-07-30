@@ -103,10 +103,10 @@ def createbranch(
     *,
     target: str = "HEAD",
     force: bool = False,
-) -> None:
+) -> pygit2.Branch:
     """Create a branch pointing to the given target."""
     commit = repository.revparse_single(target)
-    repository.branches.create(branch, commit, force=force)
+    return repository.branches.create(branch, commit, force=force)
 
 
 def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:
