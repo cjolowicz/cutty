@@ -58,6 +58,28 @@ class Repository:
 
         _fix_repository_head(repository)
 
+    def commit(
+        self, *, message: str = "", signature: Optional[pygit2.Signature] = None
+    ) -> None:
+        """Commit all changes in the repository.
+
+        If there are no changes relative to the parent, this is a noop.
+        """
+        repository = self.repository
+        repository.index.add_all()
+
+        tree = repository.index.write_tree()
+        if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
+            return
+
+        repository.index.write()
+
+        if signature is None:
+            signature = default_signature(repository)
+
+        parents = [] if repository.head_is_unborn else [repository.head.target]
+        repository.create_commit("HEAD", signature, signature, message, tree, parents)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
@@ -88,31 +110,6 @@ def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
             os.environ["GIT_AUTHOR_EMAIL"],
         )
     return repository.default_signature  # pragma: no cover
-
-
-def commit(
-    repository: pygit2.Repository,
-    *,
-    message: str = "",
-    signature: Optional[pygit2.Signature] = None,
-) -> None:
-    """Commit all changes in the repository.
-
-    If there are no changes relative to the parent, this is a noop.
-    """
-    repository.index.add_all()
-
-    tree = repository.index.write_tree()
-    if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
-        return
-
-    repository.index.write()
-
-    if signature is None:
-        signature = default_signature(repository)
-
-    parents = [] if repository.head_is_unborn else [repository.head.target]
-    repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
 
 def checkoutemptytree(repository: pygit2.Repository) -> None:
@@ -161,7 +158,7 @@ def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -
         }
         raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-    commit(repository, message=message)
+    Repository(repository).commit(message=message)
     repository.state_cleanup()
 
 

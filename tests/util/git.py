@@ -5,7 +5,6 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import Repository
 
@@ -25,17 +24,17 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     tree = repository[builder.write()]
     repository.checkout_tree(tree)
 
-    commit(repository, message=f"Move files to subdirectory {directory}")
+    Repository(repository).commit(message=f"Move files to subdirectory {directory}")
 
 
-def locaterepository(path: Path) -> pygit2.Repository:
+def locaterepository(path: Path) -> Repository:
     """Locate the git repository containing the given path."""
     while path.name and not path.exists():
         path = path.parent
 
     repository = Repository.discover(path)
     assert repository is not None
-    return repository.repository
+    return repository
 
 
 def updatefile(path: Path, text: str = "") -> None:
@@ -46,11 +45,14 @@ def updatefile(path: Path, text: str = "") -> None:
 
     path.write_text(dedent(text).lstrip())
 
-    commit(repository, message=f"{verb} {path.name}")
+    repository.commit(message=f"{verb} {path.name}")
 
 
 def updatefiles(paths: dict[Path, str]) -> None:
     """Add or update repository files."""
+    if not paths:
+        return
+
     verb = "Add"
 
     for path, text in paths.items():
@@ -62,7 +64,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
         path.write_text(dedent(text).lstrip())
 
     pathlist = " and ".join(path.name for path in paths)
-    commit(repository, message=f"{verb} {pathlist}")
+    repository.commit(message=f"{verb} {pathlist}")
 
 
 def appendfile(path: Path, text: str) -> None:
@@ -76,7 +78,7 @@ def removefile(path: Path) -> None:
 
     path.unlink()
 
-    commit(repository, message=f"Remove {path.name}")
+    repository.commit(message=f"Remove {path.name}")
 
 
 class Side(enum.Enum):
