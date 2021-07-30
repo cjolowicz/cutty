@@ -73,6 +73,11 @@ class Repository:
         self.repository.set_head(target)
 
     @property
+    def references(self) -> pygit2.References:
+        """Return the repository references."""
+        return self.repository.references
+
+    @property
     def branches(self) -> pygit2.Branches:
         """Return the repository branches."""
         return self.repository.branches
