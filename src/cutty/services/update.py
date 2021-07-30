@@ -13,7 +13,6 @@ from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfi
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import cherrypick
 from cutty.util.git import createbranch
-from cutty.util.git import createworktree
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
 from cutty.util.git import updatebranch
@@ -40,7 +39,9 @@ def update(
     repository = Repository.open(projectdir).repository
     createbranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
-    with createworktree(repository, UPDATE_BRANCH, checkout=False) as worktree:
+    with Repository(repository).createworktree(
+        UPDATE_BRANCH, checkout=False
+    ) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
