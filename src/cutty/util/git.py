@@ -36,7 +36,19 @@ class Repository:
     @classmethod
     def clone(cls, url: str, destination: Path) -> None:
         """Clone a repository using a mirror configuration."""
-        clonerepository(url, destination)
+
+        def _createremote(
+            repository: pygit2.Repository, name: bytes, url: bytes
+        ) -> pygit2.Remote:
+            name_ = name.decode()
+            repository.config[f"remote.{name_}.mirror"] = True
+            return repository.remotes.create(name, url, "+refs/*:refs/*")
+
+        repository = pygit2.clone_repository(
+            url, str(destination), bare=True, remote=_createremote
+        )
+
+        _fix_repository_head(repository)
 
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
@@ -58,23 +70,6 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
             break
 
     return head.resolve()
-
-
-def clonerepository(url: str, destination: Path) -> None:
-    """Clone a repository using a mirror configuration."""
-
-    def _createremote(
-        repository: pygit2.Repository, name: bytes, url: bytes
-    ) -> pygit2.Remote:
-        name_ = name.decode()
-        repository.config[f"remote.{name_}.mirror"] = True
-        return repository.remotes.create(name, url, "+refs/*:refs/*")
-
-    repository = pygit2.clone_repository(
-        url, str(destination), bare=True, remote=_createremote
-    )
-
-    _fix_repository_head(repository)
 
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
