@@ -62,6 +62,14 @@ def test_createbranch_target_oid(
     assert oid == branch.peel().id
 
 
+def test_createbranch_returns_branch(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It returns the branch object."""
+    branch = createbranch_(repository, "branch")
+    assert branch == repository.branches["branch"]
+
+
 def createbranches(
     repository: pygit2.Repository, *names: str
 ) -> tuple[pygit2.Branch, ...]:
