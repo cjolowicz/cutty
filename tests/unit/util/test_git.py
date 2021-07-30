@@ -6,7 +6,6 @@ import pygit2
 import pytest
 
 from cutty.util.git import Repository
-from cutty.util.git import resetmerge
 from tests.util.git import createbranches
 from tests.util.git import removefile
 from tests.util.git import updatefile
@@ -211,7 +210,7 @@ def test_resetmerge_restores_files_with_conflicts(
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
     createconflict(repository, path, ours="a", theirs="b")
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert path.read_text() == "a"
 
@@ -233,7 +232,7 @@ def test_resetmerge_removes_added_files(
     with pytest.raises(Exception, match=path1.name):
         Repository(repository).cherrypick(update.name, message="")
 
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -257,7 +256,7 @@ def test_resetmerge_keeps_unrelated_additions(
     with pytest.raises(Exception, match=path1.name):
         Repository(repository).cherrypick(update.name, message="")
 
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert path2.exists()
 
@@ -282,7 +281,7 @@ def test_resetmerge_keeps_unrelated_changes(
     with pytest.raises(Exception, match=path1.name):
         Repository(repository).cherrypick(update.name, message="")
 
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert path2.read_text() == "c"
 
@@ -307,7 +306,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     with pytest.raises(Exception, match=path1.name):
         Repository(repository).cherrypick(update.name, message="")
 
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert not path2.exists()
 
@@ -316,6 +315,6 @@ def test_resetmerge_resets_index(repository: pygit2.Repository, path: Path) -> N
     """It resets the index to HEAD, removing conflicts."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    resetmerge(repository, parent="latest", cherry="update")
+    Repository(repository).resetmerge(parent="latest", cherry="update")
 
     assert repository.index.write_tree() == repository.head.peel().tree.id
