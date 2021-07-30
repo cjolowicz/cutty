@@ -114,17 +114,8 @@ def test_broken_head_after_clone_unexpected_branch(
 ) -> None:
     """It crashes if the default branch is not master or main."""
     path = tmp_path / "repository"
-    path.mkdir()
-
     repository = Repository.init(path, head="refs/heads/whoops")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        repository.index.write_tree(),
-        [],
-    )
+    repository.commit()
 
     with pytest.raises(KeyError):
         gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)
