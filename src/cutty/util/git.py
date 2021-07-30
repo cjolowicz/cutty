@@ -98,20 +98,21 @@ class Repository:
 
         If there are no changes relative to the parent, this is a noop.
         """
-        repository = self.repository
-        repository.index.add_all()
+        self.index.add_all()
 
-        tree = repository.index.write_tree()
-        if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
+        tree = self.index.write_tree()
+        if not self.repository.head_is_unborn and tree == self.head.peel().tree.id:
             return
 
-        repository.index.write()
+        self.index.write()
 
         if signature is None:
-            signature = default_signature(repository)
+            signature = default_signature(self.repository)
 
-        parents = [] if repository.head_is_unborn else [repository.head.target]
-        repository.create_commit("HEAD", signature, signature, message, tree, parents)
+        parents = [] if self.repository.head_is_unborn else [self.head.target]
+        self.repository.create_commit(
+            "HEAD", signature, signature, message, tree, parents
+        )
 
     @contextmanager
     def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
