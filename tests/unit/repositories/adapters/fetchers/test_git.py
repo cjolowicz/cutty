@@ -15,6 +15,8 @@ from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 from cutty.util.git import Repository
+from tests.util.git import removefile
+from tests.util.git import updatefile
 
 
 signature = pygit2.Signature("you", "you@example.com")
@@ -24,19 +26,8 @@ signature = pygit2.Signature("you", "you@example.com")
 def url(tmp_path: pathlib.Path) -> URL:
     """Fixture for a repository."""
     path = tmp_path / "repository"
-    path.mkdir()
-    (path / "marker").write_text("Lorem")
-
-    repository = Repository.init(path)
-    repository.index.add("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        repository.index.write_tree(),
-        [],
-    )
+    Repository.init(path)
+    updatefile(path / "marker", "Lorem")
 
     return asurl(path)
 
@@ -63,18 +54,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
-    repository = Repository.open(aspath(url))
-    tree = repository.head.peel(pygit2.Tree)
-    repository.index.read_tree(tree)
-    repository.index.remove("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Remove the marker file",
-        repository.index.write_tree(),
-        [repository.head.target],
-    )
+    removefile(aspath(url) / "marker")
 
     # Second fetch.
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
