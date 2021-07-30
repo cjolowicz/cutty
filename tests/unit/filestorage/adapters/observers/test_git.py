@@ -53,8 +53,8 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = Repository.open(project).repository
-    repository.head  # does not raise
+    repository = Repository.open(project)
+    repository.repository.head  # does not raise
 
 
 def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -62,8 +62,8 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
     with storage:
         storage.add(file)
 
-    repository = Repository.open(project).repository
-    assert file.path.name in repository.index
+    repository = Repository.open(project)
+    assert file.path.name in repository.repository.index
 
 
 def tree(repository: Repository) -> pygit2.Tree:
@@ -124,9 +124,9 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     with storage:
         storage.add(file)
 
-    repository = Repository.open(project).repository
-    reference = repository.references[LATEST_BRANCH_REF]
-    assert repository.head.peel() == reference.peel()
+    repository = Repository.open(project)
+    reference = repository.repository.references[LATEST_BRANCH_REF]
+    assert repository.repository.head.peel() == reference.peel()
 
 
 def test_branch_not_checked_out(
@@ -136,60 +136,65 @@ def test_branch_not_checked_out(
     with storage:
         storage.add(file)
 
-    repository = Repository.open(project).repository
-    assert repository.references["HEAD"].target != LATEST_BRANCH_REF
+    repository = Repository.open(project)
+    assert repository.repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 
 def test_existing_branch(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It updates the `update` branch if it exists."""
-    repository2 = Repository.init(project)
-    repository2.commit()
+    repository = Repository.init(project)
+    repository.commit()
 
-    repository = repository2.repository
-    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.set_head(UPDATE_BRANCH_REF)
+    repository.repository.branches.create(
+        UPDATE_BRANCH, repository.repository.head.peel()
+    )
+    repository.repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
 
-    assert file.path.name in tree(repository2)
+    assert file.path.name in tree(repository)
 
 
 def test_existing_branch_not_head(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
-    repository2 = Repository.init(project)
-    repository2.commit()
+    repository = Repository.init(project)
+    repository.commit()
 
-    repository = repository2.repository
-    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.repository.branches.create(
+        UPDATE_BRANCH, repository.repository.head.peel()
+    )
 
     with pytest.raises(Exception):
         with storage:
             storage.add(file)
 
-    assert file.path.name not in tree(repository2)
+    assert file.path.name not in tree(repository)
 
 
 def test_existing_branch_commit_message(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It uses a different commit message on updates."""
-    repository2 = Repository.init(project)
-    repository2.commit()
+    repository = Repository.init(project)
+    repository.commit()
 
-    repository = repository2.repository
-    repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.set_head(UPDATE_BRANCH_REF)
+    repository.repository.branches.create(
+        LATEST_BRANCH, repository.repository.head.peel()
+    )
+    repository.repository.branches.create(
+        UPDATE_BRANCH, repository.repository.head.peel()
+    )
+    repository.repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
 
-    commit_ = repository.head.peel()
+    commit_ = repository.repository.head.peel()
     assert "initial" not in commit_.message.lower()
 
 
@@ -197,15 +202,16 @@ def test_existing_branch_no_changes(
     storage: FileStorage, project: pathlib.Path
 ) -> None:
     """It does not create an empty commit."""
-    repository2 = Repository.init(project)
-    repository2.commit()
+    repository = Repository.init(project)
+    repository.commit()
 
-    repository = repository2.repository
-    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.set_head(UPDATE_BRANCH_REF)
-    oldhead = repository.head.target
+    repository.repository.branches.create(
+        UPDATE_BRANCH, repository.repository.head.peel()
+    )
+    repository.repository.set_head(UPDATE_BRANCH_REF)
+    oldhead = repository.repository.head.target
 
     with storage:
         pass
 
-    assert oldhead == repository.head.target
+    assert oldhead == repository.repository.head.target
