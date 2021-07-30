@@ -29,6 +29,19 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     assert not repository.head.peel().parents
 
 
+def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -> None:
+    """It uses the provided signature."""
+    from cutty.util.git import commit as commit_
+
+    (repositorypath / "a").touch()
+
+    signature = pygit2.Signature("Katherine", "katherine@example.com")
+    commit_(repository, message="empty", signature=signature)
+
+    head = repository.head.peel()
+    assert signature.name == head.author.name and signature.email == head.author.email
+
+
 def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     """It creates the branch at HEAD by default."""
     createbranch(repository, "branch")
