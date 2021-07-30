@@ -27,12 +27,12 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     commit(repository, message=f"Move files to subdirectory {directory}")
 
 
-def discoverrepository(path: Path) -> Path:
+def discoverrepository(path: Path) -> pygit2.Repository:
     """Discover a git repository."""
     while path.name and not path.exists():
         path = path.parent
 
-    return Path(pygit2.discover_repository(path))
+    return pygit2.Repository(pygit2.discover_repository(path))
 
 
 def updatefile(path: Path, text: str = "") -> None:
@@ -43,7 +43,7 @@ def updatefile(path: Path, text: str = "") -> None:
 
     path.write_text(dedent(text).lstrip())
 
-    commit(pygit2.Repository(repository), message=f"{verb} {path.name}")
+    commit(repository, message=f"{verb} {path.name}")
 
 
 def updatefiles(paths: dict[Path, str]) -> None:
@@ -59,7 +59,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
         path.write_text(dedent(text).lstrip())
 
     pathlist = " and ".join(path.name for path in paths)
-    commit(pygit2.Repository(repository), message=f"{verb} {pathlist}")
+    commit(repository, message=f"{verb} {pathlist}")
 
 
 def appendfile(path: Path, text: str) -> None:
@@ -73,7 +73,7 @@ def removefile(path: Path) -> None:
 
     path.unlink()
 
-    commit(pygit2.Repository(repository), message=f"Remove {path.name}")
+    commit(repository, message=f"Remove {path.name}")
 
 
 class Side(enum.Enum):
