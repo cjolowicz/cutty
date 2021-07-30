@@ -191,13 +191,3 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     """Check out an empty tree from the repository."""
     oid = repository.TreeBuilder().write()
     repository.checkout_tree(repository[oid])
-
-
-def resetmerge(repository: pygit2.Repository, parent: str, cherry: str) -> None:
-    """Reset only files that were touched by a cherry-pick.
-
-    This emulates `git reset --merge HEAD` by performing a hard reset on the
-    files that were updated by the cherry-picked commit, and resetting the index
-    to HEAD.
-    """
-    Repository(repository).resetmerge(parent, cherry)

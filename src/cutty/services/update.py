@@ -12,7 +12,6 @@ from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
-from cutty.util.git import resetmerge
 
 
 def update(
@@ -69,7 +68,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = Repository.open(projectdir).repository
-    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    Repository(repository).resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     Repository(repository).updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
@@ -79,5 +78,5 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = Repository.open(projectdir).repository
-    resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    Repository(repository).resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     Repository(repository).updatebranch(UPDATE_BRANCH, target=LATEST_BRANCH)
