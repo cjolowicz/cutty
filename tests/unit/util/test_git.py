@@ -6,6 +6,7 @@ import pygit2
 import pytest
 
 from cutty.util.git import cherrypick
+from cutty.util.git import commit as commit_
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
@@ -21,8 +22,6 @@ pytest_plugins = ["tests.fixtures.git"]
 
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
-    from cutty.util.git import commit as commit_
-
     repository = pygit2.init_repository(tmp_path / "repository")
     commit_(repository, message="initial")
 
@@ -31,8 +30,6 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
 
 def test_commit_empty(repository: pygit2.Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
-    from cutty.util.git import commit as commit_
-
     head = repository.head.peel()
 
     commit_(repository, message="empty")
@@ -42,8 +39,6 @@ def test_commit_empty(repository: pygit2.Repository) -> None:
 
 def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -> None:
     """It uses the provided signature."""
-    from cutty.util.git import commit as commit_
-
     (repositorypath / "a").touch()
 
     signature = pygit2.Signature("Katherine", "katherine@example.com")
@@ -57,8 +52,6 @@ def test_commit_message_default(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It uses an empty message by default."""
-    from cutty.util.git import commit as commit_
-
     (repositorypath / "a").touch()
 
     commit_(repository)
