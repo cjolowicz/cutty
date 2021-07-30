@@ -64,7 +64,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
 
     # Remove the marker file.
     repository = Repository.open(aspath(url))
-    tree = repository.repository.head.peel(pygit2.Tree)
+    tree = repository.head.peel(pygit2.Tree)
     repository.index.read_tree(tree)
     repository.index.remove("marker")
     repository.repository.create_commit(
@@ -73,7 +73,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
         signature,
         "Remove the marker file",
         repository.index.write_tree(),
-        [repository.repository.head.target],
+        [repository.head.target],
     )
 
     # Second fetch.

@@ -17,9 +17,7 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     """Move all files in the repository to the given subdirectory."""
     repository = Repository.open(repositorypath)
     builder = repository.repository.TreeBuilder()
-    builder.insert(
-        directory, repository.repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE
-    )
+    builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
     tree = repository.repository[builder.write()]
     repository.repository.checkout_tree(tree)
 

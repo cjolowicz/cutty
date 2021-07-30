@@ -44,6 +44,4 @@ class GitRepositoryObserver(FileStorageObserver):
         repository.commit(message=message)
 
         if LATEST_BRANCH not in repository.repository.branches:
-            repository.repository.branches.create(
-                LATEST_BRANCH, repository.repository.head.peel()
-            )
+            repository.repository.branches.create(LATEST_BRANCH, repository.head.peel())

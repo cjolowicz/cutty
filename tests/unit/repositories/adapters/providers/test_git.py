@@ -38,7 +38,7 @@ def url(tmp_path: pathlib.Path) -> URL:
 
     repository.repository.create_tag(
         "v1.0",
-        repository.repository.head.target,
+        repository.head.target,
         pygit2.GIT_OBJ_COMMIT,
         signature,
         "Release v1.0",
@@ -52,7 +52,7 @@ def url(tmp_path: pathlib.Path) -> URL:
         signature,
         "Update marker",
         repository.index.write_tree(),
-        [repository.repository.head.target],
+        [repository.head.target],
     )
 
     return asurl(path)
