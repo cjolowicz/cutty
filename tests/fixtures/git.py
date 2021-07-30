@@ -3,7 +3,6 @@ import string
 from collections.abc import Iterator
 from pathlib import Path
 
-import pygit2
 import pytest
 
 from cutty.util.git import Repository
@@ -19,9 +18,9 @@ def repositorypath(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def repository(repositorypath: Path) -> pygit2.Repository:
+def repository(repositorypath: Path) -> Repository:
     """Fixture for a repository."""
-    return Repository.open(repositorypath).repository
+    return Repository.open(repositorypath)
 
 
 @pytest.fixture
