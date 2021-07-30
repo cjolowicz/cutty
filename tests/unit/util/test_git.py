@@ -6,7 +6,7 @@ import pygit2
 import pytest
 
 from cutty.util.git import cherrypick
-from cutty.util.git import createbranch as createbranch_
+from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
 from tests.util.git import commit
@@ -20,14 +20,9 @@ pytest_plugins = ["tests.fixtures.git"]
 
 def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     """It creates the branch at HEAD by default."""
-    createbranch_(repository, "branch")
+    createbranch(repository, "branch")
 
     assert repository.branches["branch"].peel() == repository.head.peel()
-
-
-def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
-    """Create a branch at HEAD."""
-    return repository.branches.create(name, repository.head.peel())
 
 
 def test_createbranch_target_branch(
@@ -41,7 +36,7 @@ def test_createbranch_target_branch(
     commit(repositorypath)
 
     repository.checkout(main)
-    createbranch_(repository, "branch2", target="branch1")
+    createbranch(repository, "branch2", target="branch1")
     branch2 = repository.branches["branch2"]
 
     assert branch1.peel() == branch2.peel()
@@ -56,7 +51,7 @@ def test_createbranch_target_oid(
 
     commit(repositorypath)
 
-    createbranch_(repository, "branch", target=str(oid))
+    createbranch(repository, "branch", target=str(oid))
     branch = repository.branches["branch"]
 
     assert oid == branch.peel().id
@@ -66,7 +61,7 @@ def test_createbranch_returns_branch(
     repository: pygit2.Repository, repositorypath: Path
 ) -> None:
     """It returns the branch object."""
-    branch = createbranch_(repository, "branch")
+    branch = createbranch(repository, "branch")
     assert branch == repository.branches["branch"]
 
 
