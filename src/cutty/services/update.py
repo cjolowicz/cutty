@@ -11,7 +11,6 @@ from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import createbranch
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
 from cutty.util.git import updatebranch
@@ -36,7 +35,7 @@ def update(
         directory = projectconfig.directory
 
     repository = Repository.open(projectdir).repository
-    createbranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
+    Repository(repository).createbranch(UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
     with Repository(repository).createworktree(
         UPDATE_BRANCH, checkout=False

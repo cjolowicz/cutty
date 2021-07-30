@@ -164,17 +164,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     repository.checkout_tree(repository[oid])
 
 
-def createbranch(
-    repository: pygit2.Repository,
-    branch: str,
-    *,
-    target: str = "HEAD",
-    force: bool = False,
-) -> pygit2.Branch:
-    """Create a branch pointing to the given target."""
-    return Repository(repository).createbranch(branch, target=target, force=force)
-
-
 def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:
     """Update a branch to the given target, another branch."""
     commit = repository.branches[target].peel()
