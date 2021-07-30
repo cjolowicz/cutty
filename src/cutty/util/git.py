@@ -169,11 +169,6 @@ def checkoutemptytree(repository: pygit2.Repository) -> None:
     repository.checkout_tree(repository[oid])
 
 
-def updatebranch(repository: pygit2.Repository, branch: str, *, target: str) -> None:
-    """Update a branch to the given target, another branch."""
-    return Repository(repository).updatebranch(branch, target=target)
-
-
 def resetmerge(repository: pygit2.Repository, parent: str, cherry: str) -> None:
     """Reset only files that were touched by a cherry-pick.
 

@@ -13,7 +13,6 @@ from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfi
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
-from cutty.util.git import updatebranch
 
 
 def update(
@@ -51,7 +50,7 @@ def update(
         )
 
     Repository(repository).cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
-    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
+    Repository(repository).updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -61,7 +60,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.commit(message=UPDATE_MESSAGE)
-    updatebranch(repository.repository, LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -71,7 +70,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir).repository
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
+    Repository(repository).updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def abortupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -81,4 +80,4 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir).repository
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    updatebranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH)
+    Repository(repository).updatebranch(UPDATE_BRANCH, target=LATEST_BRANCH)
