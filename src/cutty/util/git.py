@@ -30,13 +30,8 @@ class Repository:
     @classmethod
     def init(cls, path: Path, *, head: Optional[str] = None) -> Repository:
         """Create a repository."""
-        repository = initrepository(path, head=head)
+        repository = pygit2.init_repository(path, initial_head=head)
         return cls(repository)
-
-
-def initrepository(path: Path, *, head: Optional[str] = None) -> pygit2.Repository:
-    """Create a repository."""
-    return pygit2.init_repository(path, initial_head=head)
 
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
