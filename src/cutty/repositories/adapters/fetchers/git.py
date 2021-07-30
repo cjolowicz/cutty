@@ -9,8 +9,7 @@ from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import defaultstore
-from cutty.util.git import clonerepository
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 
 
 @fetcher(
@@ -22,8 +21,8 @@ def gitfetcher(
 ) -> None:
     """Fetch a git repository."""
     if destination.exists():
-        repository = openrepository(destination)
+        repository = Repository.open(destination).repository
         for remote in repository.remotes:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
     else:
-        clonerepository(str(url), destination)
+        Repository.clone(str(url), destination)

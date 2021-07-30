@@ -15,7 +15,7 @@ from cutty.util.git import cherrypick
 from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 from cutty.util.git import resetmerge
 from cutty.util.git import updatebranch
 
@@ -38,7 +38,7 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = openrepository(projectdir)
+    repository = Repository.open(projectdir).repository
     createbranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
 
     with createworktree(repository, UPDATE_BRANCH, checkout=False) as worktree:
@@ -61,7 +61,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = openrepository(projectdir)
+    repository = Repository.open(projectdir).repository
     commit(repository, message=UPDATE_MESSAGE)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
@@ -71,7 +71,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = openrepository(projectdir)
+    repository = Repository.open(projectdir).repository
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
@@ -81,6 +81,6 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = openrepository(projectdir)
+    repository = Repository.open(projectdir).repository
     resetmerge(repository, parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
     updatebranch(repository, UPDATE_BRANCH, target=LATEST_BRANCH)

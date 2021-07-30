@@ -7,7 +7,7 @@ import pygit2
 
 from cutty.util.git import commit
 from cutty.util.git import createbranch
-from cutty.util.git import openrepository
+from cutty.util.git import Repository
 
 
 def createbranches(
@@ -19,7 +19,7 @@ def createbranches(
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
-    repository = openrepository(repositorypath)
+    repository = Repository.open(repositorypath).repository
     builder = repository.TreeBuilder()
     builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
     tree = repository[builder.write()]
@@ -28,19 +28,19 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     commit(repository, message=f"Move files to subdirectory {directory}")
 
 
-def discoverrepository(path: Path) -> pygit2.Repository:
-    """Discover a git repository."""
+def locaterepository(path: Path) -> pygit2.Repository:
+    """Locate the git repository containing the given path."""
     while path.name and not path.exists():
         path = path.parent
 
-    repositorypath = pygit2.discover_repository(path)
-    assert repositorypath is not None
-    return openrepository(Path(repositorypath))
+    repository = Repository.discover(path)
+    assert repository is not None
+    return repository.repository
 
 
 def updatefile(path: Path, text: str = "") -> None:
     """Add or update a repository file."""
-    repository = discoverrepository(path)
+    repository = locaterepository(path)
 
     verb = "Update" if path.exists() else "Add"
 
@@ -54,7 +54,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
     verb = "Add"
 
     for path, text in paths.items():
-        repository = discoverrepository(path)
+        repository = locaterepository(path)
 
         if path.exists():
             verb = "Update"
@@ -72,7 +72,7 @@ def appendfile(path: Path, text: str) -> None:
 
 def removefile(path: Path) -> None:
     """Remove a repository file."""
-    repository = discoverrepository(path)
+    repository = locaterepository(path)
 
     path.unlink()
 
@@ -89,7 +89,7 @@ class Side(enum.Enum):
 
 def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     """Resolve the conflicts."""
-    repository = openrepository(repositorypath)
+    repository = Repository.open(repositorypath).repository
     pathstr = str(path.relative_to(repositorypath))
     ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]

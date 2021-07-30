@@ -1,9 +1,12 @@
 """Git utilities."""
+from __future__ import annotations
+
 import contextlib
 import hashlib
 import os
 import tempfile
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -12,14 +15,48 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 
 
-def openrepository(path: Path) -> pygit2.Repository:
-    """Return an existing repository."""
-    return pygit2.Repository(path)
+@dataclass
+class Repository:
+    """Git repository."""
 
+    repository: pygit2.Repository
 
-def initrepository(path: Path, *, head: Optional[str] = None) -> pygit2.Repository:
-    """Create a repository."""
-    return pygit2.init_repository(path, initial_head=head)
+    @classmethod
+    def open(cls, path: Path) -> Repository:
+        """Open an existing repository."""
+        repository = pygit2.Repository(path)
+        return cls(repository)
+
+    @classmethod
+    def discover(cls, path: Path) -> Optional[Repository]:
+        """Discover an existing repository."""
+        repositorypath = pygit2.discover_repository(path)
+        if repositorypath is None:
+            return None
+        return cls.open(Path(repositorypath))
+
+    @classmethod
+    def init(cls, path: Path, *, head: Optional[str] = None) -> Repository:
+        """Create a repository."""
+        repository = pygit2.init_repository(path, initial_head=head)
+        return cls(repository)
+
+    @classmethod
+    def clone(cls, url: str, destination: Path) -> None:
+        """Clone a repository using a mirror configuration."""
+
+        def _createremote(
+            repository: pygit2.Repository, name: bytes, url: bytes
+        ) -> pygit2.Remote:
+            name_ = name.decode()
+            repository.config[f"remote.{name_}.mirror"] = True
+            return repository.remotes.create(name, url, "+refs/*:refs/*")
+
+        repository = pygit2.clone_repository(
+            url, str(destination), bare=True, remote=_createremote
+        )
+
+        _fix_repository_head(repository)
 
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
@@ -41,23 +78,6 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
             break
 
     return head.resolve()
-
-
-def clonerepository(url: str, destination: Path) -> None:
-    """Clone a repository using a mirror configuration."""
-
-    def _createremote(
-        repository: pygit2.Repository, name: bytes, url: bytes
-    ) -> pygit2.Remote:
-        name_ = name.decode()
-        repository.config[f"remote.{name_}.mirror"] = True
-        return repository.remotes.create(name, url, "+refs/*:refs/*")
-
-    repository = pygit2.clone_repository(
-        url, str(destination), bare=True, remote=_createremote
-    )
-
-    _fix_repository_head(repository)
 
 
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
@@ -117,7 +137,7 @@ def createworktree(
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
             # https://github.com/libgit2/libgit2/issues/5949
-            worktreerepository = openrepository(path)
+            worktreerepository = Repository.open(path).repository
             checkoutemptytree(worktreerepository)
 
         yield path
