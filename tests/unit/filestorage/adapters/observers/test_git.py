@@ -148,7 +148,7 @@ def test_existing_branch(
     repository.commit()
 
     repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.repository.set_head(UPDATE_BRANCH_REF)
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -181,7 +181,7 @@ def test_existing_branch_commit_message(
 
     repository.repository.branches.create(LATEST_BRANCH, repository.head.peel())
     repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.repository.set_head(UPDATE_BRANCH_REF)
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -198,7 +198,7 @@ def test_existing_branch_no_changes(
     repository.commit()
 
     repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
-    repository.repository.set_head(UPDATE_BRANCH_REF)
+    repository.set_head(UPDATE_BRANCH_REF)
     oldhead = repository.head.target
 
     with storage:
