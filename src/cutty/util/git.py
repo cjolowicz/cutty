@@ -72,6 +72,11 @@ class Repository:
         """Update the repository head."""
         self.repository.set_head(target)
 
+    @property
+    def branches(self) -> pygit2.Branches:
+        """Return the repository branches."""
+        return self.repository.branches
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:

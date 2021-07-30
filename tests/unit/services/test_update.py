@@ -60,7 +60,7 @@ def test_continueupdate_fastforwards_latest(
     with chdir(repositorypath):
         continueupdate()
 
-    branches = repository.repository.branches
+    branches = repository.branches
     assert branches[LATEST_BRANCH].peel() == branches[UPDATE_BRANCH].peel()
 
 
@@ -70,12 +70,12 @@ def test_skipupdate_fastforwards_latest(
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.repository.branches[UPDATE_BRANCH].peel()
+    updatehead = repository.branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
         skipupdate()
 
-    assert repository.repository.branches[LATEST_BRANCH].peel() == updatehead
+    assert repository.branches[LATEST_BRANCH].peel() == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(
@@ -84,7 +84,7 @@ def test_abortupdate_rewinds_update_branch(
     """It resets the update branch to the tip of the latest branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    branches = repository.repository.branches
+    branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
 
     with chdir(repositorypath):

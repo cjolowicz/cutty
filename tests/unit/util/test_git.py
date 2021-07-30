@@ -62,7 +62,7 @@ def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
     repository.createbranch("branch")
 
-    assert repository.repository.branches["branch"].peel() == repository.head.peel()
+    assert repository.branches["branch"].peel() == repository.head.peel()
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
@@ -75,7 +75,7 @@ def test_createbranch_target_branch(repository: Repository) -> None:
 
     repository.repository.checkout(main)
     repository.createbranch("branch2", target="branch1")
-    branch2 = repository.repository.branches["branch2"]
+    branch2 = repository.branches["branch2"]
 
     assert branch1.peel() == branch2.peel()
 
@@ -88,7 +88,7 @@ def test_createbranch_target_oid(repository: Repository) -> None:
     repository.commit()
 
     repository.createbranch("branch", target=str(oid))
-    branch = repository.repository.branches["branch"]
+    branch = repository.branches["branch"]
 
     assert oid == branch.peel().id
 
@@ -96,7 +96,7 @@ def test_createbranch_target_oid(repository: Repository) -> None:
 def test_createbranch_returns_branch(repository: Repository) -> None:
     """It returns the branch object."""
     branch = repository.createbranch("branch")
-    assert branch == repository.repository.branches["branch"]
+    assert branch == repository.branches["branch"]
 
 
 def createconflict(

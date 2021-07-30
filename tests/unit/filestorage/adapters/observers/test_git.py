@@ -147,7 +147,7 @@ def test_existing_branch(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
@@ -163,7 +163,7 @@ def test_existing_branch_not_head(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
         with storage:
@@ -179,8 +179,8 @@ def test_existing_branch_commit_message(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(LATEST_BRANCH, repository.head.peel())
-    repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
@@ -197,7 +197,7 @@ def test_existing_branch_no_changes(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
     oldhead = repository.head.target
 
