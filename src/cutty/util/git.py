@@ -12,6 +12,11 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 
 
+def openrepository(path: Path) -> pygit2.Repository:
+    """Return an existing repository."""
+    return pygit2.Repository(path)
+
+
 def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
     """Return the default signature."""
     with contextlib.suppress(KeyError):
@@ -69,7 +74,7 @@ def createworktree(
         if not checkout:
             # Emulate `--no-checkout` by checking out an empty tree after the fact.
             # https://github.com/libgit2/libgit2/issues/5949
-            worktreerepository = pygit2.Repository(path)
+            worktreerepository = openrepository(path)
             checkoutemptytree(worktreerepository)
 
         yield path

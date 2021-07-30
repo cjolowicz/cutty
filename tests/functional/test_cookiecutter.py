@@ -1,10 +1,10 @@
 """Functional tests for the cookiecutter CLI."""
 from pathlib import Path
 
-import pygit2
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.util.git import openrepository
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
@@ -70,7 +70,7 @@ def test_extra_context_invalid(runcutty: RunCutty, template: Path) -> None:
 
 def test_checkout(runcutty: RunCutty, template: Path) -> None:
     """It uses the specified revision of the template."""
-    initial = pygit2.Repository(template).head.target
+    initial = openrepository(template).head.target
 
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 

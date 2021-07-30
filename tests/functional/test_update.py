@@ -3,10 +3,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pygit2
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
+from cutty.util.git import openrepository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import appendfile
@@ -104,12 +104,12 @@ def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
 
 def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
-    oldhead = pygit2.Repository(project).head.target
+    oldhead = openrepository(project).head.target
 
     with chdir(project):
         runcutty("update")
 
-    assert oldhead == pygit2.Repository(project).head.target
+    assert oldhead == openrepository(project).head.target
 
 
 def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
@@ -288,7 +288,7 @@ def test_checkout(
     """It uses the specified revision of the template."""
     updatefile(templateproject / "LICENSE", "a")
 
-    revision = pygit2.Repository(template).head.target
+    revision = openrepository(template).head.target
 
     updatefile(templateproject / "LICENSE", "b")
 
