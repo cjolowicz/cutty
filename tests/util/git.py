@@ -5,7 +5,6 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import Repository
 
@@ -25,7 +24,7 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     tree = repository[builder.write()]
     repository.checkout_tree(tree)
 
-    commit(repository, message=f"Move files to subdirectory {directory}")
+    Repository(repository).commit(message=f"Move files to subdirectory {directory}")
 
 
 def locaterepository(path: Path) -> Repository:
@@ -40,13 +39,13 @@ def locaterepository(path: Path) -> Repository:
 
 def updatefile(path: Path, text: str = "") -> None:
     """Add or update a repository file."""
-    repository = locaterepository(path).repository
+    repository = locaterepository(path)
 
     verb = "Update" if path.exists() else "Add"
 
     path.write_text(dedent(text).lstrip())
 
-    commit(repository, message=f"{verb} {path.name}")
+    repository.commit(message=f"{verb} {path.name}")
 
 
 def updatefiles(paths: dict[Path, str]) -> None:
@@ -57,7 +56,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
     verb = "Add"
 
     for path, text in paths.items():
-        repository = locaterepository(path).repository
+        repository = locaterepository(path)
 
         if path.exists():
             verb = "Update"
@@ -65,7 +64,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
         path.write_text(dedent(text).lstrip())
 
     pathlist = " and ".join(path.name for path in paths)
-    commit(repository, message=f"{verb} {pathlist}")
+    repository.commit(message=f"{verb} {pathlist}")
 
 
 def appendfile(path: Path, text: str) -> None:
@@ -75,11 +74,11 @@ def appendfile(path: Path, text: str) -> None:
 
 def removefile(path: Path) -> None:
     """Remove a repository file."""
-    repository = locaterepository(path).repository
+    repository = locaterepository(path)
 
     path.unlink()
 
-    commit(repository, message=f"Remove {path.name}")
+    repository.commit(message=f"Remove {path.name}")
 
 
 class Side(enum.Enum):

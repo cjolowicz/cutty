@@ -12,7 +12,6 @@ from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import cherrypick
-from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import Repository
@@ -61,9 +60,9 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
-    repository = Repository.open(projectdir).repository
-    commit(repository, message=UPDATE_MESSAGE)
-    updatebranch(repository, LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository = Repository.open(projectdir)
+    repository.commit(message=UPDATE_MESSAGE)
+    updatebranch(repository.repository, LATEST_BRANCH, target=UPDATE_BRANCH)
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:

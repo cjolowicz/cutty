@@ -4,7 +4,6 @@ import pathlib
 import pygit2
 
 from cutty.filestorage.domain.observers import FileStorageObserver
-from cutty.util.git import commit
 from cutty.util.git import Repository
 
 
@@ -42,7 +41,7 @@ class GitRepositoryObserver(FileStorageObserver):
             else UPDATE_MESSAGE
         )
 
-        commit(repository, message=message)
+        Repository(repository).commit(message=message)
 
         if LATEST_BRANCH not in repository.branches:
             repository.branches.create(LATEST_BRANCH, repository.head.peel())

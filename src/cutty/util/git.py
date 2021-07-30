@@ -58,6 +58,15 @@ class Repository:
 
         _fix_repository_head(repository)
 
+    def commit(
+        self, *, message: str = "", signature: Optional[pygit2.Signature] = None
+    ) -> None:
+        """Commit all changes in the repository.
+
+        If there are no changes relative to the parent, this is a noop.
+        """
+        return commit(self.repository, message=message, signature=signature)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
@@ -161,7 +170,7 @@ def cherrypick(repository: pygit2.Repository, reference: str, *, message: str) -
         }
         raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-    commit(repository, message=message)
+    Repository(repository).commit(message=message)
     repository.state_cleanup()
 
 

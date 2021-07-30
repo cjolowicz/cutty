@@ -6,7 +6,6 @@ import pygit2
 import pytest
 
 from cutty.util.git import cherrypick
-from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import Repository
@@ -27,17 +26,17 @@ def test_discover_fail(tmp_path: Path) -> None:
 
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
-    repository = Repository.init(tmp_path / "repository").repository
-    commit(repository, message="initial")
+    repository = Repository.init(tmp_path / "repository")
+    repository.commit(message="initial")
 
-    assert not repository.head.peel().parents
+    assert not repository.repository.head.peel().parents
 
 
 def test_commit_empty(repository: pygit2.Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
     head = repository.head.peel()
 
-    commit(repository, message="empty")
+    Repository(repository).commit(message="empty")
 
     assert head == repository.head.peel()
 
@@ -47,7 +46,7 @@ def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -
     (repositorypath / "a").touch()
 
     signature = pygit2.Signature("Katherine", "katherine@example.com")
-    commit(repository, message="empty", signature=signature)
+    Repository(repository).commit(message="empty", signature=signature)
 
     head = repository.head.peel()
     assert signature.name == head.author.name and signature.email == head.author.email
@@ -59,7 +58,7 @@ def test_commit_message_default(
     """It uses an empty message by default."""
     (repositorypath / "a").touch()
 
-    commit(repository)
+    Repository(repository).commit()
 
     head = repository.head.peel()
     assert "" == head.message
@@ -78,7 +77,7 @@ def test_createbranch_target_branch(repository: pygit2.Repository) -> None:
     branch1 = createbranch(repository, "branch1")
 
     repository.checkout(branch1)
-    commit(repository)
+    Repository(repository).commit()
 
     repository.checkout(main)
     createbranch(repository, "branch2", target="branch1")
@@ -92,7 +91,7 @@ def test_createbranch_target_oid(repository: pygit2.Repository) -> None:
     main = repository.head
     oid = main.peel().id
 
-    commit(repository)
+    Repository(repository).commit()
 
     createbranch(repository, "branch", target=str(oid))
     branch = repository.branches["branch"]

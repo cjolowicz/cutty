@@ -14,7 +14,6 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.util.git import commit
 from cutty.util.git import Repository
 
 
@@ -112,7 +111,7 @@ def test_existing_repository(
 ) -> None:
     """It creates the commit in an existing repository."""
     repository = Repository.init(project)
-    commit(repository.repository)
+    repository.commit()
 
     with storage:
         storage.add(file)
@@ -146,8 +145,9 @@ def test_existing_branch(
 ) -> None:
     """It updates the `update` branch if it exists."""
     repository2 = Repository.init(project)
+    repository2.commit()
+
     repository = repository2.repository
-    commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
 
@@ -162,8 +162,9 @@ def test_existing_branch_not_head(
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
     repository2 = Repository.init(project)
+    repository2.commit()
+
     repository = repository2.repository
-    commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
@@ -177,8 +178,10 @@ def test_existing_branch_commit_message(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It uses a different commit message on updates."""
-    repository = Repository.init(project).repository
-    commit(repository)
+    repository2 = Repository.init(project)
+    repository2.commit()
+
+    repository = repository2.repository
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
@@ -194,9 +197,10 @@ def test_existing_branch_no_changes(
     storage: FileStorage, project: pathlib.Path
 ) -> None:
     """It does not create an empty commit."""
-    repository = Repository.init(project).repository
-    commit(repository)
+    repository2 = Repository.init(project)
+    repository2.commit()
 
+    repository = repository2.repository
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
     oldhead = repository.head.target
