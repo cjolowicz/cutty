@@ -105,11 +105,7 @@ def createbranch(
     force: bool = False,
 ) -> None:
     """Create a branch pointing to the given target."""
-    commit = (
-        repository.branches[target].peel()
-        if target != "HEAD"
-        else repository.head.peel()
-    )
+    commit = repository.revparse_single(target)
     repository.branches.create(branch, commit, force=force)
 
 
