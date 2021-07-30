@@ -67,9 +67,9 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
     assert file.path.name in repository.index
 
 
-def tree(repository: pygit2.Repository) -> pygit2.Tree:
+def tree(repository: Repository) -> pygit2.Tree:
     """Return the tree at the HEAD of the repository."""
-    return repository.head.peel().tree
+    return repository.repository.head.peel().tree
 
 
 def test_hook_edits(
@@ -80,7 +80,7 @@ def test_hook_edits(
         storage.add(file)
         (project / file.path.name).write_bytes(b"teapot")
 
-    repository = Repository.open(project).repository
+    repository = Repository.open(project)
     blob = tree(repository) / file.path.name
     assert b"teapot" == blob.data
 
@@ -93,7 +93,7 @@ def test_hook_deletes(
         storage.add(file)
         (project / file.path.name).unlink()
 
-    repository = Repository.open(project).repository
+    repository = Repository.open(project)
     assert file.path.name not in tree(repository)
 
 
@@ -103,7 +103,7 @@ def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
         project.mkdir()
         (project / "marker").touch()
 
-    repository = Repository.open(project).repository
+    repository = Repository.open(project)
     assert "marker" in tree(repository)
 
 
@@ -111,8 +111,8 @@ def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates the commit in an existing repository."""
-    repository = Repository.init(project).repository
-    commit(repository)
+    repository = Repository.init(project)
+    commit(repository.repository)
 
     with storage:
         storage.add(file)
@@ -145,7 +145,8 @@ def test_existing_branch(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It updates the `update` branch if it exists."""
-    repository = Repository.init(project).repository
+    repository2 = Repository.init(project)
+    repository = repository2.repository
     commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
@@ -153,14 +154,15 @@ def test_existing_branch(
     with storage:
         storage.add(file)
 
-    assert file.path.name in tree(repository)
+    assert file.path.name in tree(repository2)
 
 
 def test_existing_branch_not_head(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
-    repository = Repository.init(project).repository
+    repository2 = Repository.init(project)
+    repository = repository2.repository
     commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
@@ -168,7 +170,7 @@ def test_existing_branch_not_head(
         with storage:
             storage.add(file)
 
-    assert file.path.name not in tree(repository)
+    assert file.path.name not in tree(repository2)
 
 
 def test_existing_branch_commit_message(
