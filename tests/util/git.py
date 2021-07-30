@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.util.git import commit as _commit
+from cutty.util.git import commit
 from cutty.util.git import createbranch
 
 
@@ -16,12 +16,6 @@ def createbranches(
     return tuple(createbranch(repository, name) for name in names)
 
 
-def commit(repositorypath: Path, *, message: str = "") -> None:
-    """Commit all changes in the repository."""
-    repository = pygit2.Repository(repositorypath)
-    _commit(repository, message=message)
-
-
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
     repository = pygit2.Repository(repositorypath)
@@ -30,7 +24,7 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     tree = repository[builder.write()]
     repository.checkout_tree(tree)
 
-    commit(repositorypath, message=f"Move files to subdirectory {directory}")
+    commit(repository, message=f"Move files to subdirectory {directory}")
 
 
 def discoverrepository(path: Path) -> Path:
@@ -49,7 +43,7 @@ def updatefile(path: Path, text: str = "") -> None:
 
     path.write_text(dedent(text).lstrip())
 
-    commit(repository, message=f"{verb} {path.name}")
+    commit(pygit2.Repository(repository), message=f"{verb} {path.name}")
 
 
 def updatefiles(paths: dict[Path, str]) -> None:
@@ -65,7 +59,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
         path.write_text(dedent(text).lstrip())
 
     pathlist = " and ".join(path.name for path in paths)
-    commit(repository, message=f"{verb} {pathlist}")
+    commit(pygit2.Repository(repository), message=f"{verb} {pathlist}")
 
 
 def appendfile(path: Path, text: str) -> None:
@@ -79,7 +73,7 @@ def removefile(path: Path) -> None:
 
     path.unlink()
 
-    commit(repository, message=f"Remove {path.name}")
+    commit(pygit2.Repository(repository), message=f"Remove {path.name}")
 
 
 class Side(enum.Enum):

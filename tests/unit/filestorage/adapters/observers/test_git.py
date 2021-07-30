@@ -14,7 +14,7 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-from tests.util.git import commit
+from cutty.util.git import commit
 
 
 @pytest.fixture
@@ -111,7 +111,7 @@ def test_existing_repository(
 ) -> None:
     """It creates the commit in an existing repository."""
     repository = pygit2.init_repository(project)
-    commit(project)
+    commit(repository)
 
     with storage:
         storage.add(file)
@@ -145,7 +145,7 @@ def test_existing_branch(
 ) -> None:
     """It updates the `update` branch if it exists."""
     repository = pygit2.init_repository(project)
-    commit(project)
+    commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
 
@@ -160,7 +160,7 @@ def test_existing_branch_not_head(
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
     repository = pygit2.init_repository(project)
-    commit(project)
+    commit(repository)
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
@@ -175,7 +175,7 @@ def test_existing_branch_commit_message(
 ) -> None:
     """It uses a different commit message on updates."""
     repository = pygit2.init_repository(project)
-    commit(project)
+    commit(repository)
     repository.branches.create(LATEST_BRANCH, repository.head.peel())
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)
@@ -192,7 +192,7 @@ def test_existing_branch_no_changes(
 ) -> None:
     """It does not create an empty commit."""
     repository = pygit2.init_repository(project)
-    commit(project)
+    commit(repository)
 
     repository.branches.create(UPDATE_BRANCH, repository.head.peel())
     repository.set_head(UPDATE_BRANCH_REF)

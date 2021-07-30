@@ -11,7 +11,7 @@ import pytest
 from click.testing import CliRunner
 
 from cutty.entrypoints.cli import main
-from tests.util.git import commit
+from cutty.util.git import commit
 
 
 @pytest.fixture
@@ -84,6 +84,6 @@ def template_directory(tmp_path: Path) -> Path:
 @pytest.fixture
 def template(template_directory: Path) -> Path:
     """Fixture for a template repository."""
-    pygit2.init_repository(template_directory)
-    commit(template_directory, message="Initial")
+    repository = pygit2.init_repository(template_directory)
+    commit(repository, message="Initial")
     return template_directory
