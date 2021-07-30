@@ -68,7 +68,7 @@ def test_createbranch_returns_branch(
 def createbranches(
     repository: pygit2.Repository, *names: str
 ) -> tuple[pygit2.Branch, ...]:
-    """Create a branch at HEAD."""
+    """Create branches at HEAD."""
     return tuple(createbranch(repository, name) for name in names)
 
 
