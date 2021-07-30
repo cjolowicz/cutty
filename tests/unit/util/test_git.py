@@ -29,6 +29,17 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     assert not repository.head.peel().parents
 
 
+def test_commit_empty(repository: pygit2.Repository) -> None:
+    """It does not produce an empty commit (unless the branch is unborn)."""
+    from cutty.util.git import commit as commit_
+
+    head = repository.head.peel()
+
+    commit_(repository, message="empty")
+
+    assert head == repository.head.peel()
+
+
 def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -> None:
     """It uses the provided signature."""
     from cutty.util.git import commit as commit_
