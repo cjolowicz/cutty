@@ -68,6 +68,10 @@ class Repository:
         """Return the repository head."""
         return self.repository.head
 
+    def set_head(self, target: str) -> None:
+        """Update the repository head."""
+        self.repository.set_head(target)
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
