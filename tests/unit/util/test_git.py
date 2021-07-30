@@ -7,7 +7,6 @@ import pytest
 
 from cutty.util.git import cherrypick
 from cutty.util.git import createbranch
-from cutty.util.git import createworktree
 from cutty.util.git import Repository
 from cutty.util.git import resetmerge
 from tests.util.git import createbranches
@@ -126,7 +125,7 @@ def test_createworktree_creates_worktree(repository: pygit2.Repository) -> None:
     """It creates a worktree."""
     createbranch(repository, "branch")
 
-    with createworktree(repository, "branch") as worktree:
+    with Repository(repository).createworktree("branch") as worktree:
         assert (worktree / ".git").is_file()
 
 
@@ -134,7 +133,7 @@ def test_createworktree_removes_worktree_on_exit(repository: pygit2.Repository) 
     """It removes the worktree on exit."""
     createbranch(repository, "branch")
 
-    with createworktree(repository, "branch") as worktree:
+    with Repository(repository).createworktree("branch") as worktree:
         pass
 
     assert not worktree.is_dir()
@@ -147,7 +146,7 @@ def test_createworktree_does_checkout(
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repository, "branch") as worktree:
+    with Repository(repository).createworktree("branch") as worktree:
         assert (worktree / path.name).is_file()
 
 
@@ -156,7 +155,7 @@ def test_createworktree_no_checkout(repository: pygit2.Repository, path: Path) -
     updatefile(path)
     createbranch(repository, "branch")
 
-    with createworktree(repository, "branch", checkout=False) as worktree:
+    with Repository(repository).createworktree("branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
 
 

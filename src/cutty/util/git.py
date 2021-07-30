@@ -80,6 +80,12 @@ class Repository:
         parents = [] if repository.head_is_unborn else [repository.head.target]
         repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
+    @contextmanager
+    def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
+        """Create a worktree for the branch in the repository."""
+        with createworktree(self.repository, branch, checkout=checkout) as path:
+            yield path
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
