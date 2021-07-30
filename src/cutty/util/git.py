@@ -33,6 +33,11 @@ class Repository:
         repository = pygit2.init_repository(path, initial_head=head)
         return cls(repository)
 
+    @classmethod
+    def clone(cls, url: str, destination: Path) -> None:
+        """Clone a repository using a mirror configuration."""
+        clonerepository(url, destination)
+
 
 def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     """Work around a bug in libgit2 resulting in a bogus HEAD reference.
