@@ -4,12 +4,20 @@ import hashlib
 import os
 import tempfile
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
+
+
+@dataclass
+class Repository:
+    """Git repository."""
+
+    repository: pygit2.Repository
 
 
 def openrepository(path: Path) -> pygit2.Repository:
