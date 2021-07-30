@@ -107,9 +107,10 @@ def test_createbranch_returns_branch(
     assert branch == repository.branches["branch"]
 
 
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+def createconflict(
+    repository: pygit2.Repository, path: Path, *, ours: str, theirs: str
+) -> None:
     """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
     main = repository.head
     update, _ = createbranches(repository, "update", "latest")
 
@@ -211,10 +212,10 @@ def test_cherrypick_conflict_deletion(
 
 
 def test_resetmerge_restores_files_with_conflicts(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository: pygit2.Repository, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     resetmerge(repository, parent="latest", cherry="update")
 
     assert path.read_text() == "a"
@@ -316,11 +317,9 @@ def test_resetmerge_keeps_unrelated_deletions(
     assert not path2.exists()
 
 
-def test_resetmerge_resets_index(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
+def test_resetmerge_resets_index(repository: pygit2.Repository, path: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     resetmerge(repository, parent="latest", cherry="update")
 
