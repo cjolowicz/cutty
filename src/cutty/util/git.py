@@ -25,7 +25,7 @@ def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
 def commit(
     repository: pygit2.Repository,
     *,
-    message: str,
+    message: str = "",
     signature: Optional[pygit2.Signature] = None,
 ) -> None:
     """Commit all changes in the repository.
