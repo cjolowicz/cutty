@@ -47,6 +47,21 @@ def test_createbranch_target_branch(
     assert branch1.peel() == branch2.peel()
 
 
+def test_createbranch_target_oid(
+    repository: pygit2.Repository, repositorypath: Path
+) -> None:
+    """It creates the branch at the commit with the given OID."""
+    main = repository.head
+    oid = main.peel().id
+
+    commit(repositorypath)
+
+    createbranch_(repository, "branch", target=str(oid))
+    branch = repository.branches["branch"]
+
+    assert oid == branch.peel().id
+
+
 def createbranches(
     repository: pygit2.Repository, *names: str
 ) -> tuple[pygit2.Branch, ...]:
