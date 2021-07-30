@@ -20,19 +20,11 @@ from tests.util.git import updatefile
 pytest_plugins = ["tests.fixtures.git"]
 
 
-def cuttybranches(
-    repository: pygit2.Repository,
-) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
-    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
-    main = repository.head
-    update, latest = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
-    return main, update, latest
-
-
 def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
     updatefile(path, theirs)
