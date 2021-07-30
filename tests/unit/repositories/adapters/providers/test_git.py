@@ -26,13 +26,13 @@ def url(tmp_path: pathlib.Path) -> URL:
     (path / "marker").write_text("Lorem")
 
     repository = Repository.init(path)
-    repository.repository.index.add("marker")
+    repository.index.add("marker")
     repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.repository.index.write_tree(),
+        repository.index.write_tree(),
         [],
     )
 
@@ -45,13 +45,13 @@ def url(tmp_path: pathlib.Path) -> URL:
     )
 
     (path / "marker").write_text("Ipsum")
-    repository.repository.index.add("marker")
+    repository.index.add("marker")
     repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Update marker",
-        repository.repository.index.write_tree(),
+        repository.index.write_tree(),
         [repository.repository.head.target],
     )
 

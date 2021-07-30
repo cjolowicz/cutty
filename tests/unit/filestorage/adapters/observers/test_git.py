@@ -63,7 +63,7 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
         storage.add(file)
 
     repository = Repository.open(project)
-    assert file.path.name in repository.repository.index
+    assert file.path.name in repository.index
 
 
 def tree(repository: Repository) -> pygit2.Tree:

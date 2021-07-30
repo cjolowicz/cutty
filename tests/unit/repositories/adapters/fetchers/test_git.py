@@ -28,13 +28,13 @@ def url(tmp_path: pathlib.Path) -> URL:
     (path / "marker").write_text("Lorem")
 
     repository = Repository.init(path)
-    repository.repository.index.add("marker")
+    repository.index.add("marker")
     repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        repository.repository.index.write_tree(),
+        repository.index.write_tree(),
         [],
     )
 
@@ -65,14 +65,14 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     # Remove the marker file.
     repository = Repository.open(aspath(url))
     tree = repository.repository.head.peel(pygit2.Tree)
-    repository.repository.index.read_tree(tree)
-    repository.repository.index.remove("marker")
+    repository.index.read_tree(tree)
+    repository.index.remove("marker")
     repository.repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Remove the marker file",
-        repository.repository.index.write_tree(),
+        repository.index.write_tree(),
         [repository.repository.head.target],
     )
 
@@ -142,7 +142,7 @@ def test_broken_head_after_clone_unexpected_branch(
         signature,
         signature,
         "Initial",
-        repository.repository.index.write_tree(),
+        repository.index.write_tree(),
         [],
     )
 

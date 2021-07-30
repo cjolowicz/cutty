@@ -314,7 +314,4 @@ def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
 
     repository.resetmerge(parent="latest", cherry="update")
 
-    assert (
-        repository.repository.index.write_tree()
-        == repository.repository.head.peel().tree.id
-    )
+    assert repository.index.write_tree() == repository.repository.head.peel().tree.id

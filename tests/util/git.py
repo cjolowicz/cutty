@@ -92,11 +92,11 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     """Resolve the conflicts."""
     repository = Repository.open(repositorypath)
     pathstr = str(path.relative_to(repositorypath))
-    ancestor, ours, theirs = repository.repository.index.conflicts[pathstr]
+    ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
 
-    del repository.repository.index.conflicts[pathstr]
+    del repository.index.conflicts[pathstr]
 
-    repository.repository.index.add(resolution)
-    repository.repository.index.write()
+    repository.index.add(resolution)
+    repository.index.write()
     repository.repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
