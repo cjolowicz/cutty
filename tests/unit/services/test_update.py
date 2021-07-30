@@ -26,10 +26,10 @@ def createconflict(
     main = repository.head
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path, theirs)
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
