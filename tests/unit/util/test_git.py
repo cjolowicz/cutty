@@ -19,6 +19,16 @@ from tests.util.git import updatefiles
 pytest_plugins = ["tests.fixtures.git"]
 
 
+def test_commit_on_unborn_branch(tmp_path: Path) -> None:
+    """It creates a commit without parents."""
+    from cutty.util.git import commit as commit_
+
+    repository = pygit2.init_repository(tmp_path / "repository")
+    commit_(repository, message="initial")
+
+    assert not repository.head.peel().parents
+
+
 def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     """It creates the branch at HEAD by default."""
     createbranch(repository, "branch")
