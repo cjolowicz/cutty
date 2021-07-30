@@ -41,14 +41,13 @@ def test_continueupdate_commits_changes(
     repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It commits the changes."""
-    repository = repository2.repository
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository2.repository, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
         continueupdate()
 
-    blob = repository.head.peel().tree / path.name
+    blob = repository2.repository.head.peel().tree / path.name
     assert blob.data == b"b"
 
 
@@ -56,14 +55,13 @@ def test_continueupdate_fastforwards_latest(
     repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    repository = repository2.repository
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository2.repository, path, ours="a", theirs="b")
     resolveconflicts(repositorypath, path, Side.THEIRS)
 
     with chdir(repositorypath):
         continueupdate()
 
-    branches = repository.branches
+    branches = repository2.repository.branches
     assert branches[LATEST_BRANCH].peel() == branches[UPDATE_BRANCH].peel()
 
 
@@ -71,25 +69,23 @@ def test_skipupdate_fastforwards_latest(
     repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    repository = repository2.repository
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository2.repository, path, ours="a", theirs="b")
 
-    updatehead = repository.branches[UPDATE_BRANCH].peel()
+    updatehead = repository2.repository.branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
         skipupdate()
 
-    assert repository.branches[LATEST_BRANCH].peel() == updatehead
+    assert repository2.repository.branches[LATEST_BRANCH].peel() == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(
     repository2: Repository, repositorypath: Path, path: Path
 ) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    repository = repository2.repository
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository2.repository, path, ours="a", theirs="b")
 
-    branches = repository.branches
+    branches = repository2.repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
 
     with chdir(repositorypath):
