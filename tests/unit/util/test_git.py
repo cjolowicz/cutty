@@ -107,7 +107,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    update, _ = createbranches(repository, "update", "latest")
+    update, _ = createbranches(Repository(repository), "update", "latest")
 
     repository.checkout(update)
     updatefile(path, theirs)
@@ -217,7 +217,7 @@ def test_resetmerge_removes_added_files(
 ) -> None:
     """It removes files added by the cherry-picked commit."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -239,7 +239,7 @@ def test_resetmerge_keeps_unrelated_additions(
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -263,7 +263,7 @@ def test_resetmerge_keeps_unrelated_changes(
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)
@@ -288,7 +288,7 @@ def test_resetmerge_keeps_unrelated_deletions(
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main = repository.repository.head
-    update, _ = createbranches(repository.repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.repository.checkout(update)

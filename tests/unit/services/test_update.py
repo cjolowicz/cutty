@@ -25,7 +25,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    update, _ = createbranches(Repository(repository), UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
     updatefile(path, theirs)
