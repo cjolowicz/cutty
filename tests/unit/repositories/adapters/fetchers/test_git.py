@@ -125,7 +125,7 @@ def test_broken_head_after_clone(
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
     assert destination is not None
     repository = Repository.open(destination)
-    head = repository.repository.references["HEAD"]
+    head = repository.references["HEAD"]
     assert head.target != f"refs/heads/{custom_default_branch}"
 
 

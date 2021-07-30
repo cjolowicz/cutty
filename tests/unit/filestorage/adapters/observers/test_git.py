@@ -125,7 +125,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    reference = repository.repository.references[LATEST_BRANCH_REF]
+    reference = repository.references[LATEST_BRANCH_REF]
     assert repository.head.peel() == reference.peel()
 
 
@@ -137,7 +137,7 @@ def test_branch_not_checked_out(
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.repository.references["HEAD"].target != LATEST_BRANCH_REF
+    assert repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 
 def test_existing_branch(
