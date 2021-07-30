@@ -87,6 +87,10 @@ class Repository:
         """Return the repository remotes."""
         return self.repository.remotes
 
+    def checkout(self, reference: pygit2.Reference) -> None:
+        """Check out the given reference."""
+        self.repository.checkout(reference)
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
