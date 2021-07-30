@@ -6,11 +6,10 @@ import pygit2
 import pytest
 
 from cutty.util.git import cherrypick
-from cutty.util.git import commit as commit_
+from cutty.util.git import commit
 from cutty.util.git import createbranch
 from cutty.util.git import createworktree
 from cutty.util.git import resetmerge
-from tests.util.git import commit
 from tests.util.git import createbranches
 from tests.util.git import removefile
 from tests.util.git import updatefile
@@ -23,7 +22,7 @@ pytest_plugins = ["tests.fixtures.git"]
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
     repository = pygit2.init_repository(tmp_path / "repository")
-    commit_(repository, message="initial")
+    commit(repository, message="initial")
 
     assert not repository.head.peel().parents
 
@@ -32,7 +31,7 @@ def test_commit_empty(repository: pygit2.Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
     head = repository.head.peel()
 
-    commit_(repository, message="empty")
+    commit(repository, message="empty")
 
     assert head == repository.head.peel()
 
@@ -42,7 +41,7 @@ def test_commit_signature(repository: pygit2.Repository, repositorypath: Path) -
     (repositorypath / "a").touch()
 
     signature = pygit2.Signature("Katherine", "katherine@example.com")
-    commit_(repository, message="empty", signature=signature)
+    commit(repository, message="empty", signature=signature)
 
     head = repository.head.peel()
     assert signature.name == head.author.name and signature.email == head.author.email
@@ -54,7 +53,7 @@ def test_commit_message_default(
     """It uses an empty message by default."""
     (repositorypath / "a").touch()
 
-    commit_(repository)
+    commit(repository)
 
     head = repository.head.peel()
     assert "" == head.message
@@ -67,15 +66,13 @@ def test_createbranch_target_default(repository: pygit2.Repository) -> None:
     assert repository.branches["branch"].peel() == repository.head.peel()
 
 
-def test_createbranch_target_branch(
-    repository: pygit2.Repository, repositorypath: Path
-) -> None:
+def test_createbranch_target_branch(repository: pygit2.Repository) -> None:
     """It creates the branch at the head of the given branch."""
     main = repository.head
     branch1 = createbranch(repository, "branch1")
 
     repository.checkout(branch1)
-    commit(repositorypath)
+    commit(repository)
 
     repository.checkout(main)
     createbranch(repository, "branch2", target="branch1")
@@ -84,14 +81,12 @@ def test_createbranch_target_branch(
     assert branch1.peel() == branch2.peel()
 
 
-def test_createbranch_target_oid(
-    repository: pygit2.Repository, repositorypath: Path
-) -> None:
+def test_createbranch_target_oid(repository: pygit2.Repository) -> None:
     """It creates the branch at the commit with the given OID."""
     main = repository.head
     oid = main.peel().id
 
-    commit(repositorypath)
+    commit(repository)
 
     createbranch(repository, "branch", target=str(oid))
     branch = repository.branches["branch"]
@@ -99,17 +94,16 @@ def test_createbranch_target_oid(
     assert oid == branch.peel().id
 
 
-def test_createbranch_returns_branch(
-    repository: pygit2.Repository, repositorypath: Path
-) -> None:
+def test_createbranch_returns_branch(repository: pygit2.Repository) -> None:
     """It returns the branch object."""
     branch = createbranch(repository, "branch")
     assert branch == repository.branches["branch"]
 
 
-def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
+def createconflict(
+    repository: pygit2.Repository, path: Path, *, ours: str, theirs: str
+) -> None:
     """Create an update conflict."""
-    repository = pygit2.Repository(repositorypath)
     main = repository.head
     update, _ = createbranches(repository, "update", "latest")
 
@@ -211,10 +205,10 @@ def test_cherrypick_conflict_deletion(
 
 
 def test_resetmerge_restores_files_with_conflicts(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
+    repository: pygit2.Repository, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
     resetmerge(repository, parent="latest", cherry="update")
 
     assert path.read_text() == "a"
@@ -316,11 +310,9 @@ def test_resetmerge_keeps_unrelated_deletions(
     assert not path2.exists()
 
 
-def test_resetmerge_resets_index(
-    repository: pygit2.Repository, repositorypath: Path, path: Path
-) -> None:
+def test_resetmerge_resets_index(repository: pygit2.Repository, path: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repositorypath, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b")
 
     resetmerge(repository, parent="latest", cherry="update")
 

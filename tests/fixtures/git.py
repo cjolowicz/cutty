@@ -6,15 +6,15 @@ from pathlib import Path
 import pygit2
 import pytest
 
-from tests.util.git import commit
+from cutty.util.git import commit
 
 
 @pytest.fixture
 def repositorypath(tmp_path: Path) -> Path:
     """Fixture for a repository."""
     repositorypath = tmp_path / "repository"
-    pygit2.init_repository(repositorypath)
-    commit(repositorypath)
+    repository = pygit2.init_repository(repositorypath)
+    commit(repository)
     return repositorypath
 
 

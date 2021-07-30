@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pygit2
 
-from cutty.util.git import commit as _commit
+from cutty.util.git import commit
 from cutty.util.git import createbranch
 
 
@@ -16,13 +16,6 @@ def createbranches(
     return tuple(createbranch(repository, name) for name in names)
 
 
-def commit(repositorypath: Path, *, message: str = "") -> None:
-    """Commit all changes in the repository."""
-    repository = pygit2.Repository(repositorypath)
-    signature = pygit2.Signature("you", "you@example.com")
-    _commit(repository, message=message, signature=signature)
-
-
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
     repository = pygit2.Repository(repositorypath)
@@ -31,15 +24,15 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     tree = repository[builder.write()]
     repository.checkout_tree(tree)
 
-    commit(repositorypath, message=f"Move files to subdirectory {directory}")
+    commit(repository, message=f"Move files to subdirectory {directory}")
 
 
-def discoverrepository(path: Path) -> Path:
+def discoverrepository(path: Path) -> pygit2.Repository:
     """Discover a git repository."""
     while path.name and not path.exists():
         path = path.parent
 
-    return Path(pygit2.discover_repository(path))
+    return pygit2.Repository(pygit2.discover_repository(path))
 
 
 def updatefile(path: Path, text: str = "") -> None:
