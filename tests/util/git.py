@@ -6,6 +6,14 @@ from textwrap import dedent
 import pygit2
 
 from cutty.util.git import commit as _commit
+from cutty.util.git import createbranch
+
+
+def createbranches(
+    repository: pygit2.Repository, *names: str
+) -> tuple[pygit2.Branch, ...]:
+    """Create branches at HEAD."""
+    return tuple(createbranch(repository, name) for name in names)
 
 
 def commit(repositorypath: Path, *, message: str = "") -> None:

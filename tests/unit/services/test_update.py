@@ -11,6 +11,7 @@ from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.util.git import cherrypick
 from tests.util.files import chdir
+from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -19,25 +20,11 @@ from tests.util.git import updatefile
 pytest_plugins = ["tests.fixtures.git"]
 
 
-def createbranch(repository: pygit2.Repository, name: str) -> pygit2.Branch:
-    """Create a branch at HEAD."""
-    return repository.branches.create(name, repository.head.peel())
-
-
-def cuttybranches(
-    repository: pygit2.Repository,
-) -> tuple[pygit2.Reference, pygit2.Reference, pygit2.Reference]:
-    """Return the current, the `cutty/latest`, and the `cutty/update` branches."""
-    main = repository.head
-    update = createbranch(repository, UPDATE_BRANCH)
-    latest = createbranch(repository, LATEST_BRANCH)
-    return main, update, latest
-
-
 def createconflict(repositorypath: Path, path: Path, *, ours: str, theirs: str) -> None:
     """Create an update conflict."""
     repository = pygit2.Repository(repositorypath)
-    main, update, _ = cuttybranches(repository)
+    main = repository.head
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
     updatefile(path, theirs)
