@@ -28,8 +28,8 @@ def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) 
     commit(repository, message=f"Move files to subdirectory {directory}")
 
 
-def discoverrepository(path: Path) -> pygit2.Repository:
-    """Discover a git repository."""
+def locaterepository(path: Path) -> pygit2.Repository:
+    """Locate the git repository containing the given path."""
     while path.name and not path.exists():
         path = path.parent
 
@@ -40,7 +40,7 @@ def discoverrepository(path: Path) -> pygit2.Repository:
 
 def updatefile(path: Path, text: str = "") -> None:
     """Add or update a repository file."""
-    repository = discoverrepository(path)
+    repository = locaterepository(path)
 
     verb = "Update" if path.exists() else "Add"
 
@@ -54,7 +54,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
     verb = "Add"
 
     for path, text in paths.items():
-        repository = discoverrepository(path)
+        repository = locaterepository(path)
 
         if path.exists():
             verb = "Update"
@@ -72,7 +72,7 @@ def appendfile(path: Path, text: str) -> None:
 
 def removefile(path: Path) -> None:
     """Remove a repository file."""
-    repository = discoverrepository(path)
+    repository = locaterepository(path)
 
     path.unlink()
 
