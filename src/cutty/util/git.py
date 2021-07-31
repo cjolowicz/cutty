@@ -129,13 +129,18 @@ class Repository:
                 # Emulate `--no-checkout` by checking out an empty tree after the fact.
                 # https://github.com/libgit2/libgit2/issues/5949
                 worktreerepository = Repository.open(path)
-                checkoutemptytree(worktreerepository._repository)
+                worktreerepository._checkoutemptytree()
 
             yield path
 
         # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
         # https://github.com/libgit2/libgit2/issues/5280
         worktree.prune(True)
+
+    def _checkoutemptytree(self) -> None:
+        """Check out an empty tree from the repository."""
+        oid = self._repository.TreeBuilder().write()
+        self._repository.checkout_tree(self._repository[oid])
 
     def cherrypick(self, reference: str, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
@@ -227,9 +232,3 @@ def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
             os.environ["GIT_AUTHOR_EMAIL"],
         )
     return repository.default_signature  # pragma: no cover
-
-
-def checkoutemptytree(repository: pygit2.Repository) -> None:
-    """Check out an empty tree from the repository."""
-    oid = repository.TreeBuilder().write()
-    repository.checkout_tree(repository[oid])
