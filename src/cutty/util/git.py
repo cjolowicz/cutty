@@ -59,8 +59,11 @@ class Repository:
 
         _fix_repository_head(repository)
 
-    def fetch(self) -> None:
-        """Fetch all remotes, pruning stale references."""
+    def fetch(self, *, prune: bool = False) -> None:
+        """Fetch all remotes."""
+        if not prune:  # pragma: no cover
+            raise NotImplementedError("fetch without prune is not implemented")
+
         for remote in self._repository.remotes:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
