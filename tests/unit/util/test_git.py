@@ -118,6 +118,15 @@ def test_branches_keys(repository: Repository) -> None:
     assert main == branch
 
 
+def test_branches_pop(repository: Repository) -> None:
+    """It removes the branch and returns the commit at its head."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    branches["branch"] = branches[main]
+    commit = branches.pop("branch")
+    assert branches[main] == commit
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
