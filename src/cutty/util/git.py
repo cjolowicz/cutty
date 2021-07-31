@@ -26,6 +26,12 @@ class Branches:
         """Return the number of branches."""
         return sum(1 for _ in self._branches)
 
+    def __bool__(self) -> bool:
+        """Return True if there are any branches."""
+        for _ in self._branches:
+            return True
+        return False
+
 
 @dataclass
 class Repository:
