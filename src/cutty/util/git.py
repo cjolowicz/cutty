@@ -15,6 +15,18 @@ import pygit2.repository
 from cutty.compat.contextlib import contextmanager
 
 
+class Branches:
+    """Branches in a git repository."""
+
+    def __init__(self, branches: pygit2.repository.Branches) -> None:
+        """Initialize."""
+        self._branches = branches
+
+    def __len__(self) -> int:
+        """Return the number of branches."""
+        return sum(1 for _ in self._branches)
+
+
 @dataclass
 class Repository:
     """Git repository."""
