@@ -43,8 +43,10 @@ class Repository:
         return cls(repository, path)
 
     @classmethod
-    def clone(cls, url: str, destination: Path) -> None:
+    def clone(cls, url: str, destination: Path, *, mirror: bool = False) -> None:
         """Clone a repository using a mirror configuration."""
+        if not mirror:  # pragma: no cover
+            raise NotImplementedError("clone without mirror is not implemented")
 
         def _createremote(
             repository: pygit2.Repository, name: bytes, url: bytes

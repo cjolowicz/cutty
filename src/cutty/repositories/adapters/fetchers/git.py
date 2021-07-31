@@ -23,4 +23,4 @@ def gitfetcher(
         repository = Repository.open(destination)
         repository.fetch(prune=True)
     else:
-        Repository.clone(str(url), destination)
+        Repository.clone(str(url), destination, mirror=True)
