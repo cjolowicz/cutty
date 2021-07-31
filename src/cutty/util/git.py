@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import pygit2.remote
 import pygit2.repository
 
 from cutty.compat.contextlib import contextmanager
@@ -88,11 +87,6 @@ class Repository:
     def branches(self) -> pygit2.repository.Branches:
         """Return the repository branches."""
         return self._repository.branches
-
-    @property
-    def remotes(self) -> pygit2.remote.RemoteCollection:
-        """Return the repository remotes."""
-        return self._repository.remotes
 
     def checkout(self, reference: pygit2.Reference) -> None:
         """Check out the given reference."""
