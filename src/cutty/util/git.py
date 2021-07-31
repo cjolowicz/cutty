@@ -36,6 +36,10 @@ class Branches:
         """Return True if the branch exists."""
         return name in self._branches
 
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the branches."""
+        return iter(self._branches)
+
 
 @dataclass
 class Repository:
