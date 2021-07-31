@@ -48,6 +48,10 @@ class Branches:
         """Create the branch, or reset the branch to another commit."""
         self._branches.create(name, commit, force=True)
 
+    def __delitem__(self, name: str) -> None:
+        """Remove the branch."""
+        self._branches.delete(name)
+
 
 @dataclass
 class Repository:
