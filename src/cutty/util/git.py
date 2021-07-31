@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 import pygit2.remote
+import pygit2.repository
 
 from cutty.compat.contextlib import contextmanager
 
@@ -78,7 +79,7 @@ class Repository:
         return self._repository.references
 
     @property
-    def branches(self) -> pygit2.Branches:
+    def branches(self) -> pygit2.repository.Branches:
         """Return the repository branches."""
         return self._repository.branches
 
