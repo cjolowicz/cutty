@@ -128,6 +128,11 @@ class Repository:
         """Return the repository branches."""
         return self._repository.branches
 
+    @property
+    def branches2(self) -> Branches:
+        """Return the repository branches."""
+        return Branches(self._repository.branches)
+
     def checkout(self, reference: pygit2.Reference) -> None:
         """Check out the given reference."""
         self._repository.checkout(reference)
