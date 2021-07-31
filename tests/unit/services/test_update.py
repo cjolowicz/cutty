@@ -56,32 +56,32 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
     with chdir(repository.path):
         continueupdate()
 
-    assert repository.branches2[LATEST_BRANCH] == repository.branches2[UPDATE_BRANCH]
+    assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
 
 
 def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.branches2[UPDATE_BRANCH]
+    updatehead = repository.branches[UPDATE_BRANCH]
 
     with chdir(repository.path):
         skipupdate()
 
-    assert repository.branches2[LATEST_BRANCH] == updatehead
+    assert repository.branches[LATEST_BRANCH] == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
     """It resets the update branch to the tip of the latest branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    latesthead = repository.branches2[LATEST_BRANCH]
+    latesthead = repository.branches[LATEST_BRANCH]
 
     with chdir(repository.path):
         abortupdate()
 
     assert (
-        repository.branches2[LATEST_BRANCH]
+        repository.branches[LATEST_BRANCH]
         == latesthead
-        == repository.branches2[UPDATE_BRANCH]
+        == repository.branches[UPDATE_BRANCH]
     )

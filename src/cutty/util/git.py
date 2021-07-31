@@ -124,7 +124,7 @@ class Repository:
         return self._repository.references
 
     @property
-    def branches2(self) -> Branches:
+    def branches(self) -> Branches:
         """Return the repository branches."""
         return Branches(self._repository.branches)
 
@@ -227,7 +227,7 @@ class Repository:
 
     def updatebranch(self, branch: str, *, target: str) -> None:
         """Update a branch to the given target, another branch."""
-        self.branches2[branch] = self.branches2[target]
+        self.branches[branch] = self.branches[target]
 
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.
@@ -239,8 +239,8 @@ class Repository:
         self._repository.index.read_tree(self._repository.head.peel().tree)
         self._repository.index.write()
 
-        parenttree = self.branches2[parent].peel(pygit2.Tree)
-        cherrytree = self.branches2[cherry].peel(pygit2.Tree)
+        parenttree = self.branches[parent].peel(pygit2.Tree)
+        cherrytree = self.branches[cherry].peel(pygit2.Tree)
         diff = cherrytree.diff_to_tree(parenttree)
         paths = [
             file.path
