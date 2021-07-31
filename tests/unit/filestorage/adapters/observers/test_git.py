@@ -45,7 +45,7 @@ def test_repository(
     with storage:
         storage.add(file)
 
-    Repository.open(project).repository  # does not raise
+    Repository.open(project)  # does not raise
 
 
 def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
