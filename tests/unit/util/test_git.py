@@ -5,6 +5,7 @@ from pathlib import Path
 import pygit2
 import pytest
 
+from cutty.util.git import Branches
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import removefile
@@ -13,6 +14,19 @@ from tests.util.git import updatefiles
 
 
 pytest_plugins = ["tests.fixtures.git"]
+
+
+def test_branches_len_empty(tmp_path: Path) -> None:
+    """It returns zero if there are no branches."""
+    repository = Repository.init(tmp_path / "repository")
+    branches = Branches(repository.branches)
+    assert not len(branches)
+
+
+def test_branches_len_nonzero(repository: Repository) -> None:
+    """It returns the number of branches."""
+    branches = Branches(repository.branches)
+    assert 1 == len(branches)
 
 
 def test_discover_fail(tmp_path: Path) -> None:
