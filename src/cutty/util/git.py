@@ -32,6 +32,10 @@ class Branches:
             return True
         return False
 
+    def __contains__(self, name: object) -> bool:
+        """Return True if the branch exists."""
+        return name in self._branches
+
 
 @dataclass
 class Repository:
