@@ -44,9 +44,9 @@ def test_commit_empty(repository: Repository) -> None:
     assert head == repository.head.peel()
 
 
-def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
+def test_commit_signature(repository: Repository) -> None:
     """It uses the provided signature."""
-    (repositorypath / "a").touch()
+    (repository.path / "a").touch()
 
     signature = pygit2.Signature("Katherine", "katherine@example.com")
     repository.commit(message="empty", signature=signature)
@@ -55,9 +55,9 @@ def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
-def test_commit_message_default(repository: Repository, repositorypath: Path) -> None:
+def test_commit_message_default(repository: Repository) -> None:
     """It uses an empty message by default."""
-    (repositorypath / "a").touch()
+    (repository.path / "a").touch()
 
     repository.commit()
 
