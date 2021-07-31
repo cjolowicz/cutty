@@ -76,6 +76,24 @@ def test_branches_getitem_pass(repository: Repository) -> None:
     assert repository.head.peel() == branches[main]
 
 
+def test_branches_setitem_new(repository: Repository) -> None:
+    """It creates a branch pointing to the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    branches["branch"] = branches[main]
+    assert branches["branch"] == branches[main]
+
+
+def test_branches_setitem_existing(repository: Repository) -> None:
+    """It resets the branch to the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    branches["branch"] = branches[main]
+    updatefile(repository.path / "file")
+    branches["branch"] = branches[main]
+    assert branches["branch"] == branches[main]
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
