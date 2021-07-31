@@ -42,6 +42,19 @@ def test_branches_bool_nonzero(repository: Repository) -> None:
     assert branches
 
 
+def test_branches_contains_false(repository: Repository) -> None:
+    """It returns False if the branch does not exist."""
+    branches = Branches(repository.branches)
+    assert "branch" not in branches
+
+
+def test_branches_contains_true(repository: Repository) -> None:
+    """It returns True if the branch exists."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    assert main in branches
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
