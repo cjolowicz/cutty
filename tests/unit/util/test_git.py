@@ -55,6 +55,13 @@ def test_branches_contains_true(repository: Repository) -> None:
     assert main in branches
 
 
+def test_branches_iter(repository: Repository) -> None:
+    """It yields the name of each branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    assert [main] == list(iter(branches))
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
