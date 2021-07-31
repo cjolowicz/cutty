@@ -44,6 +44,10 @@ class Branches:
         """Return the commit at the head of the branch."""
         return self._branches[name].peel(pygit2.Commit)
 
+    def __setitem__(self, name: str, commit: pygit2.Commit) -> None:
+        """Create the branch, or reset the branch to another commit."""
+        self._branches.create(name, commit, force=True)
+
 
 @dataclass
 class Repository:
