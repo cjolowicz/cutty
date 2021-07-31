@@ -92,6 +92,16 @@ class Repository:
         """Check out the given reference."""
         self._repository.checkout(reference)
 
+    @property
+    def default_signature(self) -> pygit2.Signature:
+        """Return the default signature."""
+        with contextlib.suppress(KeyError):
+            return pygit2.Signature(
+                os.environ["GIT_AUTHOR_NAME"],
+                os.environ["GIT_AUTHOR_EMAIL"],
+            )
+        return self._repository.default_signature  # pragma: no cover
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
@@ -108,7 +118,7 @@ class Repository:
         self.index.write()
 
         if signature is None:
-            signature = default_signature(self._repository)
+            signature = self.default_signature
 
         parents = [] if self._repository.head_is_unborn else [self.head.target]
         self._repository.create_commit(
@@ -160,9 +170,12 @@ class Repository:
 
     def createtag(self, name: str, *, message: str) -> None:
         """Create a tag at HEAD."""
-        signature = default_signature(self._repository)
         self._repository.create_tag(
-            name, self.head.target, pygit2.GIT_OBJ_COMMIT, signature, message
+            name,
+            self.head.target,
+            pygit2.GIT_OBJ_COMMIT,
+            self.default_signature,
+            message,
         )
 
     def createbranch(
@@ -221,13 +234,3 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
             break
 
     return head.resolve()
-
-
-def default_signature(repository: pygit2.Repository) -> pygit2.Signature:
-    """Return the default signature."""
-    with contextlib.suppress(KeyError):
-        return pygit2.Signature(
-            os.environ["GIT_AUTHOR_NAME"],
-            os.environ["GIT_AUTHOR_EMAIL"],
-        )
-    return repository.default_signature  # pragma: no cover
