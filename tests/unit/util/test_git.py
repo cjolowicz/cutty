@@ -110,6 +110,14 @@ def test_branches_delitem_pass(repository: Repository) -> None:
     assert "branch" not in branches
 
 
+def test_branches_keys(repository: Repository) -> None:
+    """It returns the branch names."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    [branch] = branches.keys()
+    assert main == branch
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
