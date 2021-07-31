@@ -88,8 +88,8 @@ class Side(enum.Enum):
 
 
 def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
-    """Resolve the conflicts."""
-    repository = Repository.open(repositorypath)
+    """Resolve conflicts in the given file."""
+    repository = pygit2.Repository(repositorypath)
     pathstr = str(path.relative_to(repositorypath))
     ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
@@ -98,4 +98,4 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
 
     repository.index.add(resolution)
     repository.index.write()
-    repository.repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
