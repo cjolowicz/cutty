@@ -244,8 +244,8 @@ class Repository:
         self._repository.index.read_tree(self._repository.head.peel().tree)
         self._repository.index.write()
 
-        parenttree = self._repository.branches[parent].peel(pygit2.Tree)
-        cherrytree = self._repository.branches[cherry].peel(pygit2.Tree)
+        parenttree = self.branches2[parent].peel(pygit2.Tree)
+        cherrytree = self.branches2[cherry].peel(pygit2.Tree)
         diff = cherrytree.diff_to_tree(parenttree)
         paths = [
             file.path
