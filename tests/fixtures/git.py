@@ -9,18 +9,17 @@ from cutty.util.git import Repository
 
 
 @pytest.fixture
-def repositorypath(tmp_path: Path) -> Path:
+def repository(tmp_path: Path) -> Repository:
     """Fixture for a repository."""
-    repositorypath = tmp_path / "repository"
-    repository = Repository.init(repositorypath)
+    repository = Repository.init(tmp_path / "repository")
     repository.commit()
-    return repositorypath
+    return repository
 
 
 @pytest.fixture
-def repository(repositorypath: Path) -> Repository:
+def repositorypath(repository: Repository) -> Path:
     """Fixture for a repository."""
-    return Repository.open(repositorypath)
+    return repository.path
 
 
 @pytest.fixture
