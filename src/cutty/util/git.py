@@ -60,6 +60,11 @@ class Repository:
 
         _fix_repository_head(repository)
 
+    def fetch(self) -> None:
+        """Fetch all remotes, pruning stale references."""
+        for remote in self._repository.remotes:
+            remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
+
     @property
     def index(self) -> pygit2.Index:
         """Return the repository index."""
