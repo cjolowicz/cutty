@@ -62,6 +62,20 @@ def test_branches_iter(repository: Repository) -> None:
     assert [main] == list(iter(branches))
 
 
+def test_branches_getitem_fail(repository: Repository) -> None:
+    """It raises KeyError."""
+    branches = Branches(repository.branches)
+    with pytest.raises(KeyError):
+        branches["branch"]
+
+
+def test_branches_getitem_pass(repository: Repository) -> None:
+    """It returns the commit at the head of the branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    assert repository.head.peel() == branches[main]
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
