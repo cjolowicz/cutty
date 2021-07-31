@@ -94,6 +94,22 @@ def test_branches_setitem_existing(repository: Repository) -> None:
     assert branches["branch"] == branches[main]
 
 
+def test_branches_delitem_fail(repository: Repository) -> None:
+    """It raises KeyError."""
+    branches = Branches(repository.branches)
+    with pytest.raises(KeyError):
+        del branches["branch"]
+
+
+def test_branches_delitem_pass(repository: Repository) -> None:
+    """It removes the branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = Branches(repository.branches)
+    branches["branch"] = branches[main]
+    del branches["branch"]
+    assert "branch" not in branches
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
