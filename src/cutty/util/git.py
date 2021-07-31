@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import pygit2.remote
 import pygit2.repository
 
 from cutty.compat.contextlib import contextmanager
@@ -44,8 +43,10 @@ class Repository:
         return cls(repository, path)
 
     @classmethod
-    def clone(cls, url: str, destination: Path) -> None:
+    def clone(cls, url: str, destination: Path, *, mirror: bool = False) -> None:
         """Clone a repository using a mirror configuration."""
+        if not mirror:  # pragma: no cover
+            raise NotImplementedError("clone without mirror is not implemented")
 
         def _createremote(
             repository: pygit2.Repository, name: bytes, url: bytes
@@ -59,6 +60,14 @@ class Repository:
         )
 
         _fix_repository_head(repository)
+
+    def fetch(self, *, prune: bool = False) -> None:
+        """Fetch all remotes."""
+        if not prune:  # pragma: no cover
+            raise NotImplementedError("fetch without prune is not implemented")
+
+        for remote in self._repository.remotes:
+            remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
     @property
     def index(self) -> pygit2.Index:
@@ -83,11 +92,6 @@ class Repository:
     def branches(self) -> pygit2.repository.Branches:
         """Return the repository branches."""
         return self._repository.branches
-
-    @property
-    def remotes(self) -> pygit2.remote.RemoteCollection:
-        """Return the repository remotes."""
-        return self._repository.remotes
 
     def checkout(self, reference: pygit2.Reference) -> None:
         """Check out the given reference."""

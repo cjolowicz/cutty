@@ -2,7 +2,6 @@
 import pathlib
 from typing import Optional
 
-import pygit2
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import fetcher
@@ -22,7 +21,6 @@ def gitfetcher(
     """Fetch a git repository."""
     if destination.exists():
         repository = Repository.open(destination)
-        for remote in repository.remotes:
-            remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
+        repository.fetch(prune=True)
     else:
-        Repository.clone(str(url), destination)
+        Repository.clone(str(url), destination, mirror=True)
