@@ -6,6 +6,7 @@ import hashlib
 import os
 import tempfile
 from collections.abc import Iterator
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -13,6 +14,40 @@ from typing import Optional
 import pygit2.repository
 
 from cutty.compat.contextlib import contextmanager
+
+
+class Branches(MutableMapping[str, pygit2.Commit]):
+    """Branches in a git repository."""
+
+    def __init__(self, branches: pygit2.repository.Branches) -> None:
+        """Initialize."""
+        self._branches = branches
+
+    def __len__(self) -> int:
+        """Return the number of branches."""
+        return sum(1 for _ in self._branches)
+
+    def __bool__(self) -> bool:
+        """Return True if there are any branches."""
+        for _ in self._branches:
+            return True
+        return False
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the branches."""
+        return iter(self._branches)
+
+    def __getitem__(self, name: str) -> pygit2.Commit:
+        """Return the commit at the head of the branch."""
+        return self._branches[name].peel(pygit2.Commit)
+
+    def __setitem__(self, name: str, commit: pygit2.Commit) -> None:
+        """Create the branch, or reset the branch to another commit."""
+        self._branches.create(name, commit, force=True)
+
+    def __delitem__(self, name: str) -> None:
+        """Remove the branch."""
+        self._branches.delete(name)
 
 
 @dataclass
@@ -89,9 +124,9 @@ class Repository:
         return self._repository.references
 
     @property
-    def branches(self) -> pygit2.repository.Branches:
+    def branches(self) -> Branches:
         """Return the repository branches."""
-        return self._repository.branches
+        return Branches(self._repository.branches)
 
     def checkout(self, reference: pygit2.Reference) -> None:
         """Check out the given reference."""
@@ -192,8 +227,7 @@ class Repository:
 
     def updatebranch(self, branch: str, *, target: str) -> None:
         """Update a branch to the given target, another branch."""
-        commit = self._repository.branches[target].peel()
-        self._repository.branches[branch].set_target(commit.id)
+        self.branches[branch] = self.branches[target]
 
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.
@@ -205,8 +239,8 @@ class Repository:
         self._repository.index.read_tree(self._repository.head.peel().tree)
         self._repository.index.write()
 
-        parenttree = self._repository.branches[parent].peel(pygit2.Tree)
-        cherrytree = self._repository.branches[cherry].peel(pygit2.Tree)
+        parenttree = self.branches[parent].peel(pygit2.Tree)
+        cherrytree = self.branches[cherry].peel(pygit2.Tree)
         diff = cherrytree.diff_to_tree(parenttree)
         paths = [
             file.path

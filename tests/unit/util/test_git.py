@@ -15,6 +15,105 @@ from tests.util.git import updatefiles
 pytest_plugins = ["tests.fixtures.git"]
 
 
+def test_branches_len_empty(tmp_path: Path) -> None:
+    """It returns zero if there are no branches."""
+    repository = Repository.init(tmp_path / "repository")
+    assert not len(repository.branches)
+
+
+def test_branches_len_nonzero(repository: Repository) -> None:
+    """It returns the number of branches."""
+    assert 1 == len(repository.branches)
+
+
+def test_branches_bool_empty(tmp_path: Path) -> None:
+    """It returns False if there are no branches."""
+    repository = Repository.init(tmp_path / "repository")
+    assert not repository.branches
+
+
+def test_branches_bool_nonzero(repository: Repository) -> None:
+    """It returns True if there are branches."""
+    assert repository.branches
+
+
+def test_branches_contains_false(repository: Repository) -> None:
+    """It returns False if the branch does not exist."""
+    assert "branch" not in repository.branches
+
+
+def test_branches_contains_true(repository: Repository) -> None:
+    """It returns True if the branch exists."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    assert main in repository.branches
+
+
+def test_branches_iter(repository: Repository) -> None:
+    """It yields the name of each branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    assert [main] == list(iter(repository.branches))
+
+
+def test_branches_getitem_fail(repository: Repository) -> None:
+    """It raises KeyError."""
+    with pytest.raises(KeyError):
+        repository.branches["branch"]
+
+
+def test_branches_getitem_pass(repository: Repository) -> None:
+    """It returns the commit at the head of the branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    assert repository.head.peel() == repository.branches[main]
+
+
+def test_branches_setitem_new(repository: Repository) -> None:
+    """It creates a branch pointing to the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    repository.branches["branch"] = repository.branches[main]
+    assert repository.branches["branch"] == repository.branches[main]
+
+
+def test_branches_setitem_existing(repository: Repository) -> None:
+    """It resets the branch to the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branches["branch"] = branches[main]
+    updatefile(repository.path / "file")
+    branches["branch"] = branches[main]
+    assert branches["branch"] == branches[main]
+
+
+def test_branches_delitem_fail(repository: Repository) -> None:
+    """It raises KeyError."""
+    with pytest.raises(KeyError):
+        del repository.branches["branch"]
+
+
+def test_branches_delitem_pass(repository: Repository) -> None:
+    """It removes the branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branches["branch"] = branches[main]
+    del branches["branch"]
+    assert "branch" not in branches
+
+
+def test_branches_keys(repository: Repository) -> None:
+    """It returns the branch names."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    [branch] = repository.branches.keys()
+    assert main == branch
+
+
+def test_branches_pop(repository: Repository) -> None:
+    """It removes the branch and returns the commit at its head."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branches["branch"] = branches[main]
+    commit = branches.pop("branch")
+    assert branches[main] == commit
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
@@ -69,7 +168,7 @@ def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
     repository.createbranch("branch")
 
-    assert repository.branches["branch"].peel() == repository.head.peel()
+    assert repository.branches["branch"] == repository.head.peel()
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
@@ -82,9 +181,8 @@ def test_createbranch_target_branch(repository: Repository) -> None:
 
     repository.checkout(main)
     repository.createbranch("branch2", target="branch1")
-    branch2 = repository.branches["branch2"]
 
-    assert branch1.peel() == branch2.peel()
+    assert branch1.peel() == repository.branches["branch2"]
 
 
 def test_createbranch_target_oid(repository: Repository) -> None:
@@ -95,15 +193,14 @@ def test_createbranch_target_oid(repository: Repository) -> None:
     repository.commit()
 
     repository.createbranch("branch", target=str(oid))
-    branch = repository.branches["branch"]
 
-    assert oid == branch.peel().id
+    assert oid == repository.branches["branch"].id
 
 
 def test_createbranch_returns_branch(repository: Repository) -> None:
     """It returns the branch object."""
     branch = repository.createbranch("branch")
-    assert branch == repository.branches["branch"]
+    assert branch.peel() == repository.branches["branch"]
 
 
 def createconflict(
