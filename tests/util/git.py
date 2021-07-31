@@ -15,12 +15,13 @@ def createbranches(repository: Repository, *names: str) -> tuple[pygit2.Branch, 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
-    repository = Repository.open(repositorypath)
-    builder = repository.repository.TreeBuilder()
-    builder.insert(directory, repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE)
-    tree = repository.repository[builder.write()]
-    repository.repository.checkout_tree(tree)
+    subdirectory = repositorypath / directory
+    for path in repositorypath.iterdir():
+        if path.name != ".git":
+            subdirectory.mkdir(exist_ok=True)
+            path.rename(subdirectory / path.name)
 
+    repository = Repository.open(repositorypath)
     repository.commit(message=f"Move files to subdirectory {directory}")
 
 
