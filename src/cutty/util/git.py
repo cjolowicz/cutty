@@ -153,6 +153,13 @@ class Repository:
         self.commit(message=message)
         self.repository.state_cleanup()
 
+    def createtag(self, name: str, *, message: str) -> None:
+        """Create a tag at HEAD."""
+        signature = default_signature(self.repository)
+        self.repository.create_tag(
+            name, self.head.target, pygit2.GIT_OBJ_COMMIT, signature, message
+        )
+
     def createbranch(
         self, branch: str, *, target: str = "HEAD", force: bool = False
     ) -> pygit2.Branch:

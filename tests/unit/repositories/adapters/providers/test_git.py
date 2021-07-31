@@ -26,14 +26,7 @@ def url(tmp_path: pathlib.Path) -> URL:
     repository = Repository.init(path)
     updatefile(path / "marker", "Lorem")
 
-    repository.repository.create_tag(
-        "v1.0",
-        repository.head.target,
-        pygit2.GIT_OBJ_COMMIT,
-        signature,
-        "Release v1.0",
-    )
-
+    repository.createtag("v1.0", message="Release v1.0")
     updatefile(path / "marker", "Ipsum")
 
     return asurl(path)
