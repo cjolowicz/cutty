@@ -25,16 +25,16 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     repository = Repository.init(tmp_path / "repository")
     repository.commit(message="initial")
 
-    assert not repository.repository.head.peel().parents
+    assert not repository.head.peel().parents
 
 
 def test_commit_empty(repository: Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
-    head = repository.repository.head.peel()
+    head = repository.head.peel()
 
     repository.commit(message="empty")
 
-    assert head == repository.repository.head.peel()
+    assert head == repository.head.peel()
 
 
 def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
@@ -44,7 +44,7 @@ def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
     signature = pygit2.Signature("Katherine", "katherine@example.com")
     repository.commit(message="empty", signature=signature)
 
-    head = repository.repository.head.peel()
+    head = repository.head.peel()
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
@@ -54,7 +54,7 @@ def test_commit_message_default(repository: Repository, repositorypath: Path) ->
 
     repository.commit()
 
-    head = repository.repository.head.peel()
+    head = repository.head.peel()
     assert "" == head.message
 
 
@@ -62,36 +62,33 @@ def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
     repository.createbranch("branch")
 
-    assert (
-        repository.repository.branches["branch"].peel()
-        == repository.repository.head.peel()
-    )
+    assert repository.branches["branch"].peel() == repository.head.peel()
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
     """It creates the branch at the head of the given branch."""
-    main = repository.repository.head
+    main = repository.head
     branch1 = repository.createbranch("branch1")
 
-    repository.repository.checkout(branch1)
+    repository.checkout(branch1)
     repository.commit()
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     repository.createbranch("branch2", target="branch1")
-    branch2 = repository.repository.branches["branch2"]
+    branch2 = repository.branches["branch2"]
 
     assert branch1.peel() == branch2.peel()
 
 
 def test_createbranch_target_oid(repository: Repository) -> None:
     """It creates the branch at the commit with the given OID."""
-    main = repository.repository.head
+    main = repository.head
     oid = main.peel().id
 
     repository.commit()
 
     repository.createbranch("branch", target=str(oid))
-    branch = repository.repository.branches["branch"]
+    branch = repository.branches["branch"]
 
     assert oid == branch.peel().id
 
@@ -99,20 +96,20 @@ def test_createbranch_target_oid(repository: Repository) -> None:
 def test_createbranch_returns_branch(repository: Repository) -> None:
     """It returns the branch object."""
     branch = repository.createbranch("branch")
-    assert branch == repository.repository.branches["branch"]
+    assert branch == repository.branches["branch"]
 
 
 def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path, theirs)
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
@@ -157,13 +154,13 @@ def test_createworktree_no_checkout(repository: Repository, path: Path) -> None:
 
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
-    main = repository.repository.head
+    main = repository.head
     branch = repository.createbranch("branch")
 
-    repository.repository.checkout(branch)
+    repository.checkout(branch)
     updatefile(path)
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     assert not path.is_file()
 
     repository.cherrypick(branch.name, message="")
@@ -172,13 +169,13 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
 
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
-    main = repository.repository.head
+    main = repository.head
     branch = repository.createbranch("branch")
 
-    repository.repository.checkout(branch)
+    repository.checkout(branch)
     updatefile(path, "a")
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
@@ -189,13 +186,13 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
 
-    main = repository.repository.head
+    main = repository.head
     branch = repository.createbranch("branch")
 
-    repository.repository.checkout(branch)
+    repository.checkout(branch)
     updatefile(path, "b")
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
@@ -216,14 +213,14 @@ def test_resetmerge_removes_added_files(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefiles({path1: "a", path2: ""})
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
@@ -238,14 +235,14 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path1, "b")
 
     path2.touch()
@@ -262,14 +259,14 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path1, "b")
     updatefile(path2)
 
@@ -287,14 +284,14 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path1, "b")
     updatefile(path2)
 
@@ -314,7 +311,4 @@ def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
 
     repository.resetmerge(parent="latest", cherry="update")
 
-    assert (
-        repository.repository.index.write_tree()
-        == repository.repository.head.peel().tree.id
-    )
+    assert repository.index.write_tree() == repository.head.peel().tree.id

@@ -13,6 +13,7 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 from cutty.util.git import Repository
+from tests.util.git import updatefile
 
 
 signature = pygit2.Signature("you", "you@example.com")
@@ -22,38 +23,11 @@ signature = pygit2.Signature("you", "you@example.com")
 def url(tmp_path: pathlib.Path) -> URL:
     """Fixture for a repository."""
     path = tmp_path / "repository"
-    path.mkdir()
-    (path / "marker").write_text("Lorem")
-
     repository = Repository.init(path)
-    repository.repository.index.add("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        repository.repository.index.write_tree(),
-        [],
-    )
+    updatefile(path / "marker", "Lorem")
 
-    repository.repository.create_tag(
-        "v1.0",
-        repository.repository.head.target,
-        pygit2.GIT_OBJ_COMMIT,
-        signature,
-        "Release v1.0",
-    )
-
-    (path / "marker").write_text("Ipsum")
-    repository.repository.index.add("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Update marker",
-        repository.repository.index.write_tree(),
-        [repository.repository.head.target],
-    )
+    repository.createtag("v1.0", message="Release v1.0")
+    updatefile(path / "marker", "Ipsum")
 
     return asurl(path)
 

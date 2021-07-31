@@ -22,7 +22,7 @@ def gitfetcher(
     """Fetch a git repository."""
     if destination.exists():
         repository = Repository.open(destination)
-        for remote in repository.repository.remotes:
+        for remote in repository.remotes:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
     else:
         Repository.clone(str(url), destination)

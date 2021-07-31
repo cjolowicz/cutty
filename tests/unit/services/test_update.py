@@ -23,13 +23,13 @@ def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.repository.head
+    main = repository.head
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
-    repository.repository.checkout(update)
+    repository.checkout(update)
     updatefile(path, theirs)
 
-    repository.repository.checkout(main)
+    repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
@@ -46,7 +46,7 @@ def test_continueupdate_commits_changes(
     with chdir(repositorypath):
         continueupdate()
 
-    blob = repository.repository.head.peel().tree / path.name
+    blob = repository.head.peel().tree / path.name
     assert blob.data == b"b"
 
 
@@ -60,7 +60,7 @@ def test_continueupdate_fastforwards_latest(
     with chdir(repositorypath):
         continueupdate()
 
-    branches = repository.repository.branches
+    branches = repository.branches
     assert branches[LATEST_BRANCH].peel() == branches[UPDATE_BRANCH].peel()
 
 
@@ -70,12 +70,12 @@ def test_skipupdate_fastforwards_latest(
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.repository.branches[UPDATE_BRANCH].peel()
+    updatehead = repository.branches[UPDATE_BRANCH].peel()
 
     with chdir(repositorypath):
         skipupdate()
 
-    assert repository.repository.branches[LATEST_BRANCH].peel() == updatehead
+    assert repository.branches[LATEST_BRANCH].peel() == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(
@@ -84,7 +84,7 @@ def test_abortupdate_rewinds_update_branch(
     """It resets the update branch to the tip of the latest branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    branches = repository.repository.branches
+    branches = repository.branches
     latesthead = branches[LATEST_BRANCH].peel()
 
     with chdir(repositorypath):

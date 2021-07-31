@@ -45,7 +45,7 @@ def test_repository(
     with storage:
         storage.add(file)
 
-    Repository.open(project).repository  # does not raise
+    Repository.open(project)  # does not raise
 
 
 def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -54,7 +54,7 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    repository.repository.head  # does not raise
+    repository.head  # does not raise
 
 
 def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -63,12 +63,12 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
         storage.add(file)
 
     repository = Repository.open(project)
-    assert file.path.name in repository.repository.index
+    assert file.path.name in repository.index
 
 
 def tree(repository: Repository) -> pygit2.Tree:
     """Return the tree at the HEAD of the repository."""
-    return repository.repository.head.peel().tree
+    return repository.head.peel().tree
 
 
 def test_hook_edits(
@@ -125,8 +125,8 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    reference = repository.repository.references[LATEST_BRANCH_REF]
-    assert repository.repository.head.peel() == reference.peel()
+    reference = repository.references[LATEST_BRANCH_REF]
+    assert repository.head.peel() == reference.peel()
 
 
 def test_branch_not_checked_out(
@@ -137,7 +137,7 @@ def test_branch_not_checked_out(
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.repository.references["HEAD"].target != LATEST_BRANCH_REF
+    assert repository.references["HEAD"].target != LATEST_BRANCH_REF
 
 
 def test_existing_branch(
@@ -147,10 +147,8 @@ def test_existing_branch(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(
-        UPDATE_BRANCH, repository.repository.head.peel()
-    )
-    repository.repository.set_head(UPDATE_BRANCH_REF)
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
@@ -165,9 +163,7 @@ def test_existing_branch_not_head(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(
-        UPDATE_BRANCH, repository.repository.head.peel()
-    )
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
 
     with pytest.raises(Exception):
         with storage:
@@ -183,18 +179,14 @@ def test_existing_branch_commit_message(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(
-        LATEST_BRANCH, repository.repository.head.peel()
-    )
-    repository.repository.branches.create(
-        UPDATE_BRANCH, repository.repository.head.peel()
-    )
-    repository.repository.set_head(UPDATE_BRANCH_REF)
+    repository.branches.create(LATEST_BRANCH, repository.head.peel())
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
 
     with storage:
         storage.add(file)
 
-    commit_ = repository.repository.head.peel()
+    commit_ = repository.head.peel()
     assert "initial" not in commit_.message.lower()
 
 
@@ -205,13 +197,11 @@ def test_existing_branch_no_changes(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.repository.branches.create(
-        UPDATE_BRANCH, repository.repository.head.peel()
-    )
-    repository.repository.set_head(UPDATE_BRANCH_REF)
-    oldhead = repository.repository.head.target
+    repository.branches.create(UPDATE_BRANCH, repository.head.peel())
+    repository.set_head(UPDATE_BRANCH_REF)
+    oldhead = repository.head.target
 
     with storage:
         pass
 
-    assert oldhead == repository.repository.head.target
+    assert oldhead == repository.head.target

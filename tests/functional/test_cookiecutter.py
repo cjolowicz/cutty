@@ -70,7 +70,7 @@ def test_extra_context_invalid(runcutty: RunCutty, template: Path) -> None:
 
 def test_checkout(runcutty: RunCutty, template: Path) -> None:
     """It uses the specified revision of the template."""
-    initial = Repository.open(template).repository.head.target
+    initial = Repository.open(template).head.target
 
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 

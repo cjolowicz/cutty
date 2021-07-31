@@ -88,7 +88,7 @@ module = [
     "binaryornot.*",
     "jinja2_time",
     "pyftpdlib.*",
-    "pygit2",
+    "pygit2.*",
 ]
 ignore_missing_imports = true
 

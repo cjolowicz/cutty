@@ -29,21 +29,19 @@ class GitRepositoryObserver(FileStorageObserver):
         except pygit2.GitError:
             repository = Repository.init(self.project)
 
-        if UPDATE_BRANCH in repository.repository.branches:
+        if UPDATE_BRANCH in repository.branches:
             # HEAD must point to update branch if it exists.
-            head = repository.repository.references["HEAD"].target
+            head = repository.references["HEAD"].target
             if head != UPDATE_BRANCH_REF:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
             CREATE_MESSAGE
-            if LATEST_BRANCH not in repository.repository.branches
+            if LATEST_BRANCH not in repository.branches
             else UPDATE_MESSAGE
         )
 
         repository.commit(message=message)
 
-        if LATEST_BRANCH not in repository.repository.branches:
-            repository.repository.branches.create(
-                LATEST_BRANCH, repository.repository.head.peel()
-            )
+        if LATEST_BRANCH not in repository.branches:
+            repository.branches.create(LATEST_BRANCH, repository.head.peel())

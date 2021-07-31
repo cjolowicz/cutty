@@ -15,6 +15,8 @@ from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 from cutty.util.git import Repository
+from tests.util.git import removefile
+from tests.util.git import updatefile
 
 
 signature = pygit2.Signature("you", "you@example.com")
@@ -24,19 +26,8 @@ signature = pygit2.Signature("you", "you@example.com")
 def url(tmp_path: pathlib.Path) -> URL:
     """Fixture for a repository."""
     path = tmp_path / "repository"
-    path.mkdir()
-    (path / "marker").write_text("Lorem")
-
-    repository = Repository.init(path)
-    repository.repository.index.add("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        repository.repository.index.write_tree(),
-        [],
-    )
+    Repository.init(path)
+    updatefile(path / "marker", "Lorem")
 
     return asurl(path)
 
@@ -63,18 +54,7 @@ def test_gitfetcher_update(url: URL, store: Store) -> None:
     gitfetcher(url, store, None, FetchMode.ALWAYS)
 
     # Remove the marker file.
-    repository = Repository.open(aspath(url))
-    tree = repository.repository.head.peel(pygit2.Tree)
-    repository.repository.index.read_tree(tree)
-    repository.repository.index.remove("marker")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Remove the marker file",
-        repository.repository.index.write_tree(),
-        [repository.repository.head.target],
-    )
+    removefile(aspath(url) / "marker")
 
     # Second fetch.
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
@@ -125,7 +105,7 @@ def test_broken_head_after_clone(
     destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
     assert destination is not None
     repository = Repository.open(destination)
-    head = repository.repository.references["HEAD"]
+    head = repository.references["HEAD"]
     assert head.target != f"refs/heads/{custom_default_branch}"
 
 
@@ -134,17 +114,8 @@ def test_broken_head_after_clone_unexpected_branch(
 ) -> None:
     """It crashes if the default branch is not master or main."""
     path = tmp_path / "repository"
-    path.mkdir()
-
     repository = Repository.init(path, head="refs/heads/whoops")
-    repository.repository.create_commit(
-        "HEAD",
-        signature,
-        signature,
-        "Initial",
-        repository.repository.index.write_tree(),
-        [],
-    )
+    repository.commit()
 
     with pytest.raises(KeyError):
         gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)

@@ -10,7 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import pygit2
+import pygit2.remote
+import pygit2.repository
 
 from cutty.compat.contextlib import contextmanager
 
@@ -19,7 +20,7 @@ from cutty.compat.contextlib import contextmanager
 class Repository:
     """Git repository."""
 
-    repository: pygit2.Repository
+    _repository: pygit2.Repository
 
     @classmethod
     def open(cls, path: Path) -> Repository:
@@ -58,6 +59,39 @@ class Repository:
 
         _fix_repository_head(repository)
 
+    @property
+    def index(self) -> pygit2.Index:
+        """Return the repository index."""
+        return self._repository.index
+
+    @property
+    def head(self) -> pygit2.Reference:
+        """Return the repository head."""
+        return self._repository.head
+
+    def set_head(self, target: str) -> None:
+        """Update the repository head."""
+        self._repository.set_head(target)
+
+    @property
+    def references(self) -> pygit2.repository.References:
+        """Return the repository references."""
+        return self._repository.references
+
+    @property
+    def branches(self) -> pygit2.repository.Branches:
+        """Return the repository branches."""
+        return self._repository.branches
+
+    @property
+    def remotes(self) -> pygit2.remote.RemoteCollection:
+        """Return the repository remotes."""
+        return self._repository.remotes
+
+    def checkout(self, reference: pygit2.Reference) -> None:
+        """Check out the given reference."""
+        self._repository.checkout(reference)
+
     def commit(
         self, *, message: str = "", signature: Optional[pygit2.Signature] = None
     ) -> None:
@@ -65,20 +99,21 @@ class Repository:
 
         If there are no changes relative to the parent, this is a noop.
         """
-        repository = self.repository
-        repository.index.add_all()
+        self.index.add_all()
 
-        tree = repository.index.write_tree()
-        if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
+        tree = self.index.write_tree()
+        if not self._repository.head_is_unborn and tree == self.head.peel().tree.id:
             return
 
-        repository.index.write()
+        self.index.write()
 
         if signature is None:
-            signature = default_signature(repository)
+            signature = default_signature(self._repository)
 
-        parents = [] if repository.head_is_unborn else [repository.head.target]
-        repository.create_commit("HEAD", signature, signature, message, tree, parents)
+        parents = [] if self._repository.head_is_unborn else [self.head.target]
+        self._repository.create_commit(
+            "HEAD", signature, signature, message, tree, parents
+        )
 
     @contextmanager
     def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
@@ -86,15 +121,15 @@ class Repository:
         with tempfile.TemporaryDirectory() as directory:
             name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
             path = Path(directory) / name
-            worktree = self.repository.add_worktree(
-                name, path, self.repository.branches[branch]
+            worktree = self._repository.add_worktree(
+                name, path, self._repository.branches[branch]
             )
 
             if not checkout:
                 # Emulate `--no-checkout` by checking out an empty tree after the fact.
                 # https://github.com/libgit2/libgit2/issues/5949
                 worktreerepository = Repository.open(path)
-                checkoutemptytree(worktreerepository.repository)
+                checkoutemptytree(worktreerepository._repository)
 
             yield path
 
@@ -104,32 +139,39 @@ class Repository:
 
     def cherrypick(self, reference: str, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
-        oid = self.repository.references[reference].resolve().target
-        self.repository.cherrypick(oid)
+        oid = self._repository.references[reference].resolve().target
+        self._repository.cherrypick(oid)
 
-        if self.repository.index.conflicts:
+        if self._repository.index.conflicts:
             paths = {
                 side.path
-                for _, ours, theirs in self.repository.index.conflicts
+                for _, ours, theirs in self._repository.index.conflicts
                 for side in (ours, theirs)
                 if side is not None
             }
             raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
         self.commit(message=message)
-        self.repository.state_cleanup()
+        self._repository.state_cleanup()
+
+    def createtag(self, name: str, *, message: str) -> None:
+        """Create a tag at HEAD."""
+        signature = default_signature(self._repository)
+        self._repository.create_tag(
+            name, self.head.target, pygit2.GIT_OBJ_COMMIT, signature, message
+        )
 
     def createbranch(
         self, branch: str, *, target: str = "HEAD", force: bool = False
     ) -> pygit2.Branch:
         """Create a branch pointing to the given target."""
-        commit = self.repository.revparse_single(target)
-        return self.repository.branches.create(branch, commit, force=force)
+        commit = self._repository.revparse_single(target)
+        return self._repository.branches.create(branch, commit, force=force)
 
     def updatebranch(self, branch: str, *, target: str) -> None:
         """Update a branch to the given target, another branch."""
-        commit = self.repository.branches[target].peel()
-        self.repository.branches[branch].set_target(commit.id)
+        commit = self._repository.branches[target].peel()
+        self._repository.branches[branch].set_target(commit.id)
 
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.
@@ -138,11 +180,11 @@ class Repository:
         files that were updated by the cherry-picked commit, and resetting the index
         to HEAD.
         """
-        self.repository.index.read_tree(self.repository.head.peel().tree)
-        self.repository.index.write()
+        self._repository.index.read_tree(self._repository.head.peel().tree)
+        self._repository.index.write()
 
-        parenttree = self.repository.branches[parent].peel(pygit2.Tree)
-        cherrytree = self.repository.branches[cherry].peel(pygit2.Tree)
+        parenttree = self._repository.branches[parent].peel(pygit2.Tree)
+        cherrytree = self._repository.branches[cherry].peel(pygit2.Tree)
         diff = cherrytree.diff_to_tree(parenttree)
         paths = [
             file.path
@@ -150,7 +192,7 @@ class Repository:
             for file in (delta.old_file, delta.new_file)
         ]
 
-        self.repository.checkout(
+        self._repository.checkout(
             strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
             paths=paths,
         )

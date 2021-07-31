@@ -15,14 +15,13 @@ def createbranches(repository: Repository, *names: str) -> tuple[pygit2.Branch, 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
     """Move all files in the repository to the given subdirectory."""
-    repository = Repository.open(repositorypath)
-    builder = repository.repository.TreeBuilder()
-    builder.insert(
-        directory, repository.repository.head.peel().tree.id, pygit2.GIT_FILEMODE_TREE
-    )
-    tree = repository.repository[builder.write()]
-    repository.repository.checkout_tree(tree)
+    subdirectory = repositorypath / directory
+    for path in repositorypath.iterdir():
+        if path.name != ".git":
+            subdirectory.mkdir(exist_ok=True)
+            path.rename(subdirectory / path.name)
 
+    repository = Repository.open(repositorypath)
     repository.commit(message=f"Move files to subdirectory {directory}")
 
 
@@ -89,14 +88,14 @@ class Side(enum.Enum):
 
 
 def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
-    """Resolve the conflicts."""
-    repository = Repository.open(repositorypath)
+    """Resolve conflicts in the given file."""
+    repository = pygit2.Repository(repositorypath)
     pathstr = str(path.relative_to(repositorypath))
-    ancestor, ours, theirs = repository.repository.index.conflicts[pathstr]
+    ancestor, ours, theirs = repository.index.conflicts[pathstr]
     resolution = (ancestor, ours, theirs)[side.value]
 
-    del repository.repository.index.conflicts[pathstr]
+    del repository.index.conflicts[pathstr]
 
-    repository.repository.index.add(resolution)
-    repository.repository.index.write()
-    repository.repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
+    repository.index.add(resolution)
+    repository.index.write()
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
