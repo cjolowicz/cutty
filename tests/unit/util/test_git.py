@@ -20,6 +20,13 @@ def test_discover_fail(tmp_path: Path) -> None:
     assert None is Repository.discover(tmp_path)
 
 
+def test_path(tmp_path: Path) -> None:
+    """It returns the path to the repository."""
+    path = tmp_path / "repository"
+    repository = Repository.init(path)
+    assert path == repository.path
+
+
 def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     """It creates a commit without parents."""
     repository = Repository.init(tmp_path / "repository")
@@ -37,9 +44,9 @@ def test_commit_empty(repository: Repository) -> None:
     assert head == repository.head.peel()
 
 
-def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
+def test_commit_signature(repository: Repository) -> None:
     """It uses the provided signature."""
-    (repositorypath / "a").touch()
+    (repository.path / "a").touch()
 
     signature = pygit2.Signature("Katherine", "katherine@example.com")
     repository.commit(message="empty", signature=signature)
@@ -48,9 +55,9 @@ def test_commit_signature(repository: Repository, repositorypath: Path) -> None:
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
-def test_commit_message_default(repository: Repository, repositorypath: Path) -> None:
+def test_commit_message_default(repository: Repository) -> None:
     """It uses an empty message by default."""
-    (repositorypath / "a").touch()
+    (repository.path / "a").touch()
 
     repository.commit()
 
