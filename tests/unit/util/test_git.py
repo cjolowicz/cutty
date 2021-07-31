@@ -29,6 +29,19 @@ def test_branches_len_nonzero(repository: Repository) -> None:
     assert 1 == len(branches)
 
 
+def test_branches_bool_empty(tmp_path: Path) -> None:
+    """It returns False if there are no branches."""
+    repository = Repository.init(tmp_path / "repository")
+    branches = Branches(repository.branches)
+    assert not branches
+
+
+def test_branches_bool_nonzero(repository: Repository) -> None:
+    """It returns True if there are branches."""
+    branches = Branches(repository.branches)
+    assert branches
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
