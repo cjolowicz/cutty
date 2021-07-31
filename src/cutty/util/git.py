@@ -6,7 +6,7 @@ import hashlib
 import os
 import tempfile
 from collections.abc import Iterator
-from collections.abc import Mapping
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -16,7 +16,7 @@ import pygit2.repository
 from cutty.compat.contextlib import contextmanager
 
 
-class Branches(Mapping[str, pygit2.Commit]):
+class Branches(MutableMapping[str, pygit2.Commit]):
     """Branches in a git repository."""
 
     def __init__(self, branches: pygit2.repository.Branches) -> None:
