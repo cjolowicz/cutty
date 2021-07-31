@@ -40,6 +40,10 @@ class Branches:
         """Iterate over the branches."""
         return iter(self._branches)
 
+    def __getitem__(self, name: str) -> pygit2.Commit:
+        """Return the commit at the head of the branch."""
+        return self._branches[name].peel(pygit2.Commit)
+
 
 @dataclass
 class Repository:
