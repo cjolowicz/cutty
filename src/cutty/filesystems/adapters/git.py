@@ -8,7 +8,6 @@ from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.nodefs import FilesystemNode
 from cutty.filesystems.domain.nodefs import NodeFilesystem
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.util.git import Repository
 
 
 class GitFilesystemNode(FilesystemNode):
@@ -76,6 +75,6 @@ class GitFilesystem(NodeFilesystem):
 
     def __init__(self, repository: pathlib.Path, ref: str = "HEAD") -> None:
         """Inititalize."""
-        repo = Repository.open(repository)
-        tree = repo.repository.revparse_single(ref).peel(pygit2.Tree)
+        repo = pygit2.Repository(repository)
+        tree = repo.revparse_single(ref).peel(pygit2.Tree)
         self.root = GitFilesystemNode(tree)
