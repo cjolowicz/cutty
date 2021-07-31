@@ -128,8 +128,7 @@ class Repository:
             if not checkout:
                 # Emulate `--no-checkout` by checking out an empty tree after the fact.
                 # https://github.com/libgit2/libgit2/issues/5949
-                worktreerepository = Repository.open(path)
-                worktreerepository._checkoutemptytree()
+                Repository.open(path)._checkoutemptytree()
 
             yield path
 
