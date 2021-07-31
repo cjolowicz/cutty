@@ -23,9 +23,9 @@ def repositorypath(repository: Repository) -> Path:
 
 
 @pytest.fixture
-def paths(repositorypath: Path) -> Iterator[Path]:
+def paths(repository: Repository) -> Iterator[Path]:
     """Return arbitrary paths in the repository."""
-    return (repositorypath / letter for letter in string.ascii_letters)
+    return (repository.path / letter for letter in string.ascii_letters)
 
 
 @pytest.fixture
