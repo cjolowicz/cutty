@@ -114,6 +114,12 @@ def test_branches_pop(repository: Repository) -> None:
     assert branches[main] == commit
 
 
+def test_branches_branch_fail(repository: Repository) -> None:
+    """It raises KeyError if the branch does not exist."""
+    with pytest.raises(KeyError):
+        repository.branches.branch("branch")
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
