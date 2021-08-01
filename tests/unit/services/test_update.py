@@ -10,7 +10,7 @@ from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.util.git import Repository
 from tests.util.files import chdir
-from tests.util.git import createbranches2
+from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -24,7 +24,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
     updatefile(path, theirs)

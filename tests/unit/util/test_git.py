@@ -6,7 +6,7 @@ import pygit2
 import pytest
 
 from cutty.util.git import Repository
-from tests.util.git import createbranches2
+from tests.util.git import createbranches
 from tests.util.git import removefile
 from tests.util.git import updatefile
 from tests.util.git import updatefiles
@@ -295,7 +295,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
 
     repository.checkout(update)
     updatefile(path, theirs)
@@ -408,7 +408,7 @@ def test_resetmerge_removes_added_files(
 ) -> None:
     """It removes files added by the cherry-picked commit."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -430,7 +430,7 @@ def test_resetmerge_keeps_unrelated_additions(
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -454,7 +454,7 @@ def test_resetmerge_keeps_unrelated_changes(
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
@@ -479,7 +479,7 @@ def test_resetmerge_keeps_unrelated_deletions(
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main = repository.branches.head
-    update, _ = createbranches2(repository, "update", "latest")
+    update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
     repository.checkout(update)
