@@ -9,11 +9,6 @@ from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
-def createbranches(repository: Repository, *names: str) -> tuple[pygit2.Branch, ...]:
-    """Create branches at HEAD."""
-    return tuple(repository.createbranch(name) for name in names)
-
-
 def createbranches2(repository: Repository, *names: str) -> tuple[Branch, ...]:
     """Create branches at HEAD."""
     return tuple(repository.branches.create(name) for name in names)
