@@ -214,7 +214,7 @@ class Repository:
         )
 
     @contextmanager
-    def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
+    def worktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
         with tempfile.TemporaryDirectory() as directory:
             name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
@@ -233,6 +233,12 @@ class Repository:
         # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
         # https://github.com/libgit2/libgit2/issues/5280
         worktree.prune(True)
+
+    @contextmanager
+    def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
+        """Create a worktree for the branch in the repository."""
+        with self.worktree(branch, checkout=checkout) as path:
+            yield path
 
     def _checkoutemptytree(self) -> None:
         """Check out an empty tree from the repository."""
