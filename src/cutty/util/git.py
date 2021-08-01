@@ -255,11 +255,6 @@ class Repository:
         self.commit(message=message)
         self._repository.state_cleanup()
 
-    def cherrypick(self, reference: str, *, message: str) -> None:
-        """Cherry-pick the commit onto the current branch."""
-        commit = self._repository.references[reference].peel()
-        self.cherrypick2(commit, message=message)
-
     def createtag(self, name: str, *, message: str) -> None:
         """Create a tag at HEAD."""
         self._repository.create_tag(
