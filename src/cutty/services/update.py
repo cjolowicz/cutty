@@ -33,8 +33,9 @@ def update(
 
     repository = Repository.open(projectdir)
     repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
+    branch = repository.branches.branch(UPDATE_BRANCH)
 
-    with repository.createworktree(UPDATE_BRANCH, checkout=False) as worktree:
+    with repository.worktree(branch, checkout=False) as worktree:
         create(
             projectconfig.template,
             outputdir=worktree,
@@ -45,8 +46,8 @@ def update(
             directory=directory,
         )
 
-    repository.cherrypick(repository.branches[UPDATE_BRANCH], message=UPDATE_MESSAGE)
-    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
+    repository.cherrypick(branch.commit, message=UPDATE_MESSAGE)
+    repository.branches[LATEST_BRANCH] = branch.commit
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
