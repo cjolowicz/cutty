@@ -33,7 +33,7 @@ def update(
         directory = projectconfig.directory
 
     repository = Repository.open(projectdir)
-    repository.createbranch(UPDATE_BRANCH, target=LATEST_BRANCH, force=True)
+    repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
 
     with repository.createworktree(UPDATE_BRANCH, checkout=False) as worktree:
         create(
@@ -47,7 +47,7 @@ def update(
         )
 
     repository.cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
-    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -57,7 +57,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.commit(message=UPDATE_MESSAGE)
-    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -67,7 +67,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    repository.updatebranch(LATEST_BRANCH, target=UPDATE_BRANCH)
+    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
 def abortupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -77,4 +77,4 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
-    repository.updatebranch(UPDATE_BRANCH, target=LATEST_BRANCH)
+    repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]

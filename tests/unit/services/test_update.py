@@ -23,7 +23,7 @@ def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
@@ -33,7 +33,8 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.name, message="")
+        refname = f"refs/heads/{update.name}"
+        repository.cherrypick(refname, message="")
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:

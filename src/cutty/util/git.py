@@ -175,8 +175,9 @@ class Repository:
         """Return the repository branches."""
         return Branches(self._repository.branches)
 
-    def checkout(self, reference: pygit2.Reference) -> None:
-        """Check out the given reference."""
+    def checkout(self, branch: Branch) -> None:
+        """Check out the given branch."""
+        reference = branch._branches._branches[branch.name]
         self._repository.checkout(reference)
 
     @property
@@ -264,17 +265,6 @@ class Repository:
             self.default_signature,
             message,
         )
-
-    def createbranch(
-        self, branch: str, *, target: str = "HEAD", force: bool = False
-    ) -> pygit2.Branch:
-        """Create a branch pointing to the given target."""
-        commit = self._repository.revparse_single(target)
-        return self._repository.branches.create(branch, commit, force=force)
-
-    def updatebranch(self, branch: str, *, target: str) -> None:
-        """Update a branch to the given target, another branch."""
-        self.branches[branch] = self.branches[target]
 
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.

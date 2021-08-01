@@ -253,48 +253,48 @@ def test_commit_message_default(repository: Repository) -> None:
 
 def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     assert repository.branches["branch"] == repository.head.peel()
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
     """It creates the branch at the head of the given branch."""
-    main = repository.head
-    branch1 = repository.createbranch("branch1")
+    main = repository.branches.head
+    branch1 = repository.branches.create("branch1")
 
     repository.checkout(branch1)
     repository.commit()
 
     repository.checkout(main)
-    repository.createbranch("branch2", target="branch1")
+    repository.branches.create("branch2", repository.branches["branch1"])
 
-    assert branch1.peel() == repository.branches["branch2"]
+    assert branch1.commit == repository.branches["branch2"]
 
 
 def test_createbranch_target_oid(repository: Repository) -> None:
     """It creates the branch at the commit with the given OID."""
-    main = repository.head
-    oid = main.peel().id
+    main = repository.branches.head
+    oid = main.commit.id
 
     repository.commit()
 
-    repository.createbranch("branch", target=str(oid))
+    repository.branches.create("branch", main.commit)
 
     assert oid == repository.branches["branch"].id
 
 
 def test_createbranch_returns_branch(repository: Repository) -> None:
     """It returns the branch object."""
-    branch = repository.createbranch("branch")
-    assert branch.peel() == repository.branches["branch"]
+    branch = repository.branches.create("branch")
+    assert branch.commit == repository.branches["branch"]
 
 
 def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, "update", "latest")
 
     repository.checkout(update)
@@ -304,12 +304,13 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.name, message="")
+        refname = f"refs/heads/{update.name}"
+        repository.cherrypick(refname, message="")
 
 
 def test_createworktree_creates_worktree(repository: Repository) -> None:
     """It creates a worktree."""
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     with repository.createworktree("branch") as worktree:
         assert (worktree / ".git").is_file()
@@ -317,7 +318,7 @@ def test_createworktree_creates_worktree(repository: Repository) -> None:
 
 def test_createworktree_removes_worktree_on_exit(repository: Repository) -> None:
     """It removes the worktree on exit."""
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     with repository.createworktree("branch") as worktree:
         pass
@@ -328,7 +329,7 @@ def test_createworktree_removes_worktree_on_exit(repository: Repository) -> None
 def test_createworktree_does_checkout(repository: Repository, path: Path) -> None:
     """It checks out a working tree."""
     updatefile(path)
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     with repository.createworktree("branch") as worktree:
         assert (worktree / path.name).is_file()
@@ -337,7 +338,7 @@ def test_createworktree_does_checkout(repository: Repository, path: Path) -> Non
 def test_createworktree_no_checkout(repository: Repository, path: Path) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(path)
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     with repository.createworktree("branch", checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
@@ -345,8 +346,8 @@ def test_createworktree_no_checkout(repository: Repository, path: Path) -> None:
 
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
-    main = repository.head
-    branch = repository.createbranch("branch")
+    main = repository.branches.head
+    branch = repository.branches.create("branch")
 
     repository.checkout(branch)
     updatefile(path)
@@ -354,14 +355,15 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     repository.checkout(main)
     assert not path.is_file()
 
-    repository.cherrypick(branch.name, message="")
+    refname = f"refs/heads/{branch.name}"
+    repository.cherrypick(refname, message="")
     assert path.is_file()
 
 
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
-    main = repository.head
-    branch = repository.createbranch("branch")
+    main = repository.branches.head
+    branch = repository.branches.create("branch")
 
     repository.checkout(branch)
     updatefile(path, "a")
@@ -377,8 +379,8 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
 
-    main = repository.head
-    branch = repository.createbranch("branch")
+    main = repository.branches.head
+    branch = repository.branches.create("branch")
 
     repository.checkout(branch)
     updatefile(path, "b")
@@ -387,7 +389,8 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.name, message="")
+        refname = f"refs/heads/{branch.name}"
+        repository.cherrypick(refname, message="")
 
 
 def test_resetmerge_restores_files_with_conflicts(
@@ -404,7 +407,7 @@ def test_resetmerge_removes_added_files(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -426,7 +429,7 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -450,7 +453,7 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -475,7 +478,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    main = repository.head
+    main = repository.branches.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
