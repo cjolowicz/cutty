@@ -180,10 +180,6 @@ class Repository:
         reference = branch._branches._branches[branch.name]
         self._repository.checkout(reference)
 
-    def checkout(self, reference: pygit2.Reference) -> None:
-        """Check out the given reference."""
-        self._repository.checkout(reference)
-
     @property
     def default_signature(self) -> pygit2.Signature:
         """Return the default signature."""
