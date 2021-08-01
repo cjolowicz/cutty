@@ -154,8 +154,12 @@ class Repository:
     @property
     def head(self) -> Branch:
         """Return the branch referenced by HEAD."""
-        head = self._repository.references["HEAD"]
-        name = head.target.removeprefix("refs/heads/")
+        head = self._repository.references["HEAD"].target
+
+        if isinstance(head, pygit2.Oid):
+            raise ValueError("HEAD is detached")
+
+        name = head.removeprefix("refs/heads/")
         return Branch(self.branches, name)
 
     def checkout(self, branch: Branch) -> None:
