@@ -178,7 +178,11 @@ class Repository:
         return self._repository.default_signature  # pragma: no cover
 
     def commit(
-        self, *, message: str = "", signature: Optional[pygit2.Signature] = None
+        self,
+        *,
+        message: str = "",
+        author: Optional[pygit2.Signature] = None,
+        committer: Optional[pygit2.Signature] = None,
     ) -> None:
         """Commit all changes in the repository.
 
@@ -195,11 +199,14 @@ class Repository:
 
         index.write()
 
-        if signature is None:
-            signature = self.default_signature
+        if author is None:
+            author = self.default_signature
+
+        if committer is None:
+            committer = author
 
         parents = [] if repository.head_is_unborn else [repository.head.target]
-        repository.create_commit("HEAD", signature, signature, message, tree, parents)
+        repository.create_commit("HEAD", author, committer, message, tree, parents)
 
     @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
