@@ -49,6 +49,10 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
+    def branch(self, name: str) -> None:
+        """Return the branch with the given name."""
+        raise KeyError(name)
+
 
 @dataclass
 class Repository:
