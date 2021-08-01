@@ -307,39 +307,39 @@ def createconflict(
         repository.cherrypick(update.commit, message="")
 
 
-def test_createworktree_creates_worktree(repository: Repository) -> None:
+def test_worktree_creates_worktree(repository: Repository) -> None:
     """It creates a worktree."""
-    repository.branches.create("branch")
+    branch = repository.branches.create("branch")
 
-    with repository.createworktree("branch") as worktree:
+    with repository.worktree(branch) as worktree:
         assert (worktree / ".git").is_file()
 
 
-def test_createworktree_removes_worktree_on_exit(repository: Repository) -> None:
+def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
     """It removes the worktree on exit."""
-    repository.branches.create("branch")
+    branch = repository.branches.create("branch")
 
-    with repository.createworktree("branch") as worktree:
+    with repository.worktree(branch) as worktree:
         pass
 
     assert not worktree.is_dir()
 
 
-def test_createworktree_does_checkout(repository: Repository, path: Path) -> None:
+def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
     """It checks out a working tree."""
     updatefile(path)
-    repository.branches.create("branch")
+    branch = repository.branches.create("branch")
 
-    with repository.createworktree("branch") as worktree:
+    with repository.worktree(branch) as worktree:
         assert (worktree / path.name).is_file()
 
 
-def test_createworktree_no_checkout(repository: Repository, path: Path) -> None:
+def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(path)
-    repository.branches.create("branch")
+    branch = repository.branches.create("branch")
 
-    with repository.createworktree("branch", checkout=False) as worktree:
+    with repository.worktree(branch, checkout=False) as worktree:
         assert not (worktree / path.name).is_file()
 
 
