@@ -44,14 +44,13 @@ def test_branches_contains_false(repository: Repository) -> None:
 
 def test_branches_contains_true(repository: Repository) -> None:
     """It returns True if the branch exists."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    assert main in repository.branches
+    assert repository.branches.head.name in repository.branches
 
 
 def test_branches_iter(repository: Repository) -> None:
     """It yields the name of each branch."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    assert [main] == list(iter(repository.branches))
+    head = repository.branches.head
+    assert [head.name] == list(iter(repository.branches))
 
 
 def test_branches_getitem_fail(repository: Repository) -> None:
@@ -62,25 +61,23 @@ def test_branches_getitem_fail(repository: Repository) -> None:
 
 def test_branches_getitem_pass(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    assert repository.branches.head.commit == repository.branches[main]
+    head = repository.branches.head
+    assert head.commit == repository.branches[head.name]
 
 
 def test_branches_setitem_new(repository: Repository) -> None:
     """It creates a branch pointing to the given commit."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    repository.branches["branch"] = repository.branches[main]
-    assert repository.branches["branch"] == repository.branches[main]
+    repository.branches["branch"] = repository.branches.head.commit
+    assert repository.branches.head.commit == repository.branches["branch"]
 
 
 def test_branches_setitem_existing(repository: Repository) -> None:
     """It resets the branch to the given commit."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branches["branch"] = branches[main]
+    branches["branch"] = branches.head.commit
     updatefile(repository.path / "file")
-    branches["branch"] = branches[main]
-    assert branches["branch"] == branches[main]
+    branches["branch"] = branches.head.commit
+    assert branches.head.commit == branches["branch"]
 
 
 def test_branches_delitem_fail(repository: Repository) -> None:
@@ -91,27 +88,33 @@ def test_branches_delitem_fail(repository: Repository) -> None:
 
 def test_branches_delitem_pass(repository: Repository) -> None:
     """It removes the branch."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branches["branch"] = branches[main]
+    branches["branch"] = branches.head.commit
     del branches["branch"]
     assert "branch" not in branches
 
 
 def test_branches_keys(repository: Repository) -> None:
     """It returns the branch names."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    [branch] = repository.branches.keys()
-    assert main == branch
-
-
-def test_branches_pop(repository: Repository) -> None:
-    """It removes the branch and returns the commit at its head."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branches["branch"] = branches[main]
+    [branch] = branches.keys()
+    assert branches.head.name == branch
+
+
+def test_branches_pop_returns_commit(repository: Repository) -> None:
+    """It removes the branch and returns the commit at its head."""
+    branches = repository.branches
+    branches["branch"] = branches.head.commit
     commit = branches.pop("branch")
-    assert branches[main] == commit
+    assert branches.head.commit == commit
+
+
+def test_branches_pop_removes_branch(repository: Repository) -> None:
+    """It removes the branch and returns the commit at its head."""
+    branches = repository.branches
+    branches["branch"] = branches.head.commit
+    branches.pop("branch")
+    assert "branch" not in branches
 
 
 def test_branches_branch_fail(repository: Repository) -> None:
@@ -122,44 +125,62 @@ def test_branches_branch_fail(repository: Repository) -> None:
 
 def test_branches_create_new_branch_name(repository: Repository) -> None:
     """It creates the branch with the given name."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branch = repository.branches.create("branch", repository.branches[main])
+    branches = repository.branches
+    branch = branches.create("branch", branches.head.commit)
     assert "branch" == branch.name
 
 
 def test_branches_create_new_branch_commit(repository: Repository) -> None:
     """It creates the branch at the given commit."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branch = branches.create("branch", branches[main])
-    assert branches[main] == branch.commit
+    branch = branches.create("branch", branches.head.commit)
+    assert branches.head.commit == branch.commit
+
+
+def test_branches_create_new_branch_at_ancestor(repository: Repository) -> None:
+    """It creates the branch at an earlier commit."""
+    parent = repository.branches.head.commit
+    updatefile(repository.path / "a")
+    branch = repository.branches.create("branch", parent)
+    assert parent == branch.commit
+
+
+def test_branches_create_new_branch_at_another_branch(repository: Repository) -> None:
+    """It creates the branch at a commit on another branch."""
+    branches = repository.branches
+    main = branches.head
+    branch1 = branches.create("branch1")
+
+    repository.checkout(branch1)
+    repository.commit()
+
+    repository.checkout(main)
+    branch2 = branches.create("branch2", branch1.commit)
+
+    assert branch1.commit == branch2.commit
 
 
 def test_branches_create_existing_branch(repository: Repository) -> None:
     """It raises an exception if the branch already exists."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branch = branches.create("branch", branches[main])
+    branch = branches.create("branch", branches.head.commit)
     with pytest.raises(pygit2.AlreadyExistsError):
         branches.create(branch.name, branch.commit)
 
 
 def test_branches_create_existing_branch_force(repository: Repository) -> None:
     """It updates the branch head if the branch already exists."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branch = branches.create("branch", branches[main])
-    updatefile(repository.path / "file")
-    branches.create(branch.name, branches[main], force=True)
-    assert branches[main] == branch.commit
+    branch = branches.create("branch", branches.head.commit)
+    updatefile(repository.path / "a")
+    branches.create(branch.name, branches.head.commit, force=True)
+    assert branches.head.commit == branch.commit
 
 
 def test_branches_create_default_commit(repository: Repository) -> None:
     """It creates the branch at the commit referenced by HEAD."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branches = repository.branches
-    branch = branches.create("branch")
-    assert branches[main] == branch.commit
+    branch = repository.branches.create("branch")
+    assert branch.commit == repository.branches.head.commit
 
 
 def test_branches_head_name(repository: Repository) -> None:
@@ -170,35 +191,34 @@ def test_branches_head_name(repository: Repository) -> None:
 
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branch = repository.branches.branch(main)
-    assert main == branch.name
+    branches = repository.branches
+    branch = branches.branch(branches.head.name)
+    assert branches.head.name == branch.name
 
 
 def test_branch_name_set(repository: Repository) -> None:
     """It raises AttributeError when the name is set."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branch = repository.branches.branch(main)
+    branch = repository.branches.head
     with pytest.raises(AttributeError):
         branch.name = "teapot"  # type: ignore[misc]
 
 
 def test_branch_commit_get(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branch = repository.branches.branch(main)
-    assert repository.branches[main] == branch.commit
+    branches = repository.branches
+    branch = branches.head
+    assert branches[branch.name] == branch.commit
 
 
 def test_branch_commit_set(repository: Repository) -> None:
     """It resets the branch to the given commit."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branches = repository.branches
-    branches["branch"] = branches[main]
-    updatefile(repository.path / "file")
+    head = branches.head
+    branches["branch"] = head.commit
+    updatefile(repository.path / "a")
     branch = branches.branch("branch")
-    branch.commit = branches[main]
-    assert branches[main] == branch.commit
+    branch.commit = head.commit
+    assert head.commit == branch.commit
 
 
 def test_discover_fail(tmp_path: Path) -> None:
@@ -249,45 +269,6 @@ def test_commit_message_default(repository: Repository) -> None:
 
     head = repository.branches.head.commit
     assert "" == head.message
-
-
-def test_createbranch_target_default(repository: Repository) -> None:
-    """It creates the branch at HEAD by default."""
-    repository.branches.create("branch")
-
-    assert repository.branches["branch"] == repository.branches.head.commit
-
-
-def test_createbranch_target_branch(repository: Repository) -> None:
-    """It creates the branch at the head of the given branch."""
-    main = repository.branches.head
-    branch1 = repository.branches.create("branch1")
-
-    repository.checkout(branch1)
-    repository.commit()
-
-    repository.checkout(main)
-    repository.branches.create("branch2", repository.branches["branch1"])
-
-    assert branch1.commit == repository.branches["branch2"]
-
-
-def test_createbranch_target_oid(repository: Repository) -> None:
-    """It creates the branch at the commit with the given OID."""
-    main = repository.branches.head
-    oid = main.commit.id
-
-    repository.commit()
-
-    repository.branches.create("branch", main.commit)
-
-    assert oid == repository.branches["branch"].id
-
-
-def test_createbranch_returns_branch(repository: Repository) -> None:
-    """It returns the branch object."""
-    branch = repository.branches.create("branch")
-    assert branch.commit == repository.branches["branch"]
 
 
 def createconflict(
