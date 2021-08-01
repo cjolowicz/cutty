@@ -33,8 +33,7 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        refname = f"refs/heads/{update.name}"
-        repository.cherrypick(refname, message="")
+        repository.cherrypick2(update.commit, message="")
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
