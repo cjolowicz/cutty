@@ -190,6 +190,13 @@ def test_branches_head_name(repository: Repository) -> None:
     assert name == repository.head.name
 
 
+def test_head_detached(repository: Repository) -> None:
+    """It raises an exception if the HEAD is detached."""
+    repository._repository.set_head(repository.head.commit.id)
+    with pytest.raises(ValueError):
+        repository.head
+
+
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     branch = repository.branch(repository.head.name)
