@@ -127,6 +127,14 @@ def test_branch_name_get(repository: Repository) -> None:
     assert main == branch.name
 
 
+def test_branch_name_set(repository: Repository) -> None:
+    """It raises AttributeError when the name is set."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branch = repository.branches.branch(main)
+    with pytest.raises(AttributeError):
+        branch.name = "teapot"
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
