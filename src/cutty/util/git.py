@@ -152,11 +152,6 @@ class Repository:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
     @property
-    def references(self) -> pygit2.repository.References:
-        """Return the repository references."""
-        return self._repository.references
-
-    @property
     def branches(self) -> Branches:
         """Return the repository branches."""
         return Branches(self._repository.branches)
