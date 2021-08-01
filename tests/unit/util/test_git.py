@@ -120,6 +120,21 @@ def test_branches_branch_fail(repository: Repository) -> None:
         repository.branches.branch("branch")
 
 
+def test_branches_create_new_branch_name(repository: Repository) -> None:
+    """It creates the branch with the given name."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branch = repository.branches.create("branch", repository.branches[main])
+    assert "branch" == branch.name
+
+
+def test_branches_create_new_branch_commit(repository: Repository) -> None:
+    """It creates the branch at the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branch = branches.create("branch", branches[main])
+    assert branches[main] == branch.commit
+
+
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
