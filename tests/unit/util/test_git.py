@@ -256,15 +256,29 @@ def test_commit_empty(repository: Repository) -> None:
     assert head == repository.head.commit
 
 
-def test_commit_signature(repository: Repository) -> None:
+def test_commit_author(repository: Repository) -> None:
+    """It uses the provided author."""
+    (repository.path / "a").touch()
+
+    author = pygit2.Signature("Katherine", "katherine@example.com")
+    repository.commit(message="empty", author=author)
+
+    head = repository.head.commit
+    assert author.name == head.author.name and author.email == head.author.email
+
+
+def test_commit_committer(repository: Repository) -> None:
     """It uses the provided signature."""
     (repository.path / "a").touch()
 
-    signature = pygit2.Signature("Katherine", "katherine@example.com")
-    repository.commit(message="empty", signature=signature)
+    committer = pygit2.Signature("Katherine", "katherine@example.com")
+    repository.commit(message="empty", committer=committer)
 
     head = repository.head.commit
-    assert signature.name == head.author.name and signature.email == head.author.email
+    assert (
+        committer.name == head.committer.name
+        and committer.email == head.committer.email
+    )
 
 
 def test_commit_message_default(repository: Repository) -> None:
