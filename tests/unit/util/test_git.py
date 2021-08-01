@@ -44,12 +44,12 @@ def test_branches_contains_false(repository: Repository) -> None:
 
 def test_branches_contains_true(repository: Repository) -> None:
     """It returns True if the branch exists."""
-    assert repository.branches.head.name in repository.branches
+    assert repository.head.name in repository.branches
 
 
 def test_branches_iter(repository: Repository) -> None:
     """It yields the name of each branch."""
-    head = repository.branches.head
+    head = repository.head
     assert [head.name] == list(iter(repository.branches))
 
 
@@ -61,23 +61,23 @@ def test_branches_getitem_fail(repository: Repository) -> None:
 
 def test_branches_getitem_pass(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
-    head = repository.branches.head
+    head = repository.head
     assert head.commit == repository.branches[head.name]
 
 
 def test_branches_setitem_new(repository: Repository) -> None:
     """It creates a branch pointing to the given commit."""
-    repository.branches["branch"] = repository.branches.head.commit
-    assert repository.branches.head.commit == repository.branches["branch"]
+    repository.branches["branch"] = repository.head.commit
+    assert repository.head.commit == repository.branches["branch"]
 
 
 def test_branches_setitem_existing(repository: Repository) -> None:
     """It resets the branch to the given commit."""
-    branches = repository.branches
-    branches["branch"] = branches.head.commit
+    head, branches = repository.head, repository.branches
+    branches["branch"] = head.commit
     updatefile(repository.path / "file")
-    branches["branch"] = branches.head.commit
-    assert branches.head.commit == branches["branch"]
+    branches["branch"] = head.commit
+    assert head.commit == branches["branch"]
 
 
 def test_branches_delitem_fail(repository: Repository) -> None:
@@ -88,8 +88,8 @@ def test_branches_delitem_fail(repository: Repository) -> None:
 
 def test_branches_delitem_pass(repository: Repository) -> None:
     """It removes the branch."""
-    branches = repository.branches
-    branches["branch"] = branches.head.commit
+    head, branches = repository.head, repository.branches
+    branches["branch"] = head.commit
     del branches["branch"]
     assert "branch" not in branches
 
@@ -98,21 +98,21 @@ def test_branches_keys(repository: Repository) -> None:
     """It returns the branch names."""
     branches = repository.branches
     [branch] = branches.keys()
-    assert branches.head.name == branch
+    assert repository.head.name == branch
 
 
 def test_branches_pop_returns_commit(repository: Repository) -> None:
     """It removes the branch and returns the commit at its head."""
     branches = repository.branches
-    branches["branch"] = branches.head.commit
+    branches["branch"] = repository.head.commit
     commit = branches.pop("branch")
-    assert branches.head.commit == commit
+    assert repository.head.commit == commit
 
 
 def test_branches_pop_removes_branch(repository: Repository) -> None:
     """It removes the branch and returns the commit at its head."""
     branches = repository.branches
-    branches["branch"] = branches.head.commit
+    branches["branch"] = repository.head.commit
     branches.pop("branch")
     assert "branch" not in branches
 
@@ -126,20 +126,20 @@ def test_branches_branch_fail(repository: Repository) -> None:
 def test_branches_create_new_branch_name(repository: Repository) -> None:
     """It creates the branch with the given name."""
     branches = repository.branches
-    branch = branches.create("branch", branches.head.commit)
+    branch = branches.create("branch", repository.head.commit)
     assert "branch" == branch.name
 
 
 def test_branches_create_new_branch_commit(repository: Repository) -> None:
     """It creates the branch at the given commit."""
     branches = repository.branches
-    branch = branches.create("branch", branches.head.commit)
-    assert branches.head.commit == branch.commit
+    branch = branches.create("branch", repository.head.commit)
+    assert repository.head.commit == branch.commit
 
 
 def test_branches_create_new_branch_at_ancestor(repository: Repository) -> None:
     """It creates the branch at an earlier commit."""
-    parent = repository.branches.head.commit
+    parent = repository.head.commit
     updatefile(repository.path / "a")
     branch = repository.branches.create("branch", parent)
     assert parent == branch.commit
@@ -148,7 +148,7 @@ def test_branches_create_new_branch_at_ancestor(repository: Repository) -> None:
 def test_branches_create_new_branch_at_another_branch(repository: Repository) -> None:
     """It creates the branch at a commit on another branch."""
     branches = repository.branches
-    main = branches.head
+    main = repository.head
     branch1 = branches.create("branch1")
 
     repository.checkout(branch1)
@@ -163,43 +163,43 @@ def test_branches_create_new_branch_at_another_branch(repository: Repository) ->
 def test_branches_create_existing_branch(repository: Repository) -> None:
     """It raises an exception if the branch already exists."""
     branches = repository.branches
-    branch = branches.create("branch", branches.head.commit)
+    branch = branches.create("branch", repository.head.commit)
     with pytest.raises(pygit2.AlreadyExistsError):
         branches.create(branch.name, branch.commit)
 
 
 def test_branches_create_existing_branch_force(repository: Repository) -> None:
     """It updates the branch head if the branch already exists."""
-    branches = repository.branches
-    branch = branches.create("branch", branches.head.commit)
+    head, branches = repository.head, repository.branches
+    branch = branches.create("branch", head.commit)
     updatefile(repository.path / "a")
-    branches.create(branch.name, branches.head.commit, force=True)
-    assert branches.head.commit == branch.commit
+    branches.create(branch.name, head.commit, force=True)
+    assert head.commit == branch.commit
 
 
 def test_branches_create_default_commit(repository: Repository) -> None:
     """It creates the branch at the commit referenced by HEAD."""
     branch = repository.branches.create("branch")
-    assert branch.commit == repository.branches.head.commit
+    assert branch.commit == repository.head.commit
 
 
 def test_branches_head_name(repository: Repository) -> None:
     """It returns the branch whose name is contained in HEAD."""
     head = repository._repository.references["HEAD"]
     name = head.target.removeprefix("refs/heads/")
-    assert name == repository.branches.head.name
+    assert name == repository.head.name
 
 
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     branches = repository.branches
-    branch = branches.branch(branches.head.name)
-    assert branches.head.name == branch.name
+    branch = branches.branch(repository.head.name)
+    assert repository.head.name == branch.name
 
 
 def test_branch_name_set(repository: Repository) -> None:
     """It raises AttributeError when the name is set."""
-    branch = repository.branches.head
+    branch = repository.head
     with pytest.raises(AttributeError):
         branch.name = "teapot"  # type: ignore[misc]
 
@@ -207,14 +207,13 @@ def test_branch_name_set(repository: Repository) -> None:
 def test_branch_commit_get(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
     branches = repository.branches
-    branch = branches.head
+    branch = repository.head
     assert branches[branch.name] == branch.commit
 
 
 def test_branch_commit_set(repository: Repository) -> None:
     """It resets the branch to the given commit."""
-    branches = repository.branches
-    head = branches.head
+    head, branches = repository.head, repository.branches
     branches["branch"] = head.commit
     updatefile(repository.path / "a")
     branch = branches.branch("branch")
@@ -239,16 +238,16 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     repository = Repository.init(tmp_path / "repository")
     repository.commit(message="initial")
 
-    assert not repository.branches.head.commit.parents
+    assert not repository.head.commit.parents
 
 
 def test_commit_empty(repository: Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
-    head = repository.branches.head.commit
+    head = repository.head.commit
 
     repository.commit(message="empty")
 
-    assert head == repository.branches.head.commit
+    assert head == repository.head.commit
 
 
 def test_commit_signature(repository: Repository) -> None:
@@ -258,7 +257,7 @@ def test_commit_signature(repository: Repository) -> None:
     signature = pygit2.Signature("Katherine", "katherine@example.com")
     repository.commit(message="empty", signature=signature)
 
-    head = repository.branches.head.commit
+    head = repository.head.commit
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
@@ -268,7 +267,7 @@ def test_commit_message_default(repository: Repository) -> None:
 
     repository.commit()
 
-    head = repository.branches.head.commit
+    head = repository.head.commit
     assert "" == head.message
 
 
@@ -276,7 +275,7 @@ def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
 
     repository.checkout(update)
@@ -327,7 +326,7 @@ def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
 
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
-    main = repository.branches.head
+    main = repository.head
     branch = repository.branches.create("branch")
 
     repository.checkout(branch)
@@ -342,7 +341,7 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
 
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
-    main = repository.branches.head
+    main = repository.head
     branch = repository.branches.create("branch")
 
     repository.checkout(branch)
@@ -359,7 +358,7 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
 
-    main = repository.branches.head
+    main = repository.head
     branch = repository.branches.create("branch")
 
     repository.checkout(branch)
@@ -386,7 +385,7 @@ def test_resetmerge_removes_added_files(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -408,7 +407,7 @@ def test_resetmerge_keeps_unrelated_additions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -432,7 +431,7 @@ def test_resetmerge_keeps_unrelated_changes(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -457,7 +456,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
@@ -485,4 +484,4 @@ def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
     repository.resetmerge(parent="latest", cherry="update")
 
     index = repository._repository.index
-    assert index.write_tree() == repository.branches.head.commit.tree.id
+    assert index.write_tree() == repository.head.commit.tree.id

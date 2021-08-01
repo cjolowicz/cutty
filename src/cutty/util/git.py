@@ -19,9 +19,10 @@ from cutty.compat.contextlib import contextmanager
 class Branches(MutableMapping[str, pygit2.Commit]):
     """Branches in a git repository."""
 
-    def __init__(self, branches: pygit2.repository.Branches) -> None:
+    def __init__(self, repository: Repository) -> None:
         """Initialize."""
-        self._branches = branches
+        self._repository = repository
+        self._branches = repository._repository.branches
 
     def __len__(self) -> int:
         """Return the number of branches."""
@@ -49,13 +50,6 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
-    @property
-    def head(self) -> Branch:
-        """Return the branch referenced by HEAD."""
-        head = self._branches._repository.references["HEAD"]
-        name = head.target.removeprefix("refs/heads/")
-        return Branch(self, name)
-
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
         self[name]
@@ -66,7 +60,7 @@ class Branches(MutableMapping[str, pygit2.Commit]):
     ) -> Branch:
         """Create the branch with the given name and commit."""
         if commit is None:
-            commit = self.head.commit
+            commit = self._repository.head.commit
 
         self._branches.create(name, commit, force=force)
 
@@ -154,7 +148,14 @@ class Repository:
     @property
     def branches(self) -> Branches:
         """Return the repository branches."""
-        return Branches(self._repository.branches)
+        return Branches(self)
+
+    @property
+    def head(self) -> Branch:
+        """Return the branch referenced by HEAD."""
+        head = self._repository.references["HEAD"]
+        name = head.target.removeprefix("refs/heads/")
+        return Branch(self.branches, name)
 
     def checkout(self, branch: Branch) -> None:
         """Check out the given branch."""
