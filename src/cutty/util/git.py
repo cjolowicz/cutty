@@ -257,20 +257,8 @@ class Repository:
 
     def cherrypick(self, reference: str, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
-        oid = self._repository.references[reference].resolve().target
-        self._repository.cherrypick(oid)
-
-        if self._repository.index.conflicts:
-            paths = {
-                side.path
-                for _, ours, theirs in self._repository.index.conflicts
-                for side in (ours, theirs)
-                if side is not None
-            }
-            raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
-
-        self.commit(message=message)
-        self._repository.state_cleanup()
+        commit = self._repository.references[reference].peel()
+        self.cherrypick2(commit, message=message)
 
     def createtag(self, name: str, *, message: str) -> None:
         """Create a tag at HEAD."""
