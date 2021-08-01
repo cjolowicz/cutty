@@ -139,7 +139,7 @@ def test_branch_commit_get(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branch = repository.branches.branch(main)
-    assert repository.head.peel() == branch.commit
+    assert repository.branches[main] == branch.commit
 
 
 def test_discover_fail(tmp_path: Path) -> None:
