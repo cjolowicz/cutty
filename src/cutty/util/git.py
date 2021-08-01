@@ -73,6 +73,11 @@ class Branch:
         """Return the commit at the head of branch."""
         return self._branches[self._name]
 
+    @commit.setter
+    def commit(self, commit: pygit2.Commit) -> None:
+        """Reset the branch to another commit."""
+        self._branches[self._name] = commit
+
 
 @dataclass
 class Repository:
