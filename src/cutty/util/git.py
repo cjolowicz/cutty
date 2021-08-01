@@ -161,10 +161,6 @@ class Repository:
         """Return the repository head."""
         return self._repository.head
 
-    def set_head(self, target: str) -> None:
-        """Update the repository head."""
-        self._repository.set_head(target)
-
     @property
     def references(self) -> pygit2.repository.References:
         """Return the repository references."""
