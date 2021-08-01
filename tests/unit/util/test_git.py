@@ -63,7 +63,7 @@ def test_branches_getitem_fail(repository: Repository) -> None:
 def test_branches_getitem_pass(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    assert repository.head.peel() == repository.branches[main]
+    assert repository.branches.head.commit == repository.branches[main]
 
 
 def test_branches_setitem_new(repository: Repository) -> None:
@@ -218,16 +218,16 @@ def test_commit_on_unborn_branch(tmp_path: Path) -> None:
     repository = Repository.init(tmp_path / "repository")
     repository.commit(message="initial")
 
-    assert not repository.head.peel().parents
+    assert not repository.branches.head.commit.parents
 
 
 def test_commit_empty(repository: Repository) -> None:
     """It does not produce an empty commit (unless the branch is unborn)."""
-    head = repository.head.peel()
+    head = repository.branches.head.commit
 
     repository.commit(message="empty")
 
-    assert head == repository.head.peel()
+    assert head == repository.branches.head.commit
 
 
 def test_commit_signature(repository: Repository) -> None:
@@ -237,7 +237,7 @@ def test_commit_signature(repository: Repository) -> None:
     signature = pygit2.Signature("Katherine", "katherine@example.com")
     repository.commit(message="empty", signature=signature)
 
-    head = repository.head.peel()
+    head = repository.branches.head.commit
     assert signature.name == head.author.name and signature.email == head.author.email
 
 
@@ -247,7 +247,7 @@ def test_commit_message_default(repository: Repository) -> None:
 
     repository.commit()
 
-    head = repository.head.peel()
+    head = repository.branches.head.commit
     assert "" == head.message
 
 
@@ -255,7 +255,7 @@ def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
     repository.branches.create("branch")
 
-    assert repository.branches["branch"] == repository.head.peel()
+    assert repository.branches["branch"] == repository.branches.head.commit
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
@@ -502,4 +502,4 @@ def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
 
     repository.resetmerge(parent="latest", cherry="update")
 
-    assert repository.index.write_tree() == repository.head.peel().tree.id
+    assert repository.index.write_tree() == repository.branches.head.commit.tree.id
