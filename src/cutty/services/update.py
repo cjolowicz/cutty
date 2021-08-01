@@ -46,8 +46,8 @@ def update(
             directory=directory,
         )
 
-    repository.cherrypick(repository.branches[UPDATE_BRANCH], message=UPDATE_MESSAGE)
-    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
+    repository.cherrypick(branch.commit, message=UPDATE_MESSAGE)
+    repository.branches[LATEST_BRANCH] = branch.commit
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
