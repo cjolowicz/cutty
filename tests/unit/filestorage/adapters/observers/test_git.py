@@ -53,7 +53,7 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    repository.branches.head.commit  # does not raise
+    repository.head.commit  # does not raise
 
 
 def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
@@ -67,7 +67,7 @@ def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -
 
 def tree(repository: Repository) -> pygit2.Tree:
     """Return the tree at the HEAD of the repository."""
-    return repository.branches.head.commit.tree
+    return repository.head.commit.tree
 
 
 def test_hook_edits(
@@ -124,7 +124,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.branches.head.commit == repository.branches[LATEST_BRANCH]
+    assert repository.head.commit == repository.branches[LATEST_BRANCH]
 
 
 def test_branch_not_checked_out(
@@ -135,7 +135,7 @@ def test_branch_not_checked_out(
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.branches.head.name != LATEST_BRANCH
+    assert repository.head.name != LATEST_BRANCH
 
 
 def test_existing_branch(
@@ -183,7 +183,7 @@ def test_existing_branch_commit_message(
     with storage:
         storage.add(file)
 
-    assert "initial" not in repository.branches.head.commit.message.lower()
+    assert "initial" not in repository.head.commit.message.lower()
 
 
 def test_existing_branch_no_changes(
@@ -195,9 +195,9 @@ def test_existing_branch_no_changes(
 
     branch = repository.branches.create(UPDATE_BRANCH)
     repository.checkout(branch)
-    oldhead = repository.branches.head.commit
+    oldhead = repository.head.commit
 
     with storage:
         pass
 
-    assert oldhead == repository.branches.head.commit
+    assert oldhead == repository.head.commit

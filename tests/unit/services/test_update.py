@@ -23,7 +23,7 @@ def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.branches.head
+    main = repository.head
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
     repository.checkout(update)
@@ -44,7 +44,7 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     with chdir(repository.path):
         continueupdate()
 
-    blob = repository.branches.head.commit.tree / path.name
+    blob = repository.head.commit.tree / path.name
     assert blob.data == b"b"
 
 

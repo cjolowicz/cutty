@@ -50,11 +50,6 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
-    @property
-    def head(self) -> Branch:
-        """Return the branch referenced by HEAD."""
-        return self._repository.head
-
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
         self[name]
@@ -65,7 +60,7 @@ class Branches(MutableMapping[str, pygit2.Commit]):
     ) -> Branch:
         """Create the branch with the given name and commit."""
         if commit is None:
-            commit = self.head.commit
+            commit = self._repository.head.commit
 
         self._branches.create(name, commit, force=force)
 
