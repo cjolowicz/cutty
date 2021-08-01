@@ -239,7 +239,7 @@ class Repository:
         oid = self._repository.TreeBuilder().write()
         self._repository.checkout_tree(self._repository[oid])
 
-    def cherrypick2(self, commit: pygit2.Commit, *, message: str) -> None:
+    def cherrypick(self, commit: pygit2.Commit, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
         self._repository.cherrypick(commit.id)
 

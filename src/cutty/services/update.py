@@ -45,7 +45,7 @@ def update(
             directory=directory,
         )
 
-    repository.cherrypick2(repository.branches[UPDATE_BRANCH], message=UPDATE_MESSAGE)
+    repository.cherrypick(repository.branches[UPDATE_BRANCH], message=UPDATE_MESSAGE)
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
