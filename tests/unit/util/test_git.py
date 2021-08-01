@@ -144,6 +144,16 @@ def test_branches_create_existing_branch(repository: Repository) -> None:
         branches.create(branch.name, branch.commit)
 
 
+def test_branches_create_existing_branch_force(repository: Repository) -> None:
+    """It updates the branch head if the branch already exists."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branch = branches.create("branch", branches[main])
+    updatefile(repository.path / "file")
+    branches.create(branch.name, branches[main], force=True)
+    assert branches[main] == branch.commit
+
+
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
