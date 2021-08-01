@@ -52,8 +52,7 @@ class Branches(MutableMapping[str, pygit2.Commit]):
 
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
-        self[name]
-        return Branch(self, name)
+        return self._repository.branch(name)
 
     def create(
         self, name: str, commit: Optional[pygit2.Commit] = None, *, force: bool = False
@@ -149,6 +148,12 @@ class Repository:
     def branches(self) -> Branches:
         """Return the repository branches."""
         return Branches(self)
+
+    def branch(self, name: str) -> Branch:
+        """Return the branch with the given name."""
+        branches = self.branches
+        branches[name]
+        return Branch(branches, name)
 
     @property
     def head(self) -> Branch:
