@@ -135,6 +135,32 @@ def test_branches_create_new_branch_commit(repository: Repository) -> None:
     assert branches[main] == branch.commit
 
 
+def test_branches_create_new_branch_at_ancestor(repository: Repository) -> None:
+    """It creates the branch at an earlier commit."""
+    initial = repository.branches.head.commit
+
+    updatefile(repository.path / "a")
+
+    branch = repository.branches.create("branch", initial)
+
+    assert initial == branch.commit
+
+
+def test_branches_create_new_branch_at_another_branch(repository: Repository) -> None:
+    """It creates the branch at a commit on another branch."""
+    branches = repository.branches
+    main = branches.head
+    branch1 = branches.create("branch1")
+
+    repository.checkout(branch1)
+    repository.commit()
+
+    repository.checkout(main)
+    branch2 = branches.create("branch2", branches["branch1"])
+
+    assert branch1.commit == branch2.commit
+
+
 def test_branches_create_existing_branch(repository: Repository) -> None:
     """It raises an exception if the branch already exists."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
@@ -156,10 +182,9 @@ def test_branches_create_existing_branch_force(repository: Repository) -> None:
 
 def test_branches_create_default_commit(repository: Repository) -> None:
     """It creates the branch at the commit referenced by HEAD."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    branches = repository.branches
-    branch = branches.create("branch")
-    assert branches[main] == branch.commit
+    branch = repository.branches.create("branch")
+
+    assert branch.commit == repository.branches.head.commit
 
 
 def test_branches_head_name(repository: Repository) -> None:
@@ -249,45 +274,6 @@ def test_commit_message_default(repository: Repository) -> None:
 
     head = repository.branches.head.commit
     assert "" == head.message
-
-
-def test_createbranch_target_default(repository: Repository) -> None:
-    """It creates the branch at HEAD by default."""
-    repository.branches.create("branch")
-
-    assert repository.branches["branch"] == repository.branches.head.commit
-
-
-def test_createbranch_target_branch(repository: Repository) -> None:
-    """It creates the branch at the head of the given branch."""
-    main = repository.branches.head
-    branch1 = repository.branches.create("branch1")
-
-    repository.checkout(branch1)
-    repository.commit()
-
-    repository.checkout(main)
-    repository.branches.create("branch2", repository.branches["branch1"])
-
-    assert branch1.commit == repository.branches["branch2"]
-
-
-def test_createbranch_target_oid(repository: Repository) -> None:
-    """It creates the branch at the commit with the given OID."""
-    main = repository.branches.head
-    oid = main.commit.id
-
-    repository.commit()
-
-    repository.branches.create("branch", main.commit)
-
-    assert oid == repository.branches["branch"].id
-
-
-def test_createbranch_returns_branch(repository: Repository) -> None:
-    """It returns the branch object."""
-    branch = repository.branches.create("branch")
-    assert branch.commit == repository.branches["branch"]
 
 
 def createconflict(
