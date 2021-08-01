@@ -49,6 +49,13 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
+    @property
+    def head(self) -> Branch:
+        """Return the branch referenced by HEAD."""
+        head = self._branches._repository.references["HEAD"]
+        name = head.target.removeprefix("refs/heads/")
+        return Branch(self, name)
+
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
         self[name]
