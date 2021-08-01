@@ -10,7 +10,7 @@ from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.util.git import Repository
 from tests.util.files import chdir
-from tests.util.git import createbranches
+from tests.util.git import createbranches2
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -23,17 +23,18 @@ def createconflict(
     repository: Repository, path: Path, *, ours: str, theirs: str
 ) -> None:
     """Create an update conflict."""
-    main = repository.head
-    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    main = repository.branches.head
+    update, _ = createbranches2(repository, UPDATE_BRANCH, LATEST_BRANCH)
 
-    repository.checkout(update)
+    repository.checkout2(update)
     updatefile(path, theirs)
 
-    repository.checkout(main)
+    repository.checkout2(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.name, message="")
+        refname = f"refs/heads/{update.name}"
+        repository.cherrypick(refname, message="")
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
