@@ -157,11 +157,6 @@ class Repository:
         return self._repository.index
 
     @property
-    def head(self) -> pygit2.Reference:
-        """Return the repository head."""
-        return self._repository.head
-
-    @property
     def references(self) -> pygit2.repository.References:
         """Return the repository references."""
         return self._repository.references
