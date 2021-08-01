@@ -175,6 +175,11 @@ class Repository:
         """Return the repository branches."""
         return Branches(self._repository.branches)
 
+    def checkout2(self, branch: Branch) -> None:
+        """Check out the given branch."""
+        reference = branch._branches._branches[branch.name]
+        self._repository.checkout(reference)
+
     def checkout(self, reference: pygit2.Reference) -> None:
         """Check out the given reference."""
         self._repository.checkout(reference)
