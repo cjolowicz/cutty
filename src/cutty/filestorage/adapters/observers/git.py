@@ -31,8 +31,8 @@ class GitRepositoryObserver(FileStorageObserver):
 
         if UPDATE_BRANCH in repository.branches:
             # HEAD must point to update branch if it exists.
-            head = repository.references["HEAD"].target
-            if head != UPDATE_BRANCH_REF:
+            head = repository.branches.head.name
+            if head != UPDATE_BRANCH:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
@@ -43,4 +43,4 @@ class GitRepositoryObserver(FileStorageObserver):
 
         repository.commit(message=message)
 
-        repository.branches.setdefault(LATEST_BRANCH, repository.head.peel())
+        repository.branches.setdefault(LATEST_BRANCH, repository.branches.head.commit)

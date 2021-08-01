@@ -104,12 +104,13 @@ def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
 
 def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does nothing if the generated project did not change."""
-    oldhead = Repository.open(project).head.target
+    repository = Repository.open(project)
+    oldhead = repository.branches.head.commit
 
     with chdir(project):
         runcutty("update")
 
-    assert oldhead == Repository.open(project).head.target
+    assert oldhead == repository.branches.head.commit
 
 
 def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
@@ -288,7 +289,7 @@ def test_checkout(
     """It uses the specified revision of the template."""
     updatefile(templateproject / "LICENSE", "a")
 
-    revision = Repository.open(template).head.target
+    revision = Repository.open(template).branches.head.commit.id
 
     updatefile(templateproject / "LICENSE", "b")
 
