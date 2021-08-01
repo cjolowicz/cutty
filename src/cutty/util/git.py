@@ -49,6 +49,53 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
+    @property
+    def head(self) -> Branch:
+        """Return the branch referenced by HEAD."""
+        head = self._branches._repository.references["HEAD"]
+        name = head.target.removeprefix("refs/heads/")
+        return Branch(self, name)
+
+    def branch(self, name: str) -> Branch:
+        """Return the branch with the given name."""
+        self[name]
+        return Branch(self, name)
+
+    def create(
+        self, name: str, commit: Optional[pygit2.Commit] = None, *, force: bool = False
+    ) -> Branch:
+        """Create the branch with the given name and commit."""
+        if commit is None:
+            commit = self.head.commit
+
+        self._branches.create(name, commit, force=force)
+
+        return Branch(self, name)
+
+
+class Branch:
+    """Branch in a git repository."""
+
+    def __init__(self, branches: Branches, name: str) -> None:
+        """Initialize."""
+        self._branches = branches
+        self._name = name
+
+    @property
+    def name(self) -> str:
+        """Return the name of the branch."""
+        return self._name
+
+    @property
+    def commit(self) -> pygit2.Commit:
+        """Return the commit at the head of branch."""
+        return self._branches[self._name]
+
+    @commit.setter
+    def commit(self, commit: pygit2.Commit) -> None:
+        """Reset the branch to another commit."""
+        self._branches[self._name] = commit
+
 
 @dataclass
 class Repository:
