@@ -197,21 +197,22 @@ class Repository:
 
         If there are no changes relative to the parent, this is a noop.
         """
-        self.index.add_all()
+        repository = self._repository
+        index = repository.index
 
-        tree = self.index.write_tree()
-        if not self._repository.head_is_unborn and tree == self.head.peel().tree.id:
+        index.add_all()
+
+        tree = index.write_tree()
+        if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
             return
 
-        self.index.write()
+        index.write()
 
         if signature is None:
             signature = self.default_signature
 
-        parents = [] if self._repository.head_is_unborn else [self.head.target]
-        self._repository.create_commit(
-            "HEAD", signature, signature, message, tree, parents
-        )
+        parents = [] if repository.head_is_unborn else [repository.head.target]
+        repository.create_commit("HEAD", signature, signature, message, tree, parents)
 
     @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
@@ -259,7 +260,7 @@ class Repository:
         """Create a tag at HEAD."""
         self._repository.create_tag(
             name,
-            self.head.target,
+            self._repository.head.target,
             pygit2.GIT_OBJ_COMMIT,
             self.default_signature,
             message,
