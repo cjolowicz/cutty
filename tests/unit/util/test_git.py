@@ -154,6 +154,12 @@ def test_branches_create_existing_branch_force(repository: Repository) -> None:
     assert branches[main] == branch.commit
 
 
+def test_branches_head_name(repository: Repository) -> None:
+    """It returns the branch whose name is contained in HEAD."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    assert main == repository.branches.head.name
+
+
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
