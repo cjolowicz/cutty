@@ -253,41 +253,41 @@ def test_commit_message_default(repository: Repository) -> None:
 
 def test_createbranch_target_default(repository: Repository) -> None:
     """It creates the branch at HEAD by default."""
-    repository.createbranch("branch")
+    repository.branches.create("branch")
 
     assert repository.branches["branch"] == repository.head.peel()
 
 
 def test_createbranch_target_branch(repository: Repository) -> None:
     """It creates the branch at the head of the given branch."""
-    main = repository.head
-    branch1 = repository.createbranch("branch1")
+    main = repository.branches.head
+    branch1 = repository.branches.create("branch1")
 
-    repository.checkout(branch1)
+    repository.checkout2(branch1)
     repository.commit()
 
-    repository.checkout(main)
-    repository.createbranch("branch2", target="branch1")
+    repository.checkout2(main)
+    repository.branches.create("branch2", repository.branches["branch1"])
 
-    assert branch1.peel() == repository.branches["branch2"]
+    assert branch1.commit == repository.branches["branch2"]
 
 
 def test_createbranch_target_oid(repository: Repository) -> None:
     """It creates the branch at the commit with the given OID."""
-    main = repository.head
-    oid = main.peel().id
+    main = repository.branches.head
+    oid = main.commit.id
 
     repository.commit()
 
-    repository.createbranch("branch", target=str(oid))
+    repository.branches.create("branch", main.commit)
 
     assert oid == repository.branches["branch"].id
 
 
 def test_createbranch_returns_branch(repository: Repository) -> None:
     """It returns the branch object."""
-    branch = repository.createbranch("branch")
-    assert branch.peel() == repository.branches["branch"]
+    branch = repository.branches.create("branch")
+    assert branch.commit == repository.branches["branch"]
 
 
 def createconflict(
