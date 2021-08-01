@@ -33,7 +33,7 @@ def update(
 
     repository = Repository.open(projectdir)
     repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
-    branch = repository.branches.branch(UPDATE_BRANCH)
+    branch = repository.branch(UPDATE_BRANCH)
 
     with repository.worktree(branch, checkout=False) as worktree:
         create(

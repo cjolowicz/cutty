@@ -50,10 +50,6 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         """Remove the branch."""
         self._branches.delete(name)
 
-    def branch(self, name: str) -> Branch:
-        """Return the branch with the given name."""
-        return self._repository.branch(name)
-
     def create(
         self, name: str, commit: Optional[pygit2.Commit] = None, *, force: bool = False
     ) -> Branch:
