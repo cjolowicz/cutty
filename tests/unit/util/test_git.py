@@ -142,6 +142,17 @@ def test_branch_commit_get(repository: Repository) -> None:
     assert repository.branches[main] == branch.commit
 
 
+def test_branch_commit_set(repository: Repository) -> None:
+    """It resets the branch to the given commit."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branches["branch"] = branches[main]
+    updatefile(repository.path / "file")
+    branch = branches.branch("branch")
+    branch.commit = branches[main]
+    assert branches[main] == branch.commit
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
