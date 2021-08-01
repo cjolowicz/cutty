@@ -152,11 +152,6 @@ class Repository:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
     @property
-    def index(self) -> pygit2.Index:
-        """Return the repository index."""
-        return self._repository.index
-
-    @property
     def references(self) -> pygit2.repository.References:
         """Return the repository references."""
         return self._repository.references

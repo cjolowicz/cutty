@@ -483,4 +483,5 @@ def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
 
     repository.resetmerge(parent="latest", cherry="update")
 
-    assert repository.index.write_tree() == repository.branches.head.commit.tree.id
+    index = repository._repository.index
+    assert index.write_tree() == repository.branches.head.commit.tree.id
