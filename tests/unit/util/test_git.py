@@ -117,10 +117,10 @@ def test_branches_pop_removes_branch(repository: Repository) -> None:
     assert "branch" not in branches
 
 
-def test_branches_branch_fail(repository: Repository) -> None:
+def test_branch_fail(repository: Repository) -> None:
     """It raises KeyError if the branch does not exist."""
     with pytest.raises(KeyError):
-        repository.branches.branch("branch")
+        repository.branch("branch")
 
 
 def test_branches_create_new_branch_name(repository: Repository) -> None:
@@ -192,8 +192,7 @@ def test_branches_head_name(repository: Repository) -> None:
 
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
-    branches = repository.branches
-    branch = branches.branch(repository.head.name)
+    branch = repository.branch(repository.head.name)
     assert repository.head.name == branch.name
 
 
@@ -216,7 +215,7 @@ def test_branch_commit_set(repository: Repository) -> None:
     head, branches = repository.head, repository.branches
     branches["branch"] = head.commit
     updatefile(repository.path / "a")
-    branch = branches.branch("branch")
+    branch = repository.branch("branch")
     branch.commit = head.commit
     assert head.commit == branch.commit
 
