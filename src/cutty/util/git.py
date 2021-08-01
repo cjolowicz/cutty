@@ -52,20 +52,26 @@ class Branches(MutableMapping[str, pygit2.Commit]):
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
         self[name]
-        return Branch(name)
+        return Branch(self, name)
 
 
 class Branch:
     """Branch in a git repository."""
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, branches: Branches, name: str) -> None:
         """Initialize."""
+        self._branches = branches
         self._name = name
 
     @property
     def name(self) -> str:
         """Return the name of the branch."""
         return self._name
+
+    @property
+    def commit(self) -> pygit2.Commit:
+        """Return the commit at the head of branch."""
+        return self._branches[self._name]
 
 
 @dataclass
