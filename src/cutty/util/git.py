@@ -234,12 +234,6 @@ class Repository:
         # https://github.com/libgit2/libgit2/issues/5280
         worktree.prune(True)
 
-    @contextmanager
-    def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
-        """Create a worktree for the branch in the repository."""
-        with self.worktree(self.branches.branch(branch), checkout=checkout) as path:
-            yield path
-
     def _checkoutemptytree(self) -> None:
         """Check out an empty tree from the repository."""
         oid = self._repository.TreeBuilder().write()
