@@ -266,10 +266,6 @@ class Repository:
             message,
         )
 
-    def updatebranch(self, branch: str, *, target: str) -> None:
-        """Update a branch to the given target, another branch."""
-        self.branches[branch] = self.branches[target]
-
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.
 
