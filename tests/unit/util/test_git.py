@@ -183,11 +183,18 @@ def test_branches_create_default_commit(repository: Repository) -> None:
     assert branch.commit == repository.head.commit
 
 
-def test_branches_head_name(repository: Repository) -> None:
+def test_head_name(repository: Repository) -> None:
     """It returns the branch whose name is contained in HEAD."""
     head = repository._repository.references["HEAD"]
     name = head.target.removeprefix("refs/heads/")
     assert name == repository.head.name
+
+
+def test_head_detached(repository: Repository) -> None:
+    """It raises an exception if the HEAD is detached."""
+    repository._repository.set_head(repository.head.commit.id)
+    with pytest.raises(ValueError):
+        repository.head
 
 
 def test_branch_name_get(repository: Repository) -> None:
