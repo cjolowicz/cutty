@@ -51,7 +51,6 @@ class Branches(MutableMapping[str, pygit2.Commit]):
 
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
-        self[name]
         return Branch(self, name)
 
 
@@ -62,6 +61,7 @@ class Branch:
         """Initialize."""
         self._branches = branches
         self._name = name
+        self.commit  # raise KeyError on creation
 
     @property
     def name(self) -> str:
