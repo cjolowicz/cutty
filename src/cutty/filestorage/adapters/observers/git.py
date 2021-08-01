@@ -8,9 +8,7 @@ from cutty.util.git import Repository
 
 
 LATEST_BRANCH = "cutty/latest"
-LATEST_BRANCH_REF = f"refs/heads/{LATEST_BRANCH}"
 UPDATE_BRANCH = "cutty/update"
-UPDATE_BRANCH_REF = f"refs/heads/{UPDATE_BRANCH}"
 CREATE_MESSAGE = "Initial import"
 UPDATE_MESSAGE = "Update project template"
 
