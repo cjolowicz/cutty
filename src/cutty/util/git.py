@@ -239,6 +239,22 @@ class Repository:
         oid = self._repository.TreeBuilder().write()
         self._repository.checkout_tree(self._repository[oid])
 
+    def cherrypick2(self, commit: pygit2.Commit, *, message: str) -> None:
+        """Cherry-pick the commit onto the current branch."""
+        self._repository.cherrypick(commit.id)
+
+        if self._repository.index.conflicts:
+            paths = {
+                side.path
+                for _, ours, theirs in self._repository.index.conflicts
+                for side in (ours, theirs)
+                if side is not None
+            }
+            raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
+
+        self.commit(message=message)
+        self._repository.state_cleanup()
+
     def cherrypick(self, reference: str, *, message: str) -> None:
         """Cherry-pick the commit onto the current branch."""
         oid = self._repository.references[reference].resolve().target
