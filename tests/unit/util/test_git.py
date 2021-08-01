@@ -135,6 +135,15 @@ def test_branches_create_new_branch_commit(repository: Repository) -> None:
     assert branches[main] == branch.commit
 
 
+def test_branches_create_existing_branch(repository: Repository) -> None:
+    """It raises an exception if the branch already exists."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branches = repository.branches
+    branch = branches.create("branch", branches[main])
+    with pytest.raises(pygit2.AlreadyExistsError):
+        branches.create(branch.name, branch.commit)
+
+
 def test_branch_name_get(repository: Repository) -> None:
     """It returns the name of the branch."""
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
