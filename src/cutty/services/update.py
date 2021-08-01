@@ -6,7 +6,6 @@ from typing import Optional
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
 from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -46,7 +45,7 @@ def update(
             directory=directory,
         )
 
-    repository.cherrypick(UPDATE_BRANCH_REF, message=UPDATE_MESSAGE)
+    repository.cherrypick(repository.branches[UPDATE_BRANCH], message=UPDATE_MESSAGE)
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
