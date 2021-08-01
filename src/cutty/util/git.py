@@ -270,13 +270,6 @@ class Repository:
             message,
         )
 
-    def createbranch(
-        self, branch: str, *, target: str = "HEAD", force: bool = False
-    ) -> pygit2.Branch:
-        """Create a branch pointing to the given target."""
-        commit = self._repository.revparse_single(target)
-        return self._repository.branches.create(branch, commit, force=force)
-
     def updatebranch(self, branch: str, *, target: str) -> None:
         """Update a branch to the given target, another branch."""
         self.branches[branch] = self.branches[target]
