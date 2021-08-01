@@ -43,4 +43,4 @@ class GitRepositoryObserver(FileStorageObserver):
 
         repository.commit(message=message)
 
-        repository.branches.setdefault(LATEST_BRANCH, repository.head.peel())
+        repository.branches.setdefault(LATEST_BRANCH, repository.branches.head.commit)
