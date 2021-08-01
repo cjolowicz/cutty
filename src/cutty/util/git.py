@@ -54,9 +54,11 @@ class Branches(MutableMapping[str, pygit2.Commit]):
         self[name]
         return Branch(self, name)
 
-    def create(self, name: str, commit: pygit2.Commit) -> Branch:
+    def create(
+        self, name: str, commit: pygit2.Commit, *, force: bool = False
+    ) -> Branch:
         """Create the branch with the given name and commit."""
-        self._branches.create(name, commit)
+        self._branches.create(name, commit, force=force)
         return Branch(self, name)
 
 
