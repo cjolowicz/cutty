@@ -60,7 +60,12 @@ class Branch:
 
     def __init__(self, name: str) -> None:
         """Initialize."""
-        self.name = name
+        self._name = name
+
+    @property
+    def name(self) -> str:
+        """Return the name of the branch."""
+        return self._name
 
 
 @dataclass
