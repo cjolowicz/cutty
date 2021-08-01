@@ -263,10 +263,10 @@ def test_createbranch_target_branch(repository: Repository) -> None:
     main = repository.branches.head
     branch1 = repository.branches.create("branch1")
 
-    repository.checkout2(branch1)
+    repository.checkout(branch1)
     repository.commit()
 
-    repository.checkout2(main)
+    repository.checkout(main)
     repository.branches.create("branch2", repository.branches["branch1"])
 
     assert branch1.commit == repository.branches["branch2"]
@@ -297,10 +297,10 @@ def createconflict(
     main = repository.branches.head
     update, _ = createbranches2(repository, "update", "latest")
 
-    repository.checkout2(update)
+    repository.checkout(update)
     updatefile(path, theirs)
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
@@ -349,10 +349,10 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     main = repository.branches.head
     branch = repository.branches.create("branch")
 
-    repository.checkout2(branch)
+    repository.checkout(branch)
     updatefile(path)
 
-    repository.checkout2(main)
+    repository.checkout(main)
     assert not path.is_file()
 
     refname = f"refs/heads/{branch.name}"
@@ -365,10 +365,10 @@ def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     main = repository.branches.head
     branch = repository.branches.create("branch")
 
-    repository.checkout2(branch)
+    repository.checkout(branch)
     updatefile(path, "a")
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
@@ -382,10 +382,10 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     main = repository.branches.head
     branch = repository.branches.create("branch")
 
-    repository.checkout2(branch)
+    repository.checkout(branch)
     updatefile(path, "b")
 
-    repository.checkout2(main)
+    repository.checkout(main)
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
@@ -411,10 +411,10 @@ def test_resetmerge_removes_added_files(
     update, _ = createbranches2(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.checkout2(update)
+    repository.checkout(update)
     updatefiles({path1: "a", path2: ""})
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
@@ -433,10 +433,10 @@ def test_resetmerge_keeps_unrelated_additions(
     update, _ = createbranches2(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.checkout2(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path1, "b")
 
     path2.touch()
@@ -457,10 +457,10 @@ def test_resetmerge_keeps_unrelated_changes(
     update, _ = createbranches2(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.checkout2(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path1, "b")
     updatefile(path2)
 
@@ -482,10 +482,10 @@ def test_resetmerge_keeps_unrelated_deletions(
     update, _ = createbranches2(repository, "update", "latest")
     path1, path2 = next(paths), next(paths)
 
-    repository.checkout2(update)
+    repository.checkout(update)
     updatefile(path1, "a")
 
-    repository.checkout2(main)
+    repository.checkout(main)
     updatefile(path1, "b")
     updatefile(path2)
 

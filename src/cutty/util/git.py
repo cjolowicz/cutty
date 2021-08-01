@@ -175,7 +175,7 @@ class Repository:
         """Return the repository branches."""
         return Branches(self._repository.branches)
 
-    def checkout2(self, branch: Branch) -> None:
+    def checkout(self, branch: Branch) -> None:
         """Check out the given branch."""
         reference = branch._branches._branches[branch.name]
         self._repository.checkout(reference)
