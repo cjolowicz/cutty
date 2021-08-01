@@ -214,13 +214,13 @@ class Repository:
         )
 
     @contextmanager
-    def worktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
+    def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
         with tempfile.TemporaryDirectory() as directory:
-            name = hashlib.blake2b(branch.encode(), digest_size=32).hexdigest()
+            name = hashlib.blake2b(branch.name.encode(), digest_size=32).hexdigest()
             path = Path(directory) / name
             worktree = self._repository.add_worktree(
-                name, path, self._repository.branches[branch]
+                name, path, self._repository.branches[branch.name]
             )
 
             if not checkout:
@@ -237,7 +237,7 @@ class Repository:
     @contextmanager
     def createworktree(self, branch: str, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
-        with self.worktree(branch, checkout=checkout) as path:
+        with self.worktree(self.branches.branch(branch), checkout=checkout) as path:
             yield path
 
     def _checkoutemptytree(self) -> None:
