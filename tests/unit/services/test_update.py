@@ -44,7 +44,7 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     with chdir(repository.path):
         continueupdate()
 
-    blob = repository.head.peel().tree / path.name
+    blob = repository.branches.head.commit.tree / path.name
     assert blob.data == b"b"
 
 
