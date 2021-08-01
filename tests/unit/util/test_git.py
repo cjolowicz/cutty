@@ -185,8 +185,9 @@ def test_branches_create_default_commit(repository: Repository) -> None:
 
 def test_branches_head_name(repository: Repository) -> None:
     """It returns the branch whose name is contained in HEAD."""
-    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
-    assert main == repository.branches.head.name
+    head = repository._repository.references["HEAD"]
+    name = head.target.removeprefix("refs/heads/")
+    assert name == repository.branches.head.name
 
 
 def test_branch_name_get(repository: Repository) -> None:
