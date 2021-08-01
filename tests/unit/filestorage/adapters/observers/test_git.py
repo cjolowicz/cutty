@@ -7,14 +7,13 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH_REF
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH_REF
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.util.git import Repository
+from tests.util.git import createbranches
 
 
 @pytest.fixture
@@ -125,8 +124,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    reference = repository.references[LATEST_BRANCH_REF]
-    assert repository.branches.head.commit == reference.peel()
+    assert repository.branches.head.commit == repository.branches[LATEST_BRANCH]
 
 
 def test_branch_not_checked_out(
@@ -137,7 +135,7 @@ def test_branch_not_checked_out(
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.references["HEAD"].target != LATEST_BRANCH_REF
+    assert repository.branches.head.name != LATEST_BRANCH
 
 
 def test_existing_branch(
@@ -147,8 +145,8 @@ def test_existing_branch(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.branches[UPDATE_BRANCH] = repository.branches.head.commit
-    repository.set_head(UPDATE_BRANCH_REF)
+    branch = repository.branches.create(UPDATE_BRANCH)
+    repository.checkout(branch)
 
     with storage:
         storage.add(file)
@@ -163,7 +161,7 @@ def test_existing_branch_not_head(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.branches[UPDATE_BRANCH] = repository.branches.head.commit
+    repository.branches.create(UPDATE_BRANCH)
 
     with pytest.raises(Exception):
         with storage:
@@ -179,15 +177,13 @@ def test_existing_branch_commit_message(
     repository = Repository.init(project)
     repository.commit()
 
-    branches = repository.branches
-    branches[LATEST_BRANCH] = branches[UPDATE_BRANCH] = repository.branches.head.commit
-    repository.set_head(UPDATE_BRANCH_REF)
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    repository.checkout(update)
 
     with storage:
         storage.add(file)
 
-    commit = repository.branches.head.commit
-    assert "initial" not in commit.message.lower()
+    assert "initial" not in repository.branches.head.commit.message.lower()
 
 
 def test_existing_branch_no_changes(
@@ -197,11 +193,11 @@ def test_existing_branch_no_changes(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.branches[UPDATE_BRANCH] = repository.branches.head.commit
-    repository.set_head(UPDATE_BRANCH_REF)
-    oldhead = repository.head.target
+    branch = repository.branches.create(UPDATE_BRANCH)
+    repository.checkout(branch)
+    oldhead = repository.branches.head.commit
 
     with storage:
         pass
 
-    assert oldhead == repository.head.target
+    assert oldhead == repository.branches.head.commit
