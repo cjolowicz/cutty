@@ -120,6 +120,13 @@ def test_branches_branch_fail(repository: Repository) -> None:
         repository.branches.branch("branch")
 
 
+def test_branch_name_get(repository: Repository) -> None:
+    """It returns the name of the branch."""
+    main = repository.references["HEAD"].target.removeprefix("refs/heads/")
+    branch = repository.branches.branch(main)
+    assert main == branch.name
+
+
 def test_discover_fail(tmp_path: Path) -> None:
     """It returns None."""
     assert None is Repository.discover(tmp_path)
