@@ -132,7 +132,7 @@ def test_branch_name_set(repository: Repository) -> None:
     main = repository.references["HEAD"].target.removeprefix("refs/heads/")
     branch = repository.branches.branch(main)
     with pytest.raises(AttributeError):
-        branch.name = "teapot"
+        branch.name = "teapot"  # type: ignore[misc]
 
 
 def test_discover_fail(tmp_path: Path) -> None:
