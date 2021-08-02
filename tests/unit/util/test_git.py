@@ -374,6 +374,22 @@ def test_cherrypick_message(repository: Repository, path: Path) -> None:
     assert message == repository.head.commit.message
 
 
+def test_cherrypick_author(repository: Repository) -> None:
+    """It uses the original commit author."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+    author = pygit2.Signature("author", "author@example.com")
+
+    repository.checkout(branch)
+    (repository.path / "a").touch()
+    repository.commit(author=author)
+
+    repository.checkout(main)
+
+    repository.cherrypick(branch.commit)
+    assert author.email == repository.head.commit.author.email
+
+
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
