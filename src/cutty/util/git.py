@@ -247,7 +247,7 @@ class Repository:
             }
             raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-        self.commit(message=commit.message)
+        self.commit(message=commit.message, author=commit.author)
         self._repository.state_cleanup()
 
     def createtag(self, name: str, *, message: str) -> None:
