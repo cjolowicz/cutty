@@ -359,6 +359,21 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     assert path.is_file()
 
 
+def test_cherrypick_message(repository: Repository, path: Path) -> None:
+    """It uses the original commit message."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+
+    repository.checkout(branch)
+    updatefile(path)
+    message = repository.head.commit.message
+
+    repository.checkout(main)
+
+    repository.cherrypick(branch.commit)
+    assert message == repository.head.commit.message
+
+
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
