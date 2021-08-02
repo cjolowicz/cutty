@@ -2,6 +2,7 @@
 import enum
 from pathlib import Path
 from textwrap import dedent
+from typing import Optional
 
 import pygit2
 
@@ -36,9 +37,12 @@ def locaterepository(path: Path) -> Repository:
     return repository
 
 
-def updatefile(path: Path, text: str = "") -> None:
+def updatefile(
+    path: Path, text: str = "", *, repository: Optional[Repository] = None
+) -> None:
     """Add or update a repository file."""
-    repository = locaterepository(path)
+    if repository is None:
+        repository = locaterepository(path)
 
     verb = "Update" if path.exists() else "Add"
 
@@ -47,7 +51,9 @@ def updatefile(path: Path, text: str = "") -> None:
     repository.commit(message=f"{verb} {path.name}")
 
 
-def updatefiles(paths: dict[Path, str]) -> None:
+def updatefiles(
+    paths: dict[Path, str], *, repository: Optional[Repository] = None
+) -> None:
     """Add or update repository files."""
     if not paths:
         return
@@ -55,25 +61,30 @@ def updatefiles(paths: dict[Path, str]) -> None:
     verb = "Add"
 
     for path, text in paths.items():
-        repository = locaterepository(path)
-
         if path.exists():
             verb = "Update"
 
         path.write_text(dedent(text).lstrip())
 
     pathlist = " and ".join(path.name for path in paths)
+
+    if repository is None:
+        repository = locaterepository(path)
+
     repository.commit(message=f"{verb} {pathlist}")
 
 
-def appendfile(path: Path, text: str) -> None:
+def appendfile(
+    path: Path, text: str, *, repository: Optional[Repository] = None
+) -> None:
     """Append text to a repository file."""
-    updatefile(path, path.read_text() + text)
+    updatefile(path, path.read_text() + text, repository=repository)
 
 
-def removefile(path: Path) -> None:
+def removefile(path: Path, *, repository: Optional[Repository] = None) -> None:
     """Remove a repository file."""
-    repository = locaterepository(path)
+    if repository is None:
+        repository = locaterepository(path)
 
     path.unlink()
 
