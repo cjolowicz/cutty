@@ -305,7 +305,7 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
 
 def test_worktree_creates_worktree(repository: Repository) -> None:
@@ -355,7 +355,7 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     repository.checkout(main)
     assert not path.is_file()
 
-    repository.cherrypick(branch.commit, message="")
+    repository.cherrypick(branch.commit)
     assert path.is_file()
 
 
@@ -386,7 +386,7 @@ def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.commit, message="")
+        repository.cherrypick(branch.commit)
 
 
 def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> None:
@@ -403,7 +403,7 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.commit, message="")
+        repository.cherrypick(branch.commit)
 
 
 def test_resetmerge_restores_files_with_conflicts(
@@ -431,7 +431,7 @@ def test_resetmerge_removes_added_files(
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -455,7 +455,7 @@ def test_resetmerge_keeps_unrelated_additions(
     path2.touch()
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -480,7 +480,7 @@ def test_resetmerge_keeps_unrelated_changes(
     path2.write_text("c")
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -505,7 +505,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     path2.unlink()
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
