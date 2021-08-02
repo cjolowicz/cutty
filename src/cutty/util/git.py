@@ -249,7 +249,7 @@ class Repository:
                 for side in (ours, theirs)
                 if side is not None
             }
-            raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
+            raise MergeConflictError(f"Merge conflicts: {', '.join(paths)}")
 
         self.commit(
             message=commit.message,
