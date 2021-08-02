@@ -369,8 +369,8 @@ def test_cherrypick_message(repository: Repository, path: Path) -> None:
     message = repository.head.commit.message
 
     repository.checkout(main)
-
     repository.cherrypick(branch.commit)
+
     assert message == repository.head.commit.message
 
 
@@ -385,8 +385,8 @@ def test_cherrypick_author(repository: Repository) -> None:
     repository.commit(author=author)
 
     repository.checkout(main)
-
     repository.cherrypick(branch.commit)
+
     assert author.email == repository.head.commit.author.email
 
 
