@@ -39,7 +39,11 @@ def locaterepository(path: Path) -> Repository:
 def updatefile(path: Path, text: str = "") -> None:
     """Add or update a repository file."""
     repository = locaterepository(path)
+    return updatefile2(repository, path, text)
 
+
+def updatefile2(repository: Repository, path: Path, text: str = "") -> None:
+    """Add or update a repository file."""
     verb = "Update" if path.exists() else "Add"
 
     path.write_text(dedent(text).lstrip())
