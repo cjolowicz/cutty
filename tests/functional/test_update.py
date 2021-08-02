@@ -14,7 +14,7 @@ from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
-from tests.util.git import updatefile
+from tests.util.git import updatefile2
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -44,7 +44,8 @@ def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
     path = template / "cookiecutter.json"
     data = json.loads(path.read_text())
     data[name] = value
-    updatefile(path, json.dumps(data))
+    repository = Repository.open(template)
+    updatefile2(repository, path, json.dumps(data))
 
 
 def projectvariable(project: Path, name: str) -> Any:
@@ -72,7 +73,8 @@ def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> No
 def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It merges changes from the template."""
     appendfile(project / "README.md", "An awesome project.\n")
-    updatefile(templateproject / "LICENSE")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE")
 
     with chdir(project):
         runcutty("update")
@@ -94,7 +96,8 @@ def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> N
 def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It applies file deletions from the template."""
     removefile(templateproject / "README.md")
-    updatefile(templateproject / ".keep")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / ".keep")
 
     with chdir(project):
         runcutty("update")
@@ -218,7 +221,8 @@ def test_dictvariable(
         ),
     )
 
-    updatefile(templateproject / "LICENSE")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE")
 
     project = Path("example")
 
@@ -236,7 +240,8 @@ def test_private_variables(
         """Add .cookiecutter.json file to the template."""
         path = templateproject / ".cookiecutter.json"
         text = "{{ cookiecutter | jsonify }}"
-        updatefile(path, text)
+        repository = Repository.open(template)
+        updatefile2(repository, path, text)
 
     def privatevariable(project: Path, variable: str) -> Any:
         """Return any variable from the Cookiecutter context of a generated project."""
@@ -266,7 +271,8 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
     move_repository_files_to_subdirectory(template, directory)
 
     runcutty("create", f"--directory={directory}", str(template))
-    updatefile(template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
+    repository = Repository.open(template)
+    updatefile2(repository, template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
     runcutty("update", f"--cwd={project}")
 
     assert (project / "LICENSE").is_file()
@@ -287,11 +293,12 @@ def test_checkout(
     runcutty: RunCutty, template: Path, templateproject: Path, project: Path
 ) -> None:
     """It uses the specified revision of the template."""
-    updatefile(templateproject / "LICENSE", "a")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE", "a")
 
     revision = Repository.open(template).head.commit.id
 
-    updatefile(templateproject / "LICENSE", "b")
+    updatefile2(repository, templateproject / "LICENSE", "b")
 
     runcutty("update", f"--cwd={project}", f"--checkout={revision}")
 
@@ -300,8 +307,10 @@ def test_checkout(
 
 def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It does not skip changes when a previous update was aborted."""
-    updatefile(project / "LICENSE", "a")
-    updatefile(templateproject / "LICENSE", "b")
+    repository = Repository.open(project)
+    updatefile2(repository, project / "LICENSE", "a")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
@@ -310,7 +319,7 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
     runcutty("update", f"--cwd={project}", "--abort")
 
     # Update the template with an unproblematic change.
-    updatefile(templateproject / "INSTALL")
+    updatefile2(repository, templateproject / "INSTALL")
 
     # Repeat the update, it should fail again.
     with pytest.raises(Exception, match="conflict"):
@@ -319,8 +328,10 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
 
 def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It continues the update after the conflicts have been resolved."""
-    updatefile(project / "LICENSE", "a")
-    updatefile(templateproject / "LICENSE", "b")
+    repository = Repository.open(project)
+    updatefile2(repository, project / "LICENSE", "a")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
@@ -334,15 +345,17 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
 
 def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It skips the update."""
-    updatefile(project / "LICENSE", "a")
-    updatefile(templateproject / "LICENSE", "b")
+    repository = Repository.open(project)
+    updatefile2(repository, project / "LICENSE", "a")
+    repository = Repository.open(templateproject.parent)
+    updatefile2(repository, templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
 
     runcutty("update", f"--cwd={project}", "--skip")
 
-    updatefile(templateproject / "INSTALL")
+    updatefile2(repository, templateproject / "INSTALL")
 
     runcutty("update", f"--cwd={project}")
 

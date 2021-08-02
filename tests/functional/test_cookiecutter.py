@@ -9,7 +9,7 @@ from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
-from tests.util.git import updatefile
+from tests.util.git import updatefile2
 
 
 EXTRA = Path("post_gen_project")
@@ -70,9 +70,10 @@ def test_extra_context_invalid(runcutty: RunCutty, template: Path) -> None:
 
 def test_checkout(runcutty: RunCutty, template: Path) -> None:
     """It uses the specified revision of the template."""
-    initial = Repository.open(template).head.commit.id
+    repository = Repository.open(template)
+    initial = repository.head.commit.id
 
-    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+    updatefile2(repository, template / "{{ cookiecutter.project }}" / "LICENSE")
 
     runcutty("cookiecutter", f"--checkout={initial}", str(template))
 
