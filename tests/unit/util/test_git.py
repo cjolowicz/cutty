@@ -305,7 +305,7 @@ def createconflict(
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
 
 def test_worktree_creates_worktree(repository: Repository) -> None:
@@ -355,8 +355,61 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     repository.checkout(main)
     assert not path.is_file()
 
-    repository.cherrypick(branch.commit, message="")
+    repository.cherrypick(branch.commit)
     assert path.is_file()
+
+
+def test_cherrypick_message(repository: Repository, path: Path) -> None:
+    """It uses the original commit message."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+
+    repository.checkout(branch)
+    updatefile(path)
+    message = repository.head.commit.message
+
+    repository.checkout(main)
+    repository.cherrypick(branch.commit)
+
+    assert message == repository.head.commit.message
+
+
+def test_cherrypick_author(repository: Repository) -> None:
+    """It uses the original commit author."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+    author = pygit2.Signature("author", "author@example.com")
+
+    repository.checkout(branch)
+    (repository.path / "a").touch()
+    repository.commit(author=author)
+
+    repository.checkout(main)
+    repository.cherrypick(branch.commit)
+
+    assert author.email == repository.head.commit.author.email
+
+
+def test_cherrypick_committer(
+    repository: Repository, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """It creates its own committer signature."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+    committer = pygit2.Signature("committer", "committer@example.com")
+
+    repository.checkout(branch)
+    (repository.path / "a").touch()
+    repository.commit(committer=committer)
+
+    cherrypicker = pygit2.Signature("cherrypicker", "cherrypicker@example.com")
+    monkeypatch.setenv("GIT_AUTHOR_NAME", cherrypicker.name)
+    monkeypatch.setenv("GIT_AUTHOR_EMAIL", cherrypicker.email)
+
+    repository.checkout(main)
+    repository.cherrypick(branch.commit)
+
+    assert cherrypicker.email == repository.head.commit.committer.email
 
 
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
@@ -371,7 +424,7 @@ def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     updatefile(path, "b")
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.commit, message="")
+        repository.cherrypick(branch.commit)
 
 
 def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> None:
@@ -388,7 +441,7 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
     removefile(path)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.commit, message="")
+        repository.cherrypick(branch.commit)
 
 
 def test_resetmerge_restores_files_with_conflicts(
@@ -416,7 +469,7 @@ def test_resetmerge_removes_added_files(
     updatefile(path1, "b")
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -440,7 +493,7 @@ def test_resetmerge_keeps_unrelated_additions(
     path2.touch()
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -465,7 +518,7 @@ def test_resetmerge_keeps_unrelated_changes(
     path2.write_text("c")
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
@@ -490,7 +543,7 @@ def test_resetmerge_keeps_unrelated_deletions(
     path2.unlink()
 
     with pytest.raises(Exception, match=path1.name):
-        repository.cherrypick(update.commit, message="")
+        repository.cherrypick(update.commit)
 
     repository.resetmerge(parent="latest", cherry="update")
 
