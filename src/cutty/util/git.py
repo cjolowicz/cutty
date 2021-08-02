@@ -234,9 +234,7 @@ class Repository:
         oid = self._repository.TreeBuilder().write()
         self._repository.checkout_tree(self._repository[oid])
 
-    def cherrypick(
-        self, commit: pygit2.Commit, *, message: Optional[str] = None
-    ) -> None:
+    def cherrypick(self, commit: pygit2.Commit) -> None:
         """Cherry-pick the commit onto the current branch."""
         self._repository.cherrypick(commit.id)
 
@@ -249,10 +247,7 @@ class Repository:
             }
             raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
 
-        if message is None:
-            message = commit.message
-
-        self.commit(message=message)
+        self.commit(message=commit.message)
         self._repository.state_cleanup()
 
     def createtag(self, name: str, *, message: str) -> None:
