@@ -46,7 +46,7 @@ def update(
             directory=directory,
         )
 
-    repository.cherrypick(branch.commit, message=UPDATE_MESSAGE)
+    repository.cherrypick(branch.commit)
     repository.branches[LATEST_BRANCH] = branch.commit
 
 
