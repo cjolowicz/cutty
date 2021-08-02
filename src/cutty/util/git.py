@@ -86,6 +86,10 @@ class Branch:
         self._branches[self._name] = commit
 
 
+class MergeConflictError(Exception):
+    """The merge resulted in conflicts."""
+
+
 @dataclass
 class Repository:
     """Git repository."""
