@@ -390,6 +390,28 @@ def test_cherrypick_author(repository: Repository) -> None:
     assert author.email == repository.head.commit.author.email
 
 
+def test_cherrypick_committer(
+    repository: Repository, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """It creates its own committer signature."""
+    main = repository.head
+    branch = repository.branches.create("branch")
+    committer = pygit2.Signature("committer", "committer@example.com")
+
+    repository.checkout(branch)
+    (repository.path / "a").touch()
+    repository.commit(committer=committer)
+
+    cherrypicker = pygit2.Signature("cherrypicker", "cherrypicker@example.com")
+    monkeypatch.setenv("GIT_AUTHOR_NAME", cherrypicker.name)
+    monkeypatch.setenv("GIT_AUTHOR_EMAIL", cherrypicker.email)
+
+    repository.checkout(main)
+    repository.cherrypick(branch.commit)
+
+    assert cherrypicker.email == repository.head.commit.committer.email
+
+
 def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
