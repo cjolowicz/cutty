@@ -73,6 +73,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
+
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
@@ -83,4 +84,5 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
 
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
+
     repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
