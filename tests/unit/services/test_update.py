@@ -85,6 +85,17 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
     assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
 
 
+def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
+    """It removes CHERRY_PICK_HEAD."""
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    with chdir(repository.path):
+        continueupdate()
+
+    assert repository.cherrypickhead is None
+
+
 def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
