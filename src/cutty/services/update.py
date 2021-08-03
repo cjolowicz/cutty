@@ -6,7 +6,6 @@ from typing import Optional
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_MESSAGE
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
@@ -56,7 +55,14 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = Repository.open(projectdir)
-    repository.commit(message=UPDATE_MESSAGE)
+
+    if commit := repository.cherrypickhead:
+        repository.commit(
+            message=commit.message,
+            author=commit.author,
+            committer=repository.default_signature,
+        )
+
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
