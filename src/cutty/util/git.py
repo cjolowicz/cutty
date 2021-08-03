@@ -211,6 +211,7 @@ class Repository:
 
         parents = [] if repository.head_is_unborn else [repository.head.target]
         repository.create_commit("HEAD", author, committer, message, tree, parents)
+        repository.state_cleanup()
 
     @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
