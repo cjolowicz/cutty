@@ -573,6 +573,17 @@ def test_resetcherrypick_resets_index(repository: Repository, path: Path) -> Non
     assert index.write_tree() == repository.head.commit.tree.id
 
 
+def test_resetcherrypick_state_cleanup(repository: Repository, path: Path) -> None:
+    """It removes CHERRY_PICK_HEAD."""
+    createconflict(repository, path, ours="a", theirs="b")
+
+    assert repository.cherrypickhead
+
+    repository.resetcherrypick()
+
+    assert not repository.cherrypickhead
+
+
 def test_resetcherrypick_idempotent(repository: Repository, path: Path) -> None:
     """It is idempotent."""
     createconflict(repository, path, ours="a", theirs="b")
