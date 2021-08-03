@@ -77,7 +77,6 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
 
     # The user invokes `git cherry-pick --continue` before `cutty update --continue`.
     repository.commit()
-    repository._repository.state_cleanup()
 
     with chdir(repository.path):
         continueupdate()
