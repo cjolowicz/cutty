@@ -268,29 +268,22 @@ class Repository:
             return reference.peel(pygit2.Commit)
         return None
 
-    def createtag(self, name: str, *, message: str) -> None:
-        """Create a tag at HEAD."""
-        self._repository.create_tag(
-            name,
-            self._repository.head.target,
-            pygit2.GIT_OBJ_COMMIT,
-            self.default_signature,
-            message,
-        )
-
-    def resetmerge(self, parent: str, cherry: str) -> None:
+    def resetcherrypick(self) -> None:
         """Reset only files that were touched by a cherry-pick.
 
-        This emulates `git reset --merge HEAD` by performing a hard reset on the
-        files that were updated by the cherry-picked commit, and resetting the index
-        to HEAD.
+        Emulates `git reset --merge HEAD` by performing a hard reset on the
+        files updated by CHERRY_PICK_HEAD, and resetting the index to HEAD.
         """
         self._repository.index.read_tree(self._repository.head.peel().tree)
         self._repository.index.write()
 
-        parenttree = self.branches[parent].peel(pygit2.Tree)
-        cherrytree = self.branches[cherry].peel(pygit2.Tree)
-        diff = cherrytree.diff_to_tree(parenttree)
+        commit = self.cherrypickhead
+        if not commit:
+            return
+
+        [parent] = commit.parents
+
+        diff = commit.tree.diff_to_tree(parent.tree)
         paths = [
             file.path
             for delta in diff.deltas
@@ -300,6 +293,18 @@ class Repository:
         self._repository.checkout(
             strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
             paths=paths,
+        )
+
+        self._repository.state_cleanup()
+
+    def createtag(self, name: str, *, message: str) -> None:
+        """Create a tag at HEAD."""
+        self._repository.create_tag(
+            name,
+            self._repository.head.target,
+            pygit2.GIT_OBJ_COMMIT,
+            self.default_signature,
+            message,
         )
 
 

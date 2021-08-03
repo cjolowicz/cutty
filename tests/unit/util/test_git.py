@@ -457,17 +457,17 @@ def test_cherrypickhead_progress(repository: Repository, path: Path) -> None:
     assert repository.cherrypickhead == repository.branches["update"]
 
 
-def test_resetmerge_restores_files_with_conflicts(
+def test_resetcherrypick_restores_files_with_conflicts(
     repository: Repository, path: Path
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
     createconflict(repository, path, ours="a", theirs="b")
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     assert path.read_text() == "a"
 
 
-def test_resetmerge_removes_added_files(
+def test_resetcherrypick_removes_added_files(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It removes files added by the cherry-picked commit."""
@@ -484,12 +484,12 @@ def test_resetmerge_removes_added_files(
     with pytest.raises(MergeConflictError, match=path1.name):
         repository.cherrypick(update.commit)
 
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     assert not path2.exists()
 
 
-def test_resetmerge_keeps_unrelated_additions(
+def test_resetcherrypick_keeps_unrelated_additions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps additions of files that did not change in the update."""
@@ -508,12 +508,12 @@ def test_resetmerge_keeps_unrelated_additions(
     with pytest.raises(MergeConflictError, match=path1.name):
         repository.cherrypick(update.commit)
 
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     assert path2.exists()
 
 
-def test_resetmerge_keeps_unrelated_changes(
+def test_resetcherrypick_keeps_unrelated_changes(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
@@ -533,12 +533,12 @@ def test_resetmerge_keeps_unrelated_changes(
     with pytest.raises(MergeConflictError, match=path1.name):
         repository.cherrypick(update.commit)
 
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     assert path2.read_text() == "c"
 
 
-def test_resetmerge_keeps_unrelated_deletions(
+def test_resetcherrypick_keeps_unrelated_deletions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
@@ -558,16 +558,35 @@ def test_resetmerge_keeps_unrelated_deletions(
     with pytest.raises(MergeConflictError, match=path1.name):
         repository.cherrypick(update.commit)
 
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     assert not path2.exists()
 
 
-def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
+def test_resetcherrypick_resets_index(repository: Repository, path: Path) -> None:
     """It resets the index to HEAD, removing conflicts."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    repository.resetmerge(parent="latest", cherry="update")
+    repository.resetcherrypick()
 
     index = repository._repository.index
     assert index.write_tree() == repository.head.commit.tree.id
+
+
+def test_resetcherrypick_state_cleanup(repository: Repository, path: Path) -> None:
+    """It removes CHERRY_PICK_HEAD."""
+    createconflict(repository, path, ours="a", theirs="b")
+
+    assert repository.cherrypickhead
+
+    repository.resetcherrypick()
+
+    assert not repository.cherrypickhead
+
+
+def test_resetcherrypick_idempotent(repository: Repository, path: Path) -> None:
+    """It is idempotent."""
+    createconflict(repository, path, ours="a", theirs="b")
+
+    repository.resetcherrypick()
+    repository.resetcherrypick()

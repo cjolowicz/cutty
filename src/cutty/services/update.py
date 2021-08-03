@@ -72,7 +72,8 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = Repository.open(projectdir)
-    repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    repository.resetcherrypick()
+
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
 
@@ -82,5 +83,6 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
         projectdir = Path.cwd()
 
     repository = Repository.open(projectdir)
-    repository.resetmerge(parent=LATEST_BRANCH, cherry=UPDATE_BRANCH)
+    repository.resetcherrypick()
+
     repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
