@@ -53,3 +53,26 @@ def updatefile(repository: Repository) -> UpdateFile:
         repository.commit(message=f"{verb} {path.name}")
 
     return _updatefile
+
+
+class RemoveFile(Protocol):
+    """Protocol for the `removefile` fixture."""
+
+    def __call__(self, path: Path) -> None:
+        """Function signature."""
+
+
+@pytest.fixture
+def removefile(repository: Repository) -> UpdateFile:
+    """Fixture for removing a repository file.
+
+    NOTE: We cannot use `Repository.discover` here because `Repository`
+    instances in client code would likely miss our changes to the index.
+    """
+
+    def _removefile(path: Path, text: str = "") -> None:
+        path.unlink()
+
+        repository.commit(message=f"Remove {path.name}")
+
+    return _removefile
