@@ -295,6 +295,8 @@ class Repository:
             paths=paths,
         )
 
+        self._repository.state_cleanup()
+
     def createtag(self, name: str, *, message: str) -> None:
         """Create a tag at HEAD."""
         self._repository.create_tag(
