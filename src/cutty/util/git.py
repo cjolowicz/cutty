@@ -240,6 +240,7 @@ class Repository:
 
     def cherrypick(self, commit: pygit2.Commit) -> None:
         """Cherry-pick the commit onto the current branch."""
+        self._repository.index.read()
         self._repository.cherrypick(commit.id)
 
         if self._repository.index.conflicts:
