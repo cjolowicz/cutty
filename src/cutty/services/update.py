@@ -31,7 +31,7 @@ def update(
         directory = projectconfig.directory
 
     repository = Repository.open(projectdir)
-    repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
+    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
     branch = repository.branch(UPDATE_BRANCH)
 
     with repository.worktree(branch, checkout=False) as worktree:
@@ -46,7 +46,7 @@ def update(
         )
 
     repository.cherrypick(branch.commit)
-    repository.branches[LATEST_BRANCH] = branch.commit
+    repository.heads[LATEST_BRANCH] = branch.commit
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -63,7 +63,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
             committer=repository.default_signature,
         )
 
-    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
+    repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
 
 
 def skipupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -74,7 +74,7 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
 
-    repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
+    repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
 
 
 def abortupdate(*, projectdir: Optional[Path] = None) -> None:
@@ -85,4 +85,4 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
 
-    repository.branches[UPDATE_BRANCH] = repository.branches[LATEST_BRANCH]
+    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
