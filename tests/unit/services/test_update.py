@@ -48,10 +48,36 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     assert blob.data == b"b"
 
 
+def test_continueupdate_preserves_metainfo(repository: Repository, path: Path) -> None:
+    """It preserves the original commit message."""
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    with chdir(repository.path):
+        continueupdate()
+
+    assert repository.branches[UPDATE_BRANCH].message == repository.head.commit.message
+
+
 def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
     """It updates the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
+
+    with chdir(repository.path):
+        continueupdate()
+
+    assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
+
+
+def test_continueupdate_works_after_commit(repository: Repository, path: Path) -> None:
+    """It updates the latest branch even if the cherry-pick is no longer in progress."""
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    # The user invokes `git cherry-pick --continue` before `cutty update --continue`.
+    repository.commit()
+    repository._repository.state_cleanup()
 
     with chdir(repository.path):
         continueupdate()
