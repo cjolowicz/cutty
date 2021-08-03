@@ -260,6 +260,14 @@ class Repository:
 
         self._repository.state_cleanup()
 
+    @property
+    def cherrypickhead(self) -> Optional[pygit2.Commit]:
+        """Return the commit referenced by CHERRY_PICK_HEAD, or None."""
+        reference = self._repository.references.get("CHERRY_PICK_HEAD")
+        if reference is not None:
+            return reference.peel(pygit2.Commit)
+        return None
+
     def createtag(self, name: str, *, message: str) -> None:
         """Create a tag at HEAD."""
         self._repository.create_tag(
