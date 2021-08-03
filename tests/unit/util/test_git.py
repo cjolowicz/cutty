@@ -7,8 +7,9 @@ import pytest
 
 from cutty.util.git import MergeConflictError
 from cutty.util.git import Repository
+from tests.fixtures.git import RemoveFile
+from tests.fixtures.git import UpdateFile
 from tests.util.git import createbranches
-from tests.util.git import removefile
 from tests.util.git import updatefile
 from tests.util.git import updatefiles
 
@@ -429,7 +430,9 @@ def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
 
 
 @pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
-def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> None:
+def test_cherrypick_conflict_deletion(
+    repository: Repository, path: Path, updatefile: UpdateFile, removefile: RemoveFile
+) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
 
@@ -504,7 +507,7 @@ def test_resetmerge_keeps_unrelated_additions(
 
 @pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
 def test_resetmerge_keeps_unrelated_changes(
-    repository: Repository, paths: Iterator[Path]
+    repository: Repository, paths: Iterator[Path], updatefile: UpdateFile
 ) -> None:
     """It keeps modifications to files that did not change in the update."""
     main = repository.head
@@ -530,7 +533,7 @@ def test_resetmerge_keeps_unrelated_changes(
 
 @pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
 def test_resetmerge_keeps_unrelated_deletions(
-    repository: Repository, paths: Iterator[Path]
+    repository: Repository, paths: Iterator[Path], updatefile: UpdateFile
 ) -> None:
     """It keeps deletions of files that did not change in the update."""
     main = repository.head
