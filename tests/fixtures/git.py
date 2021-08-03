@@ -2,6 +2,8 @@
 import string
 from collections.abc import Iterator
 from pathlib import Path
+from textwrap import dedent
+from typing import Protocol
 
 import pytest
 
@@ -26,3 +28,28 @@ def paths(repository: Repository) -> Iterator[Path]:
 def path(paths: Iterator[Path]) -> Path:
     """Return an arbitrary path in the repository."""
     return next(paths)
+
+
+class UpdateFile(Protocol):
+    """Protocol for the `updatefile` fixture."""
+
+    def __call__(self, path: Path, text: str = "") -> None:
+        """Function signature."""
+
+
+@pytest.fixture
+def updatefile(repository: Repository) -> UpdateFile:
+    """Fixture for adding or updating a repository file.
+
+    NOTE: We cannot use `Repository.discover` here because `Repository`
+    instances in client code would likely miss our changes to the index.
+    """
+
+    def _updatefile(path: Path, text: str = "") -> None:
+        verb = "Update" if path.exists() else "Add"
+
+        path.write_text(dedent(text).lstrip())
+
+        repository.commit(message=f"{verb} {path.name}")
+
+    return _updatefile
