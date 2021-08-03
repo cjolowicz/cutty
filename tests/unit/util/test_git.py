@@ -10,7 +10,6 @@ from cutty.util.git import Repository
 from tests.fixtures.git import RemoveFile
 from tests.fixtures.git import UpdateFile
 from tests.util.git import createbranches
-from tests.util.git import updatefile
 from tests.util.git import updatefiles
 
 
@@ -73,7 +72,9 @@ def test_branches_setitem_new(repository: Repository) -> None:
     assert repository.head.commit == repository.branches["branch"]
 
 
-def test_branches_setitem_existing(repository: Repository) -> None:
+def test_branches_setitem_existing(
+    repository: Repository, updatefile: UpdateFile
+) -> None:
     """It resets the branch to the given commit."""
     head, branches = repository.head, repository.branches
     branches["branch"] = head.commit
@@ -139,7 +140,9 @@ def test_branches_create_new_branch_commit(repository: Repository) -> None:
     assert repository.head.commit == branch.commit
 
 
-def test_branches_create_new_branch_at_ancestor(repository: Repository) -> None:
+def test_branches_create_new_branch_at_ancestor(
+    repository: Repository, updatefile: UpdateFile
+) -> None:
     """It creates the branch at an earlier commit."""
     parent = repository.head.commit
     updatefile(repository.path / "a")
@@ -170,7 +173,9 @@ def test_branches_create_existing_branch(repository: Repository) -> None:
         branches.create(branch.name, branch.commit)
 
 
-def test_branches_create_existing_branch_force(repository: Repository) -> None:
+def test_branches_create_existing_branch_force(
+    repository: Repository, updatefile: UpdateFile
+) -> None:
     """It updates the branch head if the branch already exists."""
     head, branches = repository.head, repository.branches
     branch = branches.create("branch", head.commit)
@@ -219,7 +224,7 @@ def test_branch_commit_get(repository: Repository) -> None:
     assert branches[branch.name] == branch.commit
 
 
-def test_branch_commit_set(repository: Repository) -> None:
+def test_branch_commit_set(repository: Repository, updatefile: UpdateFile) -> None:
     """It resets the branch to the given commit."""
     head, branches = repository.head, repository.branches
     branches["branch"] = head.commit
@@ -294,7 +299,12 @@ def test_commit_message_default(repository: Repository) -> None:
 
 
 def createconflict(
-    repository: Repository, path: Path, *, ours: str, theirs: str
+    repository: Repository,
+    path: Path,
+    *,
+    ours: str,
+    theirs: str,
+    updatefile: UpdateFile
 ) -> None:
     """Create an update conflict."""
     main = repository.head
@@ -328,7 +338,9 @@ def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
     assert not worktree.is_dir()
 
 
-def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
+def test_worktree_does_checkout(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It checks out a working tree."""
     updatefile(path)
     branch = repository.branches.create("branch")
@@ -337,7 +349,9 @@ def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
         assert (worktree / path.name).is_file()
 
 
-def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
+def test_worktree_no_checkout(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It creates a worktree without checking out the files."""
     updatefile(path)
     branch = repository.branches.create("branch")
@@ -346,7 +360,9 @@ def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
         assert not (worktree / path.name).is_file()
 
 
-def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
+def test_cherrypick_adds_file(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It cherry-picks the commit onto the current branch."""
     main = repository.head
     branch = repository.branches.create("branch")
@@ -361,7 +377,9 @@ def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     assert path.is_file()
 
 
-def test_cherrypick_message(repository: Repository, path: Path) -> None:
+def test_cherrypick_message(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It uses the original commit message."""
     main = repository.head
     branch = repository.branches.create("branch")
@@ -414,7 +432,9 @@ def test_cherrypick_committer(
     assert cherrypicker.email == repository.head.commit.committer.email
 
 
-def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
+def test_cherrypick_conflict_edit(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It raises an exception when both sides modified the file."""
     main = repository.head
     branch = repository.branches.create("branch")
@@ -449,17 +469,17 @@ def test_cherrypick_conflict_deletion(
 
 
 def test_resetmerge_restores_files_with_conflicts(
-    repository: Repository, path: Path
+    repository: Repository, path: Path, updatefile: UpdateFile
 ) -> None:
     """It restores the conflicting files in the working tree to our version."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
     repository.resetmerge(parent="latest", cherry="update")
 
     assert path.read_text() == "a"
 
 
 def test_resetmerge_removes_added_files(
-    repository: Repository, paths: Iterator[Path]
+    repository: Repository, paths: Iterator[Path], updatefile: UpdateFile
 ) -> None:
     """It removes files added by the cherry-picked commit."""
     main = repository.head
@@ -481,7 +501,7 @@ def test_resetmerge_removes_added_files(
 
 
 def test_resetmerge_keeps_unrelated_additions(
-    repository: Repository, paths: Iterator[Path]
+    repository: Repository, paths: Iterator[Path], updatefile: UpdateFile
 ) -> None:
     """It keeps additions of files that did not change in the update."""
     main = repository.head
@@ -554,9 +574,11 @@ def test_resetmerge_keeps_unrelated_deletions(
     assert not path2.exists()
 
 
-def test_resetmerge_resets_index(repository: Repository, path: Path) -> None:
+def test_resetmerge_resets_index(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It resets the index to HEAD, removing conflicts."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
 
     repository.resetmerge(parent="latest", cherry="update")
 
