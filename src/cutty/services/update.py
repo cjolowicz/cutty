@@ -62,6 +62,7 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
             author=commit.author,
             committer=repository.default_signature,
         )
+        repository._repository.state_cleanup()
 
     repository.branches[LATEST_BRANCH] = repository.branches[UPDATE_BRANCH]
 
