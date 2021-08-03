@@ -268,16 +268,6 @@ class Repository:
             return reference.peel(pygit2.Commit)
         return None
 
-    def createtag(self, name: str, *, message: str) -> None:
-        """Create a tag at HEAD."""
-        self._repository.create_tag(
-            name,
-            self._repository.head.target,
-            pygit2.GIT_OBJ_COMMIT,
-            self.default_signature,
-            message,
-        )
-
     def resetmerge(self, parent: str, cherry: str) -> None:
         """Reset only files that were touched by a cherry-pick.
 
@@ -300,6 +290,16 @@ class Repository:
         self._repository.checkout(
             strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
             paths=paths,
+        )
+
+    def createtag(self, name: str, *, message: str) -> None:
+        """Create a tag at HEAD."""
+        self._repository.create_tag(
+            name,
+            self._repository.head.target,
+            pygit2.GIT_OBJ_COMMIT,
+            self.default_signature,
+            message,
         )
 
 
