@@ -145,9 +145,14 @@ class Repository:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
     @property
-    def branches(self) -> Branches:
+    def heads(self) -> Branches:
         """Return the repository branches."""
         return Branches(self)
+
+    @property
+    def branches(self) -> Branches:
+        """Return the repository branches."""
+        return self.heads
 
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
