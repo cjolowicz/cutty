@@ -86,6 +86,10 @@ class Branch:
         self._branches[self._name] = commit
 
 
+class MergeConflictError(Exception):
+    """The merge resulted in conflicts."""
+
+
 @dataclass
 class Repository:
     """Git repository."""
@@ -245,7 +249,7 @@ class Repository:
                 for side in (ours, theirs)
                 if side is not None
             }
-            raise RuntimeError(f"Merge conflicts: {', '.join(paths)}")
+            raise MergeConflictError(f"Merge conflicts: {', '.join(paths)}")
 
         self.commit(
             message=commit.message,
