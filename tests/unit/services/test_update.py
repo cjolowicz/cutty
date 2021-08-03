@@ -9,18 +9,23 @@ from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.util.git import Repository
+from tests.fixtures.git import UpdateFile
 from tests.util.files import chdir
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
-from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
 
 
 def createconflict(
-    repository: Repository, path: Path, *, ours: str, theirs: str
+    repository: Repository,
+    path: Path,
+    *,
+    ours: str,
+    theirs: str,
+    updatefile: UpdateFile
 ) -> None:
     """Create an update conflict."""
     main = repository.head
@@ -36,9 +41,11 @@ def createconflict(
         repository.cherrypick(update.commit)
 
 
-def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
+def test_continueupdate_commits_changes(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It commits the changes."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
     resolveconflicts(repository.path, path, Side.THEIRS)
 
     with chdir(repository.path):
@@ -48,9 +55,11 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     assert blob.data == b"b"
 
 
-def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
+def test_continueupdate_fastforwards_latest(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It updates the latest branch to the tip of the update branch."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
     resolveconflicts(repository.path, path, Side.THEIRS)
 
     with chdir(repository.path):
@@ -59,9 +68,11 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
     assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
 
 
-def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
+def test_skipupdate_fastforwards_latest(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
 
     updatehead = repository.branches[UPDATE_BRANCH]
 
@@ -71,9 +82,11 @@ def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> N
     assert repository.branches[LATEST_BRANCH] == updatehead
 
 
-def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
+def test_abortupdate_rewinds_update_branch(
+    repository: Repository, path: Path, updatefile: UpdateFile
+) -> None:
     """It resets the update branch to the tip of the latest branch."""
-    createconflict(repository, path, ours="a", theirs="b")
+    createconflict(repository, path, ours="a", theirs="b", updatefile=updatefile)
 
     latesthead = repository.branches[LATEST_BRANCH]
 
