@@ -428,7 +428,6 @@ def test_cherrypick_conflict_edit(repository: Repository, path: Path) -> None:
         repository.cherrypick(branch.commit)
 
 
-@pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
 def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> None:
     """It raises an exception when one side modified and the other deleted the file."""
     updatefile(path, "a")
@@ -502,7 +501,6 @@ def test_resetmerge_keeps_unrelated_additions(
     assert path2.exists()
 
 
-@pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
 def test_resetmerge_keeps_unrelated_changes(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
@@ -528,7 +526,6 @@ def test_resetmerge_keeps_unrelated_changes(
     assert path2.read_text() == "c"
 
 
-@pytest.mark.xfail(reason="FIXME: repository index out of sync after updatefile")
 def test_resetmerge_keeps_unrelated_deletions(
     repository: Repository, paths: Iterator[Path]
 ) -> None:
