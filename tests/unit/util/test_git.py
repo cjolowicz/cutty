@@ -445,6 +445,18 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
         repository.cherrypick(branch.commit)
 
 
+def test_cherrypickhead_none(repository: Repository) -> None:
+    """It returns None if no cherry pick is in progress."""
+    assert repository.cherrypickhead is None
+
+
+def test_cherrypickhead_progress(repository: Repository, path: Path) -> None:
+    """It returns the commit being cherry-picked."""
+    createconflict(repository, path, ours="a", theirs="b")
+
+    assert repository.cherrypickhead == repository.branches["update"]
+
+
 def test_resetmerge_restores_files_with_conflicts(
     repository: Repository, path: Path
 ) -> None:
