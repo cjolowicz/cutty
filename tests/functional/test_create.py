@@ -48,7 +48,7 @@ def test_cutty_json(runcutty: RunCutty, template: Path) -> None:
 
 
 def test_cutty_json_already_exists(runcutty: RunCutty, template: Path) -> None:
-    """It raises an exception."""
+    """It raises an exception if the template generates cutty.json."""
     updatefile(template / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE)
 
     with pytest.raises(FileExistsError):
