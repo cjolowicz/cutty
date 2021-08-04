@@ -1,5 +1,6 @@
 """Storing files in a Git repository."""
 import pathlib
+from typing import Optional
 
 import pygit2
 
@@ -14,7 +15,13 @@ UPDATE_BRANCH = "cutty/update"
 class GitRepositoryObserver(FileStorageObserver):
     """Storage observer creating a git repository."""
 
-    def __init__(self, *, project: pathlib.Path, template: str = "template") -> None:
+    def __init__(
+        self,
+        *,
+        project: pathlib.Path,
+        template: str = "template",
+        revision: Optional[str] = None,
+    ) -> None:
         """Initialize."""
         self.project = project
         self.template = template
