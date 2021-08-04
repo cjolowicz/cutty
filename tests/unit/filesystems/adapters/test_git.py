@@ -9,15 +9,16 @@ import pytest
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.util.git import Repository
 
 
 class TreeBuilder:
     """A helper class forming a wrapper around pygit2.TreeBuilder."""
 
-    def __init__(self, repository: pygit2.Repository) -> None:
+    def __init__(self, repository: Repository) -> None:
         """Initialize."""
         self.repository = repository
-        self.builder = repository.TreeBuilder()
+        self.builder = self.repository._repository.TreeBuilder()
         self.children: dict[str, TreeBuilder] = {}
 
     def _child(self, name: str) -> TreeBuilder:
@@ -49,7 +50,7 @@ class TreeBuilder:
         self.builder.insert(name, oid, pygit2.GIT_FILEMODE_TREE)
 
     def _blob(self, name: str, text: str, attr: int) -> None:
-        oid = self.repository.create_blob(text.encode())
+        oid = self.repository._repository.create_blob(text.encode())
         self.builder.insert(name, oid, attr)
 
     def write(self) -> pygit2.Oid:
@@ -63,7 +64,7 @@ class TreeBuilder:
 @pytest.fixture
 def filesystem(tmp_path: Path) -> GitFilesystem:
     """Fixture for a git filesystem."""
-    repository = pygit2.init_repository(tmp_path / "repository")
+    repository = Repository.init(tmp_path / "repository")
 
     builder = TreeBuilder(repository)
     builder.file(PurePath("file"), "lorem ipsum dolor\n")
@@ -72,17 +73,17 @@ def filesystem(tmp_path: Path) -> GitFilesystem:
     builder.file(PurePath("dir", "subdir", ".keep"), "")
     builder.link(PurePath("sh"), "/bin/sh")
 
-    signature = pygit2.Signature("you", "you@example.com")
-    repository.create_commit(
+    author = committer = repository.default_signature
+    repository._repository.create_commit(
         "HEAD",
-        signature,
-        signature,
+        author,
+        committer,
         "Initial",
         builder.write(),
         [],
     )
 
-    return GitFilesystem(tmp_path / "repository")
+    return GitFilesystem(repository.path)
 
 
 @pytest.mark.parametrize(
