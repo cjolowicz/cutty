@@ -10,7 +10,7 @@ from cutty.util.git import Repository
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
 CREATE_MESSAGE = "Initial import from {template}"
-UPDATE_MESSAGE = "Update project template"
+UPDATE_MESSAGE = "Update {template}"
 
 
 class GitRepositoryObserver(FileStorageObserver):
@@ -35,11 +35,9 @@ class GitRepositoryObserver(FileStorageObserver):
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
-            CREATE_MESSAGE.format(template=self.template)
-            if LATEST_BRANCH not in repository.heads
-            else UPDATE_MESSAGE
+            CREATE_MESSAGE if LATEST_BRANCH not in repository.heads else UPDATE_MESSAGE
         )
 
-        repository.commit(message=message)
+        repository.commit(message=message.format(template=self.template))
 
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
