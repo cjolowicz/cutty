@@ -29,7 +29,7 @@ def filesystem(tmp_path: Path) -> GitFilesystem:
         builder.insert(name, tree.write(), pygit2.GIT_FILEMODE_TREE)
 
     signature = pygit2.Signature("you", "you@example.com")
-    repository = pygit2.init_repository(tmp_path)
+    repository = pygit2.init_repository(tmp_path / "repository")
 
     root = repository.TreeBuilder()
     root_dir = repository.TreeBuilder()
@@ -52,7 +52,7 @@ def filesystem(tmp_path: Path) -> GitFilesystem:
         [],
     )
 
-    return GitFilesystem(tmp_path)
+    return GitFilesystem(tmp_path / "repository")
 
 
 @pytest.mark.parametrize(
