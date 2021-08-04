@@ -16,8 +16,8 @@ import pygit2.repository
 from cutty.compat.contextlib import contextmanager
 
 
-class Branches(MutableMapping[str, pygit2.Commit]):
-    """Branches in a git repository."""
+class Heads(MutableMapping[str, pygit2.Commit]):
+    """Heads in a git repository."""
 
     def __init__(self, repository: Repository) -> None:
         """Initialize."""
@@ -65,7 +65,7 @@ class Branches(MutableMapping[str, pygit2.Commit]):
 class Branch:
     """Branch in a git repository."""
 
-    def __init__(self, branches: Branches, name: str) -> None:
+    def __init__(self, branches: Heads, name: str) -> None:
         """Initialize."""
         self._branches = branches
         self._name = name
@@ -145,9 +145,9 @@ class Repository:
             remote.fetch(prune=pygit2.GIT_FETCH_PRUNE)
 
     @property
-    def heads(self) -> Branches:
+    def heads(self) -> Heads:
         """Return the repository branches."""
-        return Branches(self)
+        return Heads(self)
 
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
