@@ -1,4 +1,6 @@
 """Unit tests for cutty.filesystems.adapters.git."""
+from __future__ import annotations
+
 from pathlib import Path
 
 import pygit2
@@ -9,46 +11,74 @@ from cutty.filesystems.domain.filesystem import Access
 from cutty.filesystems.domain.purepath import PurePath
 
 
+class TreeBuilder:
+    """A helper class forming a wrapper around pygit2.TreeBuilder."""
+
+    def __init__(self, repository: pygit2.Repository) -> None:
+        """Initialize."""
+        self.repository = repository
+        self.builder = repository.TreeBuilder()
+        self.children: dict[str, TreeBuilder] = {}
+
+    def _child(self, name: str) -> TreeBuilder:
+        return self.children.setdefault(name, TreeBuilder(self.repository))
+
+    def _descendant(self, path: PurePath) -> TreeBuilder:
+        builder = self
+        for name in path.parts:
+            builder = builder._child(name)
+        return builder
+
+    def file(self, path: PurePath, text: str) -> None:
+        """Create a regular file."""
+        builder = self._descendant(path.parent)
+        builder._blob(path.name, text, pygit2.GIT_FILEMODE_BLOB)
+
+    def exec(self, path: PurePath, text: str) -> None:
+        """Create an executable file."""
+        builder = self._descendant(path.parent)
+        builder._blob(path.name, text, pygit2.GIT_FILEMODE_BLOB_EXECUTABLE)
+
+    def link(self, path: PurePath, target: str) -> None:
+        """Create a symbolic link."""
+        builder = self._descendant(path.parent)
+        builder._blob(path.name, target, pygit2.GIT_FILEMODE_LINK)
+
+    def _tree(self, name: str, builder: TreeBuilder) -> None:
+        oid = builder.write()
+        self.builder.insert(name, oid, pygit2.GIT_FILEMODE_TREE)
+
+    def _blob(self, name: str, text: str, attr: int) -> None:
+        oid = self.repository.create_blob(text.encode())
+        self.builder.insert(name, oid, attr)
+
+    def write(self) -> pygit2.Oid:
+        """Write the tree to the object database."""
+        for name, child in self.children.items():
+            self._tree(name, child)
+
+        return self.builder.write()
+
+
 @pytest.fixture
 def filesystem(tmp_path: Path) -> GitFilesystem:
     """Fixture for a git filesystem."""
-
-    def _blob(builder: pygit2.TreeBuilder, name: str, text: str, attr: int) -> None:
-        builder.insert(name, repository.create_blob(text.encode()), attr)
-
-    def _file(builder: pygit2.TreeBuilder, name: str, text: str) -> None:
-        _blob(builder, name, text, pygit2.GIT_FILEMODE_BLOB)
-
-    def _exec(builder: pygit2.TreeBuilder, name: str, text: str) -> None:
-        _blob(builder, name, text, pygit2.GIT_FILEMODE_BLOB_EXECUTABLE)
-
-    def _link(builder: pygit2.TreeBuilder, name: str, target: str) -> None:
-        _blob(builder, name, target, pygit2.GIT_FILEMODE_LINK)
-
-    def _tree(builder: pygit2.TreeBuilder, name: str, tree: pygit2.TreeBuilder) -> None:
-        builder.insert(name, tree.write(), pygit2.GIT_FILEMODE_TREE)
-
-    signature = pygit2.Signature("you", "you@example.com")
     repository = pygit2.init_repository(tmp_path / "repository")
 
-    root = repository.TreeBuilder()
-    root_dir = repository.TreeBuilder()
-    root_dir_subdir = repository.TreeBuilder()
+    builder = TreeBuilder(repository)
+    builder.file(PurePath("file"), "lorem ipsum dolor\n")
+    builder.exec(PurePath("dir", "script.py"), "#!/usr/bin/env python\n")
+    builder.link(PurePath("dir", "link"), "../file")
+    builder.file(PurePath("dir", "subdir", ".keep"), "")
+    builder.link(PurePath("sh"), "/bin/sh")
 
-    _file(root, "file", "lorem ipsum dolor\n")
-    _exec(root_dir, "script.py", "#!/usr/bin/env python\n")
-    _link(root_dir, "link", "../file")
-    _file(root_dir_subdir, ".keep", "")
-    _tree(root_dir, "subdir", root_dir_subdir)
-    _tree(root, "dir", root_dir)
-    _link(root, "sh", "/bin/sh")
-
+    signature = pygit2.Signature("you", "you@example.com")
     repository.create_commit(
         "HEAD",
         signature,
         signature,
         "Initial",
-        root.write(),
+        builder.write(),
         [],
     )
 
