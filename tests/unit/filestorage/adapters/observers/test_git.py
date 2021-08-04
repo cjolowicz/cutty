@@ -238,6 +238,29 @@ def test_existing_branch_commit_message_template(
     assert template in repository.head.commit.message
 
 
+def test_existing_branch_commit_message_revision(
+    file: RegularFile, project: pathlib.Path
+) -> None:
+    """It includes the revision in the commit message."""
+    template = "awesome-template"
+    revision = "1.0.0"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, template=template, revision=revision),
+    )
+
+    repository = Repository.init(project)
+    repository.commit()
+
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    repository.checkout(update)
+
+    with storage:
+        storage.add(file)
+
+    assert revision in repository.head.commit.message
+
+
 def test_existing_branch_no_changes(
     storage: FileStorage, project: pathlib.Path
 ) -> None:
