@@ -30,9 +30,9 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
         "template": {"location": config.template, "directory": directory},
         "bindings": {binding.name: binding.value for binding in config.bindings},
     }
-    blob = json.dumps(data).encode()
+    text = json.dumps(data, indent=2) + "\n"
 
-    return RegularFile(path, blob)
+    return RegularFile(path, text.encode())
 
 
 def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
