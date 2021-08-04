@@ -201,6 +201,28 @@ def test_existing_branch_commit_message(
     assert "initial" not in repository.head.commit.message.lower()
 
 
+def test_existing_branch_commit_message_template(
+    file: RegularFile, project: pathlib.Path
+) -> None:
+    """It includes the template name in the commit message."""
+    template = "awesome-template"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, template=template),
+    )
+
+    repository = Repository.init(project)
+    repository.commit()
+
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    repository.checkout(update)
+
+    with storage:
+        storage.add(file)
+
+    assert template in repository.head.commit.message
+
+
 def test_existing_branch_no_changes(
     storage: FileStorage, project: pathlib.Path
 ) -> None:
