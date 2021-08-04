@@ -56,7 +56,7 @@ def test_continueupdate_preserves_metainfo(repository: Repository, path: Path) -
     with chdir(repository.path):
         continueupdate()
 
-    assert repository.branches[UPDATE_BRANCH].message == repository.head.commit.message
+    assert repository.heads[UPDATE_BRANCH].message == repository.head.commit.message
 
 
 def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
@@ -67,7 +67,7 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
     with chdir(repository.path):
         continueupdate()
 
-    assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
+    assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
 
 def test_continueupdate_works_after_commit(repository: Repository, path: Path) -> None:
@@ -81,7 +81,7 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
     with chdir(repository.path):
         continueupdate()
 
-    assert repository.branches[LATEST_BRANCH] == repository.branches[UPDATE_BRANCH]
+    assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
 
 def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
@@ -99,25 +99,23 @@ def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> N
     """It fast-forwards the latest branch to the tip of the update branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.branches[UPDATE_BRANCH]
+    updatehead = repository.heads[UPDATE_BRANCH]
 
     with chdir(repository.path):
         skipupdate()
 
-    assert repository.branches[LATEST_BRANCH] == updatehead
+    assert repository.heads[LATEST_BRANCH] == updatehead
 
 
 def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
     """It resets the update branch to the tip of the latest branch."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    latesthead = repository.branches[LATEST_BRANCH]
+    latesthead = repository.heads[LATEST_BRANCH]
 
     with chdir(repository.path):
         abortupdate()
 
     assert (
-        repository.branches[LATEST_BRANCH]
-        == latesthead
-        == repository.branches[UPDATE_BRANCH]
+        repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]
     )
