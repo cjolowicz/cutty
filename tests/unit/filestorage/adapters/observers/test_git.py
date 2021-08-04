@@ -124,7 +124,7 @@ def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
         storage.add(file)
 
     repository = Repository.open(project)
-    assert repository.head.commit == repository.branches[LATEST_BRANCH]
+    assert repository.head.commit == repository.heads[LATEST_BRANCH]
 
 
 def test_branch_not_checked_out(
@@ -145,7 +145,7 @@ def test_existing_branch(
     repository = Repository.init(project)
     repository.commit()
 
-    branch = repository.branches.create(UPDATE_BRANCH)
+    branch = repository.heads.create(UPDATE_BRANCH)
     repository.checkout(branch)
 
     with storage:
@@ -161,7 +161,7 @@ def test_existing_branch_not_head(
     repository = Repository.init(project)
     repository.commit()
 
-    repository.branches.create(UPDATE_BRANCH)
+    repository.heads.create(UPDATE_BRANCH)
 
     with pytest.raises(Exception):
         with storage:
@@ -193,7 +193,7 @@ def test_existing_branch_no_changes(
     repository = Repository.init(project)
     repository.commit()
 
-    branch = repository.branches.create(UPDATE_BRANCH)
+    branch = repository.heads.create(UPDATE_BRANCH)
     repository.checkout(branch)
     oldhead = repository.head.commit
 
