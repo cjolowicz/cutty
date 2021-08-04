@@ -9,7 +9,7 @@ from cutty.util.git import Repository
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
-CREATE_MESSAGE = "Initial import"
+CREATE_MESSAGE = "Initial import from {template}"
 UPDATE_MESSAGE = "Update project template"
 
 
@@ -19,6 +19,7 @@ class GitRepositoryObserver(FileStorageObserver):
     def __init__(self, *, project: pathlib.Path, template: str = "template") -> None:
         """Initialize."""
         self.project = project
+        self.template = template
 
     def commit(self) -> None:
         """A storage transaction was completed."""
@@ -34,7 +35,9 @@ class GitRepositoryObserver(FileStorageObserver):
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
         message = (
-            CREATE_MESSAGE if LATEST_BRANCH not in repository.heads else UPDATE_MESSAGE
+            CREATE_MESSAGE.format(template=self.template)
+            if LATEST_BRANCH not in repository.heads
+            else UPDATE_MESSAGE
         )
 
         repository.commit(message=message)
