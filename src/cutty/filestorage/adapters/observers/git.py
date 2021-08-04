@@ -16,7 +16,7 @@ UPDATE_MESSAGE = "Update project template"
 class GitRepositoryObserver(FileStorageObserver):
     """Storage observer creating a git repository."""
 
-    def __init__(self, *, project: pathlib.Path) -> None:
+    def __init__(self, *, project: pathlib.Path, template: str = "template") -> None:
         """Initialize."""
         self.project = project
 
