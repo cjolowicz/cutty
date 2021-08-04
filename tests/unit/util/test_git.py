@@ -97,8 +97,7 @@ def test_heads_delitem_pass(repository: Repository) -> None:
 
 def test_heads_keys(repository: Repository) -> None:
     """It returns the branch names."""
-    heads = repository.heads
-    [branch] = heads.keys()
+    [branch] = repository.heads.keys()
     assert repository.head.name == branch
 
 
@@ -126,15 +125,13 @@ def test_branch_fail(repository: Repository) -> None:
 
 def test_heads_create_new_branch_name(repository: Repository) -> None:
     """It creates the branch with the given name."""
-    heads = repository.heads
-    branch = heads.create("branch", repository.head.commit)
+    branch = repository.heads.create("branch", repository.head.commit)
     assert "branch" == branch.name
 
 
 def test_heads_create_new_branch_commit(repository: Repository) -> None:
     """It creates the branch at the given commit."""
-    heads = repository.heads
-    branch = heads.create("branch", repository.head.commit)
+    branch = repository.heads.create("branch", repository.head.commit)
     assert repository.head.commit == branch.commit
 
 
@@ -148,15 +145,14 @@ def test_heads_create_new_branch_at_ancestor(repository: Repository) -> None:
 
 def test_heads_create_new_branch_at_another_branch(repository: Repository) -> None:
     """It creates the branch at a commit on another branch."""
-    heads = repository.heads
     main = repository.head
-    branch1 = heads.create("branch1")
+    branch1 = repository.heads.create("branch1")
 
     repository.checkout(branch1)
     repository.commit()
 
     repository.checkout(main)
-    branch2 = heads.create("branch2", branch1.commit)
+    branch2 = repository.heads.create("branch2", branch1.commit)
 
     assert branch1.commit == branch2.commit
 
@@ -213,9 +209,8 @@ def test_branch_name_set(repository: Repository) -> None:
 
 def test_branch_commit_get(repository: Repository) -> None:
     """It returns the commit at the head of the branch."""
-    heads = repository.heads
     branch = repository.head
-    assert heads[branch.name] == branch.commit
+    assert repository.heads[branch.name] == branch.commit
 
 
 def test_branch_commit_set(repository: Repository) -> None:
