@@ -71,6 +71,21 @@ def test_commit_message_template(file: RegularFile, project: pathlib.Path) -> No
     assert template in repository.head.commit.message
 
 
+def test_commit_message_revision(file: RegularFile, project: pathlib.Path) -> None:
+    """It includes the revision in the commit message."""
+    revision = "1.0.0"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, revision=revision),
+    )
+
+    with storage:
+        storage.add(file)
+
+    repository = Repository.open(project)
+    assert revision in repository.head.commit.message
+
+
 def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It updates the index."""
     with storage:
