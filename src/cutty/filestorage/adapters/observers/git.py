@@ -34,10 +34,11 @@ class GitRepositoryObserver(FileStorageObserver):
             if head != UPDATE_BRANCH:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
-        message = (
-            CREATE_MESSAGE if LATEST_BRANCH not in repository.heads else UPDATE_MESSAGE
-        )
+        message = self._commitmessage(update=LATEST_BRANCH in repository.heads)
 
-        repository.commit(message=message.format(template=self.template))
-
+        repository.commit(message=message)
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
+
+    def _commitmessage(self, update: bool) -> str:
+        message = UPDATE_MESSAGE if update else CREATE_MESSAGE
+        return message.format(template=self.template)
