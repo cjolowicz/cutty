@@ -9,8 +9,6 @@ from cutty.util.git import Repository
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
-CREATE_MESSAGE = "Initial import from {template}"
-UPDATE_MESSAGE = "Update {template}"
 
 
 class GitRepositoryObserver(FileStorageObserver):
@@ -40,5 +38,5 @@ class GitRepositoryObserver(FileStorageObserver):
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     def _commitmessage(self, update: bool) -> str:
-        message = UPDATE_MESSAGE if update else CREATE_MESSAGE
+        message = "Update {template}" if update else "Initial import from {template}"
         return message.format(template=self.template)
