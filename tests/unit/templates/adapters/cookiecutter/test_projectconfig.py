@@ -86,3 +86,21 @@ def test_readprojectconfigfile_directory_typeerror(
 
     with pytest.raises(TypeError):
         readprojectconfigfile(storage.root)
+
+
+def test_createprojectconfigfile_format(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It formats the JSON file in a standard way."""
+    file = createprojectconfigfile(PurePath(), projectconfig)
+
+    with storage:
+        storage.add(file)
+
+    path = storage.resolve(file.path)
+    lines = path.read_text().splitlines(keepends=True)
+
+    assert "{\n" == lines[0]
+    assert lines[1].startswith('  "')
+    assert lines[1].endswith('": {\n')
+    assert "}\n" == lines[-1]
