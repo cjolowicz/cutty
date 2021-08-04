@@ -25,6 +25,7 @@ class GitRepositoryObserver(FileStorageObserver):
         """Initialize."""
         self.project = project
         self.template = template
+        self.revision = revision
 
     def commit(self) -> None:
         """A storage transaction was completed."""
@@ -45,5 +46,13 @@ class GitRepositoryObserver(FileStorageObserver):
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     def _commitmessage(self, update: bool) -> str:
-        message = "Update {template}" if update else "Initial import from {template}"
-        return message.format(template=self.template)
+        if update and self.revision:
+            return f"Update {self.template} to {self.revision}"
+
+        if update:
+            return f"Update {self.template}"
+
+        if self.revision:
+            return f"Initial import from {self.template} {self.revision}"
+
+        return f"Initial import from {self.template}"
