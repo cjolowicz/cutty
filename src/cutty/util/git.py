@@ -149,16 +149,11 @@ class Repository:
         """Return the repository branches."""
         return Branches(self)
 
-    @property
-    def branches(self) -> Branches:
-        """Return the repository branches."""
-        return self.heads
-
     def branch(self, name: str) -> Branch:
         """Return the branch with the given name."""
-        branches = self.branches
-        branches[name]
-        return Branch(branches, name)
+        heads = self.heads
+        heads[name]
+        return Branch(heads, name)
 
     @property
     def head(self) -> Branch:
@@ -169,7 +164,7 @@ class Repository:
             raise ValueError("HEAD is detached")
 
         name = head.removeprefix("refs/heads/")
-        return Branch(self.branches, name)
+        return Branch(self.heads, name)
 
     def checkout(self, branch: Branch) -> None:
         """Check out the given branch."""
