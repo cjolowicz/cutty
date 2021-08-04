@@ -11,7 +11,7 @@ from cutty.util.git import Repository
 
 def createbranches(repository: Repository, *names: str) -> tuple[Branch, ...]:
     """Create branches at HEAD."""
-    return tuple(repository.branches.create(name) for name in names)
+    return tuple(repository.heads.create(name) for name in names)
 
 
 def move_repository_files_to_subdirectory(repositorypath: Path, directory: str) -> None:
