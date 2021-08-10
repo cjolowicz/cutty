@@ -275,7 +275,7 @@ def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None
         provider(str(url))
 
 
-def test_repositoryprovider_happy(
+def test_repositoryprovider_with_url(
     providerstore: ProviderStore, fetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
