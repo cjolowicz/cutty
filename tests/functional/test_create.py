@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import project_files
 from tests.util.files import template_files
@@ -48,7 +49,7 @@ def test_cutty_json(runcutty: RunCutty, template: Path) -> None:
 
 
 def test_cutty_json_already_exists(runcutty: RunCutty, template: Path) -> None:
-    """It raises an exception."""
+    """It raises an exception if the template generates cutty.json."""
     updatefile(template / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE)
 
     with pytest.raises(FileExistsError):
@@ -70,3 +71,23 @@ def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
     runcutty("create", f"--directory={directory}", str(template))
 
     assert template_files(template / "a") == project_files("example") - EXTRA
+
+
+def test_commit_message_template(runcutty: RunCutty, template: Path) -> None:
+    """It includes the template name in the commit message."""
+    runcutty("create", str(template))
+    repository = Repository.open(Path("example"))
+    assert template.name in repository.head.commit.message
+
+
+def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
+    """It includes the revision in the commit message."""
+    revision = Repository.open(template).head.commit.id
+
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("create", f"--checkout={revision}", str(template))
+
+    repository = Repository.open(Path("example"))
+
+    assert str(revision) in repository.head.commit.message

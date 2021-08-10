@@ -56,6 +56,36 @@ def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) 
     repository.head.commit  # does not raise
 
 
+def test_commit_message_template(file: RegularFile, project: pathlib.Path) -> None:
+    """It includes the template name in the commit message."""
+    template = "awesome-template"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, template=template),
+    )
+
+    with storage:
+        storage.add(file)
+
+    repository = Repository.open(project)
+    assert template in repository.head.commit.message
+
+
+def test_commit_message_revision(file: RegularFile, project: pathlib.Path) -> None:
+    """It includes the revision in the commit message."""
+    revision = "1.0.0"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, revision=revision),
+    )
+
+    with storage:
+        storage.add(file)
+
+    repository = Repository.open(project)
+    assert revision in repository.head.commit.message
+
+
 def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It updates the index."""
     with storage:
@@ -184,6 +214,50 @@ def test_existing_branch_commit_message(
         storage.add(file)
 
     assert "initial" not in repository.head.commit.message.lower()
+
+
+def test_existing_branch_commit_message_template(
+    file: RegularFile, project: pathlib.Path
+) -> None:
+    """It includes the template name in the commit message."""
+    template = "awesome-template"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, template=template),
+    )
+
+    repository = Repository.init(project)
+    repository.commit()
+
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    repository.checkout(update)
+
+    with storage:
+        storage.add(file)
+
+    assert template in repository.head.commit.message
+
+
+def test_existing_branch_commit_message_revision(
+    file: RegularFile, project: pathlib.Path
+) -> None:
+    """It includes the revision in the commit message."""
+    revision = "1.0.0"
+    storage = observe(
+        DiskFileStorage(project.parent),
+        GitRepositoryObserver(project=project, revision=revision),
+    )
+
+    repository = Repository.init(project)
+    repository.commit()
+
+    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    repository.checkout(update)
+
+    with storage:
+        storage.add(file)
+
+    assert revision in repository.head.commit.message
 
 
 def test_existing_branch_no_changes(
