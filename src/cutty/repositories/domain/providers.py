@@ -46,18 +46,6 @@ class RepositoryProvider2(Protocol):
         """Return the repository located at the given URL."""
 
 
-class RepositoryProvider(Protocol):
-    """The repository provider turns a repository URL into a filesystem path."""
-
-    def __call__(
-        self,
-        location: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> Path:
-        """Return a path to the repository located at the given URL."""
-
-
 Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 
 
