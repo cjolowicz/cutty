@@ -4,6 +4,7 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Optional
 from typing import Protocol
@@ -24,6 +25,13 @@ from cutty.repositories.domain.matchers import PathMatcher
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
+
+
+@dataclass
+class Repository:
+    """A repository."""
+
+    path: Path
 
 
 class RepositoryProvider(Protocol):
