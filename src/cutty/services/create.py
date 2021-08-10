@@ -36,9 +36,8 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    templatedir = getdefaultrepositoryprovider(cachedir)(
-        template, revision=checkout
-    ).path
+    repositoryprovider = getdefaultrepositoryprovider(cachedir)
+    templatedir = repositoryprovider(template, revision=checkout).path
 
     if directory is not None:
         templatedir = templatedir.joinpath(*directory.parts)
