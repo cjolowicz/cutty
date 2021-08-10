@@ -53,7 +53,7 @@ def template_directory(tmp_path: Path) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
 
-    template = tmp_path / "template"
+    template = tmp_path / "template-42"
     context = {
         "project": "example",
         "license": ["MIT", "GPL-3.0", "Apache-2.0"],
