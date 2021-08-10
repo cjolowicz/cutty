@@ -298,8 +298,8 @@ def test_repositoryprovider_with_path(
         default=localprovider(match=lambda path: True, mount=defaultmount)
     )
     provider = repositoryprovider2(registry, providerstore)
-    repository2 = provider(str(directory))
-    [entry] = repository2.path.iterdir()
+    repository = provider(str(directory))
+    [entry] = repository.path.iterdir()
 
     assert entry.name == "marker"
 
