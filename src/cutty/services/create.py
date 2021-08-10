@@ -79,6 +79,7 @@ def create(
         else None
     )
 
+    templatename = pathlib.Path(template).name if directory is None else directory.name
     with createcookiecutterstorage(
         outputdir,
         projectdir,
@@ -86,6 +87,7 @@ def create(
         skip_if_file_exists,
         hookfiles,
         createrepository,
+        templatename,
     ) as storage:
         for projectfile in projectfiles.release():
             if strip:
