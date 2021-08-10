@@ -282,8 +282,8 @@ def test_repositoryprovider_happy(
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
     provider = repositoryprovider2(registry, providerstore)
-    path = provider(str(url)).path
-    assert not list(path.iterdir())
+    repository = provider(str(url))
+    assert not list(repository.path.iterdir())
 
 
 def test_repositoryprovider_with_path(
@@ -298,8 +298,8 @@ def test_repositoryprovider_with_path(
         default=localprovider(match=lambda path: True, mount=defaultmount)
     )
     provider = repositoryprovider2(registry, providerstore)
-    path = provider(str(repository)).path
-    [entry] = path.iterdir()
+    repository2 = provider(str(repository))
+    [entry] = repository2.path.iterdir()
 
     assert entry.name == "marker"
 
