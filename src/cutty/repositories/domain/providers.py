@@ -34,7 +34,7 @@ class Repository:
     path: Path
 
 
-class RepositoryProvider2(Protocol):
+class RepositoryProvider(Protocol):
     """The repository provider turns a repository URL into a filesystem path."""
 
     def __call__(
@@ -206,9 +206,9 @@ def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Loca
     return None, location
 
 
-def repositoryprovider2(
+def repositoryprovider(
     providerregistry: ProviderRegistry, providerstore: ProviderStore
-) -> RepositoryProvider2:
+) -> RepositoryProvider:
     """Return a repository provider."""
 
     def _provide(
