@@ -242,11 +242,10 @@ def test_existing_branch_commit_message_revision(
     file: RegularFile, project: pathlib.Path
 ) -> None:
     """It includes the revision in the commit message."""
-    template = "awesome-template"
     revision = "1.0.0"
     storage = observe(
         DiskFileStorage(project.parent),
-        GitRepositoryObserver(project=project, template=template, revision=revision),
+        GitRepositoryObserver(project=project, revision=revision),
     )
 
     repository = Repository.init(project)
