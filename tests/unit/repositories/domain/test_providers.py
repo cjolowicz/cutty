@@ -290,15 +290,15 @@ def test_repositoryprovider_with_path(
     tmp_path: pathlib.Path, providerstore: ProviderStore, fetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    repository = tmp_path / "repository"
-    repository.mkdir()
-    (repository / "marker").touch()
+    directory = tmp_path / "repository"
+    directory.mkdir()
+    (directory / "marker").touch()
 
     registry = registerproviders(
         default=localprovider(match=lambda path: True, mount=defaultmount)
     )
     provider = repositoryprovider2(registry, providerstore)
-    repository2 = provider(str(repository))
+    repository2 = provider(str(directory))
     [entry] = repository2.path.iterdir()
 
     assert entry.name == "marker"
