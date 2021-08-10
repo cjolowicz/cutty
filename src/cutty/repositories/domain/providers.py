@@ -4,6 +4,7 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Optional
 from typing import Protocol
@@ -26,6 +27,14 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
+@dataclass
+class Repository:
+    """A repository."""
+
+    name: str
+    path: Path
+
+
 class RepositoryProvider(Protocol):
     """The repository provider turns a repository URL into a filesystem path."""
 
@@ -34,8 +43,8 @@ class RepositoryProvider(Protocol):
         location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> Path:
-        """Return a path to the repository located at the given URL."""
+    ) -> Repository:
+        """Return the repository located at the given URL."""
 
 
 Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
@@ -207,13 +216,14 @@ def repositoryprovider(
         location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> Path:
+    ) -> Repository:
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        return provide(providers, location_, revision)
+        path = provide(providers, location_, revision)
+        return Repository(location_.name, path)
 
     return _provide
