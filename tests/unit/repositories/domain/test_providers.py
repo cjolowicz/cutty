@@ -26,7 +26,7 @@ from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import registerproviderfactory
 from cutty.repositories.domain.providers import registerproviders
 from cutty.repositories.domain.providers import remoteproviderfactory
-from cutty.repositories.domain.providers import repositoryprovider
+from cutty.repositories.domain.providers import repositoryprovider2
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
@@ -270,7 +270,7 @@ def test_registerproviders_override(store: Store) -> None:
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
     registry = registerproviderfactories()
-    provider = repositoryprovider(registry, providerstore)
+    provider = repositoryprovider2(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
 
@@ -281,8 +281,8 @@ def test_repositoryprovider_happy(
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
-    provider = repositoryprovider(registry, providerstore)
-    path = provider(str(url))
+    provider = repositoryprovider2(registry, providerstore)
+    path = provider(str(url)).path
     assert not list(path.iterdir())
 
 
@@ -297,8 +297,8 @@ def test_repositoryprovider_with_path(
     registry = registerproviders(
         default=localprovider(match=lambda path: True, mount=defaultmount)
     )
-    provider = repositoryprovider(registry, providerstore)
-    path = provider(str(repository))
+    provider = repositoryprovider2(registry, providerstore)
+    path = provider(str(repository)).path
     [entry] = path.iterdir()
 
     assert entry.name == "marker"
@@ -313,6 +313,6 @@ def test_repositoryprovider_with_provider_specific_url(
         default=remoteproviderfactory(fetch=[fetcher]),
         null=constproviderfactory(nullprovider),
     )
-    provider = repositoryprovider(registry, providerstore)
+    provider = repositoryprovider2(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))

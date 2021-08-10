@@ -238,20 +238,3 @@ def repositoryprovider2(
         return Repository(path)
 
     return _provide
-
-
-def repositoryprovider(
-    providerregistry: ProviderRegistry, providerstore: ProviderStore
-) -> RepositoryProvider:
-    """Return a repository provider."""
-    provider = repositoryprovider2(providerregistry, providerstore)
-
-    def _provide(
-        location: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> Path:
-        repository = provider(location, revision, fetchmode)
-        return repository.path
-
-    return _provide
