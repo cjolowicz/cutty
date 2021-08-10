@@ -82,7 +82,7 @@ def create(
         else None
     )
 
-    templatename = templaterepository.name if directory is None else directory.name
+    templatename = templaterepository.name
     with createcookiecutterstorage(
         outputdir,
         projectdir,

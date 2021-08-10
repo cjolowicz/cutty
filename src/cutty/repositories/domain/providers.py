@@ -226,11 +226,13 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
+        name = location_.name
         path = provide(providers, location_, revision)
 
         if directory is not None:
+            name = directory.name
             path = path.joinpath(*directory.parts)
 
-        return Repository(location_.name, path)
+        return Repository(name, path)
 
     return _provide
