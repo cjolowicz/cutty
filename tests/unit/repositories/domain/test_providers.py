@@ -316,3 +316,14 @@ def test_repositoryprovider_with_provider_specific_url(
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
+
+
+def test_repositoryprovider_name_from_url(
+    providerstore: ProviderStore, fetcher: Fetcher
+) -> None:
+    """It returns a provider that allows traversing repositories."""
+    providerfactory = remoteproviderfactory(fetch=[fetcher])
+    registry = registerproviderfactories(default=providerfactory)
+    provider = repositoryprovider(registry, providerstore)
+    repository = provider("https://example.com/path/to/example?query#fragment")
+    assert "example" == repository.name
