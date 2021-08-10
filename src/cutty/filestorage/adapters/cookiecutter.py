@@ -1,6 +1,7 @@
 """File storage for Cookiecutter projects."""
 import pathlib
 from collections.abc import Sequence
+from typing import Optional
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
@@ -32,6 +33,7 @@ def createcookiecutterstorage(
     hookfiles: Sequence[File],
     createrepository: bool,
     template: str = "template",
+    revision: Optional[str] = None,
 ) -> FileStorage:
     """Create storage for Cookiecutter project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
@@ -45,7 +47,10 @@ def createcookiecutterstorage(
 
     if createrepository:
         storage = observe(
-            storage, GitRepositoryObserver(project=project_dir, template=template)
+            storage,
+            GitRepositoryObserver(
+                project=project_dir, template=template, revision=revision
+            ),
         )
 
     return storage

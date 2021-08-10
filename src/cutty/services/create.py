@@ -88,6 +88,7 @@ def create(
         hookfiles,
         createrepository,
         templatename,
+        checkout,
     ) as storage:
         for projectfile in projectfiles.release():
             if strip:
