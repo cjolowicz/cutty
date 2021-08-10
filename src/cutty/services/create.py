@@ -82,7 +82,6 @@ def create(
         else None
     )
 
-    templatename = templaterepository.name
     with createcookiecutterstorage(
         outputdir,
         projectdir,
@@ -90,7 +89,7 @@ def create(
         skip_if_file_exists,
         hookfiles,
         createrepository,
-        templatename,
+        templaterepository.name,
         checkout,
     ) as storage:
         for projectfile in projectfiles.release():
