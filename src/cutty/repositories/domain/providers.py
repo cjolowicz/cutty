@@ -31,6 +31,7 @@ from cutty.repositories.domain.stores import Store
 class Repository:
     """A repository."""
 
+    name: str
     path: Path
 
 
@@ -223,6 +224,6 @@ def repositoryprovider(
         )
 
         path = provide(providers, location_, revision)
-        return Repository(path)
+        return Repository(location_.name, path)
 
     return _provide
