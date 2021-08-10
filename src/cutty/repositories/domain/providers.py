@@ -220,21 +220,22 @@ def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Loca
 
 def repositoryprovider2(
     providerregistry: ProviderRegistry, providerstore: ProviderStore
-) -> RepositoryProvider:
+) -> RepositoryProvider2:
     """Return a repository provider."""
 
     def _provide(
         location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> Path:
+    ) -> Repository:
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        return provide(providers, location_, revision)
+        path = provide(providers, location_, revision)
+        return Repository(path)
 
     return _provide
 
@@ -243,4 +244,14 @@ def repositoryprovider(
     providerregistry: ProviderRegistry, providerstore: ProviderStore
 ) -> RepositoryProvider:
     """Return a repository provider."""
-    return repositoryprovider2(providerregistry, providerstore)
+    provider = repositoryprovider2(providerregistry, providerstore)
+
+    def _provide(
+        location: str,
+        revision: Optional[Revision] = None,
+        fetchmode: FetchMode = FetchMode.ALWAYS,
+    ) -> Path:
+        repository = provider(location, revision, fetchmode)
+        return repository.path
+
+    return _provide
