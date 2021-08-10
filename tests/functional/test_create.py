@@ -78,3 +78,16 @@ def test_commit_message_template(runcutty: RunCutty, template: Path) -> None:
     runcutty("create", str(template))
     repository = Repository.open(Path("example"))
     assert template.name in repository.head.commit.message
+
+
+def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
+    """It includes the revision in the commit message."""
+    revision = Repository.open(template).head.commit.id
+
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("create", f"--checkout={revision}", str(template))
+
+    repository = Repository.open(Path("example"))
+
+    assert str(revision) in repository.head.commit.message
