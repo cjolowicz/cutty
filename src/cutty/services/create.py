@@ -62,7 +62,7 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    strip = 0 if directory is None else len(directory.parts)
+    strip = 0
 
     if outputdirisproject:
         projectdir = outputdir

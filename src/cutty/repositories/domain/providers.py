@@ -14,6 +14,7 @@ from yarl import URL
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
+from cutty.filesystems.domain.pathfs import PathFilesystem
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
@@ -231,7 +232,7 @@ def repositoryprovider(
 
         if directory is not None:
             name = directory.name
-            path = path.joinpath(*directory.parts)
+            path = Path(filesystem=PathFilesystem(path.joinpath(*directory.parts)))
 
         return Repository(name, path)
 
