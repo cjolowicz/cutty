@@ -62,13 +62,10 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    strip = 0
-
     if outputdirisproject:
         projectdir = outputdir
-        strip += 1
     else:
-        projectdir = outputdir / projectfiles[0].path.parts[strip]
+        projectdir = outputdir / projectfiles[0].path.parts[0]
 
     hookfiles = lazysequence(
         renderfiles(findcookiecutterhooks(templatedir), render, bindings)
@@ -93,8 +90,8 @@ def create(
         checkout,
     ) as storage:
         for projectfile in projectfiles.release():
-            if strip:
-                path = PurePath(*projectfile.path.parts[strip:])
+            if outputdirisproject:
+                path = PurePath(*projectfile.path.parts[1:])
                 projectfile = projectfile.withpath(path)
 
             storage.add(projectfile)
