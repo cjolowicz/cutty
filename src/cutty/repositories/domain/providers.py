@@ -14,6 +14,7 @@ from yarl import URL
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
+from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
@@ -43,6 +44,7 @@ class RepositoryProvider(Protocol):
         location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
+        directory: Optional[PurePath] = None,
     ) -> Repository:
         """Return the repository located at the given URL."""
 
@@ -216,6 +218,7 @@ def repositoryprovider(
         location: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
+        directory: Optional[PurePath] = None,
     ) -> Repository:
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_)
@@ -223,7 +226,13 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
+        name = location_.name
         path = provide(providers, location_, revision)
-        return Repository(location_.name, path)
+
+        if directory is not None:
+            name = directory.name
+            path = path.joinpath(*directory.parts)
+
+        return Repository(name, path)
 
     return _provide
