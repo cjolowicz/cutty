@@ -74,9 +74,9 @@ def test_provide_fail(providers: list[Provider]) -> None:
 )
 def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
-    path = provide(providers, URL(), None)
-    assert path.is_dir()
-    assert not (path / "marker").is_file()
+    repository = provide(providers, URL(), None)
+    assert repository.path.is_dir()
+    assert not (repository.path / "marker").is_file()
 
 
 defaultmount = unversioned_mounter(DiskFilesystem)

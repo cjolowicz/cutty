@@ -56,12 +56,13 @@ Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
-) -> Path:
-    """Provide a filesystem path for the repository located at the given URL."""
+) -> Repository:
+    """Provide the repository located at the given URL."""
     for provider in providers:
         filesystem = provider(location, revision)
         if filesystem is not None:
-            return Path(filesystem=filesystem)
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
 
     raise RuntimeError(f"unknown location {location}")
 
@@ -228,13 +229,15 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        name = location_.name
-        path = provide(providers, location_, revision)
+        repository = provide(providers, location_, revision)
 
         if directory is not None:
             name = directory.name
-            path = Path(filesystem=PathFilesystem(path.joinpath(*directory.parts)))
+            path = Path(
+                filesystem=PathFilesystem(repository.path.joinpath(*directory.parts))
+            )
+            return Repository(name, path, repository.revision)
 
-        return Repository(name, path, revision)
+        return repository
 
     return _provide
