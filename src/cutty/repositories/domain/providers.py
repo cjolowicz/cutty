@@ -52,6 +52,7 @@ class RepositoryProvider(Protocol):
 
 
 Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
+Provider2 = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
 def provide(
@@ -63,6 +64,18 @@ def provide(
         if filesystem is not None:
             path = Path(filesystem=filesystem)
             return Repository(location.name, path, revision)
+
+    raise RuntimeError(f"unknown location {location}")
+
+
+def provide2(
+    providers: Iterable[Provider2], location: Location, revision: Optional[Revision]
+) -> Repository:
+    """Provide the repository located at the given URL."""
+    for provider in providers:
+        repository = provider(location, revision)
+        if repository is not None:
+            return repository
 
     raise RuntimeError(f"unknown location {location}")
 
