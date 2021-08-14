@@ -55,17 +55,27 @@ Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 Provider2 = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def provide(
-    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
-) -> Repository:
-    """Provide the repository located at the given URL."""
-    for provider in providers:
+def asprovider2(provider: Provider) -> Provider2:
+    """Convert Provider to Provider2."""
+
+    def _provider2(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
         filesystem = provider(location, revision)
         if filesystem is not None:
             path = Path(filesystem=filesystem)
             return Repository(location.name, path, revision)
+        return None
 
-    raise RuntimeError(f"unknown location {location}")
+    return _provider2
+
+
+def provide(
+    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
+) -> Repository:
+    """Provide the repository located at the given URL."""
+    providers2 = (asprovider2(provider) for provider in providers)
+    return provide2(providers2, location, revision)
 
 
 def provide2(
