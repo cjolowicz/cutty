@@ -193,10 +193,10 @@ def _createprovider(
     providerfactory: ProviderFactory,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
-) -> Provider:
+) -> Provider2:
     """Create a provider."""
     store = providerstore(providername)
-    return providerfactory(store, fetchmode)
+    return asprovider2(providerfactory(store, fetchmode))
 
 
 def _createproviders(
@@ -204,7 +204,7 @@ def _createproviders(
     providerstore: ProviderStore,
     fetchmode: FetchMode,
     providername: Optional[ProviderName],
-) -> Iterator[Provider]:
+) -> Iterator[Provider2]:
     """Create providers."""
     if providername is not None:
         providerfactory = providerregistry[providername]
@@ -244,8 +244,7 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        providers2 = (asprovider2(provider) for provider in providers)
-        repository = provide(providers2, location_, revision)
+        repository = provide(providers, location_, revision)
 
         if directory is not None:
             name = directory.name
