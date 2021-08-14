@@ -70,7 +70,7 @@ def asprovider2(provider: Provider) -> Provider2:
     return _provider2
 
 
-def provide2(
+def provide(
     providers: Iterable[Provider2], location: Location, revision: Optional[Revision]
 ) -> Repository:
     """Provide the repository located at the given URL."""
@@ -245,7 +245,7 @@ def repositoryprovider(
         )
 
         providers2 = (asprovider2(provider) for provider in providers)
-        repository = provide2(providers2, location_, revision)
+        repository = provide(providers2, location_, revision)
 
         if directory is not None:
             name = directory.name

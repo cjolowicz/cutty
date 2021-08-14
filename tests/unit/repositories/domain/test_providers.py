@@ -19,7 +19,7 @@ from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import asprovider2
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
-from cutty.repositories.domain.providers import provide2
+from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerprovider
@@ -62,7 +62,7 @@ def test_provide_fail(providers: list[Provider]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
         providers2 = (asprovider2(provider) for provider in providers)
-        provide2(providers2, URL(), None)
+        provide(providers2, URL(), None)
 
 
 @pytest.mark.parametrize(
@@ -77,7 +77,7 @@ def test_provide_fail(providers: list[Provider]) -> None:
 def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
     providers2 = (asprovider2(provider) for provider in providers)
-    repository = provide2(providers2, URL(), None)
+    repository = provide(providers2, URL(), None)
     assert repository.path.is_dir()
     assert not (repository.path / "marker").is_file()
 
