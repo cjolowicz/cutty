@@ -35,6 +35,7 @@ class Repository:
 
     name: str
     path: Path
+    revision: Optional[Revision]
 
 
 class RepositoryProvider(Protocol):
@@ -234,6 +235,6 @@ def repositoryprovider(
             name = directory.name
             path = Path(filesystem=PathFilesystem(path.joinpath(*directory.parts)))
 
-        return Repository(name, path)
+        return Repository(name, path, revision)
 
     return _provide
