@@ -19,7 +19,7 @@ from cutty.repositories.domain.providers import asprovider2
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
-from cutty.repositories.domain.providers import Provider2
+from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import remoteproviderfactory
@@ -36,7 +36,7 @@ def nullprovider(
     return None
 
 
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider2:
+def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
     def _dictprovider(
@@ -55,7 +55,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider2:
         [nullprovider, nullprovider],
     ],
 )
-def test_provide_fail(providers: list[Provider2]) -> None:
+def test_provide_fail(providers: list[Provider]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
         provide(providers, URL(), None)
@@ -70,7 +70,7 @@ def test_provide_fail(providers: list[Provider2]) -> None:
         [dictprovider({}), dictprovider({"marker": ""})],
     ],
 )
-def test_provide_pass(providers: list[Provider2]) -> None:
+def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
     repository = provide(providers, URL(), None)
     assert repository.path.is_dir()
