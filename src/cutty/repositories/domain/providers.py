@@ -116,7 +116,7 @@ def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesyste
     return DiskFilesystem(path)
 
 
-def remoteproviderfactory2(
+def remoteproviderfactory(
     *,
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],

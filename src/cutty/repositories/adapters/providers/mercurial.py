@@ -1,6 +1,6 @@
 """Provider for Mercurial repositories."""
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
-from cutty.repositories.domain.providers import remoteproviderfactory2
+from cutty.repositories.domain.providers import remoteproviderfactory
 
 
-hgproviderfactory = remoteproviderfactory2(fetch=[hgfetcher])
+hgproviderfactory = remoteproviderfactory(fetch=[hgfetcher])

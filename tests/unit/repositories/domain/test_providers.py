@@ -22,7 +22,7 @@ from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
-from cutty.repositories.domain.providers import remoteproviderfactory2
+from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
@@ -122,7 +122,7 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
-    providerfactory = remoteproviderfactory2(fetch=[])
+    providerfactory = remoteproviderfactory(fetch=[])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -136,7 +136,7 @@ def nullfetcher(
 
 def test_remoteproviderfactory_no_matching_fetchers(store: Store) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = remoteproviderfactory2(fetch=[nullfetcher])
+    providerfactory = remoteproviderfactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -162,7 +162,7 @@ def fetcher() -> Fetcher:
 
 def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -> None:
     """It mounts a filesystem for the fetched repository."""
-    providerfactory = remoteproviderfactory2(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, None)
 
@@ -178,7 +178,7 @@ def test_remoteproviderfactory_not_matching(
     store: Store, fetcher: Fetcher, url: URL
 ) -> None:
     """It returns None if the provider itself does not match."""
-    providerfactory = remoteproviderfactory2(match=nullmatcher, fetch=[fetcher])
+    providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(url, None) is None
 
@@ -202,7 +202,7 @@ def test_remoteproviderfactory_mounter(
     assert path is not None  # for type narrowing
     path.write_text(text)
 
-    providerfactory = remoteproviderfactory2(fetch=[fetcher], mount=jsonmounter)
+    providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, revision)
 
@@ -253,7 +253,7 @@ def test_repositoryprovider_with_url(
     providerstore: ProviderStore, fetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory2(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
     provider = repositoryprovider(registry, providerstore)
     repository = provider(str(url))
@@ -286,7 +286,7 @@ def test_repositoryprovider_with_provider_specific_url(
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     registry = registerproviderfactories(
-        default=remoteproviderfactory2(fetch=[fetcher]),
+        default=remoteproviderfactory(fetch=[fetcher]),
         null=constproviderfactory(asprovider2(nullprovider)),
     )
     provider = repositoryprovider(registry, providerstore)
@@ -298,7 +298,7 @@ def test_repositoryprovider_name_from_url(
     providerstore: ProviderStore, fetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory2(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[fetcher])
     registry = registerproviderfactories(default=providerfactory)
     provider = repositoryprovider(registry, providerstore)
     repository = provider("https://example.com/path/to/example?query#fragment")
