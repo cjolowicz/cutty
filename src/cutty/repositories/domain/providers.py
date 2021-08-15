@@ -51,12 +51,12 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
+FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 Provider2 = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def asprovider2(provider: Provider) -> Provider2:
-    """Convert Provider to Provider2."""
+def asprovider2(provider: FilesystemProvider) -> Provider2:
+    """Convert FilesystemProvider to Provider2."""
 
     def _provider2(
         location: Location, revision: Optional[Revision]
