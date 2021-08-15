@@ -87,7 +87,7 @@ def create(
         hookfiles,
         createrepository,
         templaterepository.name,
-        checkout,
+        templaterepository.revision,
     ) as storage:
         for projectfile in projectfiles.release():
             if outputdirisproject:
