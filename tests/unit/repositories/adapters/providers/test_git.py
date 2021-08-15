@@ -37,18 +37,18 @@ def test_localgitprovider_happy(
     url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It provides a repository from a local directory."""
-    filesystem = localgitprovider(url, revision)
-    assert filesystem is not None
+    repository = localgitprovider(url, revision)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == expected
 
 
 def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the path is not a git repository."""
     url = asurl(tmp_path)
-    filesystem = localgitprovider(url, None)
-    assert filesystem is None
+    repository = localgitprovider(url, None)
+    assert repository is None
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
