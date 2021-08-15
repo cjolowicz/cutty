@@ -19,7 +19,7 @@ from cutty.repositories.domain.providers import asproviderregistry2
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import RepositoryProvider
-from cutty.repositories.domain.providers import repositoryprovider2
+from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.stores import Store
 
 
@@ -155,7 +155,7 @@ def getdefaultrepositoryprovider(
     path: pathlib.Path, *, timer: Timer = defaulttimer
 ) -> RepositoryProvider:
     """Return a repository provider."""
-    return repositoryprovider2(
+    return repositoryprovider(
         asproviderregistry2(defaultproviderregistry),
         getdefaultproviderstore(path, timer=timer),
     )

@@ -247,7 +247,7 @@ def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Loca
     return None, location
 
 
-def repositoryprovider2(
+def repositoryprovider(
     providerregistry: ProviderRegistry2, providerstore: ProviderStore
 ) -> RepositoryProvider:
     """Return a repository provider."""
