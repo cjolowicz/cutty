@@ -112,6 +112,12 @@ def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
     return _localprovider
 
 
+def localprovider2(*, match: PathMatcher, mount: Mounter) -> Provider2:
+    """Create a view onto the local filesystem."""
+    provider = localprovider(match=match, mount=mount)
+    return asprovider2(provider)
+
+
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
     return DiskFilesystem(path)
 

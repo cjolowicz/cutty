@@ -19,6 +19,7 @@ from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import asprovider2
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
+from cutty.repositories.domain.providers import localprovider2
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
@@ -272,7 +273,7 @@ def test_repositoryprovider_with_path(
 
     registry = registerproviderfactories2(
         default=constproviderfactory(
-            asprovider2(localprovider(match=lambda path: True, mount=defaultmount))
+            localprovider2(match=lambda path: True, mount=defaultmount)
         )
     )
     provider = repositoryprovider(registry, providerstore)
