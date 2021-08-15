@@ -227,10 +227,10 @@ def test_registerproviderfactories_add() -> None:
     registry = registerproviderfactories()
     registry = registerproviderfactory(registry, "default", providerfactory)
 
-    assert registry == registerproviderfactories(default=providerfactory)
+    assert "default" in registry
 
 
-def test_registerproviderfactories_override() -> None:
+def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
     providerfactory1 = constproviderfactory(nullprovider)
     providerfactory2 = constproviderfactory(dictprovider())
@@ -239,7 +239,11 @@ def test_registerproviderfactories_override() -> None:
     registry = registerproviderfactory(registry, "default", providerfactory1)
     registry = registerproviderfactory(registry, "default", providerfactory2)
 
-    assert registry.get("default") is providerfactory2
+    providerfactory = registry["default"]
+    provider = providerfactory(store, FetchMode.ALWAYS)
+
+    # Check that it's provider2 (the nullprovider returns None).
+    assert provider(URL(), None) is not None
 
 
 def test_registerproviders_empty() -> None:
