@@ -10,22 +10,20 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
+from cutty.repositories.domain.providers import asprovider
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import registerprovider
 from cutty.repositories.domain.providers import registerproviderfactories
-from cutty.repositories.domain.providers import registerproviderfactory
-from cutty.repositories.domain.providers import registerproviders
 from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import Repository
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
@@ -33,7 +31,7 @@ from cutty.repositories.domain.stores import Store
 
 def nullprovider(
     location: Location, revision: Optional[Revision]
-) -> Optional[Filesystem]:
+) -> Optional[Repository]:
     """Provider that matches no location."""
     return None
 
@@ -46,7 +44,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     ) -> Optional[Filesystem]:
         return DictFilesystem(mapping or {})
 
-    return _dictprovider
+    return asprovider(_dictprovider)
 
 
 @pytest.mark.parametrize(
@@ -74,9 +72,9 @@ def test_provide_fail(providers: list[Provider]) -> None:
 )
 def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
-    path = provide(providers, URL(), None)
-    assert path.is_dir()
-    assert not (path / "marker").is_file()
+    repository = provide(providers, URL(), None)
+    assert repository.path.is_dir()
+    assert not (repository.path / "marker").is_file()
 
 
 defaultmount = unversioned_mounter(DiskFilesystem)
@@ -98,18 +96,18 @@ def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
 
 
 def test_localprovider_path(tmp_path: pathlib.Path) -> None:
-    """It returns a filesystem for the repository."""
+    """It returns the repository."""
     repository = tmp_path / "repository"
     repository.mkdir()
     (repository / "marker").touch()
 
     url = asurl(repository)
     provider = localprovider(match=lambda path: True, mount=defaultmount)
-    filesystem = provider(url, None)
+    repository2 = provider(url, None)
 
-    assert filesystem is not None
-    [entry] = filesystem.iterdir(PurePath())
-    assert entry == "marker"
+    assert repository2 is not None
+    [entry] = repository2.path.iterdir()
+    assert entry.name == "marker"
 
 
 def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
@@ -165,9 +163,9 @@ def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -
     """It mounts a filesystem for the fetched repository."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    filesystem = provider(url, None)
+    repository = provider(url, None)
 
-    assert filesystem is not None
+    assert repository is not None
 
 
 def nullmatcher(url: URL) -> bool:
@@ -205,10 +203,10 @@ def test_remoteproviderfactory_mounter(
 
     providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
-    filesystem = provider(url, revision)
+    repository = provider(url, revision)
 
-    assert filesystem is not None
-    assert filesystem.read_text(PurePath("marker")) == "Lorem"
+    assert repository is not None
+    assert (repository.path / "marker").read_text() == "Lorem"
 
 
 def test_registerproviderfactories_empty() -> None:
@@ -221,44 +219,19 @@ def test_registerproviderfactories_add() -> None:
     providerfactory = constproviderfactory(nullprovider)
 
     registry = registerproviderfactories()
-    registry = registerproviderfactory(registry, "default", providerfactory)
+    registry = registerproviderfactories(registry, default=providerfactory)
 
-    assert registry == registerproviderfactories(default=providerfactory)
+    assert "default" in registry
 
 
-def test_registerproviderfactories_override() -> None:
+def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
     providerfactory1 = constproviderfactory(nullprovider)
     providerfactory2 = constproviderfactory(dictprovider())
 
     registry = registerproviderfactories()
-    registry = registerproviderfactory(registry, "default", providerfactory1)
-    registry = registerproviderfactory(registry, "default", providerfactory2)
-
-    assert registry.get("default") is providerfactory2
-
-
-def test_registerproviders_empty() -> None:
-    """It creates an empty registry."""
-    assert not registerproviders()
-
-
-def test_registerproviders_add() -> None:
-    """It adds entries."""
-    registry = registerproviders()
-    registry = registerprovider(registry, "default", nullprovider)
-
-    assert "default" in registry
-
-
-def test_registerproviders_override(store: Store) -> None:
-    """It overrides existing entries."""
-    provider1 = nullprovider
-    provider2 = dictprovider()
-
-    registry = registerproviders()
-    registry = registerprovider(registry, "default", provider1)
-    registry = registerprovider(registry, "default", provider2)
+    registry = registerproviderfactories(registry, default=providerfactory1)
+    registry = registerproviderfactories(registry, default=providerfactory2)
 
     providerfactory = registry["default"]
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -294,8 +267,10 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    registry = registerproviders(
-        default=localprovider(match=lambda path: True, mount=defaultmount)
+    registry = registerproviderfactories(
+        default=constproviderfactory(
+            localprovider(match=lambda path: True, mount=defaultmount)
+        )
     )
     provider = repositoryprovider(registry, providerstore)
     repository = provider(str(directory))

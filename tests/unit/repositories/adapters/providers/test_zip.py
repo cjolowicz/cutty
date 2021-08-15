@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 from yarl import URL
 
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
@@ -28,10 +27,10 @@ def url(tmp_path: Path) -> URL:
 
 def test_localzipprovider_happy(url: URL) -> None:
     """It provides a repository from a local directory."""
-    filesystem = localzipprovider(url, None)
-    assert filesystem is not None
+    repository = localzipprovider(url, None)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == "Lorem"
 
 
@@ -44,17 +43,17 @@ def test_localzipprovider_revision(url: URL) -> None:
 def test_localzipprovider_not_matching(tmp_path: Path) -> None:
     """It returns None if the path is not a zip repository."""
     url = asurl(tmp_path)
-    filesystem = localzipprovider(url, None)
-    assert filesystem is None
+    repository = localzipprovider(url, None)
+    assert repository is None
 
 
 def test_zipproviderfactory_happy(store: Store, url: URL) -> None:
     """It fetches a zip repository into storage."""
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = zipprovider(url, None)
-    assert filesystem is not None
+    repository = zipprovider(url, None)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == "Lorem"
 
 
@@ -62,5 +61,5 @@ def test_zipproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = zipprovider(url, None)
-    assert filesystem is None
+    repository = zipprovider(url, None)
+    assert repository is None

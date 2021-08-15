@@ -51,17 +51,33 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-Provider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
+FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
+Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
+
+
+def asprovider(provider: FilesystemProvider) -> Provider:
+    """Convert FilesystemProvider to Provider."""
+
+    def _provider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        filesystem = provider(location, revision)
+        if filesystem is not None:
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
+        return None
+
+    return _provider
 
 
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
-) -> Path:
-    """Provide a filesystem path for the repository located at the given URL."""
+) -> Repository:
+    """Provide the repository located at the given URL."""
     for provider in providers:
-        filesystem = provider(location, revision)
-        if filesystem is not None:
-            return Path(filesystem=filesystem)
+        repository = provider(location, revision)
+        if repository is not None:
+            return repository
 
     raise RuntimeError(f"unknown location {location}")
 
@@ -82,7 +98,7 @@ def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
         else:
             return mount(path, revision) if match(path) else None
 
-    return _localprovider
+    return asprovider(_localprovider)
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
@@ -112,7 +128,7 @@ def remoteproviderfactory(
 
             return None
 
-        return _remoteprovider
+        return asprovider(_remoteprovider)
 
     return _remoteproviderfactory
 
@@ -125,17 +141,9 @@ ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 
 
-def registerproviderfactory(
-    providerregistry: ProviderRegistry,
-    providername: ProviderName,
-    providerfactory: ProviderFactory,
-) -> ProviderRegistry:
-    """Register a provider factory."""
-    return {**providerregistry, providername: providerfactory}
-
-
 def registerproviderfactories(
     providerregistry: ProviderRegistry = _emptyproviderregistry,
+    /,
     **providerfactories: ProviderFactory,
 ) -> ProviderRegistry:
     """Register provider factories."""
@@ -149,27 +157,6 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
         return provider
 
     return _providerfactory
-
-
-def registerprovider(
-    providerregistry: ProviderRegistry,
-    providername: ProviderName,
-    provider: Provider,
-) -> ProviderRegistry:
-    """Register a provider factory."""
-    return {**providerregistry, providername: constproviderfactory(provider)}
-
-
-def registerproviders(
-    providerregistry: ProviderRegistry = _emptyproviderregistry,
-    **providers: Provider,
-) -> ProviderRegistry:
-    """Register provider factories."""
-    providerfactories = {
-        providername: constproviderfactory(provider)
-        for providername, provider in providers.items()
-    }
-    return {**providerregistry, **providerfactories}
 
 
 def _createprovider(
@@ -228,13 +215,15 @@ def repositoryprovider(
             providerregistry, providerstore, fetchmode, providername
         )
 
-        name = location_.name
-        path = provide(providers, location_, revision)
+        repository = provide(providers, location_, revision)
 
         if directory is not None:
             name = directory.name
-            path = Path(filesystem=PathFilesystem(path.joinpath(*directory.parts)))
+            path = Path(
+                filesystem=PathFilesystem(repository.path.joinpath(*directory.parts))
+            )
+            return Repository(name, path, repository.revision)
 
-        return Repository(name, path, revision)
+        return repository
 
     return _provide
