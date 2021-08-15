@@ -116,12 +116,12 @@ def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesyste
     return DiskFilesystem(path)
 
 
-def remoteproviderfactory(
+def remoteproviderfactory2(
     *,
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],
     mount: Optional[Mounter] = None,
-) -> ProviderFactory:
+) -> ProviderFactory2:
     """Remote providers fetch the repository into local storage first."""
     fetch = tuple(fetch)
     _mount = mount if mount is not None else _defaultmount
@@ -141,18 +141,7 @@ def remoteproviderfactory(
 
         return _remoteprovider
 
-    return _remoteproviderfactory
-
-
-def remoteproviderfactory2(
-    *,
-    match: Optional[Matcher] = None,
-    fetch: Iterable[Fetcher],
-    mount: Optional[Mounter] = None,
-) -> ProviderFactory2:
-    """Remote providers fetch the repository into local storage first."""
-    providerfactory = remoteproviderfactory(match=match, fetch=fetch, mount=mount)
-    return asproviderfactory2(providerfactory)
+    return asproviderfactory2(_remoteproviderfactory)
 
 
 ProviderName = str
