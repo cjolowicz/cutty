@@ -210,17 +210,17 @@ def registerproviders(
 
 def _createprovider(
     providername: ProviderName,
-    providerfactory: ProviderFactory,
+    providerfactory: ProviderFactory2,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
 ) -> Provider2:
     """Create a provider."""
     store = providerstore(providername)
-    return asprovider2(providerfactory(store, fetchmode))
+    return providerfactory(store, fetchmode)
 
 
 def _createproviders(
-    providerregistry: ProviderRegistry,
+    providerregistry: ProviderRegistry2,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
     providername: Optional[ProviderName],
@@ -261,7 +261,10 @@ def repositoryprovider(
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_)
         providers = _createproviders(
-            providerregistry, providerstore, fetchmode, providername
+            asproviderregistry2(providerregistry),
+            providerstore,
+            fetchmode,
+            providername,
         )
 
         repository = provide(providers, location_, revision)
