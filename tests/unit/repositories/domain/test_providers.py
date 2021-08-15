@@ -23,6 +23,7 @@ from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
+from cutty.repositories.domain.providers import registerproviderfactories2
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
@@ -213,14 +214,14 @@ def test_remoteproviderfactory_mounter(
 
 def test_registerproviderfactories_empty() -> None:
     """It creates an empty registry."""
-    assert not registerproviderfactories()
+    assert not registerproviderfactories2()
 
 
 def test_registerproviderfactories_add() -> None:
     """It adds entries."""
     providerfactory = constproviderfactory(nullprovider)
 
-    registry = registerproviderfactories()
+    registry = registerproviderfactories2()
     registry = registerproviderfactories(registry, default=providerfactory)
 
     assert "default" in registry
@@ -231,7 +232,7 @@ def test_registerproviderfactories_override(store: Store) -> None:
     providerfactory1 = constproviderfactory(nullprovider)
     providerfactory2 = constproviderfactory(dictprovider())
 
-    registry = registerproviderfactories()
+    registry = registerproviderfactories2()
     registry = registerproviderfactories(registry, default=providerfactory1)
     registry = registerproviderfactories(registry, default=providerfactory2)
 
@@ -244,7 +245,7 @@ def test_registerproviderfactories_override(store: Store) -> None:
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
-    registry = registerproviderfactories()
+    registry = registerproviderfactories2()
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
