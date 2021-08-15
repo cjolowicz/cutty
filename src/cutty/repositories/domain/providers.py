@@ -96,7 +96,7 @@ def asproviderfactory2(providerfactory: ProviderFactory) -> ProviderFactory2:
     return _providerfactory2
 
 
-def localprovider2(*, match: PathMatcher, mount: Mounter) -> Provider2:
+def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider2:
     """Create a view onto the local filesystem."""
 
     def _localprovider(
