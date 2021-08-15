@@ -83,6 +83,17 @@ def provide(
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
+ProviderFactory2 = Callable[[Store, FetchMode], Provider2]
+
+
+def asproviderfactory2(providerfactory: ProviderFactory) -> ProviderFactory2:
+    """Convert ProviderFactory to ProviderFactory2."""
+
+    def _providerfactory2(store: Store, fetchmode: FetchMode) -> Provider2:
+        provider = providerfactory(store, fetchmode)
+        return asprovider2(provider)
+
+    return _providerfactory2
 
 
 def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
