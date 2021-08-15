@@ -146,17 +146,17 @@ def remoteproviderfactory(
 
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
-ProviderRegistry2 = Mapping[ProviderName, ProviderFactory2]
+ProviderRegistry = Mapping[ProviderName, ProviderFactory2]
 
 
-_emptyproviderregistry: ProviderRegistry2 = MappingProxyType({})
+_emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 
 
 def registerproviderfactories(
-    providerregistry: ProviderRegistry2 = _emptyproviderregistry,
+    providerregistry: ProviderRegistry = _emptyproviderregistry,
     /,
     **providerfactories: ProviderFactory2,
-) -> ProviderRegistry2:
+) -> ProviderRegistry:
     """Register provider factories."""
     return {**providerregistry, **providerfactories}
 
@@ -182,7 +182,7 @@ def _createprovider(
 
 
 def _createproviders(
-    providerregistry: ProviderRegistry2,
+    providerregistry: ProviderRegistry,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
     providername: Optional[ProviderName],
@@ -210,7 +210,7 @@ def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Loca
 
 
 def repositoryprovider(
-    providerregistry: ProviderRegistry2, providerstore: ProviderStore
+    providerregistry: ProviderRegistry, providerstore: ProviderStore
 ) -> RepositoryProvider:
     """Return a repository provider."""
 
