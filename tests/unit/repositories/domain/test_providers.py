@@ -30,7 +30,7 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-def nullprovider2(
+def nullprovider(
     location: Location, revision: Optional[Revision]
 ) -> Optional[Repository]:
     """Provider that matches no location."""
@@ -57,8 +57,8 @@ def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
     "providers",
     [
         [],
-        [nullprovider2],
-        [nullprovider2, nullprovider2],
+        [nullprovider],
+        [nullprovider, nullprovider],
     ],
 )
 def test_provide_fail(providers: list[Provider2]) -> None:
@@ -71,8 +71,8 @@ def test_provide_fail(providers: list[Provider2]) -> None:
     "providers",
     [
         [dictprovider2({})],
-        [dictprovider2({}), nullprovider2],
-        [nullprovider2, dictprovider2({})],
+        [dictprovider2({}), nullprovider],
+        [nullprovider, dictprovider2({})],
         [dictprovider2({}), dictprovider2({"marker": ""})],
     ],
 )
@@ -222,7 +222,7 @@ def test_registerproviderfactories_empty() -> None:
 
 def test_registerproviderfactories_add() -> None:
     """It adds entries."""
-    providerfactory = constproviderfactory(nullprovider2)
+    providerfactory = constproviderfactory(nullprovider)
 
     registry = registerproviderfactories()
     registry = registerproviderfactories(registry, default=providerfactory)
@@ -232,7 +232,7 @@ def test_registerproviderfactories_add() -> None:
 
 def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
-    providerfactory1 = constproviderfactory(nullprovider2)
+    providerfactory1 = constproviderfactory(nullprovider)
     providerfactory2 = constproviderfactory(dictprovider2())
 
     registry = registerproviderfactories()
@@ -292,7 +292,7 @@ def test_repositoryprovider_with_provider_specific_url(
     url = url.with_scheme(f"null+{url.scheme}")
     registry = registerproviderfactories(
         default=remoteproviderfactory(fetch=[fetcher]),
-        null=constproviderfactory(nullprovider2),
+        null=constproviderfactory(nullprovider),
     )
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
