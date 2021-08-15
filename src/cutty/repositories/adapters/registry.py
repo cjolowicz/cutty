@@ -16,7 +16,7 @@ _defaultproviderregistry = {
     "localzip": factory(localzipprovider),
     "localgit": factory(localgitprovider),
     "local": factory(diskprovider),
-    "zip": asproviderfactory2(zipproviderfactory),
+    "zip": zipproviderfactory,
     "git": asproviderfactory2(gitproviderfactory),
 }
 

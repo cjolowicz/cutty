@@ -7,7 +7,7 @@ from cutty.repositories.adapters.fetchers.ftp import ftpfetcher
 from cutty.repositories.adapters.fetchers.http import httpfetcher
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import localprovider
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import remoteproviderfactory2
 
 
 def match(path: Path) -> bool:
@@ -17,7 +17,7 @@ def match(path: Path) -> bool:
 
 mount = unversioned_mounter(ZipFilesystem)
 localzipprovider = localprovider(match=match, mount=mount)
-zipproviderfactory = remoteproviderfactory(
+zipproviderfactory = remoteproviderfactory2(
     match=lambda url: url.path.lower().endswith(".zip"),
     fetch=[httpfetcher, ftpfetcher, filefetcher],
     mount=mount,
