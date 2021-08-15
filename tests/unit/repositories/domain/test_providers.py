@@ -17,7 +17,7 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import asprovider2
-from cutty.repositories.domain.providers import constproviderfactory
+from cutty.repositories.domain.providers import constproviderfactory2
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
@@ -219,7 +219,7 @@ def test_registerproviderfactories_empty() -> None:
 
 def test_registerproviderfactories_add() -> None:
     """It adds entries."""
-    providerfactory = constproviderfactory(nullprovider)
+    providerfactory = constproviderfactory2(asprovider2(nullprovider))
 
     registry = registerproviderfactories2()
     registry = registerproviderfactories2(registry, default=providerfactory)
@@ -229,8 +229,8 @@ def test_registerproviderfactories_add() -> None:
 
 def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
-    providerfactory1 = constproviderfactory(nullprovider)
-    providerfactory2 = constproviderfactory(dictprovider())
+    providerfactory1 = constproviderfactory2(asprovider2(nullprovider))
+    providerfactory2 = constproviderfactory2(asprovider2(dictprovider()))
 
     registry = registerproviderfactories2()
     registry = registerproviderfactories2(registry, default=providerfactory1)
@@ -271,8 +271,8 @@ def test_repositoryprovider_with_path(
     (directory / "marker").touch()
 
     registry = registerproviderfactories2(
-        default=constproviderfactory(
-            localprovider(match=lambda path: True, mount=defaultmount)
+        default=constproviderfactory2(
+            asprovider2(localprovider(match=lambda path: True, mount=defaultmount))
         )
     )
     provider = repositoryprovider(registry, providerstore)
@@ -292,7 +292,7 @@ def test_repositoryprovider_with_provider_specific_url(
     )
     registry = registerproviderfactories2(
         registry,
-        null=constproviderfactory(nullprovider),
+        null=constproviderfactory2(asprovider2(nullprovider)),
     )
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
