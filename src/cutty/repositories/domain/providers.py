@@ -181,7 +181,7 @@ def registerproviderfactories2(
     return {**providerregistry, **providerfactories}
 
 
-def constproviderfactory2(provider: Provider) -> ProviderFactory2:
+def constproviderfactory(provider: Provider) -> ProviderFactory2:
     """Create a provider factory that returns the given provider."""
 
     def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:

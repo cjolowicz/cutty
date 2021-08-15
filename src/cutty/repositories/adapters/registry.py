@@ -7,7 +7,7 @@ from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
-from cutty.repositories.domain.providers import constproviderfactory2 as factory
+from cutty.repositories.domain.providers import constproviderfactory as factory
 from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import registerproviderfactories2
 
