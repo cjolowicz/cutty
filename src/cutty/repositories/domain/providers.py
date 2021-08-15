@@ -183,9 +183,14 @@ def registerproviderfactories2(
 
 def constproviderfactory(provider: Provider) -> ProviderFactory2:
     """Create a provider factory that returns the given provider."""
+    return constproviderfactory2(asprovider2(provider))
+
+
+def constproviderfactory2(provider: Provider2) -> ProviderFactory2:
+    """Create a provider factory that returns the given provider."""
 
     def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:
-        return asprovider2(provider)
+        return provider
 
     return _providerfactory
 
