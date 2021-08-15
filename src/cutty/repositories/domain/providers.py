@@ -146,16 +146,7 @@ def remoteproviderfactory(
 
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
-ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 ProviderRegistry2 = Mapping[ProviderName, ProviderFactory2]
-
-
-def asproviderregistry2(providerregistry: ProviderRegistry) -> ProviderRegistry2:
-    """Convert ProviderRegistry to ProviderRegistry2."""
-    return {
-        providername: asproviderfactory2(providerfactory)
-        for providername, providerfactory in providerregistry.items()
-    }
 
 
 _emptyproviderregistry: ProviderRegistry2 = MappingProxyType({})
