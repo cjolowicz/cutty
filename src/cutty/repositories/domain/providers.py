@@ -152,7 +152,7 @@ ProviderRegistry2 = Mapping[ProviderName, ProviderFactory2]
 _emptyproviderregistry: ProviderRegistry2 = MappingProxyType({})
 
 
-def registerproviderfactories2(
+def registerproviderfactories(
     providerregistry: ProviderRegistry2 = _emptyproviderregistry,
     /,
     **providerfactories: ProviderFactory2,

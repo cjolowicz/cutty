@@ -23,7 +23,7 @@ from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import registerproviderfactories2
+from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
@@ -214,15 +214,15 @@ def test_remoteproviderfactory_mounter(
 
 def test_registerproviderfactories_empty() -> None:
     """It creates an empty registry."""
-    assert not registerproviderfactories2()
+    assert not registerproviderfactories()
 
 
 def test_registerproviderfactories_add() -> None:
     """It adds entries."""
     providerfactory = constproviderfactory(asprovider2(nullprovider))
 
-    registry = registerproviderfactories2()
-    registry = registerproviderfactories2(registry, default=providerfactory)
+    registry = registerproviderfactories()
+    registry = registerproviderfactories(registry, default=providerfactory)
 
     assert "default" in registry
 
@@ -232,9 +232,9 @@ def test_registerproviderfactories_override(store: Store) -> None:
     providerfactory1 = constproviderfactory(asprovider2(nullprovider))
     providerfactory2 = constproviderfactory(asprovider2(dictprovider()))
 
-    registry = registerproviderfactories2()
-    registry = registerproviderfactories2(registry, default=providerfactory1)
-    registry = registerproviderfactories2(registry, default=providerfactory2)
+    registry = registerproviderfactories()
+    registry = registerproviderfactories(registry, default=providerfactory1)
+    registry = registerproviderfactories(registry, default=providerfactory2)
 
     providerfactory = registry["default"]
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -245,7 +245,7 @@ def test_registerproviderfactories_override(store: Store) -> None:
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
-    registry = registerproviderfactories2()
+    registry = registerproviderfactories()
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
@@ -256,7 +256,7 @@ def test_repositoryprovider_with_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = registerproviderfactories2(default=asproviderfactory2(providerfactory))
+    registry = registerproviderfactories(default=asproviderfactory2(providerfactory))
     provider = repositoryprovider(registry, providerstore)
     repository = provider(str(url))
     assert not list(repository.path.iterdir())
@@ -270,7 +270,7 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    registry = registerproviderfactories2(
+    registry = registerproviderfactories(
         default=constproviderfactory(
             localprovider(match=lambda path: True, mount=defaultmount)
         )
@@ -287,7 +287,7 @@ def test_repositoryprovider_with_provider_specific_url(
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
-    registry = registerproviderfactories2(
+    registry = registerproviderfactories(
         default=asproviderfactory2(remoteproviderfactory(fetch=[fetcher])),
         null=constproviderfactory(asprovider2(nullprovider)),
     )
@@ -301,7 +301,7 @@ def test_repositoryprovider_name_from_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = registerproviderfactories2(default=asproviderfactory2(providerfactory))
+    registry = registerproviderfactories(default=asproviderfactory2(providerfactory))
     provider = repositoryprovider(registry, providerstore)
     repository = provider("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name

@@ -9,7 +9,7 @@ from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
 from cutty.repositories.domain.providers import asproviderfactory2
 from cutty.repositories.domain.providers import constproviderfactory as factory
-from cutty.repositories.domain.providers import registerproviderfactories2
+from cutty.repositories.domain.providers import registerproviderfactories
 
 
 _defaultproviderregistry = {
@@ -23,4 +23,4 @@ _defaultproviderregistry = {
 if shutil.which("hg") is not None:  # pragma: no cover
     _defaultproviderregistry["hg"] = asproviderfactory2(hgproviderfactory)
 
-defaultproviderregistry = registerproviderfactories2(**_defaultproviderregistry)
+defaultproviderregistry = registerproviderfactories(**_defaultproviderregistry)
