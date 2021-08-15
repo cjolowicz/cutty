@@ -7,7 +7,6 @@ from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
-from cutty.repositories.domain.providers import asproviderfactory2
 from cutty.repositories.domain.providers import constproviderfactory as factory
 from cutty.repositories.domain.providers import registerproviderfactories
 
@@ -21,6 +20,6 @@ _defaultproviderregistry = {
 }
 
 if shutil.which("hg") is not None:  # pragma: no cover
-    _defaultproviderregistry["hg"] = asproviderfactory2(hgproviderfactory)
+    _defaultproviderregistry["hg"] = hgproviderfactory
 
 defaultproviderregistry = registerproviderfactories(**_defaultproviderregistry)

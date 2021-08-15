@@ -8,7 +8,6 @@ from typing import Protocol
 import pytest
 from yarl import URL
 
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
@@ -73,10 +72,10 @@ def test_hgproviderfactory_happy(
 ) -> None:
     """It fetches a hg repository into storage."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = hgprovider(url, revision)
-    assert filesystem is not None
+    repository = hgprovider(url, revision)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == expected
 
 
@@ -84,5 +83,5 @@ def test_hgproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = hgprovider(url, None)
-    assert filesystem is None
+    repository = hgprovider(url, None)
+    assert repository is None
