@@ -82,7 +82,6 @@ def provide(
     raise RuntimeError(f"unknown location {location}")
 
 
-ProviderFactory = Callable[[Store, FetchMode], Provider]
 ProviderFactory2 = Callable[[Store, FetchMode], Provider2]
 
 
