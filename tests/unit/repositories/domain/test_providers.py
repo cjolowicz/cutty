@@ -36,7 +36,7 @@ def nullprovider(
     return None
 
 
-def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
+def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider2:
     """Provider that matches every URL with a filesystem."""
 
     def _dictprovider(
@@ -64,10 +64,10 @@ def test_provide_fail(providers: list[Provider2]) -> None:
 @pytest.mark.parametrize(
     "providers",
     [
-        [dictprovider2({})],
-        [dictprovider2({}), nullprovider],
-        [nullprovider, dictprovider2({})],
-        [dictprovider2({}), dictprovider2({"marker": ""})],
+        [dictprovider({})],
+        [dictprovider({}), nullprovider],
+        [nullprovider, dictprovider({})],
+        [dictprovider({}), dictprovider({"marker": ""})],
     ],
 )
 def test_provide_pass(providers: list[Provider2]) -> None:
@@ -227,7 +227,7 @@ def test_registerproviderfactories_add() -> None:
 def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
     providerfactory1 = constproviderfactory(nullprovider)
-    providerfactory2 = constproviderfactory(dictprovider2())
+    providerfactory2 = constproviderfactory(dictprovider())
 
     registry = registerproviderfactories()
     registry = registerproviderfactories(registry, default=providerfactory1)
