@@ -59,30 +59,28 @@ def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
     "providers",
     [
         [],
-        [nullprovider],
-        [nullprovider, nullprovider],
+        [nullprovider2],
+        [nullprovider2, nullprovider2],
     ],
 )
-def test_provide_fail(providers: list[Provider]) -> None:
+def test_provide_fail(providers: list[Provider2]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
-        providers2 = (asprovider2(provider) for provider in providers)
-        provide(providers2, URL(), None)
+        provide(providers, URL(), None)
 
 
 @pytest.mark.parametrize(
     "providers",
     [
-        [dictprovider({})],
-        [dictprovider({}), nullprovider],
-        [nullprovider, dictprovider({})],
-        [dictprovider({}), dictprovider({"marker": ""})],
+        [dictprovider2({})],
+        [dictprovider2({}), nullprovider2],
+        [nullprovider2, dictprovider2({})],
+        [dictprovider2({}), dictprovider2({"marker": ""})],
     ],
 )
-def test_provide_pass(providers: list[Provider]) -> None:
+def test_provide_pass(providers: list[Provider2]) -> None:
     """It returns a path to the filesystem."""
-    providers2 = (asprovider2(provider) for provider in providers)
-    repository = provide(providers2, URL(), None)
+    repository = provide(providers, URL(), None)
     assert repository.path.is_dir()
     assert not (repository.path / "marker").is_file()
 
