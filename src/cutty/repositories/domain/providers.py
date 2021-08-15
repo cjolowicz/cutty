@@ -55,10 +55,10 @@ FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesyste
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def asprovider2(provider: FilesystemProvider) -> Provider:
+def asprovider(provider: FilesystemProvider) -> Provider:
     """Convert FilesystemProvider to Provider."""
 
-    def _provider2(
+    def _provider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
         filesystem = provider(location, revision)
@@ -67,7 +67,7 @@ def asprovider2(provider: FilesystemProvider) -> Provider:
             return Repository(location.name, path, revision)
         return None
 
-    return _provider2
+    return _provider
 
 
 def provide(
@@ -98,7 +98,7 @@ def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
         else:
             return mount(path, revision) if match(path) else None
 
-    return asprovider2(_localprovider)
+    return asprovider(_localprovider)
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
@@ -128,7 +128,7 @@ def remoteproviderfactory(
 
             return None
 
-        return asprovider2(_remoteprovider)
+        return asprovider(_remoteprovider)
 
     return _remoteproviderfactory
 

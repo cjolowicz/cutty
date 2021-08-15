@@ -15,7 +15,7 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
-from cutty.repositories.domain.providers import asprovider2
+from cutty.repositories.domain.providers import asprovider
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
@@ -44,7 +44,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     ) -> Optional[Filesystem]:
         return DictFilesystem(mapping or {})
 
-    return asprovider2(_dictprovider)
+    return asprovider(_dictprovider)
 
 
 @pytest.mark.parametrize(
