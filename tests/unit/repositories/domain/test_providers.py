@@ -35,6 +35,9 @@ def nullprovider(
     return None
 
 
+nullprovider2 = asprovider2(nullprovider)
+
+
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
@@ -217,7 +220,7 @@ def test_registerproviderfactories_empty() -> None:
 
 def test_registerproviderfactories_add() -> None:
     """It adds entries."""
-    providerfactory = constproviderfactory(asprovider2(nullprovider))
+    providerfactory = constproviderfactory(nullprovider2)
 
     registry = registerproviderfactories()
     registry = registerproviderfactories(registry, default=providerfactory)
@@ -227,7 +230,7 @@ def test_registerproviderfactories_add() -> None:
 
 def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
-    providerfactory1 = constproviderfactory(asprovider2(nullprovider))
+    providerfactory1 = constproviderfactory(nullprovider2)
     providerfactory2 = constproviderfactory(asprovider2(dictprovider()))
 
     registry = registerproviderfactories()
@@ -287,7 +290,7 @@ def test_repositoryprovider_with_provider_specific_url(
     url = url.with_scheme(f"null+{url.scheme}")
     registry = registerproviderfactories(
         default=remoteproviderfactory(fetch=[fetcher]),
-        null=constproviderfactory(asprovider2(nullprovider)),
+        null=constproviderfactory(nullprovider2),
     )
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
