@@ -10,7 +10,6 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
@@ -23,7 +22,6 @@ from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
-from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import remoteproviderfactory2
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
@@ -124,7 +122,7 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
-    providerfactory = remoteproviderfactory(fetch=[])
+    providerfactory = remoteproviderfactory2(fetch=[])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -138,7 +136,7 @@ def nullfetcher(
 
 def test_remoteproviderfactory_no_matching_fetchers(store: Store) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = remoteproviderfactory(fetch=[nullfetcher])
+    providerfactory = remoteproviderfactory2(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -164,11 +162,11 @@ def fetcher() -> Fetcher:
 
 def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -> None:
     """It mounts a filesystem for the fetched repository."""
-    providerfactory = remoteproviderfactory(fetch=[fetcher])
+    providerfactory = remoteproviderfactory2(fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    filesystem = provider(url, None)
+    repository = provider(url, None)
 
-    assert filesystem is not None
+    assert repository is not None
 
 
 def nullmatcher(url: URL) -> bool:
@@ -180,7 +178,7 @@ def test_remoteproviderfactory_not_matching(
     store: Store, fetcher: Fetcher, url: URL
 ) -> None:
     """It returns None if the provider itself does not match."""
-    providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[fetcher])
+    providerfactory = remoteproviderfactory2(match=nullmatcher, fetch=[fetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(url, None) is None
 
@@ -204,12 +202,12 @@ def test_remoteproviderfactory_mounter(
     assert path is not None  # for type narrowing
     path.write_text(text)
 
-    providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
+    providerfactory = remoteproviderfactory2(fetch=[fetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
-    filesystem = provider(url, revision)
+    repository = provider(url, revision)
 
-    assert filesystem is not None
-    assert filesystem.read_text(PurePath("marker")) == "Lorem"
+    assert repository is not None
+    assert (repository.path / "marker").read_text() == "Lorem"
 
 
 def test_registerproviderfactories_empty() -> None:
