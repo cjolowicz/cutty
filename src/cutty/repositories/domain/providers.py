@@ -172,6 +172,7 @@ def registerproviderfactory(
 
 def registerproviderfactories(
     providerregistry: ProviderRegistry = _emptyproviderregistry,
+    /,
     **providerfactories: ProviderFactory,
 ) -> ProviderRegistry:
     """Register provider factories."""
