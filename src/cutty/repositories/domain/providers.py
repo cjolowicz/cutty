@@ -82,7 +82,7 @@ def provide(
     raise RuntimeError(f"unknown location {location}")
 
 
-ProviderFactory2 = Callable[[Store, FetchMode], Provider2]
+ProviderFactory = Callable[[Store, FetchMode], Provider2]
 
 
 def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider2:
@@ -110,7 +110,7 @@ def remoteproviderfactory(
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],
     mount: Optional[Mounter] = None,
-) -> ProviderFactory2:
+) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
     fetch = tuple(fetch)
     _mount = mount if mount is not None else _defaultmount
@@ -135,7 +135,7 @@ def remoteproviderfactory(
 
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
-ProviderRegistry = Mapping[ProviderName, ProviderFactory2]
+ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 
 
 _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
@@ -144,13 +144,13 @@ _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 def registerproviderfactories(
     providerregistry: ProviderRegistry = _emptyproviderregistry,
     /,
-    **providerfactories: ProviderFactory2,
+    **providerfactories: ProviderFactory,
 ) -> ProviderRegistry:
     """Register provider factories."""
     return {**providerregistry, **providerfactories}
 
 
-def constproviderfactory(provider: Provider2) -> ProviderFactory2:
+def constproviderfactory(provider: Provider2) -> ProviderFactory:
     """Create a provider factory that returns the given provider."""
 
     def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:
@@ -161,7 +161,7 @@ def constproviderfactory(provider: Provider2) -> ProviderFactory2:
 
 def _createprovider(
     providername: ProviderName,
-    providerfactory: ProviderFactory2,
+    providerfactory: ProviderFactory,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
 ) -> Provider2:
