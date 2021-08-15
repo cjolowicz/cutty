@@ -190,6 +190,15 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
     return _providerfactory
 
 
+def constproviderfactory2(provider: Provider) -> ProviderFactory2:
+    """Create a provider factory that returns the given provider."""
+
+    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:
+        return asprovider2(provider)
+
+    return _providerfactory
+
+
 def _createprovider(
     providername: ProviderName,
     providerfactory: ProviderFactory2,
