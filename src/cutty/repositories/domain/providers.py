@@ -86,16 +86,6 @@ ProviderFactory = Callable[[Store, FetchMode], Provider]
 ProviderFactory2 = Callable[[Store, FetchMode], Provider2]
 
 
-def asproviderfactory2(providerfactory: ProviderFactory) -> ProviderFactory2:
-    """Convert ProviderFactory to ProviderFactory2."""
-
-    def _providerfactory2(store: Store, fetchmode: FetchMode) -> Provider2:
-        provider = providerfactory(store, fetchmode)
-        return asprovider2(provider)
-
-    return _providerfactory2
-
-
 def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider2:
     """Create a view onto the local filesystem."""
 
@@ -126,7 +116,7 @@ def remoteproviderfactory(
     fetch = tuple(fetch)
     _mount = mount if mount is not None else _defaultmount
 
-    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
+    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider2:
         def _remoteprovider(
             location: Location, revision: Optional[Revision]
         ) -> Optional[Filesystem]:
@@ -139,9 +129,9 @@ def remoteproviderfactory(
 
             return None
 
-        return _remoteprovider
+        return asprovider2(_remoteprovider)
 
-    return asproviderfactory2(_remoteproviderfactory)
+    return _remoteproviderfactory
 
 
 ProviderName = str
