@@ -19,7 +19,6 @@ from cutty.repositories.domain.providers import asprovider2
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
-from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import Provider2
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
@@ -37,7 +36,7 @@ def nullprovider(
     return None
 
 
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
+def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
     """Provider that matches every URL with a filesystem."""
 
     def _dictprovider(
@@ -45,12 +44,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     ) -> Optional[Filesystem]:
         return DictFilesystem(mapping or {})
 
-    return _dictprovider
-
-
-def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
-    """Provider that matches every URL with a filesystem."""
-    return asprovider2(dictprovider(mapping))
+    return asprovider2(_dictprovider)
 
 
 @pytest.mark.parametrize(
