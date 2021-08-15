@@ -15,7 +15,6 @@ from typing import Optional
 from yarl import URL
 
 from cutty.repositories.adapters.registry import defaultproviderregistry
-from cutty.repositories.domain.providers import asproviderregistry2
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import RepositoryProvider
@@ -156,6 +155,6 @@ def getdefaultrepositoryprovider(
 ) -> RepositoryProvider:
     """Return a repository provider."""
     return repositoryprovider(
-        asproviderregistry2(defaultproviderregistry),
+        defaultproviderregistry,
         getdefaultproviderstore(path, timer=timer),
     )
