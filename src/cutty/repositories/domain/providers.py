@@ -251,6 +251,13 @@ def repositoryprovider(
     providerregistry: ProviderRegistry, providerstore: ProviderStore
 ) -> RepositoryProvider:
     """Return a repository provider."""
+    return repositoryprovider2(asproviderregistry2(providerregistry), providerstore)
+
+
+def repositoryprovider2(
+    providerregistry: ProviderRegistry2, providerstore: ProviderStore
+) -> RepositoryProvider:
+    """Return a repository provider."""
 
     def _provide(
         location: str,
@@ -261,10 +268,7 @@ def repositoryprovider(
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_)
         providers = _createproviders(
-            asproviderregistry2(providerregistry),
-            providerstore,
-            fetchmode,
-            providername,
+            providerregistry, providerstore, fetchmode, providername
         )
 
         repository = provide(providers, location_, revision)
