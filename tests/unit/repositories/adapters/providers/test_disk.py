@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.disk import diskprovider
 from cutty.repositories.domain.locations import asurl
 
@@ -20,10 +19,10 @@ def repository(tmp_path: Path) -> Path:
 def test_diskprovider_happy(repository: Path) -> None:
     """It provides a repository from a local directory."""
     url = asurl(repository)
-    filesystem = diskprovider(url, None)
-    assert filesystem is not None
+    repository2 = diskprovider(url, None)
+    assert repository2 is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository2.path / "marker").read_text()
     assert text == "Lorem"
 
 

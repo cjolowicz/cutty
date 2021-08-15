@@ -16,7 +16,7 @@ from cutty.repositories.domain.providers import registerproviderfactories2
 _defaultproviderregistry2 = {
     "localzip": factory(asprovider2(localzipprovider)),
     "localgit": factory(asprovider2(localgitprovider)),
-    "local": factory(asprovider2(diskprovider)),
+    "local": factory(diskprovider),
 }
 
 defaultproviderregistry = registerproviderfactories2(**_defaultproviderregistry2)
