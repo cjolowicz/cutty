@@ -167,7 +167,18 @@ def registerproviderfactories(
     **providerfactories: ProviderFactory,
 ) -> ProviderRegistry2:
     """Register provider factories."""
-    return {**providerregistry, **asproviderregistry2(providerfactories)}
+    return registerproviderfactories2(
+        providerregistry, **asproviderregistry2(providerfactories)
+    )
+
+
+def registerproviderfactories2(
+    providerregistry: ProviderRegistry2 = _emptyproviderregistry,
+    /,
+    **providerfactories: ProviderFactory2,
+) -> ProviderRegistry2:
+    """Register provider factories."""
+    return {**providerregistry, **providerfactories}
 
 
 def constproviderfactory(provider: Provider) -> ProviderFactory:
