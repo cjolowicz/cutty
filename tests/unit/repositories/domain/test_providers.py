@@ -17,12 +17,12 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import asprovider2
+from cutty.repositories.domain.providers import asproviderfactory2
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import registerproviderfactories2
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
@@ -256,7 +256,7 @@ def test_repositoryprovider_with_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = registerproviderfactories(default=providerfactory)
+    registry = registerproviderfactories2(default=asproviderfactory2(providerfactory))
     provider = repositoryprovider(registry, providerstore)
     repository = provider(str(url))
     assert not list(repository.path.iterdir())
@@ -287,11 +287,8 @@ def test_repositoryprovider_with_provider_specific_url(
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
-    registry = registerproviderfactories(
-        default=remoteproviderfactory(fetch=[fetcher]),
-    )
     registry = registerproviderfactories2(
-        registry,
+        default=asproviderfactory2(remoteproviderfactory(fetch=[fetcher])),
         null=constproviderfactory(asprovider2(nullprovider)),
     )
     provider = repositoryprovider(registry, providerstore)
@@ -304,7 +301,7 @@ def test_repositoryprovider_name_from_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = registerproviderfactories(default=providerfactory)
+    registry = registerproviderfactories2(default=asproviderfactory2(providerfactory))
     provider = repositoryprovider(registry, providerstore)
     repository = provider("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name
