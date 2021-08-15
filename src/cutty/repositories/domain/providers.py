@@ -144,6 +144,17 @@ def remoteproviderfactory(
     return _remoteproviderfactory
 
 
+def remoteproviderfactory2(
+    *,
+    match: Optional[Matcher] = None,
+    fetch: Iterable[Fetcher],
+    mount: Optional[Mounter] = None,
+) -> ProviderFactory2:
+    """Remote providers fetch the repository into local storage first."""
+    providerfactory = remoteproviderfactory(match=match, fetch=fetch, mount=mount)
+    return asproviderfactory2(providerfactory)
+
+
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
 ProviderRegistry2 = Mapping[ProviderName, ProviderFactory2]
