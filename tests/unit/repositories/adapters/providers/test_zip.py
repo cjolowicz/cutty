@@ -28,10 +28,10 @@ def url(tmp_path: Path) -> URL:
 
 def test_localzipprovider_happy(url: URL) -> None:
     """It provides a repository from a local directory."""
-    filesystem = localzipprovider(url, None)
-    assert filesystem is not None
+    repository = localzipprovider(url, None)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == "Lorem"
 
 
@@ -44,8 +44,8 @@ def test_localzipprovider_revision(url: URL) -> None:
 def test_localzipprovider_not_matching(tmp_path: Path) -> None:
     """It returns None if the path is not a zip repository."""
     url = asurl(tmp_path)
-    filesystem = localzipprovider(url, None)
-    assert filesystem is None
+    repository = localzipprovider(url, None)
+    assert repository is None
 
 
 def test_zipproviderfactory_happy(store: Store, url: URL) -> None:
