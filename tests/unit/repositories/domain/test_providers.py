@@ -20,6 +20,7 @@ from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
+from cutty.repositories.domain.providers import Provider2
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import remoteproviderfactory
@@ -47,6 +48,11 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
         return DictFilesystem(mapping or {})
 
     return _dictprovider
+
+
+def dictprovider2(mapping: Optional[dict[str, Any]] = None) -> Provider2:
+    """Provider that matches every URL with a filesystem."""
+    return asprovider2(dictprovider(mapping))
 
 
 @pytest.mark.parametrize(
@@ -231,7 +237,7 @@ def test_registerproviderfactories_add() -> None:
 def test_registerproviderfactories_override(store: Store) -> None:
     """It overrides existing entries."""
     providerfactory1 = constproviderfactory(nullprovider2)
-    providerfactory2 = constproviderfactory(asprovider2(dictprovider()))
+    providerfactory2 = constproviderfactory(dictprovider2())
 
     registry = registerproviderfactories()
     registry = registerproviderfactories(registry, default=providerfactory1)
