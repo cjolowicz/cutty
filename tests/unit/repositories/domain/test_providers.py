@@ -24,19 +24,17 @@ from cutty.repositories.domain.providers import Provider2
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerproviderfactories
 from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import Repository
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-def nullprovider(
+def nullprovider2(
     location: Location, revision: Optional[Revision]
-) -> Optional[Filesystem]:
+) -> Optional[Repository]:
     """Provider that matches no location."""
     return None
-
-
-nullprovider2 = asprovider2(nullprovider)
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
