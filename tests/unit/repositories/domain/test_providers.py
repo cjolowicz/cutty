@@ -23,9 +23,7 @@ from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import registerprovider
 from cutty.repositories.domain.providers import registerproviderfactories
-from cutty.repositories.domain.providers import registerproviders
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
@@ -245,35 +243,6 @@ def test_registerproviderfactories_override(store: Store) -> None:
     assert provider(URL(), None) is not None
 
 
-def test_registerproviders_empty() -> None:
-    """It creates an empty registry."""
-    assert not registerproviders()
-
-
-def test_registerproviders_add() -> None:
-    """It adds entries."""
-    registry = registerproviders()
-    registry = registerprovider(registry, "default", nullprovider)
-
-    assert "default" in registry
-
-
-def test_registerproviders_override(store: Store) -> None:
-    """It overrides existing entries."""
-    provider1 = nullprovider
-    provider2 = dictprovider()
-
-    registry = registerproviders()
-    registry = registerprovider(registry, "default", provider1)
-    registry = registerprovider(registry, "default", provider2)
-
-    providerfactory = registry["default"]
-    provider = providerfactory(store, FetchMode.ALWAYS)
-
-    # Check that it's provider2 (the nullprovider returns None).
-    assert provider(URL(), None) is not None
-
-
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
     registry = registerproviderfactories()
@@ -301,8 +270,10 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    registry = registerproviders(
-        default=localprovider(match=lambda path: True, mount=defaultmount)
+    registry = registerproviderfactories(
+        default=constproviderfactory(
+            localprovider(match=lambda path: True, mount=defaultmount)
+        )
     )
     provider = repositoryprovider(asproviderregistry2(registry), providerstore)
     repository = provider(str(directory))
