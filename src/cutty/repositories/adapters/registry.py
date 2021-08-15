@@ -17,7 +17,7 @@ _defaultproviderregistry = {
     "localgit": factory(localgitprovider),
     "local": factory(diskprovider),
     "zip": zipproviderfactory,
-    "git": asproviderfactory2(gitproviderfactory),
+    "git": gitproviderfactory,
 }
 
 if shutil.which("hg") is not None:  # pragma: no cover

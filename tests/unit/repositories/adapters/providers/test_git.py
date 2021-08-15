@@ -6,7 +6,6 @@ import pygit2
 import pytest
 from yarl import URL
 
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.providers.git import gitproviderfactory
 from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.domain.fetchers import FetchMode
@@ -57,10 +56,10 @@ def test_gitproviderfactory_happy(
 ) -> None:
     """It fetches a git repository into storage."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = gitprovider(url, revision)
-    assert filesystem is not None
+    repository = gitprovider(url, revision)
+    assert repository is not None
 
-    text = filesystem.read_text(PurePath("marker"))
+    text = (repository.path / "marker").read_text()
     assert text == expected
 
 
@@ -68,5 +67,5 @@ def test_gitproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    filesystem = gitprovider(url, None)
-    assert filesystem is None
+    repository = gitprovider(url, None)
+    assert repository is None
