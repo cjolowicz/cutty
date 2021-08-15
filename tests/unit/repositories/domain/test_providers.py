@@ -25,7 +25,6 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import registerprovider
 from cutty.repositories.domain.providers import registerproviderfactories
-from cutty.repositories.domain.providers import registerproviderfactory
 from cutty.repositories.domain.providers import registerproviders
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import repositoryprovider
@@ -225,7 +224,7 @@ def test_registerproviderfactories_add() -> None:
     providerfactory = constproviderfactory(nullprovider)
 
     registry = registerproviderfactories()
-    registry = registerproviderfactory(registry, "default", providerfactory)
+    registry = registerproviderfactories(registry, default=providerfactory)
 
     assert "default" in registry
 
@@ -236,8 +235,8 @@ def test_registerproviderfactories_override(store: Store) -> None:
     providerfactory2 = constproviderfactory(dictprovider())
 
     registry = registerproviderfactories()
-    registry = registerproviderfactory(registry, "default", providerfactory1)
-    registry = registerproviderfactory(registry, "default", providerfactory2)
+    registry = registerproviderfactories(registry, default=providerfactory1)
+    registry = registerproviderfactories(registry, default=providerfactory2)
 
     providerfactory = registry["default"]
     provider = providerfactory(store, FetchMode.ALWAYS)
