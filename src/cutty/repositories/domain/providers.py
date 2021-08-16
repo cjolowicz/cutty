@@ -94,14 +94,15 @@ def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
         try:
             path_ = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
-            filesystem = None
-        else:
-            filesystem = mount(path_, revision) if match(path_) else None
+            return None
 
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
+        if not match(path_):
+            return None
+
+        filesystem = mount(path_, revision)
+        path = Path(filesystem=filesystem)
+
+        return Repository(location.name, path, revision)
 
     return _provider
 
