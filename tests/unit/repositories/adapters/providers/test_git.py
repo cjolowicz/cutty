@@ -50,6 +50,13 @@ def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
     assert repository is None
 
 
+def test_localgitprovider_revision_tag(url: URL) -> None:
+    """It returns the tag name."""
+    repository = localgitprovider(url, "HEAD^")
+    assert repository is not None
+    assert repository.revision == "v1.0"
+
+
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_gitproviderfactory_happy(
     store: Store, url: URL, revision: Optional[str], expected: str
