@@ -83,9 +83,12 @@ def provide(
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
+GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
-def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
+def localprovider(
+    *, match: PathMatcher, mount: Mounter, getrevision: Optional[GetRevision] = None
+) -> Provider:
     """Create a view onto the local filesystem."""
 
     def _provider(
