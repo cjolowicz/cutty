@@ -90,4 +90,4 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
 
     repository = Repository.open(Path("example"))
 
-    assert str(revision) in repository.head.commit.message
+    assert str(revision)[:7] in repository.head.commit.message
