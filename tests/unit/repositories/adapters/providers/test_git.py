@@ -1,5 +1,6 @@
 """Unit tests for cutty.repositories.adapters.providers.git."""
 import pathlib
+import string
 from typing import Optional
 
 import pygit2
@@ -55,6 +56,15 @@ def test_localgitprovider_revision_tag(url: URL) -> None:
     repository = localgitprovider(url, "HEAD^")
     assert repository is not None
     assert repository.revision == "v1.0"
+
+
+def test_localgitprovider_revision_commit(url: URL) -> None:
+    """It returns seven or more hexadecimal digits."""
+    repository = localgitprovider(url, None)
+    assert repository is not None
+    assert len(repository.revision) >= 7 and all(
+        c in string.hexdigits for c in repository.revision
+    )
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
