@@ -98,7 +98,16 @@ def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
         else:
             return mount(path, revision) if match(path) else None
 
-    return asprovider(_localprovider)
+    def _provider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        filesystem = _localprovider(location, revision)
+        if filesystem is not None:
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
+        return None
+
+    return _provider
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
