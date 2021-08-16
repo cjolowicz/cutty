@@ -105,6 +105,9 @@ def localprovider(
         filesystem = mount(path_, revision)
         path = Path(filesystem=filesystem)
 
+        if getrevision is not None:
+            revision = getrevision(path_, revision)
+
         return Repository(location.name, path, revision)
 
     return _provider
