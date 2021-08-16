@@ -119,6 +119,29 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
         provider(url, "v1.0.0")
 
 
+def test_localprovider_repository_revision(tmp_path: pathlib.Path) -> None:
+    """It determines the revision of the repository."""
+
+    def getrevision(
+        path: pathlib.Path, revision: Optional[Revision]
+    ) -> Optional[Revision]:
+        """Return the contents of the VERSION file."""
+        return (path / "VERSION").read_text().strip()
+
+    provider = localprovider(
+        match=lambda _: True, mount=defaultmount, getrevision=getrevision
+    )
+
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "VERSION").write_text("1.0")
+
+    repository = provider(asurl(path), None)
+
+    assert repository is not None
+    assert "1.0" == repository.revision
+
+
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = remoteproviderfactory(fetch=[])
