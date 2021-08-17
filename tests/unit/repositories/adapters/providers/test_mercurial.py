@@ -67,6 +67,11 @@ def test_hgproviderfactory_happy(
     assert text == expected
 
 
+def is_mercurial_shorthash(revision: str) -> bool:
+    """Return True if the text is a short changeset identification hash."""
+    return len(revision) == 12 and all(c in string.hexdigits for c in revision)
+
+
 def test_hgproviderfactory_revision_commit(
     store: Store, hgrepository: pathlib.Path
 ) -> None:
@@ -76,8 +81,7 @@ def test_hgproviderfactory_revision_commit(
     assert (
         repository is not None
         and repository.revision is not None
-        and len(repository.revision) == 12
-        and all(c in string.hexdigits for c in repository.revision)
+        and is_mercurial_shorthash(repository.revision)
     )
 
 
@@ -107,8 +111,7 @@ def test_hgproviderfactory_revision_no_tags(
     assert (
         repository is not None
         and repository.revision is not None
-        and len(repository.revision) == 12
-        and all(c in string.hexdigits for c in repository.revision)
+        and is_mercurial_shorthash(repository.revision)
     )
 
 
