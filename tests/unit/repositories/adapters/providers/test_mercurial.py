@@ -121,6 +121,25 @@ def test_hgproviderfactory_revision_no_tags(
     )
 
 
+def test_hgproviderfactory_revision_multiple_tags(
+    store: Store, hg: Hg, tmp_path: pathlib.Path
+) -> None:
+    """It returns the tag names separated by colon."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").touch()
+
+    hg("init", cwd=path)
+    hg("add", "marker", cwd=path)
+    hg("commit", "--message=Initial", cwd=path)
+    hg("tag", "--rev=0", "tag1", cwd=path)
+    hg("tag", "--rev=0", "tag2", cwd=path)
+
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(asurl(path), "tip~2")
+    assert repository is not None and repository.revision == "tag1:tag2"
+
+
 def test_hgproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
