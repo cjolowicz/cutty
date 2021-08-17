@@ -17,7 +17,6 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
-from cutty.repositories.domain.providers import FilesystemProvider
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
@@ -37,21 +36,6 @@ def nullprovider(
     return None
 
 
-def asprovider(provider: FilesystemProvider) -> Provider:
-    """Convert FilesystemProvider to Provider."""
-
-    def _provider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        filesystem = provider(location, revision)
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
-
-    return _provider
-
-
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
@@ -60,7 +44,16 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     ) -> Optional[Filesystem]:
         return DictFilesystem(mapping or {})
 
-    return asprovider(_dictprovider)
+    def _provider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        filesystem = _dictprovider(location, revision)
+        if filesystem is not None:
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
+        return None
+
+    return _provider
 
 
 @pytest.mark.parametrize(
