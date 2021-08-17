@@ -141,15 +141,6 @@ ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 
 
-def registerproviderfactories(
-    providerregistry: ProviderRegistry = _emptyproviderregistry,
-    /,
-    **providerfactories: ProviderFactory,
-) -> ProviderRegistry:
-    """Register provider factories."""
-    return {**providerregistry, **providerfactories}
-
-
 def constproviderfactory(provider: Provider) -> ProviderFactory:
     """Create a provider factory that returns the given provider."""
 
