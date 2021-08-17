@@ -1,50 +1,38 @@
 """Unit tests for cutty.repositories.adapters.providers.mercurial."""
 import pathlib
-import shutil
+import string
 import subprocess  # noqa: S404
 from typing import Optional
-from typing import Protocol
 
 import pytest
 from yarl import URL
 
+from cutty.repositories.adapters.fetchers.mercurial import findhg
+from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
-from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 
 
-class Hg(Protocol):
-    """Protocol for the hg command."""
-
-    def __call__(
-        self, *args: str, cwd: Optional[pathlib.Path] = None
-    ) -> subprocess.CompletedProcess[str]:
-        """Invoke hg."""
-
-
 @pytest.fixture
-def hg() -> Optional[Hg]:
+def hg() -> Hg:
     """Fixture for a hg command."""
-    executable = shutil.which("hg")
+    hg = findhg()
 
-    def hg(
+    def _hg(
         *args: str, cwd: Optional[pathlib.Path] = None
     ) -> subprocess.CompletedProcess[str]:
-        """Run a hg command."""
-        if executable is None:
+        try:
+            return hg(*args, cwd=cwd)
+        except RuntimeError:
             pytest.skip("cannot locate hg")
 
-        return subprocess.run(  # noqa: S603
-            [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
-        )
-
-    return hg
+    return _hg
 
 
 @pytest.fixture
-def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
-    """Fixture for a repository."""
+def hgrepository(hg: Hg, tmp_path: pathlib.Path) -> pathlib.Path:
+    """Fixture for a Mercurial repository."""
     path = tmp_path / "repository"
     path.mkdir()
 
@@ -63,20 +51,87 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
     hg("add", "marker", cwd=path)
     hg("commit", "--message=Update marker", cwd=path)
 
-    return asurl(path)
+    return path
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_hgproviderfactory_happy(
-    store: Store, url: URL, revision: Optional[str], expected: str
+    store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a hg repository into storage."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(url, revision)
+    repository = hgprovider(hgrepository, revision)
     assert repository is not None
 
     text = (repository.path / "marker").read_text()
     assert text == expected
+
+
+def is_mercurial_shorthash(revision: str) -> bool:
+    """Return True if the text is a short changeset identification hash."""
+    return len(revision) == 12 and all(c in string.hexdigits for c in revision)
+
+
+def test_hgproviderfactory_revision_commit(
+    store: Store, hgrepository: pathlib.Path
+) -> None:
+    """It returns the short changeset identification hash."""
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(hgrepository, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and is_mercurial_shorthash(repository.revision)
+    )
+
+
+def test_hgproviderfactory_revision_tag(
+    store: Store, hgrepository: pathlib.Path
+) -> None:
+    """It returns the tag name."""
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(hgrepository, "tip~2")
+    assert repository is not None and repository.revision == "v1.0"
+
+
+def test_hgproviderfactory_revision_no_tags(
+    store: Store, hg: Hg, tmp_path: pathlib.Path
+) -> None:
+    """It returns the changeset hash in a repository without tags."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").touch()
+
+    hg("init", cwd=path)
+    hg("add", "marker", cwd=path)
+    hg("commit", "--message=Initial", cwd=path)
+
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(path, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and is_mercurial_shorthash(repository.revision)
+    )
+
+
+def test_hgproviderfactory_revision_multiple_tags(
+    store: Store, hg: Hg, tmp_path: pathlib.Path
+) -> None:
+    """It returns the tag names separated by colon."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").touch()
+
+    hg("init", cwd=path)
+    hg("add", "marker", cwd=path)
+    hg("commit", "--message=Initial", cwd=path)
+    hg("tag", "--rev=0", "tag1", cwd=path)
+    hg("tag", "--rev=0", "tag2", cwd=path)
+
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(path, "tip~2")
+    assert repository is not None and repository.revision == "tag1:tag2"
 
 
 def test_hgproviderfactory_not_matching(store: Store) -> None:
