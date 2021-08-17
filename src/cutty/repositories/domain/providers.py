@@ -51,7 +51,6 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
