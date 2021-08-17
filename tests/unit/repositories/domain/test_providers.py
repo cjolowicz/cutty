@@ -10,13 +10,14 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
-from cutty.repositories.domain.providers import asprovider
 from cutty.repositories.domain.providers import constproviderfactory
+from cutty.repositories.domain.providers import FilesystemProvider
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
@@ -34,6 +35,21 @@ def nullprovider(
 ) -> Optional[Repository]:
     """Provider that matches no location."""
     return None
+
+
+def asprovider(provider: FilesystemProvider) -> Provider:
+    """Convert FilesystemProvider to Provider."""
+
+    def _provider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        filesystem = provider(location, revision)
+        if filesystem is not None:
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
+        return None
+
+    return _provider
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:

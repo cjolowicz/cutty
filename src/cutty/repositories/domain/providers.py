@@ -55,21 +55,6 @@ FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesyste
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def asprovider(provider: FilesystemProvider) -> Provider:
-    """Convert FilesystemProvider to Provider."""
-
-    def _provider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        filesystem = provider(location, revision)
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
-
-    return _provider
-
-
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Repository:
