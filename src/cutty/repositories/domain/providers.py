@@ -130,26 +130,19 @@ def remoteproviderfactory(
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         def _remoteprovider(
             location: Location, revision: Optional[Revision]
-        ) -> Optional[Filesystem]:
+        ) -> Optional[Repository]:
             url = location if isinstance(location, URL) else asurl(location)
             if match is None or match(url):
                 for fetcher in fetch:
                     path = fetcher(url, store, revision, fetchmode)
                     if path is not None:
-                        return _mount(path, revision)
+                        filesystem = _mount(path, revision)
+                        path_ = Path(filesystem=filesystem)
+                        return Repository(location.name, path_, revision)
 
             return None
 
-        def _provider(
-            location: Location, revision: Optional[Revision]
-        ) -> Optional[Repository]:
-            filesystem = _remoteprovider(location, revision)
-            if filesystem is not None:
-                path = Path(filesystem=filesystem)
-                return Repository(location.name, path, revision)
-            return None
-
-        return _provider
+        return _remoteprovider
 
     return _remoteproviderfactory
 
