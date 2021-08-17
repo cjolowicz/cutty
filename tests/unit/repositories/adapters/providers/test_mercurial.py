@@ -99,6 +99,28 @@ def test_hgproviderfactory_revision_tag(store: Store, url: URL) -> None:
     assert repository is not None and repository.revision == "v1.0"
 
 
+def test_hgproviderfactory_revision_no_tags(
+    store: Store, hg: Hg, tmp_path: pathlib.Path
+) -> None:
+    """It returns the changeset hash in a repository without tags."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").touch()
+
+    hg("init", cwd=path)
+    hg("add", "marker", cwd=path)
+    hg("commit", "--message=Initial", cwd=path)
+
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(asurl(path), None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) == 12
+        and all(c in string.hexdigits for c in repository.revision)
+    )
+
+
 def test_hgproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
