@@ -122,6 +122,7 @@ def remoteproviderfactory(
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],
     mount: Optional[Mounter] = None,
+    getrevision: Optional[GetRevision] = None,
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
     fetch = tuple(fetch)
