@@ -139,6 +139,10 @@ def remoteproviderfactory(
                     if path is not None:
                         filesystem = _mount(path, revision)
                         path_ = Path(filesystem=filesystem)
+
+                        if getrevision is not None:
+                            revision = getrevision(path, revision)
+
                         return Repository(location.name, path_, revision)
 
             return None
