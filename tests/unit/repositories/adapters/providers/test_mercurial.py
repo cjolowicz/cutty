@@ -84,7 +84,7 @@ def test_hgproviderfactory_revision_commit(
 def test_hgproviderfactory_revision_tag(
     store: Store, hgrepository: pathlib.Path
 ) -> None:
-    """It returns the short changeset identification hash."""
+    """It returns the tag name."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
     repository = hgprovider(hgrepository, "tip~2")
     assert repository is not None and repository.revision == "v1.0"
