@@ -140,7 +140,16 @@ def remoteproviderfactory(
 
             return None
 
-        return asprovider(_remoteprovider)
+        def _provider(
+            location: Location, revision: Optional[Revision]
+        ) -> Optional[Repository]:
+            filesystem = _remoteprovider(location, revision)
+            if filesystem is not None:
+                path = Path(filesystem=filesystem)
+                return Repository(location.name, path, revision)
+            return None
+
+        return _provider
 
     return _remoteproviderfactory
 
