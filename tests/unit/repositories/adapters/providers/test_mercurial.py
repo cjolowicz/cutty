@@ -11,7 +11,6 @@ from cutty.repositories.adapters.fetchers.mercurial import findhg
 from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
-from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 
 
@@ -32,8 +31,8 @@ def hg() -> Hg:
 
 
 @pytest.fixture
-def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
-    """Fixture for a repository."""
+def hgrepository(hg: Hg, tmp_path: pathlib.Path) -> pathlib.Path:
+    """Fixture for a Mercurial repository."""
     path = tmp_path / "repository"
     path.mkdir()
 
@@ -52,26 +51,28 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
     hg("add", "marker", cwd=path)
     hg("commit", "--message=Update marker", cwd=path)
 
-    return asurl(path)
+    return path
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_hgproviderfactory_happy(
-    store: Store, url: URL, revision: Optional[str], expected: str
+    store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a hg repository into storage."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(url, revision)
+    repository = hgprovider(hgrepository, revision)
     assert repository is not None
 
     text = (repository.path / "marker").read_text()
     assert text == expected
 
 
-def test_hgproviderfactory_revision_commit(store: Store, url: URL) -> None:
+def test_hgproviderfactory_revision_commit(
+    store: Store, hgrepository: pathlib.Path
+) -> None:
     """It returns the short changeset identification hash."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(url, None)
+    repository = hgprovider(hgrepository, None)
     assert (
         repository is not None
         and repository.revision is not None
@@ -80,10 +81,12 @@ def test_hgproviderfactory_revision_commit(store: Store, url: URL) -> None:
     )
 
 
-def test_hgproviderfactory_revision_tag(store: Store, url: URL) -> None:
+def test_hgproviderfactory_revision_tag(
+    store: Store, hgrepository: pathlib.Path
+) -> None:
     """It returns the short changeset identification hash."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(url, "tip~2")
+    repository = hgprovider(hgrepository, "tip~2")
     assert repository is not None and repository.revision == "v1.0"
 
 
@@ -100,7 +103,7 @@ def test_hgproviderfactory_revision_no_tags(
     hg("commit", "--message=Initial", cwd=path)
 
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(asurl(path), None)
+    repository = hgprovider(path, None)
     assert (
         repository is not None
         and repository.revision is not None
@@ -124,7 +127,7 @@ def test_hgproviderfactory_revision_multiple_tags(
     hg("tag", "--rev=0", "tag2", cwd=path)
 
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(asurl(path), "tip~2")
+    repository = hgprovider(path, "tip~2")
     assert repository is not None and repository.revision == "tag1:tag2"
 
 
