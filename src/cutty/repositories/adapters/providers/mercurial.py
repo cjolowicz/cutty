@@ -25,7 +25,11 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     if revision is None:
         revision = "."
 
-    result = hg("log", f"--rev={revision}", "--template={node|short}")
+    result = hg(
+        "log",
+        f"--rev={revision}",
+        "--template={ifeq(latesttagdistance, 0, latesttag, short(node))}",
+    )
     return result.stdout
 
 
