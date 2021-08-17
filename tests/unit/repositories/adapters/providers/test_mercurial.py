@@ -1,6 +1,7 @@
 """Unit tests for cutty.repositories.adapters.providers.mercurial."""
 import pathlib
 import shutil
+import string
 import subprocess  # noqa: S404
 from typing import Optional
 from typing import Protocol
@@ -77,6 +78,18 @@ def test_hgproviderfactory_happy(
 
     text = (repository.path / "marker").read_text()
     assert text == expected
+
+
+def test_hgproviderfactory_revision_commit(store: Store, url: URL) -> None:
+    """It returns the short changeset identification hash."""
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(url, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) == 12
+        and all(c in string.hexdigits for c in repository.revision)
+    )
 
 
 def test_hgproviderfactory_not_matching(store: Store) -> None:
