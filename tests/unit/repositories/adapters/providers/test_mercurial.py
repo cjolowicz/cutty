@@ -92,6 +92,13 @@ def test_hgproviderfactory_revision_commit(store: Store, url: URL) -> None:
     )
 
 
+def test_hgproviderfactory_revision_tag(store: Store, url: URL) -> None:
+    """It returns the short changeset identification hash."""
+    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    repository = hgprovider(url, "tip~2")
+    assert repository is not None and repository.revision == "v1.0"
+
+
 def test_hgproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
