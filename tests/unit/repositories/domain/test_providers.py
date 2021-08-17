@@ -191,6 +191,24 @@ def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -
     assert repository is not None
 
 
+def test_remoteproviderfactory_repository_revision(
+    store: Store, fetcher: Fetcher, url: URL
+) -> None:
+    """It returns the repository revision."""
+
+    def getrevision(
+        path: pathlib.Path, revision: Optional[Revision]
+    ) -> Optional[Revision]:
+        """Return a fake version."""
+        return "v1.0"
+
+    providerfactory = remoteproviderfactory(fetch=[fetcher], getrevision=getrevision)
+    provider = providerfactory(store, FetchMode.ALWAYS)
+    repository = provider(url, None)
+
+    assert repository is not None and repository.revision == "v1.0"
+
+
 def nullmatcher(url: URL) -> bool:
     """Matcher that matches no URL."""
     return False
