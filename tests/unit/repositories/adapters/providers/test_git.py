@@ -61,9 +61,11 @@ def test_localgitprovider_revision_tag(url: URL) -> None:
 def test_localgitprovider_revision_commit(url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
     repository = localgitprovider(url, None)
-    assert repository is not None
-    assert len(repository.revision) >= 7 and all(
-        c in string.hexdigits for c in repository.revision
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) >= 7
+        and all(c in string.hexdigits for c in repository.revision)
     )
 
 
