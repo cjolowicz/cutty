@@ -55,4 +55,6 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
 
 localgitprovider = localprovider(match=match, mount=mount, getrevision=getrevision)
-gitproviderfactory = remoteproviderfactory(fetch=[gitfetcher], mount=mount)
+gitproviderfactory = remoteproviderfactory(
+    fetch=[gitfetcher], mount=mount, getrevision=getrevision
+)
