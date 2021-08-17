@@ -10,12 +10,12 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
+from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
-from cutty.repositories.domain.providers import asprovider
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import localprovider
 from cutty.repositories.domain.providers import provide
@@ -38,12 +38,16 @@ def nullprovider(
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
-    def _dictprovider(
+    def _provider(
         location: Location, revision: Optional[Revision]
-    ) -> Optional[Filesystem]:
-        return DictFilesystem(mapping or {})
+    ) -> Optional[Repository]:
+        filesystem = DictFilesystem(mapping or {})
+        if filesystem is not None:
+            path = Path(filesystem=filesystem)
+            return Repository(location.name, path, revision)
+        return None
 
-    return asprovider(_dictprovider)
+    return _provider
 
 
 @pytest.mark.parametrize(
@@ -118,6 +122,29 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
         provider(url, "v1.0.0")
 
 
+def test_localprovider_repository_revision(tmp_path: pathlib.Path) -> None:
+    """It determines the revision of the repository."""
+
+    def getrevision(
+        path: pathlib.Path, revision: Optional[Revision]
+    ) -> Optional[Revision]:
+        """Return the contents of the VERSION file."""
+        return (path / "VERSION").read_text().strip()
+
+    provider = localprovider(
+        match=lambda _: True, mount=defaultmount, getrevision=getrevision
+    )
+
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "VERSION").write_text("1.0")
+
+    repository = provider(asurl(path), None)
+
+    assert repository is not None
+    assert "1.0" == repository.revision
+
+
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = remoteproviderfactory(fetch=[])
@@ -165,6 +192,24 @@ def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -
     repository = provider(url, None)
 
     assert repository is not None
+
+
+def test_remoteproviderfactory_repository_revision(
+    store: Store, fetcher: Fetcher, url: URL
+) -> None:
+    """It returns the repository revision."""
+
+    def getrevision(
+        path: pathlib.Path, revision: Optional[Revision]
+    ) -> Optional[Revision]:
+        """Return a fake version."""
+        return "v1.0"
+
+    providerfactory = remoteproviderfactory(fetch=[fetcher], getrevision=getrevision)
+    provider = providerfactory(store, FetchMode.ALWAYS)
+    repository = provider(url, None)
+
+    assert repository is not None and repository.revision == "v1.0"
 
 
 def nullmatcher(url: URL) -> bool:

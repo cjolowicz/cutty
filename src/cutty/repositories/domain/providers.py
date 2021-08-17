@@ -51,23 +51,7 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-FilesystemProvider = Callable[[Location, Optional[Revision]], Optional[Filesystem]]
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
-
-
-def asprovider(provider: FilesystemProvider) -> Provider:
-    """Convert FilesystemProvider to Provider."""
-
-    def _provider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        filesystem = provider(location, revision)
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
-
-    return _provider
 
 
 def provide(
@@ -83,22 +67,34 @@ def provide(
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
+GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
-def localprovider(*, match: PathMatcher, mount: Mounter) -> Provider:
+def localprovider(
+    *, match: PathMatcher, mount: Mounter, getrevision: Optional[GetRevision] = None
+) -> Provider:
     """Create a view onto the local filesystem."""
 
-    def _localprovider(
+    def _provider(
         location: Location, revision: Optional[Revision]
-    ) -> Optional[Filesystem]:
+    ) -> Optional[Repository]:
         try:
-            path = location if isinstance(location, pathlib.Path) else aspath(location)
+            path_ = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
-        else:
-            return mount(path, revision) if match(path) else None
 
-    return asprovider(_localprovider)
+        if not match(path_):
+            return None
+
+        filesystem = mount(path_, revision)
+        path = Path(filesystem=filesystem)
+
+        if getrevision is not None:
+            revision = getrevision(path_, revision)
+
+        return Repository(location.name, path, revision)
+
+    return _provider
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
@@ -110,6 +106,7 @@ def remoteproviderfactory(
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],
     mount: Optional[Mounter] = None,
+    getrevision: Optional[GetRevision] = None,
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
     fetch = tuple(fetch)
@@ -118,17 +115,23 @@ def remoteproviderfactory(
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         def _remoteprovider(
             location: Location, revision: Optional[Revision]
-        ) -> Optional[Filesystem]:
+        ) -> Optional[Repository]:
             url = location if isinstance(location, URL) else asurl(location)
             if match is None or match(url):
                 for fetcher in fetch:
                     path = fetcher(url, store, revision, fetchmode)
                     if path is not None:
-                        return _mount(path, revision)
+                        filesystem = _mount(path, revision)
+                        path_ = Path(filesystem=filesystem)
+
+                        if getrevision is not None:
+                            revision = getrevision(path, revision)
+
+                        return Repository(location.name, path_, revision)
 
             return None
 
-        return asprovider(_remoteprovider)
+        return _remoteprovider
 
     return _remoteproviderfactory
 
