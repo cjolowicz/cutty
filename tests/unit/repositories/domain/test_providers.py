@@ -220,8 +220,7 @@ def test_repositoryprovider_with_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = dict(default=providerfactory)
-    provider = repositoryprovider(registry, providerstore)
+    provider = repositoryprovider({"default": providerfactory}, providerstore)
     repository = provider(str(url))
     assert not list(repository.path.iterdir())
 
@@ -234,12 +233,11 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    registry = dict(
-        default=constproviderfactory(
-            localprovider(match=lambda path: True, mount=defaultmount)
-        )
+    providerfactory = constproviderfactory(
+        localprovider(match=lambda path: True, mount=defaultmount)
     )
-    provider = repositoryprovider(registry, providerstore)
+
+    provider = repositoryprovider({"default": providerfactory}, providerstore)
     repository = provider(str(directory))
     [entry] = repository.path.iterdir()
 
@@ -251,10 +249,10 @@ def test_repositoryprovider_with_provider_specific_url(
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
-    registry = dict(
-        default=remoteproviderfactory(fetch=[fetcher]),
-        null=constproviderfactory(nullprovider),
-    )
+    registry = {
+        "default": remoteproviderfactory(fetch=[fetcher]),
+        "null": constproviderfactory(nullprovider),
+    }
     provider = repositoryprovider(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
@@ -265,7 +263,6 @@ def test_repositoryprovider_name_from_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    registry = dict(default=providerfactory)
-    provider = repositoryprovider(registry, providerstore)
+    provider = repositoryprovider({"default": providerfactory}, providerstore)
     repository = provider("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name
