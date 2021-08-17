@@ -82,6 +82,25 @@ def test_gitproviderfactory_happy(
     assert text == expected
 
 
+def test_gitproviderfactory_revision_tag(store: Store, url: URL) -> None:
+    """It returns the tag name."""
+    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    repository = gitprovider(url, "HEAD^")
+    assert repository is not None and repository.revision == "v1.0"
+
+
+def test_gitproviderfactory_revision_commit(store: Store, url: URL) -> None:
+    """It returns seven or more hexadecimal digits."""
+    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    repository = gitprovider(url, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) >= 7
+        and all(c in string.hexdigits for c in repository.revision)
+    )
+
+
 def test_gitproviderfactory_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
