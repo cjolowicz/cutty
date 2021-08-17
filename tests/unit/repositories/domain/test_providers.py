@@ -39,15 +39,10 @@ def nullprovider(
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
-    def _dictprovider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Filesystem]:
-        return DictFilesystem(mapping or {})
-
     def _provider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
-        filesystem = _dictprovider(location, revision)
+        filesystem = DictFilesystem(mapping or {})
         if filesystem is not None:
             path = Path(filesystem=filesystem)
             return Repository(location.name, path, revision)
