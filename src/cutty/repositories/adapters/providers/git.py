@@ -30,5 +30,31 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
     return GitFilesystem(path, *filter(None, [revision]))
 
 
-localgitprovider = localprovider(match=match, mount=mount)
-gitproviderfactory = remoteproviderfactory(fetch=[gitfetcher], mount=mount)
+def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the repository revision."""
+    if revision is None:
+        revision = "HEAD"
+
+    repository = pygit2.Repository(path)
+    commit = repository.revparse_single(revision).peel(pygit2.Commit)
+
+    try:
+        revision = repository.describe(
+            commit,
+            describe_strategy=pygit2.GIT_DESCRIBE_TAGS,
+            max_candidates_tags=0,
+            show_commit_oid_as_fallback=True,
+        )
+    except KeyError:
+        # Emulate `show_commit_oid_as_fallback` when no tag matches exactly,
+        # which results in GIT_ENOTFOUND ("cannot describe - no tag exactly
+        # matches '...'").
+        revision = commit.short_id
+
+    return revision
+
+
+localgitprovider = localprovider(match=match, mount=mount, getrevision=getrevision)
+gitproviderfactory = remoteproviderfactory(
+    fetch=[gitfetcher], mount=mount, getrevision=getrevision
+)

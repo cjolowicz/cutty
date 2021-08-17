@@ -1,5 +1,6 @@
 """Unit tests for cutty.repositories.adapters.providers.git."""
 import pathlib
+import string
 from typing import Optional
 
 import pygit2
@@ -50,6 +51,24 @@ def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
     assert repository is None
 
 
+def test_localgitprovider_revision_tag(url: URL) -> None:
+    """It returns the tag name."""
+    repository = localgitprovider(url, "HEAD^")
+    assert repository is not None
+    assert repository.revision == "v1.0"
+
+
+def test_localgitprovider_revision_commit(url: URL) -> None:
+    """It returns seven or more hexadecimal digits."""
+    repository = localgitprovider(url, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) >= 7
+        and all(c in string.hexdigits for c in repository.revision)
+    )
+
+
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_gitproviderfactory_happy(
     store: Store, url: URL, revision: Optional[str], expected: str
@@ -61,6 +80,25 @@ def test_gitproviderfactory_happy(
 
     text = (repository.path / "marker").read_text()
     assert text == expected
+
+
+def test_gitproviderfactory_revision_tag(store: Store, url: URL) -> None:
+    """It returns the tag name."""
+    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    repository = gitprovider(url, "HEAD^")
+    assert repository is not None and repository.revision == "v1.0"
+
+
+def test_gitproviderfactory_revision_commit(store: Store, url: URL) -> None:
+    """It returns seven or more hexadecimal digits."""
+    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    repository = gitprovider(url, None)
+    assert (
+        repository is not None
+        and repository.revision is not None
+        and len(repository.revision) >= 7
+        and all(c in string.hexdigits for c in repository.revision)
+    )
 
 
 def test_gitproviderfactory_not_matching(store: Store) -> None:
