@@ -11,6 +11,7 @@ from typing import Protocol
 
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
@@ -62,7 +63,7 @@ def provide(
         if repository := provider(location, revision):
             return repository
 
-    raise RuntimeError(f"unknown location {location}")
+    raise CuttyError(f"unknown location {location}")
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
