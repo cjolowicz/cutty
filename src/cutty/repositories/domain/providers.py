@@ -181,12 +181,14 @@ def _createproviders(
             )
 
 
-def _splitprovidername(location: Location) -> tuple[Optional[ProviderName], Location]:
+def _splitprovidername(
+    location: Location, providerregistry: ProviderRegistry
+) -> tuple[Optional[ProviderName], Location]:
     """Split off the provider name from the URL scheme, if any."""
     if isinstance(location, URL):
         providername, _, scheme = location.scheme.rpartition("+")
 
-        if providername:
+        if providername and providername in providerregistry:
             return providername, location.with_scheme(scheme)
 
     return None, location
@@ -204,7 +206,7 @@ def repositoryprovider(
         directory: Optional[PurePath] = None,
     ) -> Repository:
         location_ = parselocation(location)
-        providername, location_ = _splitprovidername(location_)
+        providername, location_ = _splitprovidername(location_, providerregistry)
         providers = _createproviders(
             providerregistry, providerstore, fetchmode, providername
         )
