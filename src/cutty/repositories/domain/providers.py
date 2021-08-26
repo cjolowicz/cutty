@@ -86,31 +86,43 @@ ProviderFactory = Callable[[Store, FetchMode], Provider]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
-def localprovider(
-    *, match: PathMatcher, mount: Mounter, getrevision: Optional[GetRevision] = None
-) -> Provider:
+class LocalProvider(Provider2):
     """Create a view onto the local filesystem."""
 
-    def _provider(
-        location: Location, revision: Optional[Revision]
+    def __init__(
+        self,
+        *,
+        match: PathMatcher,
+        mount: Mounter,
+        getrevision: Optional[GetRevision] = None,
+    ) -> None:
+        """Initialize."""
+        self.match = match
+        self.mount = mount
+        self.getrevision = getrevision
+
+    def __call__(
+        self, location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
+        """Return the repository at the given location."""
         try:
             path_ = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
 
-        if not match(path_):
+        if not self.match(path_):
             return None
 
-        filesystem = mount(path_, revision)
+        filesystem = self.mount(path_, revision)
         path = Path(filesystem=filesystem)
 
-        if getrevision is not None:
-            revision = getrevision(path_, revision)
+        if self.getrevision is not None:
+            revision = self.getrevision(path_, revision)
 
         return Repository(location.name, path, revision)
 
-    return _provider
+
+localprovider = LocalProvider
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
