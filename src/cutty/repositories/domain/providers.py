@@ -160,6 +160,8 @@ class RemoteProvider(BaseProvider):
         return None
 
 
+ProviderName = str
+ProviderStore = Callable[[ProviderName], Store]
 ProviderFactory = Callable[[Store, FetchMode], Provider]
 
 
@@ -183,10 +185,6 @@ def remoteproviderfactory(
         )
 
     return _remoteproviderfactory
-
-
-ProviderName = str
-ProviderStore = Callable[[ProviderName], Store]
 
 
 def constproviderfactory(provider: Provider) -> ProviderFactory:
