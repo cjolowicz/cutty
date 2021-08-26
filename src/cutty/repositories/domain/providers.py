@@ -52,7 +52,7 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-class Provider2:
+class Provider:
     """Provider for a specific type of repository."""
 
     def __call__(
@@ -69,7 +69,7 @@ class UnknownLocationError(CuttyError):
 
 
 def provide(
-    providers: Iterable[Provider2], location: Location, revision: Optional[Revision]
+    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Repository:
     """Provide the repository located at the given URL."""
     for provider in providers:
@@ -79,11 +79,11 @@ def provide(
     raise UnknownLocationError(location)
 
 
-ProviderFactory = Callable[[Store, FetchMode], Provider2]
+ProviderFactory = Callable[[Store, FetchMode], Provider]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
-class LocalProvider(Provider2):
+class LocalProvider(Provider):
     """Create a view onto the local filesystem."""
 
     def __init__(
@@ -123,7 +123,7 @@ def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesyste
     return DiskFilesystem(path)
 
 
-class RemoteProvider(Provider2):
+class RemoteProvider(Provider):
     """Remote providers fetch the repository into local storage first."""
 
     def __init__(
@@ -173,7 +173,7 @@ def remoteproviderfactory(
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
 
-    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider2:
+    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         return RemoteProvider(
             match=match,
             fetch=fetch,
@@ -194,10 +194,10 @@ ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 
 
-def constproviderfactory(provider: Provider2) -> ProviderFactory:
+def constproviderfactory(provider: Provider) -> ProviderFactory:
     """Create a provider factory that returns the given provider."""
 
-    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:
+    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider:
         return provider
 
     return _providerfactory
@@ -208,7 +208,7 @@ def _createprovider(
     providerfactory: ProviderFactory,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
-) -> Provider2:
+) -> Provider:
     """Create a provider."""
     store = providerstore(providername)
     return providerfactory(store, fetchmode)
@@ -219,7 +219,7 @@ def _createproviders(
     providerstore: ProviderStore,
     fetchmode: FetchMode,
     providername: Optional[ProviderName],
-) -> Iterator[Provider2]:
+) -> Iterator[Provider]:
     """Create providers."""
     if providername is not None:
         providerfactory = providerregistry[providername]

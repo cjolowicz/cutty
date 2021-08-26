@@ -20,7 +20,7 @@ from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import provide
-from cutty.repositories.domain.providers import Provider2
+from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import Repository
@@ -32,10 +32,10 @@ from cutty.repositories.domain.stores import Store
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def provider2(function: ProviderFunction) -> Provider2:
+def provider2(function: ProviderFunction) -> Provider:
     """Decorator to create a provider from a function."""
 
-    class _Provider(Provider2):
+    class _Provider(Provider):
         def __call__(
             self, location: Location, revision: Optional[Revision]
         ) -> Optional[Repository]:
@@ -52,7 +52,7 @@ def nullprovider(
     return None
 
 
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider2:
+def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
     @provider2
@@ -76,7 +76,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider2:
         [nullprovider, nullprovider],
     ],
 )
-def test_provide_fail(providers: list[Provider2]) -> None:
+def test_provide_fail(providers: list[Provider]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
         provide(providers, URL(), None)
@@ -91,7 +91,7 @@ def test_provide_fail(providers: list[Provider2]) -> None:
         [dictprovider({}), dictprovider({"marker": ""})],
     ],
 )
-def test_provide_pass(providers: list[Provider2]) -> None:
+def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
     repository = provide(providers, URL(), None)
     assert repository.path.is_dir()
