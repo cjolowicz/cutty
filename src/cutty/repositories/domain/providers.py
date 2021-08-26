@@ -111,12 +111,11 @@ class LocalProvider(Provider):
             return None
 
         filesystem = self.mount(path_, revision)
-        path = Path(filesystem=filesystem)
 
         if self.getrevision is not None:
             revision = self.getrevision(path_, revision)
 
-        return Repository(location.name, path, revision)
+        return Repository(location.name, Path(filesystem=filesystem), revision)
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
