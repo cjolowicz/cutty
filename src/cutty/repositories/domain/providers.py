@@ -204,7 +204,7 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
 
 
 class RepositoryProvider:
-    """The repository provider turns a repository URL into a filesystem path."""
+    """The repository provider retrieves repositories using registered providers."""
 
     def __init__(self, registry: ProviderRegistry, store: ProviderStore) -> None:
         """Initialize."""
