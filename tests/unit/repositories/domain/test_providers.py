@@ -1,6 +1,7 @@
 """Unit tests for cutty.repositories.domain.providers."""
 import json
 import pathlib
+from collections.abc import Callable
 from typing import Any
 from typing import Optional
 
@@ -19,7 +20,6 @@ from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import provide
-from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import Provider2
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
@@ -27,6 +27,9 @@ from cutty.repositories.domain.providers import Repository
 from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
+
+
+Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
 def provider2(function: Provider) -> Provider2:

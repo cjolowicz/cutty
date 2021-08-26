@@ -52,9 +52,6 @@ class RepositoryProvider(Protocol):
         """Return the repository located at the given URL."""
 
 
-Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
-
-
 class Provider2:
     """Provider for a specific type of repository."""
 
