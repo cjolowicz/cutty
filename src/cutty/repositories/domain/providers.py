@@ -201,17 +201,6 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
     return _providerfactory
 
 
-def _createprovider(
-    providername: ProviderName,
-    providerfactory: ProviderFactory,
-    providerstore: ProviderStore,
-    fetchmode: FetchMode,
-) -> Provider:
-    """Create a provider."""
-    store = providerstore(providername)
-    return providerfactory(store, fetchmode)
-
-
 def _splitprovidername(
     location: Location, providerregistry: ProviderRegistry
 ) -> tuple[Optional[ProviderName], Location]:
@@ -266,11 +255,17 @@ class RepositoryProvider:
         """Create providers."""
         if providername is not None:
             providerfactory = self.providerregistry[providername]
-            yield _createprovider(
-                providername, providerfactory, self.providerstore, fetchmode
-            )
+            yield self._createprovider(providername, providerfactory, fetchmode)
         else:
             for providername, providerfactory in self.providerregistry.items():
-                yield _createprovider(
-                    providername, providerfactory, self.providerstore, fetchmode
-                )
+                yield self._createprovider(providername, providerfactory, fetchmode)
+
+    def _createprovider(
+        self,
+        providername: ProviderName,
+        providerfactory: ProviderFactory,
+        fetchmode: FetchMode,
+    ) -> Provider:
+        """Create a provider."""
+        store = self.providerstore(providername)
+        return providerfactory(store, fetchmode)
