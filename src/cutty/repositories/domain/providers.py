@@ -55,6 +55,15 @@ class RepositoryProvider(Protocol):
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
+class Provider2:
+    """Provider for a specific type of repository."""
+
+    def __call__(
+        self, location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        """Return the repository at the given location."""
+
+
 @dataclass
 class UnknownLocationError(CuttyError):
     """The repository location could not be processed by any provider."""
