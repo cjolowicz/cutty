@@ -153,12 +153,13 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if path := fetcher(url, self.store, revision, self.fetchmode):
                     filesystem = self.mount(path, revision)
-                    path_ = Path(filesystem=filesystem)
 
                     if self.getrevision is not None:
                         revision = self.getrevision(path, revision)
 
-                    return Repository(location.name, path_, revision)
+                    return Repository(
+                        location.name, Path(filesystem=filesystem), revision
+                    )
 
         return None
 
