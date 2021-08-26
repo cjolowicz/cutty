@@ -208,13 +208,13 @@ class ProviderRegistry:
 
     def __call__(
         self,
-        location: str,
+        rawlocation: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
         directory: Optional[PurePath] = None,
     ) -> Repository:
         """Return the repository located at the given URL."""
-        location_ = parselocation(location)
+        location_ = parselocation(rawlocation)
         providername, location_ = self._splitprovidername(location_)
         providers = self._createproviders(fetchmode, providername)
 
