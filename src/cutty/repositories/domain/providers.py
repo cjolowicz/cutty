@@ -55,8 +55,11 @@ class RepositoryProvider(Protocol):
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
+@dataclass
 class UnknownLocationError(CuttyError):
     """The repository location could not be processed by any provider."""
+
+    location: Location
 
 
 def provide(
