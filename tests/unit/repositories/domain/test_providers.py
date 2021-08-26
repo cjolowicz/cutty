@@ -48,6 +48,18 @@ nullprovider = Provider()
 """Provider that matches no location."""
 
 
+def constprovider(repository: Repository) -> Provider:
+    """Provider that returns the same repository always."""
+
+    @provider
+    def _constprovider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        return repository
+
+    return _constprovider
+
+
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a repository."""
 
@@ -324,14 +336,7 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
-    @provider
-    def fakeprovider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        """Fake provider."""
-        return repository
-
-    registry = {"default": constproviderfactory(fakeprovider)}
+    registry = {"default": constproviderfactory(constprovider(repository))}
     provider_ = RepositoryProvider(registry, providerstore)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
