@@ -214,11 +214,11 @@ class ProviderRegistry:
         directory: Optional[PurePath] = None,
     ) -> Repository:
         """Return the repository located at the given URL."""
-        location_ = parselocation(rawlocation)
-        providername, location_ = self._splitprovidername(location_)
+        location = parselocation(rawlocation)
+        providername, location = self._splitprovidername(location)
         providers = self._createproviders(fetchmode, providername)
 
-        repository = provide(providers, location_, revision)
+        repository = provide(providers, location, revision)
 
         if directory is not None:
             name = directory.name
