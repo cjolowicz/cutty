@@ -72,7 +72,7 @@ class UnknownLocationError(CuttyError):
 
 
 def provide(
-    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
+    providers: Iterable[Provider2], location: Location, revision: Optional[Revision]
 ) -> Repository:
     """Provide the repository located at the given URL."""
     for provider in providers:
@@ -82,7 +82,7 @@ def provide(
     raise UnknownLocationError(location)
 
 
-ProviderFactory = Callable[[Store, FetchMode], Provider]
+ProviderFactory = Callable[[Store, FetchMode], Provider2]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
@@ -176,7 +176,7 @@ def remoteproviderfactory(
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
 
-    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
+    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider2:
         return RemoteProvider(
             match=match,
             fetch=fetch,
@@ -197,10 +197,10 @@ ProviderRegistry = Mapping[ProviderName, ProviderFactory]
 _emptyproviderregistry: ProviderRegistry = MappingProxyType({})
 
 
-def constproviderfactory(provider: Provider) -> ProviderFactory:
+def constproviderfactory(provider: Provider2) -> ProviderFactory:
     """Create a provider factory that returns the given provider."""
 
-    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider:
+    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider2:
         return provider
 
     return _providerfactory
@@ -211,7 +211,7 @@ def _createprovider(
     providerfactory: ProviderFactory,
     providerstore: ProviderStore,
     fetchmode: FetchMode,
-) -> Provider:
+) -> Provider2:
     """Create a provider."""
     store = providerstore(providername)
     return providerfactory(store, fetchmode)
@@ -222,7 +222,7 @@ def _createproviders(
     providerstore: ProviderStore,
     fetchmode: FetchMode,
     providername: Optional[ProviderName],
-) -> Iterator[Provider]:
+) -> Iterator[Provider2]:
     """Create providers."""
     if providername is not None:
         providerfactory = providerregistry[providername]
