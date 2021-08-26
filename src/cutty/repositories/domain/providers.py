@@ -7,7 +7,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Optional
-from typing import Protocol
 
 from yarl import URL
 
@@ -243,8 +242,15 @@ def _splitprovidername(
     return None, location
 
 
-class RepositoryProvider(Protocol):
+class RepositoryProvider:
     """The repository provider turns a repository URL into a filesystem path."""
+
+    def __init__(
+        self, providerregistry: ProviderRegistry, providerstore: ProviderStore
+    ) -> None:
+        """Initialize."""
+        self.providerregistry = providerregistry
+        self.providerstore = providerstore
 
     def __call__(
         self,
@@ -254,23 +260,10 @@ class RepositoryProvider(Protocol):
         directory: Optional[PurePath] = None,
     ) -> Repository:
         """Return the repository located at the given URL."""
-
-
-def repositoryprovider(
-    providerregistry: ProviderRegistry, providerstore: ProviderStore
-) -> RepositoryProvider:
-    """Return a repository provider."""
-
-    def _provide(
-        location: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
-    ) -> Repository:
         location_ = parselocation(location)
-        providername, location_ = _splitprovidername(location_, providerregistry)
+        providername, location_ = _splitprovidername(location_, self.providerregistry)
         providers = _createproviders(
-            providerregistry, providerstore, fetchmode, providername
+            self.providerregistry, self.providerstore, fetchmode, providername
         )
 
         repository = provide(providers, location_, revision)
@@ -284,4 +277,5 @@ def repositoryprovider(
 
         return repository
 
-    return _provide
+
+repositoryprovider = RepositoryProvider
