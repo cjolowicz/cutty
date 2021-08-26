@@ -49,7 +49,7 @@ nullprovider = Provider()
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
-    """Provider that matches every URL with a filesystem."""
+    """Provider that matches every URL with a repository."""
 
     @provider
     def _provider(
