@@ -20,6 +20,7 @@ from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
+from cutty.repositories.domain.providers import Provider2
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import Repository
@@ -28,6 +29,19 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
+def provider2(function: Provider) -> Provider2:
+    """Decorator to create a provider from a function."""
+
+    class _Provider(Provider2):
+        def __call__(
+            self, location: Location, revision: Optional[Revision]
+        ) -> Optional[Repository]:
+            return function(location, revision)
+
+    return _Provider()
+
+
+@provider2
 def nullprovider(
     location: Location, revision: Optional[Revision]
 ) -> Optional[Repository]:
@@ -38,6 +52,7 @@ def nullprovider(
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
+    @provider2
     def _provider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
