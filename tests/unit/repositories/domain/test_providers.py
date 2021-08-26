@@ -44,12 +44,8 @@ def provider(function: ProviderFunction) -> Provider:
     return _Provider()
 
 
-@provider
-def nullprovider(
-    location: Location, revision: Optional[Revision]
-) -> Optional[Repository]:
-    """Provider that matches no location."""
-    return None
+nullprovider = Provider()
+"""Provider that matches no location."""
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
