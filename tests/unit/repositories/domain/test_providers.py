@@ -32,7 +32,7 @@ from cutty.repositories.domain.stores import Store
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def provider2(function: ProviderFunction) -> Provider:
+def provider(function: ProviderFunction) -> Provider:
     """Decorator to create a provider from a function."""
 
     class _Provider(Provider):
@@ -44,7 +44,7 @@ def provider2(function: ProviderFunction) -> Provider:
     return _Provider()
 
 
-@provider2
+@provider
 def nullprovider(
     location: Location, revision: Optional[Revision]
 ) -> Optional[Repository]:
@@ -55,7 +55,7 @@ def nullprovider(
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a filesystem."""
 
-    @provider2
+    @provider
     def _provider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
@@ -328,7 +328,7 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
-    @provider2
+    @provider
     def fakeprovider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
@@ -336,10 +336,10 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
         return repository
 
     registry = {"default": constproviderfactory(fakeprovider)}
-    provider = repositoryprovider(registry, providerstore)
+    provider_ = repositoryprovider(registry, providerstore)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
-    assert repository == provider(str(url))
+    assert repository == provider_(str(url))
 
 
 def test_repositoryprovider_name_from_url(
