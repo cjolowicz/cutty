@@ -187,7 +187,6 @@ def remoteproviderfactory(
 
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
-ProviderFactories = Mapping[ProviderName, ProviderFactory]
 
 
 def constproviderfactory(provider: Provider) -> ProviderFactory:
@@ -202,7 +201,9 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
 class ProviderRegistry:
     """The repository provider retrieves repositories using registered providers."""
 
-    def __init__(self, registry: ProviderFactories, store: ProviderStore) -> None:
+    def __init__(
+        self, registry: Mapping[ProviderName, ProviderFactory], store: ProviderStore
+    ) -> None:
         """Initialize."""
         self.registry = registry
         self.store = store
