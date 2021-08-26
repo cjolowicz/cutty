@@ -215,7 +215,7 @@ class ProviderRegistry:
     ) -> Repository:
         """Return the repository located at the given URL."""
         location = parselocation(rawlocation)
-        providername, location = self._splitprovidername(location)
+        providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
 
         repository = provide(providers, location, revision)
@@ -229,7 +229,7 @@ class ProviderRegistry:
 
         return repository
 
-    def _splitprovidername(
+    def _extractprovidername(
         self, location: Location
     ) -> tuple[Optional[ProviderName], Location]:
         """Split off the provider name from the URL scheme, if any."""
