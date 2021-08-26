@@ -151,8 +151,7 @@ class RemoteProvider(Provider):
         url = location if isinstance(location, URL) else asurl(location)
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
-                path = fetcher(url, self.store, revision, self.fetchmode)
-                if path is not None:
+                if path := fetcher(url, self.store, revision, self.fetchmode):
                     filesystem = self.mount(path, revision)
                     path_ = Path(filesystem=filesystem)
 
