@@ -65,7 +65,6 @@ def provide(
     raise UnknownLocationError(location)
 
 
-ProviderFactory = Callable[[Store, FetchMode], Provider]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
@@ -160,6 +159,9 @@ class RemoteProvider(BaseProvider):
                     return self._loadrepository(location, revision, path)
 
         return None
+
+
+ProviderFactory = Callable[[Store, FetchMode], Provider]
 
 
 def remoteproviderfactory(
