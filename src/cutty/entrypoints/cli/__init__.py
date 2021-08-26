@@ -8,9 +8,8 @@ from cutty.entrypoints.cli.update import update
 
 registercommand = main.command()
 
-registercommand(fatal(create))
-registercommand(fatal(update))
-registercommand(fatal(cookiecutter))
+for command in [create, update, cookiecutter]:
+    registercommand(fatal(command))
 
 
 __all__ = ["main"]
