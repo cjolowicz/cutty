@@ -276,6 +276,3 @@ class RepositoryProvider:
             return Repository(name, path, repository.revision)
 
         return repository
-
-
-repositoryprovider = RepositoryProvider

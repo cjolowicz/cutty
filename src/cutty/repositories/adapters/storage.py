@@ -18,7 +18,6 @@ from cutty.repositories.adapters.registry import defaultproviderregistry
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import RepositoryProvider
-from cutty.repositories.domain.providers import repositoryprovider
 from cutty.repositories.domain.stores import Store
 
 
@@ -154,7 +153,7 @@ def getdefaultrepositoryprovider(
     path: pathlib.Path, *, timer: Timer = defaulttimer
 ) -> RepositoryProvider:
     """Return a repository provider."""
-    return repositoryprovider(
+    return RepositoryProvider(
         defaultproviderregistry,
         getdefaultproviderstore(path, timer=timer),
     )

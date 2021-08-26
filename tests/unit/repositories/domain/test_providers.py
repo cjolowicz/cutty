@@ -24,7 +24,7 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.providers import Repository
-from cutty.repositories.domain.providers import repositoryprovider
+from cutty.repositories.domain.providers import RepositoryProvider
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
@@ -269,7 +269,7 @@ def test_remoteproviderfactory_mounter(
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
-    provider = repositoryprovider({}, providerstore)
+    provider = RepositoryProvider({}, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
 
@@ -279,7 +279,7 @@ def test_repositoryprovider_with_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    provider = repositoryprovider({"default": providerfactory}, providerstore)
+    provider = RepositoryProvider({"default": providerfactory}, providerstore)
     repository = provider(str(url))
     assert not list(repository.path.iterdir())
 
@@ -296,7 +296,7 @@ def test_repositoryprovider_with_path(
         LocalProvider(match=lambda path: True, mount=defaultmount)
     )
 
-    provider = repositoryprovider({"default": providerfactory}, providerstore)
+    provider = RepositoryProvider({"default": providerfactory}, providerstore)
     repository = provider(str(directory))
     [entry] = repository.path.iterdir()
 
@@ -312,7 +312,7 @@ def test_repositoryprovider_with_provider_specific_url(
         "default": remoteproviderfactory(fetch=[fetcher]),
         "null": constproviderfactory(nullprovider),
     }
-    provider = repositoryprovider(registry, providerstore)
+    provider = RepositoryProvider(registry, providerstore)
     with pytest.raises(Exception):
         provider(str(url))
 
@@ -332,7 +332,7 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
         return repository
 
     registry = {"default": constproviderfactory(fakeprovider)}
-    provider_ = repositoryprovider(registry, providerstore)
+    provider_ = RepositoryProvider(registry, providerstore)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
     assert repository == provider_(str(url))
@@ -343,6 +343,6 @@ def test_repositoryprovider_name_from_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory(fetch=[fetcher])
-    provider = repositoryprovider({"default": providerfactory}, providerstore)
+    provider = RepositoryProvider({"default": providerfactory}, providerstore)
     repository = provider("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name
