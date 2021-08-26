@@ -5,7 +5,6 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from dataclasses import dataclass
-from types import MappingProxyType
 from typing import Optional
 
 from yarl import URL
@@ -189,9 +188,6 @@ def remoteproviderfactory(
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
 ProviderFactories = Mapping[ProviderName, ProviderFactory]
-
-
-_emptyproviderregistry: ProviderFactories = MappingProxyType({})
 
 
 def constproviderfactory(provider: Provider) -> ProviderFactory:
