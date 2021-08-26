@@ -95,5 +95,5 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
 
 def test_unknown_location(runcutty: RunCutty) -> None:
     """It prints an error message."""
-    with pytest.raises(Exception, match="fatal: unknown location"):
+    with pytest.raises(Exception, match="unknown location"):
         runcutty("create", "invalid://location")
