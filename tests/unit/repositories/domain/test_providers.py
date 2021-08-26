@@ -29,10 +29,10 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
+ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def provider2(function: Provider) -> Provider2:
+def provider2(function: ProviderFunction) -> Provider2:
     """Decorator to create a provider from a function."""
 
     class _Provider(Provider2):
