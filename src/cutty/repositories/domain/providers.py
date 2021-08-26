@@ -122,9 +122,6 @@ class LocalProvider(Provider2):
         return Repository(location.name, path, revision)
 
 
-localprovider = LocalProvider
-
-
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
     return DiskFilesystem(path)
 

@@ -17,7 +17,7 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
-from cutty.repositories.domain.providers import localprovider
+from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
@@ -85,7 +85,7 @@ defaultmount = unversioned_mounter(DiskFilesystem)
 
 def test_localprovider_not_local(url: URL) -> None:
     """It returns None if the location is not local."""
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
 
     assert provider(url, None) is None
 
@@ -93,7 +93,7 @@ def test_localprovider_not_local(url: URL) -> None:
 def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
-    provider = localprovider(match=lambda path: False, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: False, mount=defaultmount)
 
     assert provider(url, None) is None
 
@@ -105,7 +105,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     (repository / "marker").touch()
 
     url = asurl(repository)
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
     repository2 = provider(url, None)
 
     assert repository2 is not None
@@ -116,7 +116,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
 def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
 
     with pytest.raises(Exception):
         provider(url, "v1.0.0")
@@ -131,7 +131,7 @@ def test_localprovider_repository_revision(tmp_path: pathlib.Path) -> None:
         """Return the contents of the VERSION file."""
         return (path / "VERSION").read_text().strip()
 
-    provider = localprovider(
+    provider = LocalProvider(
         match=lambda _: True, mount=defaultmount, getrevision=getrevision
     )
 
@@ -279,7 +279,7 @@ def test_repositoryprovider_with_path(
     (directory / "marker").touch()
 
     providerfactory = constproviderfactory(
-        localprovider(match=lambda path: True, mount=defaultmount)
+        LocalProvider(match=lambda path: True, mount=defaultmount)
     )
 
     provider = repositoryprovider({"default": providerfactory}, providerstore)
