@@ -203,7 +203,7 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
     return _providerfactory
 
 
-class RepositoryProvider:
+class ProviderRegistry:
     """The repository provider retrieves repositories using registered providers."""
 
     def __init__(self, registry: ProviderFactories, store: ProviderStore) -> None:
