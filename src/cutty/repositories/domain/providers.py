@@ -217,12 +217,10 @@ def _splitprovidername(
 class RepositoryProvider:
     """The repository provider turns a repository URL into a filesystem path."""
 
-    def __init__(
-        self, providerregistry: ProviderRegistry, providerstore: ProviderStore
-    ) -> None:
+    def __init__(self, registry: ProviderRegistry, store: ProviderStore) -> None:
         """Initialize."""
-        self.providerregistry = providerregistry
-        self.providerstore = providerstore
+        self.registry = registry
+        self.store = store
 
     def __call__(
         self,
@@ -233,7 +231,7 @@ class RepositoryProvider:
     ) -> Repository:
         """Return the repository located at the given URL."""
         location_ = parselocation(location)
-        providername, location_ = _splitprovidername(location_, self.providerregistry)
+        providername, location_ = _splitprovidername(location_, self.registry)
         providers = self._createproviders(fetchmode, providername)
 
         repository = provide(providers, location_, revision)
@@ -254,10 +252,10 @@ class RepositoryProvider:
     ) -> Iterator[Provider]:
         """Create providers."""
         if providername is not None:
-            providerfactory = self.providerregistry[providername]
+            providerfactory = self.registry[providername]
             yield self._createprovider(providername, providerfactory, fetchmode)
         else:
-            for providername, providerfactory in self.providerregistry.items():
+            for providername, providerfactory in self.registry.items():
                 yield self._createprovider(providername, providerfactory, fetchmode)
 
     def _createprovider(
@@ -267,5 +265,5 @@ class RepositoryProvider:
         fetchmode: FetchMode,
     ) -> Provider:
         """Create a provider."""
-        store = self.providerstore(providername)
+        store = self.store(providername)
         return providerfactory(store, fetchmode)
