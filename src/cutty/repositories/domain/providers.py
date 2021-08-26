@@ -55,6 +55,10 @@ class RepositoryProvider(Protocol):
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
+class UnknownLocationError(CuttyError):
+    """The repository location could not be processed by any provider."""
+
+
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Repository:
@@ -63,7 +67,7 @@ def provide(
         if repository := provider(location, revision):
             return repository
 
-    raise CuttyError(f"unknown location {location}")
+    raise UnknownLocationError(f"unknown location {location}")
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
