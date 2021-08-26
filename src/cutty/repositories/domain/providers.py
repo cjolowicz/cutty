@@ -126,6 +126,47 @@ def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesyste
     return DiskFilesystem(path)
 
 
+class RemoteProvider(Provider2):
+    """Remote providers fetch the repository into local storage first."""
+
+    def __init__(
+        self,
+        *,
+        match: Optional[Matcher] = None,
+        fetch: Iterable[Fetcher],
+        mount: Optional[Mounter] = None,
+        getrevision: Optional[GetRevision] = None,
+        store: Store,
+        fetchmode: FetchMode,
+    ) -> None:
+        """Initialize."""
+        self.match = match
+        self.fetch = tuple(fetch)
+        self.mount = mount if mount is not None else _defaultmount
+        self.getrevision = getrevision
+        self.store = store
+        self.fetchmode = fetchmode
+
+    def __call__(
+        self, location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        """Return the repository at the given location."""
+        url = location if isinstance(location, URL) else asurl(location)
+        if self.match is None or self.match(url):
+            for fetcher in self.fetch:
+                path = fetcher(url, self.store, revision, self.fetchmode)
+                if path is not None:
+                    filesystem = self.mount(path, revision)
+                    path_ = Path(filesystem=filesystem)
+
+                    if self.getrevision is not None:
+                        revision = self.getrevision(path, revision)
+
+                    return Repository(location.name, path_, revision)
+
+        return None
+
+
 def remoteproviderfactory(
     *,
     match: Optional[Matcher] = None,
@@ -134,29 +175,16 @@ def remoteproviderfactory(
     getrevision: Optional[GetRevision] = None,
 ) -> ProviderFactory:
     """Remote providers fetch the repository into local storage first."""
-    fetch = tuple(fetch)
-    _mount = mount if mount is not None else _defaultmount
 
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
-        def _remoteprovider(
-            location: Location, revision: Optional[Revision]
-        ) -> Optional[Repository]:
-            url = location if isinstance(location, URL) else asurl(location)
-            if match is None or match(url):
-                for fetcher in fetch:
-                    path = fetcher(url, store, revision, fetchmode)
-                    if path is not None:
-                        filesystem = _mount(path, revision)
-                        path_ = Path(filesystem=filesystem)
-
-                        if getrevision is not None:
-                            revision = getrevision(path, revision)
-
-                        return Repository(location.name, path_, revision)
-
-            return None
-
-        return _remoteprovider
+        return RemoteProvider(
+            match=match,
+            fetch=fetch,
+            mount=mount,
+            getrevision=getrevision,
+            store=store,
+            fetchmode=fetchmode,
+        )
 
     return _remoteproviderfactory
 
