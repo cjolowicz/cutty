@@ -8,7 +8,8 @@ from cutty.util.exceptionhandlers import exceptionhandler
 
 @exceptionhandler
 def _unknownlocation(error: UnknownLocationError) -> NoReturn:
-    raise SystemExit(f"fatal: {error}")
+    [location] = error.args
+    raise SystemExit(f"fatal: unknown location {location}")
 
 
 @exceptionhandler

@@ -67,7 +67,7 @@ def provide(
         if repository := provider(location, revision):
             return repository
 
-    raise UnknownLocationError(f"unknown location {location}")
+    raise UnknownLocationError(location)
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
