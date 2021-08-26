@@ -12,6 +12,8 @@ def _unknownlocation(error: UnknownLocationError) -> NoReturn:
 
 
 @exceptionhandler
-def fatal(error: CuttyError) -> NoReturn:
-    """Exit with an error message."""
+def _fatal(error: CuttyError) -> NoReturn:
     raise SystemExit(f"fatal: {error}")
+
+
+fatal = _unknownlocation >> _fatal
