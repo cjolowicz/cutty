@@ -103,17 +103,17 @@ class LocalProvider(Provider):
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
         try:
-            path_ = location if isinstance(location, pathlib.Path) else aspath(location)
+            path = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
 
-        if not self.match(path_):
+        if not self.match(path):
             return None
 
-        filesystem = self.mount(path_, revision)
+        filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
-            revision = self.getrevision(path_, revision)
+            revision = self.getrevision(path, revision)
 
         return Repository(location.name, Path(filesystem=filesystem), revision)
 
