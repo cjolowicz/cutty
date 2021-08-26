@@ -39,19 +39,6 @@ class Repository:
     revision: Optional[Revision]
 
 
-class RepositoryProvider(Protocol):
-    """The repository provider turns a repository URL into a filesystem path."""
-
-    def __call__(
-        self,
-        location: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
-    ) -> Repository:
-        """Return the repository located at the given URL."""
-
-
 class Provider:
     """Provider for a specific type of repository."""
 
@@ -254,6 +241,19 @@ def _splitprovidername(
             return providername, location.with_scheme(scheme)
 
     return None, location
+
+
+class RepositoryProvider(Protocol):
+    """The repository provider turns a repository URL into a filesystem path."""
+
+    def __call__(
+        self,
+        location: str,
+        revision: Optional[Revision] = None,
+        fetchmode: FetchMode = FetchMode.ALWAYS,
+        directory: Optional[PurePath] = None,
+    ) -> Repository:
+        """Return the repository located at the given URL."""
 
 
 def repositoryprovider(
