@@ -212,23 +212,6 @@ def _createprovider(
     return providerfactory(store, fetchmode)
 
 
-def _createproviders(
-    providerregistry: ProviderRegistry,
-    providerstore: ProviderStore,
-    fetchmode: FetchMode,
-    providername: Optional[ProviderName],
-) -> Iterator[Provider]:
-    """Create providers."""
-    if providername is not None:
-        providerfactory = providerregistry[providername]
-        yield _createprovider(providername, providerfactory, providerstore, fetchmode)
-    else:
-        for providername, providerfactory in providerregistry.items():
-            yield _createprovider(
-                providername, providerfactory, providerstore, fetchmode
-            )
-
-
 def _splitprovidername(
     location: Location, providerregistry: ProviderRegistry
 ) -> tuple[Optional[ProviderName], Location]:
@@ -262,9 +245,7 @@ class RepositoryProvider:
         """Return the repository located at the given URL."""
         location_ = parselocation(location)
         providername, location_ = _splitprovidername(location_, self.providerregistry)
-        providers = _createproviders(
-            self.providerregistry, self.providerstore, fetchmode, providername
-        )
+        providers = self._createproviders(fetchmode, providername)
 
         repository = provide(providers, location_, revision)
 
@@ -276,3 +257,20 @@ class RepositoryProvider:
             return Repository(name, path, repository.revision)
 
         return repository
+
+    def _createproviders(
+        self,
+        fetchmode: FetchMode,
+        providername: Optional[ProviderName],
+    ) -> Iterator[Provider]:
+        """Create providers."""
+        if providername is not None:
+            providerfactory = self.providerregistry[providername]
+            yield _createprovider(
+                providername, providerfactory, self.providerstore, fetchmode
+            )
+        else:
+            for providername, providerfactory in self.providerregistry.items():
+                yield _createprovider(
+                    providername, providerfactory, self.providerstore, fetchmode
+                )
