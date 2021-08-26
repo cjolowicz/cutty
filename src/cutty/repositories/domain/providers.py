@@ -197,7 +197,7 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
 
 
 class ProviderRegistry:
-    """The repository provider retrieves repositories using registered providers."""
+    """The provider registry retrieves repositories using registered providers."""
 
     def __init__(
         self, registry: Mapping[ProviderName, ProviderFactory], store: ProviderStore
