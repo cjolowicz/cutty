@@ -201,19 +201,6 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
     return _providerfactory
 
 
-def _splitprovidername(
-    location: Location, providerregistry: ProviderRegistry
-) -> tuple[Optional[ProviderName], Location]:
-    """Split off the provider name from the URL scheme, if any."""
-    if isinstance(location, URL):
-        providername, _, scheme = location.scheme.rpartition("+")
-
-        if providername and providername in providerregistry:
-            return providername, location.with_scheme(scheme)
-
-    return None, location
-
-
 class RepositoryProvider:
     """The repository provider turns a repository URL into a filesystem path."""
 
@@ -231,7 +218,7 @@ class RepositoryProvider:
     ) -> Repository:
         """Return the repository located at the given URL."""
         location_ = parselocation(location)
-        providername, location_ = _splitprovidername(location_, self.registry)
+        providername, location_ = self._splitprovidername(location_)
         providers = self._createproviders(fetchmode, providername)
 
         repository = provide(providers, location_, revision)
@@ -244,6 +231,18 @@ class RepositoryProvider:
             return Repository(name, path, repository.revision)
 
         return repository
+
+    def _splitprovidername(
+        self, location: Location
+    ) -> tuple[Optional[ProviderName], Location]:
+        """Split off the provider name from the URL scheme, if any."""
+        if isinstance(location, URL):
+            providername, _, scheme = location.scheme.rpartition("+")
+
+            if providername and providername in self.registry:
+                return providername, location.with_scheme(scheme)
+
+        return None, location
 
     def _createproviders(
         self,
