@@ -16,7 +16,6 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderFactory
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.repository import descend
 from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 
@@ -63,7 +62,7 @@ class ProviderRegistry:
         providers = self._createproviders(fetchmode, providername)
         repository = provide(providers, location, revision)
 
-        return repository if directory is None else descend(repository, directory)
+        return repository if directory is None else repository.descend(directory)
 
     def _extractprovidername(
         self, location: Location
