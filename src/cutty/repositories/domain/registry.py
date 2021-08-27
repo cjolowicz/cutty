@@ -40,6 +40,16 @@ def provide(
     raise UnknownLocationError(location)
 
 
+def descend(repository: Repository, directory: PurePath) -> Repository:
+    """Return the subrepository located in the given directory."""
+    path = repository.path.joinpath(*directory.parts)
+    return Repository(
+        directory.name,
+        Path(filesystem=PathFilesystem(path)),
+        repository.revision,
+    )
+
+
 class ProviderRegistry:
     """The provider registry retrieves repositories using registered providers."""
 
@@ -64,15 +74,7 @@ class ProviderRegistry:
         providers = self._createproviders(fetchmode, providername)
         repository = provide(providers, location, revision)
 
-        if directory is not None:
-            path = repository.path.joinpath(*directory.parts)
-            return Repository(
-                directory.name,
-                Path(filesystem=PathFilesystem(path)),
-                repository.revision,
-            )
-
-        return repository
+        return repository if directory is None else descend(repository, directory)
 
     def _extractprovidername(
         self, location: Location
