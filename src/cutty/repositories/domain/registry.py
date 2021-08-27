@@ -59,17 +59,18 @@ class ProviderRegistry:
     ) -> Repository:
         """Return the repository located at the given URL."""
         location = parselocation(rawlocation)
+
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-
         repository = provide(providers, location, revision)
 
         if directory is not None:
-            name = directory.name
-            path = Path(
-                filesystem=PathFilesystem(repository.path.joinpath(*directory.parts))
+            path = repository.path.joinpath(*directory.parts)
+            return Repository(
+                directory.name,
+                Path(filesystem=PathFilesystem(path)),
+                repository.revision,
             )
-            return Repository(name, path, repository.revision)
 
         return repository
 
