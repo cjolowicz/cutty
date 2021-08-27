@@ -1,0 +1,12 @@
+breaking: "breaking/*"
+bug: ["bug/*", "fix/*"]
+build: "build/*"
+ci: "ci/*"
+dependencies: ["dependencies/*", "deps/*"]
+documentation: ["documentation/*", "docs/*"]
+enhancement: ["enhancement/*", "feature/*", "feat/*"]
+performance: ["performance/*", "perf/*"]
+refactoring: ["refactoring/*", "refactor/*"]
+removal: ["removal/*", "remove/*"]
+style: ["style/*"]
+testing: ["testing/*", "test/*"]
