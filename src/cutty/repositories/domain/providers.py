@@ -11,6 +11,7 @@ from typing import Protocol
 
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
@@ -54,16 +55,22 @@ class RepositoryProvider(Protocol):
 Provider = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
+@dataclass
+class UnknownLocationError(CuttyError):
+    """The repository location could not be processed by any provider."""
+
+    location: Location
+
+
 def provide(
     providers: Iterable[Provider], location: Location, revision: Optional[Revision]
 ) -> Repository:
     """Provide the repository located at the given URL."""
     for provider in providers:
-        repository = provider(location, revision)
-        if repository is not None:
+        if repository := provider(location, revision):
             return repository
 
-    raise RuntimeError(f"unknown location {location}")
+    raise UnknownLocationError(location)
 
 
 ProviderFactory = Callable[[Store, FetchMode], Provider]
