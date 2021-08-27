@@ -8,8 +8,6 @@ from typing import Optional
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.filesystems.domain.path import Path
-from cutty.filesystems.domain.pathfs import PathFilesystem
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import Location
@@ -59,19 +57,12 @@ class ProviderRegistry:
     ) -> Repository:
         """Return the repository located at the given URL."""
         location = parselocation(rawlocation)
+
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-
         repository = provide(providers, location, revision)
 
-        if directory is not None:
-            name = directory.name
-            path = Path(
-                filesystem=PathFilesystem(repository.path.joinpath(*directory.parts))
-            )
-            return Repository(name, path, repository.revision)
-
-        return repository
+        return repository if directory is None else repository.descend(directory)
 
     def _extractprovidername(
         self, location: Location
