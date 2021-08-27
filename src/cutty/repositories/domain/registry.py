@@ -8,8 +8,6 @@ from typing import Optional
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.filesystems.domain.path import Path
-from cutty.filesystems.domain.pathfs import PathFilesystem
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import Location
@@ -18,6 +16,7 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderFactory
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.repository import descend
 from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 
@@ -38,16 +37,6 @@ def provide(
             return repository
 
     raise UnknownLocationError(location)
-
-
-def descend(repository: Repository, directory: PurePath) -> Repository:
-    """Return the subrepository located in the given directory."""
-    path = repository.path.joinpath(*directory.parts)
-    return Repository(
-        directory.name,
-        Path(filesystem=PathFilesystem(path)),
-        repository.revision,
-    )
 
 
 class ProviderRegistry:
