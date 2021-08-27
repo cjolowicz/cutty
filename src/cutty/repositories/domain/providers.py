@@ -83,7 +83,31 @@ ProviderFactory = Callable[[Store, FetchMode], Provider]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
-class LocalProvider(Provider):
+class BaseProvider(Provider):
+    """Base class for local and remote providers."""
+
+    def __init__(
+        self,
+        *,
+        mount: Mounter,
+        getrevision: Optional[GetRevision] = None,
+    ) -> None:
+        """Initialize."""
+        self.mount = mount
+        self.getrevision = getrevision
+
+    def _loadrepository(
+        self, location: Location, revision: Optional[Revision], path: pathlib.Path
+    ) -> Repository:
+        filesystem = self.mount(path, revision)
+
+        if self.getrevision is not None:
+            revision = self.getrevision(path, revision)
+
+        return Repository(location.name, Path(filesystem=filesystem), revision)
+
+
+class LocalProvider(BaseProvider):
     """Provide a repository from the local filesystem."""
 
     def __init__(
@@ -94,9 +118,8 @@ class LocalProvider(Provider):
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
+        super().__init__(mount=mount, getrevision=getrevision)
         self.match = match
-        self.mount = mount
-        self.getrevision = getrevision
 
     def __call__(
         self, location: Location, revision: Optional[Revision]
@@ -112,22 +135,12 @@ class LocalProvider(Provider):
 
         return self._loadrepository(location, revision, path)
 
-    def _loadrepository(
-        self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> Repository:
-        filesystem = self.mount(path, revision)
-
-        if self.getrevision is not None:
-            revision = self.getrevision(path, revision)
-
-        return Repository(location.name, Path(filesystem=filesystem), revision)
-
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
     return DiskFilesystem(path)
 
 
-class RemoteProvider(Provider):
+class RemoteProvider(BaseProvider):
     """Remote providers fetch the repository into local storage first."""
 
     def __init__(
@@ -141,10 +154,11 @@ class RemoteProvider(Provider):
         fetchmode: FetchMode,
     ) -> None:
         """Initialize."""
+        super().__init__(
+            mount=mount if mount is not None else _defaultmount, getrevision=getrevision
+        )
         self.match = match
         self.fetch = tuple(fetch)
-        self.mount = mount if mount is not None else _defaultmount
-        self.getrevision = getrevision
         self.store = store
         self.fetchmode = fetchmode
 
@@ -160,16 +174,6 @@ class RemoteProvider(Provider):
                     return self._loadrepository(location, revision, path)
 
         return None
-
-    def _loadrepository(
-        self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> Repository:
-        filesystem = self.mount(path, revision)
-
-        if self.getrevision is not None:
-            revision = self.getrevision(path, revision)
-
-        return Repository(location.name, Path(filesystem=filesystem), revision)
 
 
 def remoteproviderfactory(
