@@ -110,6 +110,11 @@ class LocalProvider(Provider):
         if not self.match(path):
             return None
 
+        return self._loadrepository(location, revision, path)
+
+    def _loadrepository(
+        self, location: Location, revision: Optional[Revision], path: pathlib.Path
+    ) -> Repository:
         filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
