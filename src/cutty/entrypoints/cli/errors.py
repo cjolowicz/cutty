@@ -2,7 +2,7 @@
 from typing import NoReturn
 
 from cutty.errors import CuttyError
-from cutty.repositories.domain.providers import UnknownLocationError
+from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.util.exceptionhandlers import exceptionhandler
 
 

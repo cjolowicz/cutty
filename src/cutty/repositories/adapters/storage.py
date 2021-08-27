@@ -16,8 +16,8 @@ from yarl import URL
 
 from cutty.repositories.adapters.registry import defaultproviderfactories
 from cutty.repositories.domain.providers import ProviderName
-from cutty.repositories.domain.providers import ProviderRegistry
 from cutty.repositories.domain.providers import ProviderStore
+from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.stores import Store
 
 
