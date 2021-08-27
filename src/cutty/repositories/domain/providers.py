@@ -5,9 +5,7 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from dataclasses import dataclass
-from types import MappingProxyType
 from typing import Optional
-from typing import Protocol
 
 from yarl import URL
 
@@ -39,19 +37,6 @@ class Repository:
     revision: Optional[Revision]
 
 
-class RepositoryProvider(Protocol):
-    """The repository provider turns a repository URL into a filesystem path."""
-
-    def __call__(
-        self,
-        location: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
-    ) -> Repository:
-        """Return the repository located at the given URL."""
-
-
 class Provider:
     """Provider for a specific type of repository."""
 
@@ -79,7 +64,6 @@ def provide(
     raise UnknownLocationError(location)
 
 
-ProviderFactory = Callable[[Store, FetchMode], Provider]
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
@@ -176,6 +160,11 @@ class RemoteProvider(BaseProvider):
         return None
 
 
+ProviderName = str
+ProviderStore = Callable[[ProviderName], Store]
+ProviderFactory = Callable[[Store, FetchMode], Provider]
+
+
 def remoteproviderfactory(
     *,
     match: Optional[Matcher] = None,
@@ -198,14 +187,6 @@ def remoteproviderfactory(
     return _remoteproviderfactory
 
 
-ProviderName = str
-ProviderStore = Callable[[ProviderName], Store]
-ProviderRegistry = Mapping[ProviderName, ProviderFactory]
-
-
-_emptyproviderregistry: ProviderRegistry = MappingProxyType({})
-
-
 def constproviderfactory(provider: Provider) -> ProviderFactory:
     """Create a provider factory that returns the given provider."""
 
@@ -215,65 +196,29 @@ def constproviderfactory(provider: Provider) -> ProviderFactory:
     return _providerfactory
 
 
-def _createprovider(
-    providername: ProviderName,
-    providerfactory: ProviderFactory,
-    providerstore: ProviderStore,
-    fetchmode: FetchMode,
-) -> Provider:
-    """Create a provider."""
-    store = providerstore(providername)
-    return providerfactory(store, fetchmode)
+class ProviderRegistry:
+    """The provider registry retrieves repositories using registered providers."""
 
+    def __init__(
+        self, registry: Mapping[ProviderName, ProviderFactory], store: ProviderStore
+    ) -> None:
+        """Initialize."""
+        self.registry = registry
+        self.store = store
 
-def _createproviders(
-    providerregistry: ProviderRegistry,
-    providerstore: ProviderStore,
-    fetchmode: FetchMode,
-    providername: Optional[ProviderName],
-) -> Iterator[Provider]:
-    """Create providers."""
-    if providername is not None:
-        providerfactory = providerregistry[providername]
-        yield _createprovider(providername, providerfactory, providerstore, fetchmode)
-    else:
-        for providername, providerfactory in providerregistry.items():
-            yield _createprovider(
-                providername, providerfactory, providerstore, fetchmode
-            )
-
-
-def _splitprovidername(
-    location: Location, providerregistry: ProviderRegistry
-) -> tuple[Optional[ProviderName], Location]:
-    """Split off the provider name from the URL scheme, if any."""
-    if isinstance(location, URL):
-        providername, _, scheme = location.scheme.rpartition("+")
-
-        if providername and providername in providerregistry:
-            return providername, location.with_scheme(scheme)
-
-    return None, location
-
-
-def repositoryprovider(
-    providerregistry: ProviderRegistry, providerstore: ProviderStore
-) -> RepositoryProvider:
-    """Return a repository provider."""
-
-    def _provide(
-        location: str,
+    def __call__(
+        self,
+        rawlocation: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
         directory: Optional[PurePath] = None,
     ) -> Repository:
-        location_ = parselocation(location)
-        providername, location_ = _splitprovidername(location_, providerregistry)
-        providers = _createproviders(
-            providerregistry, providerstore, fetchmode, providername
-        )
+        """Return the repository located at the given URL."""
+        location = parselocation(rawlocation)
+        providername, location = self._extractprovidername(location)
+        providers = self._createproviders(fetchmode, providername)
 
-        repository = provide(providers, location_, revision)
+        repository = provide(providers, location, revision)
 
         if directory is not None:
             name = directory.name
@@ -284,4 +229,37 @@ def repositoryprovider(
 
         return repository
 
-    return _provide
+    def _extractprovidername(
+        self, location: Location
+    ) -> tuple[Optional[ProviderName], Location]:
+        """Split off the provider name from the URL scheme, if any."""
+        if isinstance(location, URL):
+            providername, _, scheme = location.scheme.rpartition("+")
+
+            if providername and providername in self.registry:
+                return providername, location.with_scheme(scheme)
+
+        return None, location
+
+    def _createproviders(
+        self,
+        fetchmode: FetchMode,
+        providername: Optional[ProviderName],
+    ) -> Iterator[Provider]:
+        """Create providers."""
+        if providername is not None:
+            providerfactory = self.registry[providername]
+            yield self._createprovider(providername, providerfactory, fetchmode)
+        else:
+            for providername, providerfactory in self.registry.items():
+                yield self._createprovider(providername, providerfactory, fetchmode)
+
+    def _createprovider(
+        self,
+        providername: ProviderName,
+        providerfactory: ProviderFactory,
+        fetchmode: FetchMode,
+    ) -> Provider:
+        """Create a provider."""
+        store = self.store(providername)
+        return providerfactory(store, fetchmode)
