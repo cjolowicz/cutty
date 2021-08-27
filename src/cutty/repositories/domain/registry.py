@@ -18,7 +18,7 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderFactory
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import Repository
+from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 
 

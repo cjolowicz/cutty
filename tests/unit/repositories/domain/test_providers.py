@@ -22,9 +22,9 @@ from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
-from cutty.repositories.domain.providers import Repository
 from cutty.repositories.domain.registry import provide
 from cutty.repositories.domain.registry import ProviderRegistry
+from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
