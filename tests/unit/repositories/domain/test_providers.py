@@ -1,6 +1,7 @@
 """Unit tests for cutty.repositories.domain.providers."""
 import json
 import pathlib
+from collections.abc import Callable
 from typing import Any
 from typing import Optional
 
@@ -17,7 +18,7 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
-from cutty.repositories.domain.providers import localprovider
+from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import provide
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
@@ -28,16 +29,29 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-def nullprovider(
-    location: Location, revision: Optional[Revision]
-) -> Optional[Repository]:
-    """Provider that matches no location."""
-    return None
+ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
+
+
+def provider(function: ProviderFunction) -> Provider:
+    """Decorator to create a provider from a function."""
+
+    class _Provider(Provider):
+        def __call__(
+            self, location: Location, revision: Optional[Revision]
+        ) -> Optional[Repository]:
+            return function(location, revision)
+
+    return _Provider()
+
+
+nullprovider = Provider()
+"""Provider that matches no location."""
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
-    """Provider that matches every URL with a filesystem."""
+    """Provider that matches every URL with a repository."""
 
+    @provider
     def _provider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
@@ -85,7 +99,7 @@ defaultmount = unversioned_mounter(DiskFilesystem)
 
 def test_localprovider_not_local(url: URL) -> None:
     """It returns None if the location is not local."""
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
 
     assert provider(url, None) is None
 
@@ -93,7 +107,7 @@ def test_localprovider_not_local(url: URL) -> None:
 def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
-    provider = localprovider(match=lambda path: False, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: False, mount=defaultmount)
 
     assert provider(url, None) is None
 
@@ -105,7 +119,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     (repository / "marker").touch()
 
     url = asurl(repository)
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
     repository2 = provider(url, None)
 
     assert repository2 is not None
@@ -116,7 +130,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
 def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
-    provider = localprovider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
 
     with pytest.raises(Exception):
         provider(url, "v1.0.0")
@@ -131,7 +145,7 @@ def test_localprovider_repository_revision(tmp_path: pathlib.Path) -> None:
         """Return the contents of the VERSION file."""
         return (path / "VERSION").read_text().strip()
 
-    provider = localprovider(
+    provider = LocalProvider(
         match=lambda _: True, mount=defaultmount, getrevision=getrevision
     )
 
@@ -279,7 +293,7 @@ def test_repositoryprovider_with_path(
     (directory / "marker").touch()
 
     providerfactory = constproviderfactory(
-        localprovider(match=lambda path: True, mount=defaultmount)
+        LocalProvider(match=lambda path: True, mount=defaultmount)
     )
 
     provider = repositoryprovider({"default": providerfactory}, providerstore)
@@ -310,6 +324,7 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
+    @provider
     def fakeprovider(
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
@@ -317,10 +332,10 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
         return repository
 
     registry = {"default": constproviderfactory(fakeprovider)}
-    provider = repositoryprovider(registry, providerstore)
+    provider_ = repositoryprovider(registry, providerstore)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
-    assert repository == provider(str(url))
+    assert repository == provider_(str(url))
 
 
 def test_repositoryprovider_name_from_url(
