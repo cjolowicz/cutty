@@ -148,19 +148,23 @@ class RemoteProvider(Provider):
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
         url = location if isinstance(location, URL) else asurl(location)
+
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
                 if path := fetcher(url, self.store, revision, self.fetchmode):
-                    filesystem = self.mount(path, revision)
-
-                    if self.getrevision is not None:
-                        revision = self.getrevision(path, revision)
-
-                    return Repository(
-                        location.name, Path(filesystem=filesystem), revision
-                    )
+                    return self._loadrepository(location, revision, path)
 
         return None
+
+    def _loadrepository(
+        self, location: Location, revision: Optional[Revision], path: pathlib.Path
+    ) -> Repository:
+        filesystem = self.mount(path, revision)
+
+        if self.getrevision is not None:
+            revision = self.getrevision(path, revision)
+
+        return Repository(location.name, Path(filesystem=filesystem), revision)
 
 
 def remoteproviderfactory(
