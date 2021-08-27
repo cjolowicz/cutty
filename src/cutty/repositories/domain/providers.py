@@ -84,7 +84,7 @@ GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
 class LocalProvider(Provider):
-    """Create a view onto the local filesystem."""
+    """Provide a repository from the local filesystem."""
 
     def __init__(
         self,
