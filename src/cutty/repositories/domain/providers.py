@@ -130,10 +130,10 @@ class LocalProvider(BaseProvider):
         except ValueError:
             return None
 
-        if not self.match(path):
-            return None
+        if self.match(path):
+            return self._loadrepository(location, revision, path)
 
-        return self._loadrepository(location, revision, path)
+        return None
 
 
 def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
