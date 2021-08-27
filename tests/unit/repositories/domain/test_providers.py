@@ -303,6 +303,26 @@ def test_repositoryprovider_with_provider_specific_url(
         provider(str(url))
 
 
+def test_repositoryprovider_unknown_provider_in_url_scheme(
+    providerstore: ProviderStore, url: URL
+) -> None:
+    """It invokes providers with the original scheme."""
+    repositorypath = Path(filesystem=DictFilesystem({}))
+    repository = Repository("example", repositorypath, None)
+
+    def fakeprovider(
+        location: Location, revision: Optional[Revision]
+    ) -> Optional[Repository]:
+        """Fake provider."""
+        return repository
+
+    registry = {"default": constproviderfactory(fakeprovider)}
+    provider = repositoryprovider(registry, providerstore)
+    url = url.with_scheme(f"invalid+{url.scheme}")
+
+    assert repository == provider(str(url))
+
+
 def test_repositoryprovider_name_from_url(
     providerstore: ProviderStore, fetcher: Fetcher
 ) -> None:
