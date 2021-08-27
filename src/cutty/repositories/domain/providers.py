@@ -2,7 +2,6 @@
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterable
-from dataclasses import dataclass
 from typing import Optional
 
 from yarl import URL
@@ -18,17 +17,9 @@ from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.matchers import PathMatcher
 from cutty.repositories.domain.mounters import Mounter
+from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
-
-
-@dataclass
-class Repository:
-    """A repository."""
-
-    name: str
-    path: Path
-    revision: Optional[Revision]
 
 
 class Provider:
