@@ -183,23 +183,25 @@ def test_storage_clean_something(
 
 
 @pytest.fixture
-def providerstore(tmp_path: Path, timer: FakeTimer) -> ProviderStore:
+def defaultproviderstore(tmp_path: Path, timer: FakeTimer) -> ProviderStore:
     """Fixture for a repository storage."""
     return getdefaultproviderstore(tmp_path, timer=timer)
 
 
-def test_getdefaultproviderstore_exists(providerstore: ProviderStore, url: URL) -> None:
+def test_getdefaultproviderstore_exists(
+    defaultproviderstore: ProviderStore, url: URL
+) -> None:
     """It returns a valid filesystem path."""
-    store = providerstore("git")
+    store = defaultproviderstore("git")
     path = store(url)
 
     assert path.exists()
 
 
 def test_getdefaultproviderstore_idempotent(
-    providerstore: ProviderStore, url: URL
+    defaultproviderstore: ProviderStore, url: URL
 ) -> None:
     """It returns the same path each time."""
-    store = providerstore("git")
+    store = defaultproviderstore("git")
 
     assert store(url) == store(url)
