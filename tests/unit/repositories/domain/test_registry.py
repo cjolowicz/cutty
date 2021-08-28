@@ -21,6 +21,7 @@ from tests.fixtures.repositories.domain.providers import nullprovider
 pytest_plugins = [
     "tests.fixtures.repositories.domain.fetchers",
     "tests.fixtures.repositories.domain.mounters",
+    "tests.fixtures.repositories.domain.providers",
 ]
 
 
