@@ -44,7 +44,7 @@ def test_repositoryprovider_with_url(
 def test_repositoryprovider_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
-    defaultmount: Mounter,
+    diskmounter: Mounter,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     directory = tmp_path / "repository"
@@ -52,7 +52,7 @@ def test_repositoryprovider_with_path(
     (directory / "marker").touch()
 
     providerfactory = constproviderfactory(
-        LocalProvider(match=lambda path: True, mount=defaultmount)
+        LocalProvider(match=lambda path: True, mount=diskmounter)
     )
 
     registry = ProviderRegistry({"default": providerfactory}, providerstore)

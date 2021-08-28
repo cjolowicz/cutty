@@ -58,31 +58,31 @@ def test_provide_pass(providers: list[Provider]) -> None:
     assert not (repository.path / "marker").is_file()
 
 
-def test_localprovider_not_local(url: URL, defaultmount: Mounter) -> None:
+def test_localprovider_not_local(url: URL, diskmounter: Mounter) -> None:
     """It returns None if the location is not local."""
-    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
     assert provider(url, None) is None
 
 
 def test_localprovider_not_matching(
-    tmp_path: pathlib.Path, defaultmount: Mounter
+    tmp_path: pathlib.Path, diskmounter: Mounter
 ) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
-    provider = LocalProvider(match=lambda path: False, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: False, mount=diskmounter)
 
     assert provider(url, None) is None
 
 
-def test_localprovider_path(tmp_path: pathlib.Path, defaultmount: Mounter) -> None:
+def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
     """It returns the repository."""
     repository = tmp_path / "repository"
     repository.mkdir()
     (repository / "marker").touch()
 
     url = asurl(repository)
-    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter)
     repository2 = provider(url, None)
 
     assert repository2 is not None
@@ -90,17 +90,17 @@ def test_localprovider_path(tmp_path: pathlib.Path, defaultmount: Mounter) -> No
     assert entry.name == "marker"
 
 
-def test_localprovider_revision(tmp_path: pathlib.Path, defaultmount: Mounter) -> None:
+def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
-    provider = LocalProvider(match=lambda path: True, mount=defaultmount)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
     with pytest.raises(Exception):
         provider(url, "v1.0.0")
 
 
 def test_localprovider_repository_revision(
-    tmp_path: pathlib.Path, defaultmount: Mounter
+    tmp_path: pathlib.Path, diskmounter: Mounter
 ) -> None:
     """It determines the revision of the repository."""
 
@@ -111,7 +111,7 @@ def test_localprovider_repository_revision(
         return (path / "VERSION").read_text().strip()
 
     provider = LocalProvider(
-        match=lambda _: True, mount=defaultmount, getrevision=getrevision
+        match=lambda _: True, mount=diskmounter, getrevision=getrevision
     )
 
     path = tmp_path / "repository"
