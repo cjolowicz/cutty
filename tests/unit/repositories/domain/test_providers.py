@@ -9,14 +9,13 @@ import pytest
 from yarl import URL
 
 from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.locations import Location
-from cutty.repositories.domain.mounters import unversioned_mounter
+from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import remoteproviderfactory
@@ -26,7 +25,10 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
+pytest_plugins = [
+    "tests.fixtures.repositories.domain.fetchers",
+    "tests.fixtures.repositories.domain.mounters",
+]
 
 
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
@@ -94,17 +96,16 @@ def test_provide_pass(providers: list[Provider]) -> None:
     assert not (repository.path / "marker").is_file()
 
 
-defaultmount = unversioned_mounter(DiskFilesystem)
-
-
-def test_localprovider_not_local(url: URL) -> None:
+def test_localprovider_not_local(url: URL, defaultmount: Mounter) -> None:
     """It returns None if the location is not local."""
     provider = LocalProvider(match=lambda path: True, mount=defaultmount)
 
     assert provider(url, None) is None
 
 
-def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
+def test_localprovider_not_matching(
+    tmp_path: pathlib.Path, defaultmount: Mounter
+) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: False, mount=defaultmount)
@@ -112,7 +113,7 @@ def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
     assert provider(url, None) is None
 
 
-def test_localprovider_path(tmp_path: pathlib.Path) -> None:
+def test_localprovider_path(tmp_path: pathlib.Path, defaultmount: Mounter) -> None:
     """It returns the repository."""
     repository = tmp_path / "repository"
     repository.mkdir()
@@ -127,7 +128,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     assert entry.name == "marker"
 
 
-def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
+def test_localprovider_revision(tmp_path: pathlib.Path, defaultmount: Mounter) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: True, mount=defaultmount)
@@ -136,7 +137,9 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
         provider(url, "v1.0.0")
 
 
-def test_localprovider_repository_revision(tmp_path: pathlib.Path) -> None:
+def test_localprovider_repository_revision(
+    tmp_path: pathlib.Path, defaultmount: Mounter
+) -> None:
     """It determines the revision of the repository."""
 
     def getrevision(

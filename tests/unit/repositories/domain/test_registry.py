@@ -7,11 +7,10 @@ import pytest
 from yarl import URL
 
 from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.locations import Location
-from cutty.repositories.domain.mounters import unversioned_mounter
+from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
@@ -22,10 +21,10 @@ from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 
 
-pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
-
-
-defaultmount = unversioned_mounter(DiskFilesystem)
+pytest_plugins = [
+    "tests.fixtures.repositories.domain.fetchers",
+    "tests.fixtures.repositories.domain.mounters",
+]
 
 
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
@@ -77,7 +76,10 @@ def test_repositoryprovider_with_url(
 
 
 def test_repositoryprovider_with_path(
-    tmp_path: pathlib.Path, providerstore: ProviderStore, fetcher: Fetcher
+    tmp_path: pathlib.Path,
+    providerstore: ProviderStore,
+    fetcher: Fetcher,
+    defaultmount: Mounter,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     directory = tmp_path / "repository"
