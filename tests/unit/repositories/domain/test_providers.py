@@ -180,13 +180,11 @@ def test_remoteproviderfactory_mounter(
     store: Store, fetcher: Fetcher, url: URL, jsonmounter: Mounter
 ) -> None:
     """It uses the mounter to mount the filesystem."""
-    revision = "v1.0.0"
     url = url.with_name(f"{url.name}.json")
-    data = {revision: {"marker": "Lorem"}}
-    text = json.dumps(data)
-    path = fetcher(url, store, revision, FetchMode.ALWAYS)
-    assert path is not None  # for type narrowing
-    path.write_text(text)
+    revision = "v1.0.0"
+    if path := fetcher(url, store, revision, FetchMode.ALWAYS):
+        text = json.dumps({revision: {"marker": "Lorem"}})
+        path.write_text(text)
 
     providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
