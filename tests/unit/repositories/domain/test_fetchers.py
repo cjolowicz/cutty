@@ -1,7 +1,4 @@
 """Unit tests for cutty.repositories.domain.fetchers."""
-from pathlib import Path
-
-import pytest
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import Fetcher
@@ -10,13 +7,10 @@ from cutty.repositories.domain.stores import Store
 from tests.fixtures.repositories.domain.fetchers import FetcherCalls
 
 
-pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
-
-
-@pytest.fixture
-def store(tmp_path: Path) -> Store:
-    """Fixture for a store."""
-    return lambda url: tmp_path
+pytest_plugins = [
+    "tests.fixtures.repositories.domain.fetchers",
+    "tests.fixtures.repositories.domain.stores",
+]
 
 
 def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
