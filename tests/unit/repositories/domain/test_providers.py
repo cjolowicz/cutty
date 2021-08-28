@@ -6,8 +6,6 @@ from typing import Optional
 import pytest
 from yarl import URL
 
-from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
@@ -186,15 +184,8 @@ def test_remoteproviderfactory_not_matching(
     assert provider(url, None) is None
 
 
-def jsonmounter(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
-    """Mount a dict filesystem read from JSON."""
-    text = path.read_text()
-    data = json.loads(text)
-    return DictFilesystem(data[revision] if revision is not None else data)
-
-
 def test_remoteproviderfactory_mounter(
-    store: Store, fetcher: Fetcher, url: URL
+    store: Store, fetcher: Fetcher, url: URL, jsonmounter: Mounter
 ) -> None:
     """It uses the mounter to mount the filesystem."""
     revision = "v1.0.0"
