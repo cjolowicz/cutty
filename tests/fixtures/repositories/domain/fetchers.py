@@ -6,9 +6,34 @@ import pytest
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import Fetcher
+from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.fetchers import FetchMode
+from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
+
+
+FetcherCalls = list[tuple[URL, pathlib.Path, Optional[str]]]
+
+
+@pytest.fixture
+def fetchercalls() -> FetcherCalls:
+    """Fixture to record arguments in fetcher calls."""
+    return []
+
+
+@pytest.fixture
+def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
+    """Fixture for a fetcher."""
+
+    @fetcher(match=scheme("https"))
+    def fakefetcher(
+        url: URL, destination: pathlib.Path, revision: Optional[str]
+    ) -> None:
+        """Fake fetcher."""
+        fetchercalls.append((url, destination, revision))
+
+    return fakefetcher
 
 
 @pytest.fixture

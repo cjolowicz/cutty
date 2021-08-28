@@ -1,42 +1,22 @@
 """Unit tests for cutty.repositories.domain.fetchers."""
 from pathlib import Path
-from typing import Optional
 
 import pytest
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import Fetcher
-from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.fetchers import FetchMode
-from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.stores import Store
+from tests.fixtures.repositories.domain.fetchers import FetcherCalls
+
+
+pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
 
 
 @pytest.fixture
 def store(tmp_path: Path) -> Store:
     """Fixture for a store."""
     return lambda url: tmp_path
-
-
-FetcherCalls = list[tuple[URL, Path, Optional[str]]]
-
-
-@pytest.fixture
-def fetchercalls() -> FetcherCalls:
-    """Fixture to record arguments in fetcher calls."""
-    return []
-
-
-@pytest.fixture
-def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
-    """Fixture for a fetcher."""
-
-    @fetcher(match=scheme("https"))
-    def fakefetcher(url: URL, destination: Path, revision: Optional[str]) -> None:
-        """Fake fetcher."""
-        fetchercalls.append((url, destination, revision))
-
-    return fakefetcher
 
 
 def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
