@@ -1,5 +1,4 @@
 """Fixtures for cutty.repositories.domain.providers."""
-import pathlib
 from collections.abc import Callable
 from typing import Any
 from typing import Optional
@@ -13,6 +12,10 @@ from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
+from cutty.repositories.domain.stores import Store
+
+
+pytest_plugins = ["tests.fixtures.repositories.domain.stores"]
 
 
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
@@ -57,8 +60,6 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
 
 
 @pytest.fixture
-def providerstore(tmp_path: pathlib.Path) -> ProviderStore:
+def providerstore(store: Store) -> ProviderStore:
     """Fixture for a simple provider store."""
-    path = tmp_path / "store"
-    path.mkdir()
-    return lambda providername: lambda url: path
+    return lambda providername: store
