@@ -1,7 +1,5 @@
 """Unit tests for cutty.repositories.domain.registry."""
 import pathlib
-from collections.abc import Callable
-from typing import Optional
 
 import pytest
 from yarl import URL
@@ -9,53 +7,21 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
-from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
-from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.repository import Repository
-from cutty.repositories.domain.revisions import Revision
+from tests.fixtures.repositories.domain.providers import constprovider
+from tests.fixtures.repositories.domain.providers import nullprovider
 
 
 pytest_plugins = [
     "tests.fixtures.repositories.domain.fetchers",
     "tests.fixtures.repositories.domain.mounters",
 ]
-
-
-ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
-
-
-def provider(function: ProviderFunction) -> Provider:
-    """Decorator to create a provider from a function."""
-
-    class _Provider(Provider):
-        def __call__(
-            self, location: Location, revision: Optional[Revision]
-        ) -> Optional[Repository]:
-            return function(location, revision)
-
-    return _Provider()
-
-
-nullprovider = Provider()
-"""Provider that matches no location."""
-
-
-def constprovider(repository: Repository) -> Provider:
-    """Provider that returns the same repository always."""
-
-    @provider
-    def _constprovider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        return repository
-
-    return _constprovider
 
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:

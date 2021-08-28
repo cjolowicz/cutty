@@ -1,8 +1,6 @@
 """Unit tests for cutty.repositories.domain.providers."""
 import json
 import pathlib
-from collections.abc import Callable
-from typing import Any
 from typing import Optional
 
 import pytest
@@ -10,60 +8,24 @@ from yarl import URL
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
-from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
-from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.registry import provide
-from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
+from tests.fixtures.repositories.domain.providers import dictprovider
+from tests.fixtures.repositories.domain.providers import nullprovider
 
 
 pytest_plugins = [
     "tests.fixtures.repositories.domain.fetchers",
     "tests.fixtures.repositories.domain.mounters",
 ]
-
-
-ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
-
-
-def provider(function: ProviderFunction) -> Provider:
-    """Decorator to create a provider from a function."""
-
-    class _Provider(Provider):
-        def __call__(
-            self, location: Location, revision: Optional[Revision]
-        ) -> Optional[Repository]:
-            return function(location, revision)
-
-    return _Provider()
-
-
-nullprovider = Provider()
-"""Provider that matches no location."""
-
-
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
-    """Provider that matches every URL with a repository."""
-
-    @provider
-    def _provider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
-        filesystem = DictFilesystem(mapping or {})
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
-
-    return _provider
 
 
 @pytest.mark.parametrize(
