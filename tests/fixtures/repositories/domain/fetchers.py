@@ -13,27 +13,16 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
-FetcherCalls = list[tuple[URL, pathlib.Path, Optional[str]]]
-
-
 @pytest.fixture
-def fetchercalls() -> FetcherCalls:
-    """Fixture to record arguments in fetcher calls."""
-    return []
+def nullfetcher() -> Fetcher:
+    """Fixture for a fetcher that matches no URL."""
 
+    def _(
+        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+    ) -> Optional[pathlib.Path]:
+        return None
 
-@pytest.fixture
-def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
-    """Fixture for a fetcher."""
-
-    @fetcher(match=scheme("https"))
-    def fakefetcher(
-        url: URL, destination: pathlib.Path, revision: Optional[str]
-    ) -> None:
-        """Fake fetcher."""
-        fetchercalls.append((url, destination, revision))
-
-    return fakefetcher
+    return _
 
 
 @pytest.fixture
@@ -55,13 +44,24 @@ def emptyfetcher() -> Fetcher:
     return _fetcher
 
 
+FetcherCalls = list[tuple[URL, pathlib.Path, Optional[str]]]
+
+
 @pytest.fixture
-def nullfetcher() -> Fetcher:
-    """Fixture for a fetcher that matches no URL."""
+def fetchercalls() -> FetcherCalls:
+    """Fixture to record arguments in fetcher calls."""
+    return []
 
-    def _(
-        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
-    ) -> Optional[pathlib.Path]:
-        return None
 
-    return _
+@pytest.fixture
+def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
+    """Fixture for a fetcher."""
+
+    @fetcher(match=scheme("https"))
+    def fakefetcher(
+        url: URL, destination: pathlib.Path, revision: Optional[str]
+    ) -> None:
+        """Fake fetcher."""
+        fetchercalls.append((url, destination, revision))
+
+    return fakefetcher
