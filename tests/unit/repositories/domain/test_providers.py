@@ -129,14 +129,9 @@ def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     assert provider(URL(), None) is None
 
 
-def nullfetcher(
-    url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
-) -> Optional[pathlib.Path]:
-    """Fetcher that matches no URL."""
-    return None
-
-
-def test_remoteproviderfactory_no_matching_fetchers(store: Store) -> None:
+def test_remoteproviderfactory_no_matching_fetchers(
+    store: Store, nullfetcher: Fetcher
+) -> None:
     """It returns None if all fetchers return None."""
     providerfactory = remoteproviderfactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)

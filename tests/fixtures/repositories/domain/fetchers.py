@@ -28,3 +28,15 @@ def fetcher() -> Fetcher:
         return path
 
     return _fetcher
+
+
+@pytest.fixture
+def nullfetcher() -> Fetcher:
+    """Fixture for a fetcher that matches no URL."""
+
+    def _(
+        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+    ) -> Optional[pathlib.Path]:
+        return None
+
+    return _
