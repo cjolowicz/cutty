@@ -26,6 +26,9 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
 
 
+pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
+
+
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
@@ -175,25 +178,6 @@ def test_remoteproviderfactory_no_matching_fetchers(store: Store) -> None:
     providerfactory = remoteproviderfactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
-
-
-@pytest.fixture
-def fetcher() -> Fetcher:
-    """Fixture for a fetcher that simply creates the destination path."""
-
-    def _fetcher(
-        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
-    ) -> Optional[pathlib.Path]:
-        path = store(url) / url.name
-
-        if path.suffix:
-            path.touch()
-        else:
-            path.mkdir(exist_ok=True)
-
-        return path
-
-    return _fetcher
 
 
 def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -> None:

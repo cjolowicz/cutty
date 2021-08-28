@@ -10,7 +10,6 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.mounters import unversioned_mounter
 from cutty.repositories.domain.providers import constproviderfactory
@@ -21,7 +20,9 @@ from cutty.repositories.domain.providers import remoteproviderfactory
 from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
-from cutty.repositories.domain.stores import Store
+
+
+pytest_plugins = ["tests.fixtures.repositories.domain.fetchers"]
 
 
 defaultmount = unversioned_mounter(DiskFilesystem)
@@ -56,25 +57,6 @@ def constprovider(repository: Repository) -> Provider:
         return repository
 
     return _constprovider
-
-
-@pytest.fixture
-def fetcher() -> Fetcher:
-    """Fixture for a fetcher that simply creates the destination path."""
-
-    def _fetcher(
-        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
-    ) -> Optional[pathlib.Path]:
-        path = store(url) / url.name
-
-        if path.suffix:
-            path.touch()
-        else:
-            path.mkdir(exist_ok=True)
-
-        return path
-
-    return _fetcher
 
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
