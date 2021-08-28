@@ -34,23 +34,19 @@ def constprovider(repository: Repository) -> Provider:
     """Provider that returns the same repository always."""
 
     @provider
-    def _constprovider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
+    def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
         return repository
 
-    return _constprovider
+    return _
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a repository."""
 
     @provider
-    def _provider(
-        location: Location, revision: Optional[Revision]
-    ) -> Optional[Repository]:
+    def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
         filesystem = DictFilesystem(mapping or {})
         path = Path(filesystem=filesystem)
         return Repository(location.name, path, revision)
 
-    return _provider
+    return _

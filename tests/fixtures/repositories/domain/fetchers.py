@@ -29,7 +29,7 @@ def nullfetcher() -> Fetcher:
 def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
-    def _fetcher(
+    def _(
         url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
     ) -> Optional[pathlib.Path]:
         path = store(url) / url.name
@@ -41,7 +41,7 @@ def emptyfetcher() -> Fetcher:
 
         return path
 
-    return _fetcher
+    return _
 
 
 FetcherCalls = list[tuple[URL, pathlib.Path, Optional[str]]]
@@ -58,10 +58,8 @@ def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
     """Fixture for a fetcher."""
 
     @fetcher(match=scheme("https"))
-    def fakefetcher(
-        url: URL, destination: pathlib.Path, revision: Optional[str]
-    ) -> None:
+    def _(url: URL, destination: pathlib.Path, revision: Optional[str]) -> None:
         """Fake fetcher."""
         fetchercalls.append((url, destination, revision))
 
-    return fakefetcher
+    return _
