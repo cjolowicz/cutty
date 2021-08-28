@@ -12,7 +12,7 @@ from cutty.repositories.domain.stores import Store
 
 
 @pytest.fixture
-def fetcher() -> Fetcher:
+def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     def _fetcher(

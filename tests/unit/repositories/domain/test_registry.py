@@ -32,10 +32,10 @@ def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None
 
 
 def test_repositoryprovider_with_url(
-    providerstore: ProviderStore, fetcher: Fetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
     registry = ProviderRegistry({"default": providerfactory}, providerstore)
     repository = registry(str(url))
     assert not list(repository.path.iterdir())
@@ -44,7 +44,6 @@ def test_repositoryprovider_with_url(
 def test_repositoryprovider_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
-    fetcher: Fetcher,
     defaultmount: Mounter,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
@@ -64,12 +63,12 @@ def test_repositoryprovider_with_path(
 
 
 def test_repositoryprovider_with_provider_specific_url(
-    providerstore: ProviderStore, fetcher: Fetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     factories = {
-        "default": remoteproviderfactory(fetch=[fetcher]),
+        "default": remoteproviderfactory(fetch=[emptyfetcher]),
         "null": constproviderfactory(nullprovider),
     }
     registry = ProviderRegistry(factories, providerstore)
@@ -92,10 +91,10 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
 
 
 def test_repositoryprovider_name_from_url(
-    providerstore: ProviderStore, fetcher: Fetcher
+    providerstore: ProviderStore, emptyfetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
     registry = ProviderRegistry({"default": providerfactory}, providerstore)
     repository = registry("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name

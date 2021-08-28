@@ -140,9 +140,11 @@ def test_remoteproviderfactory_no_matching_fetchers(
     assert provider(URL(), None) is None
 
 
-def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -> None:
+def test_remoteproviderfactory_happy(
+    store: Store, emptyfetcher: Fetcher, url: URL
+) -> None:
     """It mounts a filesystem for the fetched repository."""
-    providerfactory = remoteproviderfactory(fetch=[fetcher])
+    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, None)
 
@@ -150,7 +152,7 @@ def test_remoteproviderfactory_happy(store: Store, fetcher: Fetcher, url: URL) -
 
 
 def test_remoteproviderfactory_repository_revision(
-    store: Store, fetcher: Fetcher, url: URL
+    store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns the repository revision."""
 
@@ -160,7 +162,9 @@ def test_remoteproviderfactory_repository_revision(
         """Return a fake version."""
         return "v1.0"
 
-    providerfactory = remoteproviderfactory(fetch=[fetcher], getrevision=getrevision)
+    providerfactory = remoteproviderfactory(
+        fetch=[emptyfetcher], getrevision=getrevision
+    )
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, None)
 
@@ -168,25 +172,25 @@ def test_remoteproviderfactory_repository_revision(
 
 
 def test_remoteproviderfactory_not_matching(
-    store: Store, fetcher: Fetcher, url: URL, nullmatcher: Matcher
+    store: Store, emptyfetcher: Fetcher, url: URL, nullmatcher: Matcher
 ) -> None:
     """It returns None if the provider itself does not match."""
-    providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[fetcher])
+    providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(url, None) is None
 
 
 def test_remoteproviderfactory_mounter(
-    store: Store, fetcher: Fetcher, url: URL, jsonmounter: Mounter
+    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter: Mounter
 ) -> None:
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
     revision = "v1.0.0"
-    if path := fetcher(url, store, revision, FetchMode.ALWAYS):
+    if path := emptyfetcher(url, store, revision, FetchMode.ALWAYS):
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = remoteproviderfactory(fetch=[fetcher], mount=jsonmounter)
+    providerfactory = remoteproviderfactory(fetch=[emptyfetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, revision)
 
