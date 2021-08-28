@@ -50,9 +50,7 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
         location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
         filesystem = DictFilesystem(mapping or {})
-        if filesystem is not None:
-            path = Path(filesystem=filesystem)
-            return Repository(location.name, path, revision)
-        return None
+        path = Path(filesystem=filesystem)
+        return Repository(location.name, path, revision)
 
     return _provider
