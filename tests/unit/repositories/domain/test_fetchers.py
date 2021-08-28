@@ -18,23 +18,23 @@ def store(tmp_path: Path) -> Store:
     return lambda url: tmp_path
 
 
-Calls = list[tuple[URL, Path, Optional[str]]]
+FetcherCalls = list[tuple[URL, Path, Optional[str]]]
 
 
 @pytest.fixture
-def calls() -> Calls:
+def fetchercalls() -> FetcherCalls:
     """Fixture to record arguments in fetcher calls."""
     return []
 
 
 @pytest.fixture
-def fakefetcher(calls: Calls) -> Fetcher:
+def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
     """Fixture for a fetcher."""
 
     @fetcher(match=scheme("https"))
     def fakefetcher(url: URL, destination: Path, revision: Optional[str]) -> None:
         """Fake fetcher."""
-        calls.append((url, destination, revision))
+        fetchercalls.append((url, destination, revision))
 
     return fakefetcher
 
@@ -46,22 +46,22 @@ def test_fetcher_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
 
 
 def test_fetcher_fetch_always(
-    fakefetcher: Fetcher, calls: Calls, url: URL, store: Store
+    fakefetcher: Fetcher, fetchercalls: FetcherCalls, url: URL, store: Store
 ) -> None:
     """It delegates to the fetch function."""
     destination = store(url) / url.name
     path = fakefetcher(url, store, None, FetchMode.ALWAYS)
 
     assert path == destination
-    assert calls == [(url, destination, None)]
+    assert fetchercalls == [(url, destination, None)]
 
 
 def test_fetcher_fetch_never(
-    fakefetcher: Fetcher, calls: Calls, url: URL, store: Store
+    fakefetcher: Fetcher, fetchercalls: FetcherCalls, url: URL, store: Store
 ) -> None:
     """It returns the destination without fetching."""
     destination = store(url) / url.name
     path = fakefetcher(url, store, None, FetchMode.NEVER)
 
     assert path == destination
-    assert not calls
+    assert not fetchercalls
