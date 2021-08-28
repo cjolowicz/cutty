@@ -9,6 +9,7 @@ from yarl import URL
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
+from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
@@ -22,6 +23,7 @@ from tests.fixtures.repositories.domain.providers import nullprovider
 
 pytest_plugins = [
     "tests.fixtures.repositories.domain.fetchers",
+    "tests.fixtures.repositories.domain.matchers",
     "tests.fixtures.repositories.domain.mounters",
 ]
 
@@ -165,13 +167,8 @@ def test_remoteproviderfactory_repository_revision(
     assert repository is not None and repository.revision == "v1.0"
 
 
-def nullmatcher(url: URL) -> bool:
-    """Matcher that matches no URL."""
-    return False
-
-
 def test_remoteproviderfactory_not_matching(
-    store: Store, fetcher: Fetcher, url: URL
+    store: Store, fetcher: Fetcher, url: URL, nullmatcher: Matcher
 ) -> None:
     """It returns None if the provider itself does not match."""
     providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[fetcher])
