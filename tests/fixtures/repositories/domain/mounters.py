@@ -21,7 +21,7 @@ def diskmounter() -> Mounter:
 
 @pytest.fixture
 def jsonmounter() -> Mounter:
-    """Mount a dict filesystem read from JSON."""
+    """Mount a versioned dict filesystem read from JSON."""
 
     def _(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
         text = path.read_text()
