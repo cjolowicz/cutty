@@ -4,7 +4,7 @@ from yarl import URL
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
-from tests.fixtures.repositories.domain.fetchers import FetcherCalls
+from tests.fixtures.repositories.domain.types import FetcherCalls
 
 
 pytest_plugins = [

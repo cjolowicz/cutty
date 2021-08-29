@@ -11,6 +11,7 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
+from tests.fixtures.repositories.domain.types import FetcherCalls
 
 
 @pytest.fixture
@@ -42,9 +43,6 @@ def emptyfetcher() -> Fetcher:
         return path
 
     return _
-
-
-FetcherCalls = list[tuple[URL, pathlib.Path, Optional[str]]]
 
 
 @pytest.fixture
