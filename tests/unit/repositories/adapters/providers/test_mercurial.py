@@ -1,33 +1,18 @@
 """Unit tests for cutty.repositories.adapters.providers.mercurial."""
 import pathlib
 import string
-import subprocess  # noqa: S404
 from typing import Optional
 
 import pytest
 from yarl import URL
 
-from cutty.repositories.adapters.fetchers.mercurial import findhg
 from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
 
 
-@pytest.fixture
-def hg() -> Hg:
-    """Fixture for a hg command."""
-    hg = findhg()
-
-    def _hg(
-        *args: str, cwd: Optional[pathlib.Path] = None
-    ) -> subprocess.CompletedProcess[str]:
-        try:
-            return hg(*args, cwd=cwd)
-        except RuntimeError:
-            pytest.skip("cannot locate hg")
-
-    return _hg
+pytest_plugins = ["tests.fixtures.repositories.adapters.mercurial"]
 
 
 @pytest.fixture

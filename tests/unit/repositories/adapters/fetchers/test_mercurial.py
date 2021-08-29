@@ -1,15 +1,12 @@
 """Unit tests for cutty.repositories.adapters.fetchers.hg."""
 import pathlib
-import shutil
-import subprocess  # noqa: S404
-from typing import Optional
-from typing import Protocol
 
 import pytest
 from yarl import URL
 
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
+from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
@@ -17,32 +14,7 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 
 
-class Hg(Protocol):
-    """Protocol for the hg command."""
-
-    def __call__(
-        self, *args: str, cwd: Optional[pathlib.Path] = None
-    ) -> subprocess.CompletedProcess[str]:
-        """Invoke hg."""
-
-
-@pytest.fixture
-def hg() -> Optional[Hg]:
-    """Fixture for a hg command."""
-    executable = shutil.which("hg")
-
-    def hg(
-        *args: str, cwd: Optional[pathlib.Path] = None
-    ) -> subprocess.CompletedProcess[str]:
-        """Run a hg command."""
-        if executable is None:
-            pytest.skip("cannot locate hg")
-
-        return subprocess.run(  # noqa: S603
-            [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
-        )
-
-    return hg
+pytest_plugins = ["tests.fixtures.repositories.adapters.mercurial"]
 
 
 @pytest.fixture
