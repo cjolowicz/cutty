@@ -3,16 +3,12 @@ from collections.abc import Callable
 from typing import Any
 from typing import Optional
 
-import pytest
-
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.providers import Provider
-from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
-from cutty.repositories.domain.stores import Store
 
 
 pytest_plugins = ["tests.fixtures.repositories.domain.stores"]
@@ -57,9 +53,3 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
         return Repository(location.name, path, revision)
 
     return _
-
-
-@pytest.fixture
-def providerstore(store: Store) -> ProviderStore:
-    """Fixture for a simple provider store."""
-    return lambda providername: store
