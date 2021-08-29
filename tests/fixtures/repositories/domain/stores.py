@@ -4,6 +4,7 @@ import pathlib
 import pytest
 from yarl import URL
 
+from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.stores import Store
 
@@ -23,4 +24,8 @@ def store(tmp_path: pathlib.Path) -> Store:
 @pytest.fixture
 def providerstore(store: Store) -> ProviderStore:
     """Fixture for a simple provider store."""
-    return lambda providername: store
+
+    def _(providername: ProviderName) -> Store:
+        return store
+
+    return _
