@@ -27,7 +27,7 @@ pytest_plugins = [
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
-    registry = ProviderRegistry({}, providerstore)
+    registry = ProviderRegistry({}, providerstore, factories=[])
     with pytest.raises(Exception):
         registry(str(url))
 
@@ -36,8 +36,8 @@ def test_repositoryprovider_with_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
+    registry = ProviderRegistry({}, providerstore, factories=[providerfactory])
     repository = registry(str(url))
     assert not list(repository.path.iterdir())
 
@@ -53,10 +53,10 @@ def test_repositoryprovider_with_path(
     (directory / "marker").touch()
 
     providerfactory = constproviderfactory(
-        LocalProvider(match=lambda path: True, mount=diskmounter)
+        LocalProvider("default", match=lambda path: True, mount=diskmounter)
     )
 
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    registry = ProviderRegistry({}, providerstore, factories=[providerfactory])
     repository = registry(str(directory))
     [entry] = repository.path.iterdir()
 
@@ -68,11 +68,11 @@ def test_repositoryprovider_with_provider_specific_url(
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
-    factories = {
-        "default": remoteproviderfactory(fetch=[emptyfetcher]),
-        "null": constproviderfactory(nullprovider),
-    }
-    registry = ProviderRegistry(factories, providerstore)
+    factories = [
+        remoteproviderfactory("default", fetch=[emptyfetcher]),
+        constproviderfactory(nullprovider),
+    ]
+    registry = ProviderRegistry({}, providerstore, factories)
     with pytest.raises(Exception):
         registry(str(url))
 
@@ -84,8 +84,8 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
-    factories = {"default": constproviderfactory(constprovider(repository))}
-    registry = ProviderRegistry(factories, providerstore)
+    factories = [constproviderfactory(constprovider("default", repository))]
+    registry = ProviderRegistry({}, providerstore, factories)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
     assert repository == registry(str(url))
@@ -95,7 +95,7 @@ def test_repositoryprovider_name_from_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
+    registry = ProviderRegistry({}, providerstore, factories=[providerfactory])
     repository = registry("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name

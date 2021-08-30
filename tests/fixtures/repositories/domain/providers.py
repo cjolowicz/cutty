@@ -17,26 +17,29 @@ pytest_plugins = ["tests.fixtures.repositories.domain.stores"]
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
 
 
-def provider(function: ProviderFunction) -> Provider:
+def provider(name: str) -> Callable[[ProviderFunction], Provider]:
     """Decorator to create a provider from a function."""
 
-    class _Provider(Provider):
-        def __call__(
-            self, location: Location, revision: Optional[Revision]
-        ) -> Optional[Repository]:
-            return function(location, revision)
+    def _decorator(function: ProviderFunction) -> Provider:
+        class _Provider(Provider):
+            def __call__(
+                self, location: Location, revision: Optional[Revision]
+            ) -> Optional[Repository]:
+                return function(location, revision)
 
-    return _Provider()
+        return _Provider()
+
+    return _decorator
 
 
-nullprovider = Provider()
+nullprovider = Provider("null")
 """Provider that matches no location."""
 
 
-def constprovider(repository: Repository) -> Provider:
+def constprovider(name: str, repository: Repository) -> Provider:
     """Provider that returns the same repository always."""
 
-    @provider
+    @provider(name)
     def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
         return repository
 
@@ -46,7 +49,7 @@ def constprovider(repository: Repository) -> Provider:
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a repository."""
 
-    @provider
+    @provider("dict")
     def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
         filesystem = DictFilesystem(mapping or {})
         path = Path(filesystem=filesystem)
