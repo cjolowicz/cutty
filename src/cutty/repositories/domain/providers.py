@@ -144,7 +144,6 @@ class RemoteProvider(BaseProvider):
 
 ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
-ProviderFactory = Callable[[Store, FetchMode], Provider]
 
 
 class ProviderFactory2(abc.ABC):
