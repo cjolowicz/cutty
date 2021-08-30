@@ -10,7 +10,7 @@ from cutty.repositories.adapters.providers.zip import zipproviderfactory
 from cutty.repositories.domain.providers import constproviderfactory as factory
 
 
-defaultproviderfactories2 = [
+defaultproviderfactories = [
     factory(localzipprovider),
     factory(localgitprovider),
     factory(diskprovider),
@@ -19,4 +19,4 @@ defaultproviderfactories2 = [
 ]
 
 if shutil.which("hg") is not None:  # pragma: no cover
-    defaultproviderfactories2.append(hgproviderfactory)
+    defaultproviderfactories.append(hgproviderfactory)

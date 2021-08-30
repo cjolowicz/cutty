@@ -14,7 +14,7 @@ from typing import Optional
 
 from yarl import URL
 
-from cutty.repositories.adapters.registry import defaultproviderfactories2
+from cutty.repositories.adapters.registry import defaultproviderfactories
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.registry import ProviderRegistry
@@ -156,7 +156,7 @@ def getdefaultrepositoryprovider(
     return ProviderRegistry(
         {
             providerfactory.name: providerfactory
-            for providerfactory in defaultproviderfactories2
+            for providerfactory in defaultproviderfactories
         },
         getdefaultproviderstore(path, timer=timer),
     )
