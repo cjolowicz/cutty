@@ -5,6 +5,7 @@ from cutty.repositories.domain.providers import LocalProvider
 
 
 diskprovider = LocalProvider(
+    "local",
     match=lambda path: path.is_dir(),
     mount=unversioned_mounter(DiskFilesystem),
 )

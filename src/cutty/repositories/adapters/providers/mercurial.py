@@ -24,4 +24,6 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return result.stdout
 
 
-hgproviderfactory = remoteproviderfactory(fetch=[hgfetcher], getrevision=getrevision)
+hgproviderfactory = remoteproviderfactory(
+    "hg", fetch=[hgfetcher], getrevision=getrevision
+)
