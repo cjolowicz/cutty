@@ -14,6 +14,7 @@ from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.locations import parselocation
 from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import ProviderFactory
+from cutty.repositories.domain.providers import ProviderFactory2
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.repository import Repository
@@ -42,10 +43,16 @@ class ProviderRegistry:
     """The provider registry retrieves repositories using registered providers."""
 
     def __init__(
-        self, registry: Mapping[ProviderName, ProviderFactory], store: ProviderStore
+        self,
+        registry: Mapping[ProviderName, ProviderFactory],
+        store: ProviderStore,
+        factories: Iterable[ProviderFactory2] = (),
     ) -> None:
         """Initialize."""
-        self.registry = registry
+        registry2 = {
+            providerfactory.name: providerfactory for providerfactory in factories
+        }
+        self.registry = {**registry, **registry2}
         self.store = store
 
     def __call__(
