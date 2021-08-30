@@ -8,7 +8,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.mounters import Mounter
-from cutty.repositories.domain.providers import constproviderfactory
+from cutty.repositories.domain.providers import ConstProviderFactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.providers import RemoteProviderFactory
@@ -52,7 +52,7 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    providerfactory = constproviderfactory(
+    providerfactory = ConstProviderFactory(
         LocalProvider("default", match=lambda path: True, mount=diskmounter)
     )
 
@@ -70,7 +70,7 @@ def test_repositoryprovider_with_provider_specific_url(
     url = url.with_scheme(f"null+{url.scheme}")
     factories = [
         RemoteProviderFactory("default", fetch=[emptyfetcher]),
-        constproviderfactory(nullprovider),
+        ConstProviderFactory(nullprovider),
     ]
     registry = ProviderRegistry(providerstore, factories)
     with pytest.raises(Exception):
@@ -84,7 +84,7 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
-    factories = [constproviderfactory(constprovider("default", repository))]
+    factories = [ConstProviderFactory(constprovider("default", repository))]
     registry = ProviderRegistry(providerstore, factories)
     url = url.with_scheme(f"invalid+{url.scheme}")
 

@@ -7,13 +7,13 @@ from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
-from cutty.repositories.domain.providers import constproviderfactory as factory
+from cutty.repositories.domain.providers import ConstProviderFactory as Factory
 
 
 defaultproviderfactories = [
-    factory(localzipprovider),
-    factory(localgitprovider),
-    factory(diskprovider),
+    Factory(localzipprovider),
+    Factory(localgitprovider),
+    Factory(diskprovider),
     zipproviderfactory,
     gitproviderfactory,
 ]

@@ -202,6 +202,3 @@ class ConstProviderFactory(ProviderFactory):
     def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
         """Return the provider."""
         return self.provider
-
-
-constproviderfactory = ConstProviderFactory
