@@ -25,6 +25,10 @@ from cutty.repositories.domain.stores import Store
 class Provider:
     """Provider for a specific type of repository."""
 
+    def __init__(self, name: str = "") -> None:
+        """Initialize."""
+        self.name = name
+
     def __call__(
         self, location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
@@ -39,11 +43,15 @@ class BaseProvider(Provider):
 
     def __init__(
         self,
+        name: str = "",
+        /,
         *,
         mount: Mounter,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
+        super().__init__(name)
+
         self.mount = mount
         self.getrevision = getrevision
 
@@ -63,13 +71,15 @@ class LocalProvider(BaseProvider):
 
     def __init__(
         self,
+        name: str = "local",
+        /,
         *,
         match: PathMatcher,
         mount: Mounter,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        super().__init__(mount=mount, getrevision=getrevision)
+        super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
 
     def __call__(
@@ -96,6 +106,8 @@ class RemoteProvider(BaseProvider):
 
     def __init__(
         self,
+        name: str = "remote",
+        /,
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
@@ -106,7 +118,9 @@ class RemoteProvider(BaseProvider):
     ) -> None:
         """Initialize."""
         super().__init__(
-            mount=mount if mount is not None else _defaultmount, getrevision=getrevision
+            name,
+            mount=mount if mount is not None else _defaultmount,
+            getrevision=getrevision,
         )
         self.match = match
         self.fetch = tuple(fetch)
@@ -133,6 +147,8 @@ ProviderFactory = Callable[[Store, FetchMode], Provider]
 
 
 def remoteproviderfactory(
+    name: str = "remote",
+    /,
     *,
     match: Optional[Matcher] = None,
     fetch: Iterable[Fetcher],
@@ -143,6 +159,7 @@ def remoteproviderfactory(
 
     def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
         return RemoteProvider(
+            name,
             match=match,
             fetch=fetch,
             mount=mount,
