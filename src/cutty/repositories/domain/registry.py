@@ -1,7 +1,6 @@
 """The provider registry is the main entry point of cutty.repositories."""
 from collections.abc import Iterable
 from collections.abc import Iterator
-from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Optional
 
@@ -44,15 +43,14 @@ class ProviderRegistry:
 
     def __init__(
         self,
-        registry: Mapping[ProviderName, ProviderFactory],
         store: ProviderStore,
-        factories: Iterable[ProviderFactory2] = (),
+        factories: Iterable[ProviderFactory2],
     ) -> None:
         """Initialize."""
         registry2 = {
             providerfactory.name: providerfactory for providerfactory in factories
         }
-        self.registry = {**registry, **registry2}
+        self.registry = {**registry2}
         self.store = store
 
     def __call__(
