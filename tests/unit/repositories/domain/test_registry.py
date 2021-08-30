@@ -11,7 +11,7 @@ from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import constproviderfactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.repository import Repository
 from tests.fixtures.repositories.domain.providers import constprovider
@@ -36,7 +36,7 @@ def test_repositoryprovider_with_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry(str(url))
     assert not list(repository.path.iterdir())
@@ -69,7 +69,7 @@ def test_repositoryprovider_with_provider_specific_url(
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     factories = [
-        remoteproviderfactory("default", fetch=[emptyfetcher]),
+        RemoteProviderFactory("default", fetch=[emptyfetcher]),
         constproviderfactory(nullprovider),
     ]
     registry = ProviderRegistry(providerstore, factories)
@@ -95,7 +95,7 @@ def test_repositoryprovider_name_from_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name

@@ -13,7 +13,7 @@ from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import Provider
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.registry import provide
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
@@ -126,7 +126,7 @@ def test_localprovider_repository_revision(
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
-    providerfactory = remoteproviderfactory(fetch=[])
+    providerfactory = RemoteProviderFactory(fetch=[])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -135,7 +135,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
     store: Store, nullfetcher: Fetcher
 ) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = remoteproviderfactory(fetch=[nullfetcher])
+    providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(URL(), None) is None
 
@@ -144,7 +144,7 @@ def test_remoteproviderfactory_happy(
     store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It mounts a filesystem for the fetched repository."""
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, None)
 
@@ -162,7 +162,7 @@ def test_remoteproviderfactory_repository_revision(
         """Return a fake version."""
         return "v1.0"
 
-    providerfactory = remoteproviderfactory(
+    providerfactory = RemoteProviderFactory(
         fetch=[emptyfetcher], getrevision=getrevision
     )
     provider = providerfactory(store, FetchMode.ALWAYS)
@@ -175,7 +175,7 @@ def test_remoteproviderfactory_not_matching(
     store: Store, emptyfetcher: Fetcher, url: URL, nullmatcher: Matcher
 ) -> None:
     """It returns None if the provider itself does not match."""
-    providerfactory = remoteproviderfactory(match=nullmatcher, fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
     assert provider(url, None) is None
 
@@ -190,7 +190,7 @@ def test_remoteproviderfactory_mounter(
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher], mount=jsonmounter)
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
     provider = providerfactory(store, FetchMode.ALWAYS)
     repository = provider(url, revision)
 

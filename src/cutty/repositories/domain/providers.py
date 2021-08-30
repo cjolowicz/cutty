@@ -204,5 +204,4 @@ class ConstProviderFactory(ProviderFactory):
         return self.provider
 
 
-remoteproviderfactory = RemoteProviderFactory
 constproviderfactory = ConstProviderFactory
