@@ -47,11 +47,10 @@ class ProviderRegistry:
         factories: Iterable[ProviderFactory2],
     ) -> None:
         """Initialize."""
-        registry2 = {
+        self.store = store
+        self.registry = {
             providerfactory.name: providerfactory for providerfactory in factories
         }
-        self.registry = {**registry2}
-        self.store = store
 
     def __call__(
         self,
