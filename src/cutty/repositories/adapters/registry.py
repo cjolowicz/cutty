@@ -20,8 +20,3 @@ defaultproviderfactories2 = [
 
 if shutil.which("hg") is not None:  # pragma: no cover
     defaultproviderfactories2.append(hgproviderfactory)
-
-defaultproviderfactories = {
-    providerfactory.name: providerfactory
-    for providerfactory in defaultproviderfactories2
-}

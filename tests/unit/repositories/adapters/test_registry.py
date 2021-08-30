@@ -1,26 +1,19 @@
 """Unit tests for cutty.repositories.adapters.registry."""
 from yarl import URL
 
-from cutty.repositories.adapters.registry import defaultproviderfactories
+from cutty.repositories.adapters.registry import defaultproviderfactories2
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
 
 
 def test_defaultproviderfactories_non_empty() -> None:
     """It is not empty."""
-    assert defaultproviderfactories
-
-
-def test_defaultproviderfactories_strings() -> None:
-    """Its keys are strings."""
-    assert all(
-        isinstance(providername, str) for providername in defaultproviderfactories
-    )
+    assert defaultproviderfactories2
 
 
 def test_defaultproviderfactories_providerfactories(store: Store) -> None:
-    """Its values are provider factories."""
+    """Its items are provider factories."""
     url = URL("mailto:you@example.com")
-    for providerfactory in defaultproviderfactories.values():
+    for providerfactory in defaultproviderfactories2:
         provider = providerfactory(store, FetchMode.ALWAYS)
         assert provider(url, None) is None
