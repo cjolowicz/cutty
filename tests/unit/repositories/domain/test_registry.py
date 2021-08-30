@@ -37,7 +37,7 @@ def test_repositoryprovider_with_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
-    registry = ProviderRegistry(providerstore, factories=[providerfactory])
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry(str(url))
     assert not list(repository.path.iterdir())
 
@@ -56,7 +56,7 @@ def test_repositoryprovider_with_path(
         LocalProvider("default", match=lambda path: True, mount=diskmounter)
     )
 
-    registry = ProviderRegistry(providerstore, factories=[providerfactory])
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry(str(directory))
     [entry] = repository.path.iterdir()
 
@@ -96,6 +96,6 @@ def test_repositoryprovider_name_from_url(
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = remoteproviderfactory("default", fetch=[emptyfetcher])
-    registry = ProviderRegistry(providerstore, factories=[providerfactory])
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name
