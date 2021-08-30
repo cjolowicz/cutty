@@ -146,7 +146,7 @@ ProviderName = str
 ProviderStore = Callable[[ProviderName], Store]
 
 
-class ProviderFactory2(abc.ABC):
+class ProviderFactory(abc.ABC):
     """Provider factory."""
 
     def __init__(self, name: str = "") -> None:
@@ -158,7 +158,7 @@ class ProviderFactory2(abc.ABC):
         """Create a provider."""
 
 
-class RemoteProviderFactory(ProviderFactory2):
+class RemoteProviderFactory(ProviderFactory):
     """Factory for remote providers."""
 
     def __init__(
@@ -191,7 +191,7 @@ class RemoteProviderFactory(ProviderFactory2):
         )
 
 
-class ConstProviderFactory(ProviderFactory2):
+class ConstProviderFactory(ProviderFactory):
     """Provider factory returning a given provider."""
 
     def __init__(self, provider: Provider) -> None:

@@ -12,7 +12,7 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.locations import parselocation
 from cutty.repositories.domain.providers import Provider
-from cutty.repositories.domain.providers import ProviderFactory2
+from cutty.repositories.domain.providers import ProviderFactory
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
 from cutty.repositories.domain.repository import Repository
@@ -43,7 +43,7 @@ class ProviderRegistry:
     def __init__(
         self,
         store: ProviderStore,
-        factories: Iterable[ProviderFactory2],
+        factories: Iterable[ProviderFactory],
     ) -> None:
         """Initialize."""
         self.store = store
@@ -94,7 +94,7 @@ class ProviderRegistry:
 
     def _createprovider(
         self,
-        providerfactory: ProviderFactory2,
+        providerfactory: ProviderFactory,
         fetchmode: FetchMode,
     ) -> Provider:
         """Create a provider."""
