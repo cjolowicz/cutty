@@ -8,10 +8,10 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.domain.fetchers import Fetcher
 from cutty.repositories.domain.mounters import Mounter
-from cutty.repositories.domain.providers import constproviderfactory
+from cutty.repositories.domain.providers import ConstProviderFactory
 from cutty.repositories.domain.providers import LocalProvider
 from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.repository import Repository
 from tests.fixtures.repositories.domain.providers import constprovider
@@ -27,7 +27,7 @@ pytest_plugins = [
 
 def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
-    registry = ProviderRegistry({}, providerstore)
+    registry = ProviderRegistry(providerstore, factories=[])
     with pytest.raises(Exception):
         registry(str(url))
 
@@ -36,8 +36,8 @@ def test_repositoryprovider_with_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry(str(url))
     assert not list(repository.path.iterdir())
 
@@ -52,11 +52,11 @@ def test_repositoryprovider_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    providerfactory = constproviderfactory(
-        LocalProvider(match=lambda path: True, mount=diskmounter)
+    providerfactory = ConstProviderFactory(
+        LocalProvider("default", match=lambda path: True, mount=diskmounter)
     )
 
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry(str(directory))
     [entry] = repository.path.iterdir()
 
@@ -68,11 +68,11 @@ def test_repositoryprovider_with_provider_specific_url(
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
-    factories = {
-        "default": remoteproviderfactory(fetch=[emptyfetcher]),
-        "null": constproviderfactory(nullprovider),
-    }
-    registry = ProviderRegistry(factories, providerstore)
+    factories = [
+        RemoteProviderFactory("default", fetch=[emptyfetcher]),
+        ConstProviderFactory(nullprovider),
+    ]
+    registry = ProviderRegistry(providerstore, factories)
     with pytest.raises(Exception):
         registry(str(url))
 
@@ -84,8 +84,8 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
 
-    factories = {"default": constproviderfactory(constprovider(repository))}
-    registry = ProviderRegistry(factories, providerstore)
+    factories = [ConstProviderFactory(constprovider("default", repository))]
+    registry = ProviderRegistry(providerstore, factories)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
     assert repository == registry(str(url))
@@ -95,7 +95,7 @@ def test_repositoryprovider_name_from_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = remoteproviderfactory(fetch=[emptyfetcher])
-    registry = ProviderRegistry({"default": providerfactory}, providerstore)
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
+    registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry("https://example.com/path/to/example?query#fragment")
     assert "example" == repository.name

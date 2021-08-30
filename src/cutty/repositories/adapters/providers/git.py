@@ -7,7 +7,7 @@ import pygit2
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.repositories.adapters.fetchers.git import gitfetcher
 from cutty.repositories.domain.providers import LocalProvider
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.revisions import Revision
 
 
@@ -54,7 +54,9 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return revision
 
 
-localgitprovider = LocalProvider(match=match, mount=mount, getrevision=getrevision)
-gitproviderfactory = remoteproviderfactory(
-    fetch=[gitfetcher], mount=mount, getrevision=getrevision
+localgitprovider = LocalProvider(
+    "localgit", match=match, mount=mount, getrevision=getrevision
+)
+gitproviderfactory = RemoteProviderFactory(
+    "git", fetch=[gitfetcher], mount=mount, getrevision=getrevision
 )

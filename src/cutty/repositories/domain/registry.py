@@ -1,7 +1,6 @@
 """The provider registry is the main entry point of cutty.repositories."""
 from collections.abc import Iterable
 from collections.abc import Iterator
-from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Optional
 
@@ -42,11 +41,15 @@ class ProviderRegistry:
     """The provider registry retrieves repositories using registered providers."""
 
     def __init__(
-        self, registry: Mapping[ProviderName, ProviderFactory], store: ProviderStore
+        self,
+        store: ProviderStore,
+        factories: Iterable[ProviderFactory],
     ) -> None:
         """Initialize."""
-        self.registry = registry
         self.store = store
+        self.registry = {
+            providerfactory.name: providerfactory for providerfactory in factories
+        }
 
     def __call__(
         self,
@@ -84,17 +87,16 @@ class ProviderRegistry:
         """Create providers."""
         if providername is not None:
             providerfactory = self.registry[providername]
-            yield self._createprovider(providername, providerfactory, fetchmode)
+            yield self._createprovider(providerfactory, fetchmode)
         else:
-            for providername, providerfactory in self.registry.items():
-                yield self._createprovider(providername, providerfactory, fetchmode)
+            for providerfactory in self.registry.values():
+                yield self._createprovider(providerfactory, fetchmode)
 
     def _createprovider(
         self,
-        providername: ProviderName,
         providerfactory: ProviderFactory,
         fetchmode: FetchMode,
     ) -> Provider:
         """Create a provider."""
-        store = self.store(providername)
+        store = self.store(providerfactory.name)
         return providerfactory(store, fetchmode)

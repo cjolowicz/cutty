@@ -4,7 +4,7 @@ from typing import Optional
 
 from cutty.repositories.adapters.fetchers.mercurial import findhg
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
-from cutty.repositories.domain.providers import remoteproviderfactory
+from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.revisions import Revision
 
 
@@ -24,4 +24,6 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return result.stdout
 
 
-hgproviderfactory = remoteproviderfactory(fetch=[hgfetcher], getrevision=getrevision)
+hgproviderfactory = RemoteProviderFactory(
+    "hg", fetch=[hgfetcher], getrevision=getrevision
+)

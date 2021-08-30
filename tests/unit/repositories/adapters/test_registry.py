@@ -11,16 +11,9 @@ def test_defaultproviderfactories_non_empty() -> None:
     assert defaultproviderfactories
 
 
-def test_defaultproviderfactories_strings() -> None:
-    """Its keys are strings."""
-    assert all(
-        isinstance(providername, str) for providername in defaultproviderfactories
-    )
-
-
 def test_defaultproviderfactories_providerfactories(store: Store) -> None:
-    """Its values are provider factories."""
+    """Its items are provider factories."""
     url = URL("mailto:you@example.com")
-    for providerfactory in defaultproviderfactories.values():
+    for providerfactory in defaultproviderfactories:
         provider = providerfactory(store, FetchMode.ALWAYS)
         assert provider(url, None) is None

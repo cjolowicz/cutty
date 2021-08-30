@@ -154,6 +154,6 @@ def getdefaultrepositoryprovider(
 ) -> ProviderRegistry:
     """Return a repository provider."""
     return ProviderRegistry(
-        defaultproviderfactories,
         getdefaultproviderstore(path, timer=timer),
+        defaultproviderfactories,
     )
