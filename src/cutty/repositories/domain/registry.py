@@ -12,7 +12,6 @@ from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import Location
 from cutty.repositories.domain.locations import parselocation
 from cutty.repositories.domain.providers import Provider
-from cutty.repositories.domain.providers import ProviderFactory
 from cutty.repositories.domain.providers import ProviderFactory2
 from cutty.repositories.domain.providers import ProviderName
 from cutty.repositories.domain.providers import ProviderStore
@@ -88,17 +87,16 @@ class ProviderRegistry:
         """Create providers."""
         if providername is not None:
             providerfactory = self.registry[providername]
-            yield self._createprovider(providername, providerfactory, fetchmode)
+            yield self._createprovider(providerfactory, fetchmode)
         else:
-            for providername, providerfactory in self.registry.items():
-                yield self._createprovider(providername, providerfactory, fetchmode)
+            for providerfactory in self.registry.values():
+                yield self._createprovider(providerfactory, fetchmode)
 
     def _createprovider(
         self,
-        providername: ProviderName,
-        providerfactory: ProviderFactory,
+        providerfactory: ProviderFactory2,
         fetchmode: FetchMode,
     ) -> Provider:
         """Create a provider."""
-        store = self.store(providername)
+        store = self.store(providerfactory.name)
         return providerfactory(store, fetchmode)
