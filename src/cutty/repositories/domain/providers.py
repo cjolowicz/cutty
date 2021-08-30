@@ -1,4 +1,5 @@
 """Repository providers."""
+import abc
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterable
@@ -146,35 +147,63 @@ ProviderStore = Callable[[ProviderName], Store]
 ProviderFactory = Callable[[Store, FetchMode], Provider]
 
 
-def remoteproviderfactory(
-    name: str = "remote",
-    /,
-    *,
-    match: Optional[Matcher] = None,
-    fetch: Iterable[Fetcher],
-    mount: Optional[Mounter] = None,
-    getrevision: Optional[GetRevision] = None,
-) -> ProviderFactory:
-    """Remote providers fetch the repository into local storage first."""
+class ProviderFactory2(abc.ABC):
+    """Provider factory."""
 
-    def _remoteproviderfactory(store: Store, fetchmode: FetchMode) -> Provider:
+    def __init__(self, name: str = "") -> None:
+        """Initialize."""
+        self.name = name
+
+    @abc.abstractmethod
+    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+        """Create a provider."""
+
+
+class RemoteProviderFactory(ProviderFactory2):
+    """Factory for remote providers."""
+
+    def __init__(
+        self,
+        name: str = "remote",
+        /,
+        *,
+        match: Optional[Matcher] = None,
+        fetch: Iterable[Fetcher],
+        mount: Optional[Mounter] = None,
+        getrevision: Optional[GetRevision] = None,
+    ) -> None:
+        """Initialize."""
+        super().__init__(name)
+        self.match = match
+        self.fetch = fetch
+        self.mount = mount
+        self.getrevision = getrevision
+
+    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+        """Create a provider."""
         return RemoteProvider(
-            name,
-            match=match,
-            fetch=fetch,
-            mount=mount,
-            getrevision=getrevision,
+            self.name,
+            match=self.match,
+            fetch=self.fetch,
+            mount=self.mount,
+            getrevision=self.getrevision,
             store=store,
             fetchmode=fetchmode,
         )
 
-    return _remoteproviderfactory
+
+class ConstProviderFactory(ProviderFactory2):
+    """Provider factory returning a given provider."""
+
+    def __init__(self, provider: Provider) -> None:
+        """Initialize."""
+        super().__init__(provider.name)
+        self.provider = provider
+
+    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+        """Return the provider."""
+        return self.provider
 
 
-def constproviderfactory(provider: Provider) -> ProviderFactory:
-    """Create a provider factory that returns the given provider."""
-
-    def _providerfactory(store: Store, fetchmode: FetchMode) -> Provider:
-        return provider
-
-    return _providerfactory
+remoteproviderfactory = RemoteProviderFactory
+constproviderfactory = ConstProviderFactory
