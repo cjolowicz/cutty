@@ -101,5 +101,5 @@ def test_unknown_location_invalid_url(runcutty: RunCutty) -> None:
 
 def test_unknown_location_no_such_path(runcutty: RunCutty) -> None:
     """It prints an error message."""
-    with pytest.raises(Exception, match="unknown location"):
+    with pytest.raises(Exception, match="no such file or directory"):
         runcutty("create", "/no/such/file/or/directory")
