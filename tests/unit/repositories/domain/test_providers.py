@@ -196,3 +196,14 @@ def test_remoteproviderfactory_mounter(
 
     assert repository is not None
     assert (repository.path / "marker").read_text() == "Lorem"
+
+
+def test_remoteproviderfactory_inexistent_path(
+    store: Store, emptyfetcher: Fetcher, nullmatcher: Matcher
+) -> None:
+    """It returns None if the location is an inexistent path."""
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
+    provider = providerfactory(store, FetchMode.ALWAYS)
+    path = pathlib.Path("/no/such/file/or/directory")
+
+    assert provider(path, None) is None
