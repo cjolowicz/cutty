@@ -93,7 +93,13 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
     assert str(revision)[:7] in repository.head.commit.message
 
 
-def test_unknown_location(runcutty: RunCutty) -> None:
+def test_unknown_location_invalid_url(runcutty: RunCutty) -> None:
     """It prints an error message."""
     with pytest.raises(Exception, match="unknown location"):
         runcutty("create", "invalid://location")
+
+
+def test_unknown_location_no_such_path(runcutty: RunCutty) -> None:
+    """It prints an error message."""
+    with pytest.raises(Exception, match="unknown location"):
+        runcutty("create", "/no/such/file/or/directory")
