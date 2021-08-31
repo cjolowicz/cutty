@@ -92,7 +92,7 @@ class LocalProvider(BaseProvider):
         except ValueError:
             return None
 
-        if self.match(path):
+        if path.exists() and self.match(path):
             return self._loadrepository(location, revision, path)
 
         return None
@@ -132,7 +132,12 @@ class RemoteProvider(BaseProvider):
         self, location: Location, revision: Optional[Revision]
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
-        url = location if isinstance(location, URL) else asurl(location)
+        if isinstance(location, URL):
+            url = location
+        elif location.exists():
+            url = asurl(location)
+        else:
+            return None
 
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
