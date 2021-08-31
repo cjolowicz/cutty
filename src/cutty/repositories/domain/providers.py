@@ -92,7 +92,7 @@ class LocalProvider(BaseProvider):
         except ValueError:
             return None
 
-        if self.match(path):
+        if path.exists() and self.match(path):
             return self._loadrepository(location, revision, path)
 
         return None
