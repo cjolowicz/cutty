@@ -28,7 +28,7 @@ lazysequence = ">=0.2.1,<0.4.0"
 platformdirs = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
+pytest = "^6.2.5"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
 mypy = "^0.910"
