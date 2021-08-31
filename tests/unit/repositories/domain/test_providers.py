@@ -75,6 +75,14 @@ def test_localprovider_not_matching(
     assert provider(url, None) is None
 
 
+def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
+    """It returns None if the location is an inexistent path."""
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter)
+    path = pathlib.Path("/no/such/file/or/directory")
+
+    assert provider(path, None) is None
+
+
 def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
     """It returns the repository."""
     repository = tmp_path / "repository"
