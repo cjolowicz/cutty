@@ -16,8 +16,8 @@ from cutty.repositories.domain.registry import UnknownLocationError
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
     ],
 )
-def test_unknown_location_invalid_url(error: CuttyError) -> None:
-    """It raises SystemExit instead of the original exception."""
-    with pytest.raises(SystemExit):
+def test_errors(error: CuttyError) -> None:
+    """It exits with an error message."""
+    with pytest.raises(SystemExit, match="error: "):
         with fatal:
             raise error
