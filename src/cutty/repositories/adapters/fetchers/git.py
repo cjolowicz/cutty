@@ -12,7 +12,7 @@ from cutty.util.git import Repository
 
 
 @fetcher(
-    match=scheme("file", "ftp", "ftps", "git", "http", "https", "ssh"),
+    match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )
 def gitfetcher(
