@@ -10,14 +10,14 @@ from cutty.util.exceptionhandlers import exceptionhandler
 @exceptionhandler
 def _unknownlocation(error: UnknownLocationError) -> NoReturn:
     if isinstance(error.location, pathlib.Path) and not error.location.exists():
-        raise SystemExit(f"no such file or directory: {error.location}")
+        raise SystemExit(f"error: no such file or directory: {error.location}")
 
-    raise SystemExit(f"unknown location {error.location}")
+    raise SystemExit(f"error: unknown location {error.location}")
 
 
 @exceptionhandler
 def _fatal(error: CuttyError) -> NoReturn:
-    raise SystemExit(f"fatal: {error}")
+    raise SystemExit(f"error: {error}")
 
 
 fatal = _unknownlocation >> _fatal
