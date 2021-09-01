@@ -2,7 +2,6 @@
 import pathlib
 from typing import NoReturn
 
-from cutty.errors import CuttyError
 from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.util.exceptionhandlers import exceptionhandler
 
@@ -19,9 +18,4 @@ def _unknownlocation(error: UnknownLocationError) -> NoReturn:
     _die(f"unknown location {error.location}")
 
 
-@exceptionhandler
-def _fatal(error: CuttyError) -> NoReturn:
-    _die(str(error))
-
-
-fatal = _unknownlocation >> _fatal
+fatal = _unknownlocation

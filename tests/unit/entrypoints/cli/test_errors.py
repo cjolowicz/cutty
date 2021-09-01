@@ -9,13 +9,6 @@ from cutty.errors import CuttyError
 from cutty.repositories.domain.registry import UnknownLocationError
 
 
-def test_fatal() -> None:
-    """It raises SystemExit with the exception message."""
-    with pytest.raises(SystemExit, match="error: Boom"):
-        with fatal:
-            raise CuttyError("Boom")
-
-
 @pytest.mark.parametrize(
     "error",
     [
