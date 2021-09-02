@@ -7,6 +7,7 @@ import pygit2
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.git import gitfetcher
@@ -118,3 +119,18 @@ def test_broken_head_after_clone_unexpected_branch(
 
     with pytest.raises(KeyError):
         gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)
+
+
+@pytest.mark.parametrize(
+    ("url", "message"),
+    [
+        (
+            URL("https://example.invalid/repository.git"),
+            "failed to resolve address for example.invalid",
+        ),
+    ],
+)
+def test_fetch_error(url: URL, store: Store, message: str) -> None:
+    """It raises an exception with libgit2's error message."""
+    with pytest.raises(CuttyError, match=message):
+        gitfetcher(url, store, None, FetchMode.ALWAYS)
