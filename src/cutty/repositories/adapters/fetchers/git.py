@@ -32,13 +32,13 @@ def _errorhandler(error: pygit2.GitError) -> NoReturn:
     match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )
-@_errorhandler
 def gitfetcher(
     url: URL, destination: pathlib.Path, revision: Optional[Revision]
 ) -> None:
     """Fetch a git repository."""
-    if destination.exists():
-        repository = Repository.open(destination)
-        repository.fetch(prune=True)
-    else:
-        Repository.clone(str(url), destination, mirror=True)
+    with _errorhandler:
+        if destination.exists():
+            repository = Repository.open(destination)
+            repository.fetch(prune=True)
+        else:
+            Repository.clone(str(url), destination, mirror=True)
