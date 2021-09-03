@@ -27,7 +27,7 @@ def _unsupportedrevision(error: UnsupportedRevisionError) -> NoReturn:
 
 @exceptionhandler
 def _gitfetcher(error: GitFetcherError) -> NoReturn:
-    _die(f"cannot access remote git repository: {error.message}")
+    _die(f"cannot access remote git repository at {error.url}: {error.message}")
 
 
 fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher
