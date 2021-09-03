@@ -12,6 +12,7 @@ from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import defaultstore
+from cutty.util.exceptionhandlers import ExceptionHandler
 from cutty.util.exceptionhandlers import exceptionhandler
 from cutty.util.git import Repository
 
@@ -23,9 +24,12 @@ class GitFetcherError(CuttyError):
     message: str
 
 
-@exceptionhandler
-def _errorhandler(error: pygit2.GitError) -> NoReturn:
-    raise GitFetcherError(str(error))
+def _errorhandler() -> ExceptionHandler:
+    @exceptionhandler
+    def _(error: pygit2.GitError) -> NoReturn:
+        raise GitFetcherError(str(error))
+
+    return _
 
 
 @fetcher(
@@ -36,7 +40,7 @@ def gitfetcher(
     url: URL, destination: pathlib.Path, revision: Optional[Revision]
 ) -> None:
     """Fetch a git repository."""
-    with _errorhandler:
+    with _errorhandler():
         if destination.exists():
             repository = Repository.open(destination)
             repository.fetch(prune=True)
