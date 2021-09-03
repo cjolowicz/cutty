@@ -135,4 +135,5 @@ def test_fetch_error(url: URL, store: Store, message: str) -> None:
     with pytest.raises(GitFetcherError) as exceptioninfo:
         gitfetcher(url, store, None, FetchMode.ALWAYS)
 
+    assert url == exceptioninfo.value.url
     assert message in exceptioninfo.value.message
