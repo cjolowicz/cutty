@@ -14,7 +14,10 @@ from cutty.repositories.domain.registry import UnknownLocationError
 @pytest.mark.parametrize(
     "error",
     [
-        GitFetcherError("unsupported URL protocol"),
+        GitFetcherError(
+            URL("ssh://git@github.com/user/repository.git"),
+            "unsupported URL protocol",
+        ),
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),

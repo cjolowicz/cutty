@@ -21,13 +21,14 @@ from cutty.util.git import Repository
 class GitFetcherError(CuttyError):
     """Cannot access the remote repository."""
 
+    url: URL
     message: str
 
 
-def _errorhandler() -> ExceptionHandler:
+def _errorhandler(url: URL) -> ExceptionHandler:
     @exceptionhandler
     def _(error: pygit2.GitError) -> NoReturn:
-        raise GitFetcherError(str(error))
+        raise GitFetcherError(url, str(error))
 
     return _
 
@@ -40,7 +41,7 @@ def gitfetcher(
     url: URL, destination: pathlib.Path, revision: Optional[Revision]
 ) -> None:
     """Fetch a git repository."""
-    with _errorhandler():
+    with _errorhandler(url):
         if destination.exists():
             repository = Repository.open(destination)
             repository.fetch(prune=True)
