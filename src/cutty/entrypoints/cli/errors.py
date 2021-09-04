@@ -2,6 +2,7 @@
 import pathlib
 from typing import NoReturn
 
+from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -24,4 +25,9 @@ def _unsupportedrevision(error: UnsupportedRevisionError) -> NoReturn:
     _die(f"template does not support revisions, got {error.revision!r}")
 
 
-fatal = _unknownlocation >> _unsupportedrevision
+@exceptionhandler
+def _gitfetcher(error: GitFetcherError) -> NoReturn:
+    _die(f"cannot access remote git repository at {error.url}: {error.message}")
+
+
+fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher

@@ -10,6 +10,7 @@ from yarl import URL
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.git import gitfetcher
+from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
@@ -118,3 +119,42 @@ def test_broken_head_after_clone_unexpected_branch(
 
     with pytest.raises(KeyError):
         gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)
+
+
+@pytest.mark.parametrize(
+    ("url", "posixmessage", "windowsmessage"),
+    [
+        (
+            URL("https://example.invalid/repository.git"),
+            "failed to resolve address for example.invalid",
+            "failed to send request: The server name or address could not be resolved",
+        ),
+        (
+            URL("https://example.com/repository.git"),
+            "unexpected http status code: 404",
+            "request failed with status code: 404",
+        ),
+        (
+            URL("https://example.com/index.html"),
+            "invalid content-type: 'text/html; charset=UTF-8'",
+            "received unexpected content-type",
+        ),
+        (
+            URL("https://www.mercurial-scm.org/repo/hg/"),
+            "unexpected http status code: 400",
+            "request failed with status code: 400",
+        ),
+    ],
+)
+def test_fetch_error(
+    url: URL, store: Store, posixmessage: str, windowsmessage: str
+) -> None:
+    """It raises an exception with libgit2's error message."""
+    with pytest.raises(GitFetcherError) as exceptioninfo:
+        gitfetcher(url, store, None, FetchMode.ALWAYS)
+
+    assert url == exceptioninfo.value.url
+    assert any(
+        message in exceptioninfo.value.message
+        for message in (posixmessage, windowsmessage)
+    )
