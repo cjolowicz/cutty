@@ -29,7 +29,7 @@ class Hg(Protocol):
 def findhg() -> Hg:
     """Return a function for running hg commands."""
     if not (path := shutil.which("hg")):
-        raise HgNotFoundError("cannot locate hg")
+        raise HgNotFoundError()
 
     executable = path
 
