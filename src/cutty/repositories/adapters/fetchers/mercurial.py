@@ -7,9 +7,14 @@ from typing import Protocol
 
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
+
+
+class HgNotFoundError(CuttyError):
+    """Cannot locate the ``hg`` executable."""
 
 
 class Hg(Protocol):
@@ -24,7 +29,7 @@ class Hg(Protocol):
 def findhg() -> Hg:
     """Return a function for running hg commands."""
     if not (path := shutil.which("hg")):
-        raise RuntimeError("cannot locate hg")
+        raise HgNotFoundError("cannot locate hg")
 
     executable = path
 

@@ -3,6 +3,7 @@ import pytest
 
 from cutty.repositories.adapters.fetchers.mercurial import findhg
 from cutty.repositories.adapters.fetchers.mercurial import Hg
+from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 
 
 @pytest.fixture
@@ -10,5 +11,5 @@ def hg() -> Hg:
     """Fixture for a hg command."""
     try:
         return findhg()
-    except RuntimeError:
+    except HgNotFoundError:
         pytest.skip("cannot locate hg")
