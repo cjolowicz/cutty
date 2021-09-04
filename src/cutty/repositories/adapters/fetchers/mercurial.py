@@ -23,15 +23,15 @@ class Hg(Protocol):
 
 def findhg() -> Hg:
     """Return a function for running hg commands."""
-    executable = shutil.which("hg")
+    if not (path := shutil.which("hg")):
+        raise RuntimeError("cannot locate hg")
+
+    executable = path
 
     def hg(
         *args: str, cwd: Optional[pathlib.Path] = None
     ) -> subprocess.CompletedProcess[str]:
         """Run a hg command."""
-        if executable is None:
-            raise RuntimeError("cannot locate hg")
-
         return subprocess.run(  # noqa: S603
             [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
         )
