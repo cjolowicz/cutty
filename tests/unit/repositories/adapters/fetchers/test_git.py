@@ -128,6 +128,18 @@ def test_broken_head_after_clone_unexpected_branch(
             URL("https://example.invalid/repository.git"),
             "failed to resolve address for example.invalid",
         ),
+        (
+            URL("https://example.com/repository.git"),
+            "unexpected http status code: 404",
+        ),
+        (
+            URL("https://example.com/index.html"),
+            "invalid content-type: 'text/html; charset=UTF-8'",
+        ),
+        (
+            URL("https://www.mercurial-scm.org/repo/hg/"),
+            "unexpected http status code: 400",
+        ),
     ],
 )
 def test_fetch_error(url: URL, store: Store, message: str) -> None:
