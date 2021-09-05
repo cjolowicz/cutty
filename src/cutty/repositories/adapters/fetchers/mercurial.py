@@ -2,6 +2,7 @@
 import pathlib
 import shutil
 import subprocess  # noqa: S404
+from dataclasses import dataclass
 from typing import Optional
 from typing import Protocol
 
@@ -15,6 +16,16 @@ from cutty.repositories.domain.revisions import Revision
 
 class HgNotFoundError(CuttyError):
     """Cannot locate the ``hg`` executable."""
+
+
+@dataclass
+class HgError(CuttyError):
+    """Mercurial exited with a non-zero status code."""
+
+    command: tuple[str, ...]
+    stdout: str
+    stderr: str
+    status: int
 
 
 class Hg(Protocol):
@@ -37,9 +48,14 @@ def findhg() -> Hg:
         *args: str, cwd: Optional[pathlib.Path] = None
     ) -> subprocess.CompletedProcess[str]:
         """Run a hg command."""
-        return subprocess.run(  # noqa: S603
-            [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
-        )
+        try:
+            return subprocess.run(  # noqa: S603
+                [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
+            )
+        except subprocess.CalledProcessError as error:
+            raise HgError(
+                (executable, *args), error.stdout, error.stderr, error.returncode
+            )
 
     return hg
 
