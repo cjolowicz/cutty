@@ -1,8 +1,10 @@
 """Error handling for the command-line interface."""
 import pathlib
+import shlex
 from typing import NoReturn
 
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
+from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
@@ -36,4 +38,13 @@ def _hgnotfound(error: HgNotFoundError) -> NoReturn:
     _die("cannot locate hg executable on PATH")
 
 
-fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher >> _hgnotfound
+@exceptionhandler
+def _hg(error: HgError) -> NoReturn:
+    command = shlex.join(error.command)
+    output = error.stderr if error.stderr else error.stdout
+    message = output.splitlines()[0] if output else ""
+
+    _die(f"command {command!r} exited with {error.status}: {message}")
+
+
+fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher >> _hgnotfound >> _hg
