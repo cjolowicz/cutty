@@ -26,6 +26,7 @@ class HgError(CuttyError):
     stdout: str
     stderr: str
     status: int
+    cwd: Optional[pathlib.Path]
 
 
 class Hg(Protocol):
@@ -54,7 +55,7 @@ def findhg() -> Hg:
             )
         except subprocess.CalledProcessError as error:
             raise HgError(
-                (executable, *args), error.stdout, error.stderr, error.returncode
+                (executable, *args), error.stdout, error.stderr, error.returncode, cwd
             )
 
     return hg

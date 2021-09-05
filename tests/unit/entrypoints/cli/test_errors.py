@@ -26,6 +26,7 @@ from cutty.repositories.domain.registry import UnknownLocationError
             "",
             "abort: no repository found in '/' (.hg not found)\n",
             255,
+            None,
         ),
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
