@@ -28,6 +28,7 @@ from cutty.repositories.domain.registry import UnknownLocationError
             255,
             None,
         ),
+        HgError(("/usr/bin/hg",), "", "", 1, pathlib.Path("/home/user")),
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
