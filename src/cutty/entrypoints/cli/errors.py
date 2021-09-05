@@ -1,6 +1,5 @@
 """Error handling for the command-line interface."""
 import pathlib
-import shlex
 from typing import NoReturn
 
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
@@ -40,11 +39,15 @@ def _hgnotfound(error: HgNotFoundError) -> NoReturn:
 
 @exceptionhandler
 def _hg(error: HgError) -> NoReturn:
-    command = shlex.join(error.command)
-    output = error.stderr if error.stderr else error.stdout
-    message = output.splitlines()[0] if output else ""
+    command = f"hg {error.command[1]}" if len(error.command) > 1 else "hg"
 
-    _die(f"command {command!r} exited with {error.status}: {message}")
+    if message := error.stderr + error.stdout:
+        message = message.splitlines()[0]
+        message = message.removeprefix("abort: ").removeprefix("error: ")
+    else:
+        message = str(error.status)
+
+    _die(f"{command}: {message}")
 
 
 fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher >> _hgnotfound >> _hg
