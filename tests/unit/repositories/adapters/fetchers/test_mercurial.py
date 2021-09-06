@@ -81,7 +81,7 @@ def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
         URL("https://example.invalid/repository.git"),
     ],
 )
-def test_fetch_error(url: URL, store: Store) -> None:
+def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
     """It raises an exception with hg's error message."""
     with pytest.raises(HgError):
         hgfetcher(url, store, None, FetchMode.ALWAYS)
