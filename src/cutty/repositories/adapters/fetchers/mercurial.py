@@ -2,14 +2,31 @@
 import pathlib
 import shutil
 import subprocess  # noqa: S404
+from dataclasses import dataclass
 from typing import Optional
 from typing import Protocol
 
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.repositories.domain.fetchers import fetcher
 from cutty.repositories.domain.matchers import scheme
 from cutty.repositories.domain.revisions import Revision
+
+
+class HgNotFoundError(CuttyError):
+    """Cannot locate the ``hg`` executable."""
+
+
+@dataclass
+class HgError(CuttyError):
+    """Mercurial exited with a non-zero status code."""
+
+    command: tuple[str, ...]
+    stdout: str
+    stderr: str
+    status: int
+    cwd: Optional[pathlib.Path]
 
 
 class Hg(Protocol):
@@ -23,18 +40,23 @@ class Hg(Protocol):
 
 def findhg() -> Hg:
     """Return a function for running hg commands."""
-    executable = shutil.which("hg")
+    if not (path := shutil.which("hg")):
+        raise HgNotFoundError()
+
+    executable = path
 
     def hg(
         *args: str, cwd: Optional[pathlib.Path] = None
     ) -> subprocess.CompletedProcess[str]:
         """Run a hg command."""
-        if executable is None:
-            raise RuntimeError("cannot locate hg")
-
-        return subprocess.run(  # noqa: S603
-            [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
-        )
+        try:
+            return subprocess.run(  # noqa: S603
+                [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
+            )
+        except subprocess.CalledProcessError as error:
+            raise HgError(
+                (executable, *args), error.stdout, error.stderr, error.returncode, cwd
+            )
 
     return hg
 

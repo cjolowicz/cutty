@@ -3,6 +3,8 @@ import pathlib
 from typing import NoReturn
 
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
+from cutty.repositories.adapters.fetchers.mercurial import HgError
+from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -30,4 +32,22 @@ def _gitfetcher(error: GitFetcherError) -> NoReturn:
     _die(f"cannot access remote git repository at {error.url}: {error.message}")
 
 
-fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher
+@exceptionhandler
+def _hgnotfound(error: HgNotFoundError) -> NoReturn:
+    _die("cannot locate hg executable on PATH")
+
+
+@exceptionhandler
+def _hg(error: HgError) -> NoReturn:
+    command = f"hg {error.command[1]}" if len(error.command) > 1 else "hg"
+
+    if message := error.stderr + error.stdout:
+        message = message.splitlines()[0]
+        message = message.removeprefix("abort: ").removeprefix("error: ")
+    else:
+        message = str(error.status)
+
+    _die(f"{command}: {message}")
+
+
+fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher >> _hgnotfound >> _hg

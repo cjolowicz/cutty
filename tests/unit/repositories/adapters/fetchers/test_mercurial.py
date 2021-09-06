@@ -7,6 +7,7 @@ from yarl import URL
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.mercurial import Hg
+from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
@@ -72,3 +73,15 @@ def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
     # Check that the marker file is gone.
     path = Path("marker", filesystem=DiskFilesystem(destination))
     assert not (path / "marker").is_file()
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        URL("https://example.invalid/repository.git"),
+    ],
+)
+def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
+    """It raises an exception with hg's error message."""
+    with pytest.raises(HgError):
+        hgfetcher(url, store, None, FetchMode.ALWAYS)
