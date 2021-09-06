@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.repositories.adapters.fetchers.file import filefetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
@@ -75,3 +76,10 @@ def test_filefetcher_file_update(repository: Path, store: Store) -> None:
     # Check that the marker file is updated.
     assert path is not None
     assert path.read_text() == "Ipsum"
+
+
+def test_fetch_error(store: Store) -> None:
+    """It raises an exception."""
+    url = URL("file:///no/such/file")
+    with pytest.raises(CuttyError):
+        filefetcher(url, store, None, FetchMode.ALWAYS)
