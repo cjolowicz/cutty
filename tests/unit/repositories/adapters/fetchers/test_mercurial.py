@@ -79,6 +79,8 @@ def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
     "url",
     [
         URL("https://example.invalid/repository.git"),
+        URL("https://example.com/repository.git"),
+        URL("https://example.com/index.html"),
     ],
 )
 def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
