@@ -2,6 +2,7 @@
 import pathlib
 from typing import NoReturn
 
+from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
@@ -55,4 +56,16 @@ def _hg(error: HgError) -> NoReturn:
     _die(f"{command}: {message}")
 
 
-fatal = _unknownlocation >> _unsupportedrevision >> _gitfetcher >> _hgnotfound >> _hg
+@exceptionhandler
+def _filefetcher(error: FileFetcherError) -> NoReturn:
+    _die(f"cannot fetch template: {error.error}")
+
+
+fatal = (
+    _unknownlocation
+    >> _unsupportedrevision
+    >> _gitfetcher
+    >> _hgnotfound
+    >> _hg
+    >> _filefetcher
+)
