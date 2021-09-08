@@ -1,6 +1,7 @@
 """Fetch a repository from the filesystem."""
 import pathlib
 import shutil
+from dataclasses import dataclass
 from typing import NoReturn
 from typing import Optional
 
@@ -14,9 +15,16 @@ from cutty.repositories.domain.revisions import Revision
 from cutty.util.exceptionhandlers import exceptionhandler
 
 
+@dataclass
+class FileFetcherError(CuttyError):
+    """The file or directory could not be fetched."""
+
+    error: OSError
+
+
 @exceptionhandler
 def _errorhandler(error: OSError) -> NoReturn:
-    raise CuttyError(error)
+    raise FileFetcherError(error)
 
 
 @fetcher(match=scheme("file"))
