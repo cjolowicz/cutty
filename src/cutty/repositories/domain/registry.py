@@ -75,6 +75,18 @@ class ProviderRegistry:
             providername, _, scheme = location.scheme.rpartition("+")
 
             if providername and providername in self.registry:
+                if location.raw_host is None:
+                    # yarl does not allow scheme replacement in URLs without host
+                    # https://github.com/aio-libs/yarl/issues/280
+                    location = URL.build(
+                        scheme=scheme,
+                        authority=location.raw_authority,
+                        path=location.raw_path,
+                        query_string=location.raw_query_string,
+                        fragment=location.raw_fragment,
+                        encoded=True,
+                    )
+                    return providername, location
                 return providername, location.with_scheme(scheme)
 
         return None, location
