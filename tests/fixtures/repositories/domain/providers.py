@@ -22,6 +22,9 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
 
     def _decorator(function: ProviderFunction) -> Provider:
         class _Provider(Provider):
+            def __init__(self) -> None:
+                super().__init__(name)
+
             def __call__(
                 self, location: Location, revision: Optional[Revision]
             ) -> Optional[Repository]:
