@@ -43,7 +43,12 @@ def _hg(error: HgError) -> NoReturn:
 
     if message := error.stderr + error.stdout:
         message = message.splitlines()[0]
-        message = message.removeprefix("abort: ").removeprefix("error: ")
+        message = (
+            message.removeprefix("abort: ")
+            .removeprefix("error: ")
+            .removesuffix(":")
+            .strip()
+        )
     else:
         message = str(error.status)
 
