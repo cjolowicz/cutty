@@ -15,6 +15,7 @@ from cutty.repositories.domain.providers import RemoteProviderFactory
 from cutty.repositories.domain.registry import ProviderRegistry
 from cutty.repositories.domain.repository import Repository
 from tests.fixtures.repositories.domain.providers import constprovider
+from tests.fixtures.repositories.domain.providers import dictprovider
 from tests.fixtures.repositories.domain.providers import nullprovider
 
 
@@ -89,6 +90,13 @@ def test_repositoryprovider_unknown_provider_in_url_scheme(
     url = url.with_scheme(f"invalid+{url.scheme}")
 
     assert repository == registry(str(url))
+
+
+def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
+    """It does not crash when rewriting provider-specific file:// URLs."""
+    # https://github.com/aio-libs/yarl/issues/280
+    registry = ProviderRegistry(providerstore, [ConstProviderFactory(dictprovider())])
+    registry("dict+file:///path/to/repository.zip")  # does not raise
 
 
 def test_repositoryprovider_name_from_url(
