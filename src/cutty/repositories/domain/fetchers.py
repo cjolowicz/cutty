@@ -28,7 +28,7 @@ class Fetcher(Protocol):
         self,
         url: URL,
         store: Store,
-        revision: Optional[Revision],
+        revision: Optional[Revision] = None,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         """Retrieve the repository at the URL into local storage."""
@@ -46,7 +46,7 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
         def _fetcher(
             url: URL,
             store: Store,
-            revision: Optional[Revision],
+            revision: Optional[Revision] = None,
             mode: FetchMode = FetchMode.ALWAYS,
         ) -> Optional[pathlib.Path]:
             if not match(url):

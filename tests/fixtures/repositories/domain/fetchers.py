@@ -21,7 +21,7 @@ def nullfetcher() -> Fetcher:
     def _(
         url: URL,
         store: Store,
-        revision: Optional[Revision],
+        revision: Optional[Revision] = None,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         return None
@@ -36,7 +36,7 @@ def emptyfetcher() -> Fetcher:
     def _(
         url: URL,
         store: Store,
-        revision: Optional[Revision],
+        revision: Optional[Revision] = None,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         path = store(url) / url.name
