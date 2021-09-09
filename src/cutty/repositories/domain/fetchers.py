@@ -25,7 +25,11 @@ class Fetcher(Protocol):
     """The typing protocol for a fetcher."""
 
     def __call__(
-        self, url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+        self,
+        url: URL,
+        store: Store,
+        revision: Optional[Revision],
+        mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         """Retrieve the repository at the URL into local storage."""
 
@@ -40,7 +44,10 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
         def _fetcher(
-            url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+            url: URL,
+            store: Store,
+            revision: Optional[Revision],
+            mode: FetchMode = FetchMode.ALWAYS,
         ) -> Optional[pathlib.Path]:
             if not match(url):
                 return None

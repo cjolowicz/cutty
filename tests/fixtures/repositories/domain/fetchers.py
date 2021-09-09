@@ -19,7 +19,10 @@ def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
     def _(
-        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+        url: URL,
+        store: Store,
+        revision: Optional[Revision],
+        mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         return None
 
@@ -31,7 +34,10 @@ def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     def _(
-        url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+        url: URL,
+        store: Store,
+        revision: Optional[Revision],
+        mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         path = store(url) / url.name
 
