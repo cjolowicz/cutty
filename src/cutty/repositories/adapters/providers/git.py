@@ -1,9 +1,11 @@
 """Providers for git repositories."""
 import pathlib
+from dataclasses import dataclass
 from typing import Optional
 
 import pygit2
 
+from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.repositories.adapters.fetchers.git import gitfetcher
 from cutty.repositories.domain.providers import LocalProvider
@@ -21,13 +23,26 @@ def match(path: pathlib.Path) -> bool:
     return path in (repositorypath, repositorypath.parent)
 
 
+@dataclass
+class RevisionNotFoundError(CuttyError):
+    """The specified revision does not exist in the repository."""
+
+    revision: Revision
+
+
 def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
     """Return a filesystem tree for the given revision.
 
     This function returns the root of a Git filesystem for the given
     revision. If ``revision`` is None, HEAD is used instead.
     """
-    return GitFilesystem(path, *filter(None, [revision]))
+    if revision is not None:
+        try:
+            return GitFilesystem(path, revision)
+        except KeyError:
+            raise RevisionNotFoundError(revision)
+
+    return GitFilesystem(path)
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
