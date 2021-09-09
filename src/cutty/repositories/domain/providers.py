@@ -31,7 +31,7 @@ class Provider:
         self.name = name
 
     def __call__(
-        self, location: Location, revision: Optional[Revision]
+        self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
 
@@ -84,7 +84,7 @@ class LocalProvider(BaseProvider):
         self.match = match
 
     def __call__(
-        self, location: Location, revision: Optional[Revision]
+        self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
         try:
@@ -129,7 +129,7 @@ class RemoteProvider(BaseProvider):
         self.fetchmode = fetchmode
 
     def __call__(
-        self, location: Location, revision: Optional[Revision]
+        self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Repository]:
         """Return the repository at the given location."""
         if isinstance(location, URL):

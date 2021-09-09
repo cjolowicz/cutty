@@ -26,7 +26,7 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
                 super().__init__(name)
 
             def __call__(
-                self, location: Location, revision: Optional[Revision]
+                self, location: Location, revision: Optional[Revision] = None
             ) -> Optional[Repository]:
                 return function(location, revision)
 
