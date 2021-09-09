@@ -12,6 +12,7 @@ from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
 from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
+from cutty.repositories.adapters.providers.git import RevisionNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
 
@@ -41,6 +42,7 @@ from cutty.repositories.domain.registry import UnknownLocationError
                 request=httpx.Request("GET", "https://example.com/repository"),
             )
         ),
+        RevisionNotFoundError("v1.0.0"),
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
