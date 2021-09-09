@@ -1,6 +1,7 @@
 """Unit tests for cutty.entrypoints.cli.errors."""
 import pathlib
 
+import httpx
 import pytest
 from yarl import URL
 
@@ -8,6 +9,7 @@ from cutty.entrypoints.cli.errors import fatal
 from cutty.errors import CuttyError
 from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
+from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
 from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
@@ -32,6 +34,12 @@ from cutty.repositories.domain.registry import UnknownLocationError
         HgError(("/usr/bin/hg",), "", "", 1, pathlib.Path("/home/user")),
         FileFetcherError(
             FileNotFoundError(2, "No such file or directory", "/no/such/file")
+        ),
+        HTTPFetcherError(
+            httpx.TooManyRedirects(
+                "Exceeded maximum allowed redirects.",
+                request=httpx.Request("GET", "https://example.com/repository"),
+            )
         ),
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
