@@ -46,7 +46,7 @@ def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
 def test_local_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the path is not a git repository."""
     url = asurl(tmp_path)
-    repository = localgitprovider(url, None)
+    repository = localgitprovider(url)
     assert repository is None
 
 
@@ -65,7 +65,7 @@ def test_local_revision_tag(url: URL) -> None:
 
 def test_local_revision_commit(url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
-    repository = localgitprovider(url, None)
+    repository = localgitprovider(url)
     assert (
         repository is not None
         and repository.revision is not None
@@ -97,7 +97,7 @@ def test_remote_revision_tag(store: Store, url: URL) -> None:
 def test_remote_revision_commit(store: Store, url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    repository = gitprovider(url, None)
+    repository = gitprovider(url)
     assert (
         repository is not None
         and repository.revision is not None
@@ -110,5 +110,5 @@ def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
-    repository = gitprovider(url, None)
+    repository = gitprovider(url)
     assert repository is None

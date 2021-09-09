@@ -62,7 +62,7 @@ def test_localprovider_not_local(url: URL, diskmounter: Mounter) -> None:
     """It returns None if the location is not local."""
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
-    assert provider(url, None) is None
+    assert provider(url) is None
 
 
 def test_localprovider_not_matching(
@@ -72,7 +72,7 @@ def test_localprovider_not_matching(
     url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: False, mount=diskmounter)
 
-    assert provider(url, None) is None
+    assert provider(url) is None
 
 
 def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
@@ -80,7 +80,7 @@ def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
     path = pathlib.Path("/no/such/file/or/directory")
 
-    assert provider(path, None) is None
+    assert provider(path) is None
 
 
 def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
@@ -91,7 +91,7 @@ def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> Non
 
     url = asurl(repository)
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
-    repository2 = provider(url, None)
+    repository2 = provider(url)
 
     assert repository2 is not None
     [entry] = repository2.path.iterdir()
@@ -126,7 +126,7 @@ def test_localprovider_repository_revision(
     path.mkdir()
     (path / "VERSION").write_text("1.0")
 
-    repository = provider(asurl(path), None)
+    repository = provider(asurl(path))
 
     assert repository is not None
     assert "1.0" == repository.revision
@@ -136,7 +136,7 @@ def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = RemoteProviderFactory(fetch=[])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    assert provider(URL(), None) is None
+    assert provider(URL()) is None
 
 
 def test_remoteproviderfactory_no_matching_fetchers(
@@ -145,7 +145,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
     """It returns None if all fetchers return None."""
     providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    assert provider(URL(), None) is None
+    assert provider(URL()) is None
 
 
 def test_remoteproviderfactory_happy(
@@ -154,7 +154,7 @@ def test_remoteproviderfactory_happy(
     """It mounts a filesystem for the fetched repository."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    repository = provider(url, None)
+    repository = provider(url)
 
     assert repository is not None
 
@@ -174,7 +174,7 @@ def test_remoteproviderfactory_repository_revision(
         fetch=[emptyfetcher], getrevision=getrevision
     )
     provider = providerfactory(store, FetchMode.ALWAYS)
-    repository = provider(url, None)
+    repository = provider(url)
 
     assert repository is not None and repository.revision == "v1.0"
 
@@ -185,7 +185,7 @@ def test_remoteproviderfactory_not_matching(
     """It returns None if the provider itself does not match."""
     providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
     provider = providerfactory(store, FetchMode.ALWAYS)
-    assert provider(url, None) is None
+    assert provider(url) is None
 
 
 def test_remoteproviderfactory_mounter(
@@ -214,4 +214,4 @@ def test_remoteproviderfactory_inexistent_path(
     provider = providerfactory(store, FetchMode.ALWAYS)
     path = pathlib.Path("/no/such/file/or/directory")
 
-    assert provider(path, None) is None
+    assert provider(path) is None

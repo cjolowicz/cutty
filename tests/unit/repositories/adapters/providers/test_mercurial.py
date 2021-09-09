@@ -60,7 +60,7 @@ def is_mercurial_shorthash(revision: str) -> bool:
 def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
     """It returns the short changeset identification hash."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(hgrepository, None)
+    repository = hgprovider(hgrepository)
     assert (
         repository is not None
         and repository.revision is not None
@@ -86,7 +86,7 @@ def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     hg("commit", "--message=Initial", cwd=path)
 
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(path, None)
+    repository = hgprovider(path)
     assert (
         repository is not None
         and repository.revision is not None
@@ -115,5 +115,5 @@ def test_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
-    repository = hgprovider(url, None)
+    repository = hgprovider(url)
     assert repository is None
