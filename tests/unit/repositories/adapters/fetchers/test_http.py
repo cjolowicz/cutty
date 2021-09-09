@@ -10,6 +10,7 @@ from threading import Thread
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.repositories.adapters.fetchers.http import httpfetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
@@ -73,3 +74,10 @@ def test_httpfetcher_update(server: URL, store: Store, repository: Path) -> None
 
     assert path is not None
     assert path.read_text() == repository.read_text()
+
+
+def test_httpfetcher_error(store: Store) -> None:
+    """It raises an exception."""
+    url = URL("https://example.invalid/repository")
+    with pytest.raises(CuttyError):
+        httpfetcher(url, store, None, FetchMode.ALWAYS)
