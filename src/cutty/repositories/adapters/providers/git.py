@@ -27,7 +27,9 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
     This function returns the root of a Git filesystem for the given
     revision. If ``revision`` is None, HEAD is used instead.
     """
-    return GitFilesystem(path, *filter(None, [revision]))
+    if revision is not None:
+        return GitFilesystem(path, revision)
+    return GitFilesystem(path)
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
