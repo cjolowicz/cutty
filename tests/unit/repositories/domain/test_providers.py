@@ -39,7 +39,7 @@ pytest_plugins = [
 def test_provide_fail(providers: list[Provider]) -> None:
     """It raises an exception."""
     with pytest.raises(Exception):
-        provide(providers, URL(), None)
+        provide(providers, URL())
 
 
 @pytest.mark.parametrize(
@@ -53,7 +53,7 @@ def test_provide_fail(providers: list[Provider]) -> None:
 )
 def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
-    repository = provide(providers, URL(), None)
+    repository = provide(providers, URL())
     assert repository.path.is_dir()
     assert not (repository.path / "marker").is_file()
 
