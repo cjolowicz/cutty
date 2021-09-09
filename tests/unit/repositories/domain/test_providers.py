@@ -135,7 +135,7 @@ def test_localprovider_repository_revision(
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = RemoteProviderFactory(fetch=[])
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     assert provider(URL()) is None
 
 
@@ -144,7 +144,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
 ) -> None:
     """It returns None if all fetchers return None."""
     providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     assert provider(URL()) is None
 
 
@@ -153,7 +153,7 @@ def test_remoteproviderfactory_happy(
 ) -> None:
     """It mounts a filesystem for the fetched repository."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     repository = provider(url)
 
     assert repository is not None
@@ -173,7 +173,7 @@ def test_remoteproviderfactory_repository_revision(
     providerfactory = RemoteProviderFactory(
         fetch=[emptyfetcher], getrevision=getrevision
     )
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     repository = provider(url)
 
     assert repository is not None and repository.revision == "v1.0"
@@ -184,7 +184,7 @@ def test_remoteproviderfactory_not_matching(
 ) -> None:
     """It returns None if the provider itself does not match."""
     providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     assert provider(url) is None
 
 
@@ -199,7 +199,7 @@ def test_remoteproviderfactory_mounter(
         path.write_text(text)
 
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     repository = provider(url, revision)
 
     assert repository is not None
@@ -211,7 +211,7 @@ def test_remoteproviderfactory_inexistent_path(
 ) -> None:
     """It returns None if the location is an inexistent path."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
-    provider = providerfactory(store, FetchMode.ALWAYS)
+    provider = providerfactory(store)
     path = pathlib.Path("/no/such/file/or/directory")
 
     assert provider(path) is None

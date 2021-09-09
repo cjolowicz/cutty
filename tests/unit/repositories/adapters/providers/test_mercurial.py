@@ -8,7 +8,6 @@ from yarl import URL
 
 from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.providers.mercurial import hgproviderfactory
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
 
 
@@ -44,7 +43,7 @@ def test_happy(
     store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a hg repository into storage."""
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(hgrepository, revision)
     assert repository is not None
 
@@ -59,7 +58,7 @@ def is_mercurial_shorthash(revision: str) -> bool:
 
 def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
     """It returns the short changeset identification hash."""
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(hgrepository)
     assert (
         repository is not None
@@ -70,7 +69,7 @@ def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
 
 def test_revision_tag(store: Store, hgrepository: pathlib.Path) -> None:
     """It returns the tag name."""
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(hgrepository, "tip~2")
     assert repository is not None and repository.revision == "v1.0"
 
@@ -85,7 +84,7 @@ def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     hg("add", "marker", cwd=path)
     hg("commit", "--message=Initial", cwd=path)
 
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(path)
     assert (
         repository is not None
@@ -106,7 +105,7 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
     hg("tag", "--rev=0", "tag1", cwd=path)
     hg("tag", "--rev=0", "tag2", cwd=path)
 
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(path, "tip~2")
     assert repository is not None and repository.revision == "tag1:tag2"
 
@@ -114,6 +113,6 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
 def test_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
-    hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
+    hgprovider = hgproviderfactory(store)
     repository = hgprovider(url)
     assert repository is None

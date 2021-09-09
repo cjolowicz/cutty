@@ -7,7 +7,6 @@ from yarl import URL
 
 from cutty.repositories.adapters.providers.zip import localzipprovider
 from cutty.repositories.adapters.providers.zip import zipproviderfactory
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 
@@ -49,7 +48,7 @@ def test_local_not_matching(tmp_path: Path) -> None:
 
 def test_remote_happy(store: Store, url: URL) -> None:
     """It fetches a zip repository into storage."""
-    zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
+    zipprovider = zipproviderfactory(store)
     repository = zipprovider(url)
     assert repository is not None
 
@@ -60,6 +59,6 @@ def test_remote_happy(store: Store, url: URL) -> None:
 def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
-    zipprovider = zipproviderfactory(store, FetchMode.ALWAYS)
+    zipprovider = zipproviderfactory(store)
     repository = zipprovider(url)
     assert repository is None

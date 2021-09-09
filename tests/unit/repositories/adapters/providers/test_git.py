@@ -10,7 +10,6 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.repositories.adapters.providers.git import gitproviderfactory
 from cutty.repositories.adapters.providers.git import localgitprovider
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
 from cutty.util.git import Repository
@@ -79,7 +78,7 @@ def test_remote_happy(
     store: Store, url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a git repository into storage."""
-    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    gitprovider = gitproviderfactory(store)
     repository = gitprovider(url, revision)
     assert repository is not None
 
@@ -89,14 +88,14 @@ def test_remote_happy(
 
 def test_remote_revision_tag(store: Store, url: URL) -> None:
     """It returns the tag name."""
-    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    gitprovider = gitproviderfactory(store)
     repository = gitprovider(url, "HEAD^")
     assert repository is not None and repository.revision == "v1.0"
 
 
 def test_remote_revision_commit(store: Store, url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
-    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    gitprovider = gitproviderfactory(store)
     repository = gitprovider(url)
     assert (
         repository is not None
@@ -109,6 +108,6 @@ def test_remote_revision_commit(store: Store, url: URL) -> None:
 def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
-    gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
+    gitprovider = gitproviderfactory(store)
     repository = gitprovider(url)
     assert repository is None
