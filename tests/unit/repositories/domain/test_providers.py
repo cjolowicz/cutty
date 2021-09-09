@@ -12,13 +12,9 @@ from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.mounters import Mounter
 from cutty.repositories.domain.providers import LocalProvider
-from cutty.repositories.domain.providers import Provider
 from cutty.repositories.domain.providers import RemoteProviderFactory
-from cutty.repositories.domain.registry import provide
 from cutty.repositories.domain.revisions import Revision
 from cutty.repositories.domain.stores import Store
-from tests.fixtures.repositories.domain.providers import dictprovider
-from tests.fixtures.repositories.domain.providers import nullprovider
 
 
 pytest_plugins = [
@@ -26,36 +22,6 @@ pytest_plugins = [
     "tests.fixtures.repositories.domain.matchers",
     "tests.fixtures.repositories.domain.mounters",
 ]
-
-
-@pytest.mark.parametrize(
-    "providers",
-    [
-        [],
-        [nullprovider],
-        [nullprovider, nullprovider],
-    ],
-)
-def test_provide_fail(providers: list[Provider]) -> None:
-    """It raises an exception."""
-    with pytest.raises(Exception):
-        provide(providers, URL())
-
-
-@pytest.mark.parametrize(
-    "providers",
-    [
-        [dictprovider({})],
-        [dictprovider({}), nullprovider],
-        [nullprovider, dictprovider({})],
-        [dictprovider({}), dictprovider({"marker": ""})],
-    ],
-)
-def test_provide_pass(providers: list[Provider]) -> None:
-    """It returns a path to the filesystem."""
-    repository = provide(providers, URL())
-    assert repository.path.is_dir()
-    assert not (repository.path / "marker").is_file()
 
 
 def test_localprovider_not_local(url: URL, diskmounter: Mounter) -> None:
