@@ -4,6 +4,7 @@ import pathlib
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.mercurial import Hg
@@ -87,3 +88,9 @@ def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
     """It raises an exception with hg's error message."""
     with pytest.raises(HgError):
         hgfetcher(url, store, None, FetchMode.ALWAYS)
+
+
+def test_hgfetcher_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
+    """It raises an exception."""
+    with pytest.raises(CuttyError):
+        hgfetcher(url, store, "invalid", FetchMode.ALWAYS)

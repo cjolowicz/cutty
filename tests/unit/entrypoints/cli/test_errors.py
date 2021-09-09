@@ -33,6 +33,13 @@ from cutty.repositories.domain.registry import UnknownLocationError
             None,
         ),
         HgError(("/usr/bin/hg",), "", "", 1, pathlib.Path("/home/user")),
+        HgError(
+            ("/usr/bin/hg", "update", "--rev", "invalid"),
+            "",
+            "abort: unknown revision 'invalid'\n",
+            255,
+            pathlib.Path("/home/user/repository"),
+        ),
         FileFetcherError(
             FileNotFoundError(2, "No such file or directory", "/no/such/file")
         ),
