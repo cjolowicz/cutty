@@ -22,7 +22,7 @@ def repository(tmp_path: Path) -> Path:
 def test_directory_happy(repository: Path, store: Store) -> None:
     """It copies the filesystem tree."""
     url = asurl(repository)
-    path = filefetcher(url, store, None)
+    path = filefetcher(url, store)
 
     assert path is not None
     assert (path / "marker").read_text() == "Lorem"
@@ -32,7 +32,7 @@ def test_file_happy(repository: Path, store: Store) -> None:
     """It copies the file."""
     repository /= "marker"
     url = asurl(repository)
-    path = filefetcher(url, store, None)
+    path = filefetcher(url, store)
 
     assert path is not None
     assert path.read_text() == "Lorem"
@@ -40,7 +40,7 @@ def test_file_happy(repository: Path, store: Store) -> None:
 
 def test_not_matched(store: Store, url: URL) -> None:
     """It returns None if the URL does not use the file scheme."""
-    path = filefetcher(url, store, None)
+    path = filefetcher(url, store)
     assert path is None
 
 
@@ -49,11 +49,11 @@ def test_directory_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher(url, store, None)
+    filefetcher(url, store)
 
     # Second fetch, without the marker file.
     (repository / "marker").unlink()
-    path = filefetcher(url, store, None)
+    path = filefetcher(url, store)
 
     # Check that the marker file is gone.
     assert path is not None
@@ -66,11 +66,11 @@ def test_file_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher(url, store, None)
+    filefetcher(url, store)
 
     # Second fetch, with modified marker file.
     repository.write_text("Ipsum")
-    path = filefetcher(url, store, None)
+    path = filefetcher(url, store)
 
     # Check that the marker file is updated.
     assert path is not None
@@ -81,4 +81,4 @@ def test_fetch_error(store: Store) -> None:
     """It raises an exception."""
     url = URL("file:///no/such/file")
     with pytest.raises(CuttyError):
-        filefetcher(url, store, None)
+        filefetcher(url, store)

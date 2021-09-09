@@ -33,7 +33,7 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
 
 def test_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
-    destination = hgfetcher(url, store, None)
+    destination = hgfetcher(url, store)
     assert destination is not None
 
     path = Path("marker", filesystem=DiskFilesystem(destination))
@@ -43,7 +43,7 @@ def test_happy(url: URL, store: Store) -> None:
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = hgfetcher(url, store, None)
+    path = hgfetcher(url, store)
     assert path is None
 
 
@@ -51,20 +51,20 @@ def test_no_executable(url: URL, store: Store, monkeypatch: pytest.MonkeyPatch) 
     """It raises an exception if the hg executable cannot be located."""
     monkeypatch.setattr("shutil.which", lambda _: None)
     with pytest.raises(Exception):
-        hgfetcher(url, store, None)
+        hgfetcher(url, store)
 
 
 def test_update(url: URL, hg: Hg, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
-    hgfetcher(url, store, None)
+    hgfetcher(url, store)
 
     # Remove the marker file.
     hg("rm", "marker", cwd=aspath(url))
     hg("commit", "--message=Remove the marker file", cwd=aspath(url))
 
     # Second fetch.
-    destination = hgfetcher(url, store, None)
+    destination = hgfetcher(url, store)
     assert destination is not None
 
     # Check that the marker file is gone.
@@ -83,7 +83,7 @@ def test_update(url: URL, hg: Hg, store: Store) -> None:
 def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
-        hgfetcher(url, store, None)
+        hgfetcher(url, store)
 
 
 def test_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
