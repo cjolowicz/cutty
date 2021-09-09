@@ -4,6 +4,7 @@ from typing import NoReturn
 
 from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
+from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
 from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
@@ -61,6 +62,11 @@ def _filefetcher(error: FileFetcherError) -> NoReturn:
     _die(f"cannot fetch template: {error.error}")
 
 
+@exceptionhandler
+def _httpfetcher(error: HTTPFetcherError) -> NoReturn:
+    _die(f"cannot fetch template: {error.error}")
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -68,4 +74,5 @@ fatal = (
     >> _hgnotfound
     >> _hg
     >> _filefetcher
+    >> _httpfetcher
 )
