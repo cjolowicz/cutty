@@ -7,6 +7,7 @@ from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
 from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
+from cutty.repositories.adapters.providers.git import RevisionNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -67,6 +68,11 @@ def _httpfetcher(error: HTTPFetcherError) -> NoReturn:
     _die(f"cannot fetch template: {error.error}")
 
 
+@exceptionhandler
+def _revisionnotfound(error: RevisionNotFoundError) -> NoReturn:
+    _die(f"revision not found: {error.revision}")
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -75,4 +81,5 @@ fatal = (
     >> _hg
     >> _filefetcher
     >> _httpfetcher
+    >> _revisionnotfound
 )
