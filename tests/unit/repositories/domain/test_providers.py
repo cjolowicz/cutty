@@ -7,7 +7,6 @@ import pytest
 from yarl import URL
 
 from cutty.repositories.domain.fetchers import Fetcher
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.matchers import Matcher
 from cutty.repositories.domain.mounters import Mounter
@@ -160,7 +159,7 @@ def test_remoteproviderfactory_mounter(
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
     revision = "v1.0.0"
-    if path := emptyfetcher(url, store, revision, FetchMode.ALWAYS):
+    if path := emptyfetcher(url, store, revision):
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
