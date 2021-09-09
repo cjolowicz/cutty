@@ -115,7 +115,7 @@ class RemoteProvider(BaseProvider):
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
-        fetchmode: FetchMode,
+        fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> None:
         """Initialize."""
         super().__init__(
@@ -159,7 +159,9 @@ class ProviderFactory(abc.ABC):
         self.name = name
 
     @abc.abstractmethod
-    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+    def __call__(
+        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
+    ) -> Provider:
         """Create a provider."""
 
 
@@ -183,7 +185,9 @@ class RemoteProviderFactory(ProviderFactory):
         self.mount = mount
         self.getrevision = getrevision
 
-    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+    def __call__(
+        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
+    ) -> Provider:
         """Create a provider."""
         return RemoteProvider(
             self.name,
@@ -204,6 +208,8 @@ class ConstProviderFactory(ProviderFactory):
         super().__init__(provider.name)
         self.provider = provider
 
-    def __call__(self, store: Store, fetchmode: FetchMode) -> Provider:
+    def __call__(
+        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
+    ) -> Provider:
         """Return the provider."""
         return self.provider
