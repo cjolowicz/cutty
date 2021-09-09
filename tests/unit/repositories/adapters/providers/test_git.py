@@ -7,6 +7,7 @@ import pygit2
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.repositories.adapters.providers.git import gitproviderfactory
 from cutty.repositories.adapters.providers.git import localgitprovider
 from cutty.repositories.domain.fetchers import FetchMode
@@ -49,6 +50,12 @@ def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
     url = asurl(tmp_path)
     repository = localgitprovider(url, None)
     assert repository is None
+
+
+def test_localgitprovider_invalid_revision(url: URL) -> None:
+    """It raises an exception."""
+    with pytest.raises(CuttyError):
+        localgitprovider(url, "invalid")
 
 
 def test_localgitprovider_revision_tag(url: URL) -> None:
