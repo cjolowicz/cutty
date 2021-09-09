@@ -8,7 +8,6 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.mercurial import Hg
-from cutty.repositories.adapters.fetchers.mercurial import HgError
 from cutty.repositories.adapters.fetchers.mercurial import hgfetcher
 from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
@@ -33,7 +32,7 @@ def url(hg: Hg, tmp_path: pathlib.Path) -> URL:
     return asurl(path)
 
 
-def test_hgfetcher_happy(url: URL, store: Store) -> None:
+def test_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
     destination = hgfetcher(url, store, None, FetchMode.ALWAYS)
     assert destination is not None
@@ -42,23 +41,21 @@ def test_hgfetcher_happy(url: URL, store: Store) -> None:
     assert path.read_text() == "Lorem"
 
 
-def test_hgfetcher_not_matched(store: Store) -> None:
+def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
     path = hgfetcher(url, store, None, FetchMode.ALWAYS)
     assert path is None
 
 
-def test_hgfetcher_no_executable(
-    url: URL, store: Store, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_no_executable(url: URL, store: Store, monkeypatch: pytest.MonkeyPatch) -> None:
     """It raises an exception if the hg executable cannot be located."""
     monkeypatch.setattr("shutil.which", lambda _: None)
     with pytest.raises(Exception):
         hgfetcher(url, store, None, FetchMode.ALWAYS)
 
 
-def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
+def test_update(url: URL, hg: Hg, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
     hgfetcher(url, store, None, FetchMode.ALWAYS)
@@ -85,12 +82,12 @@ def test_hgfetcher_update(url: URL, hg: Hg, store: Store) -> None:
     ],
 )
 def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
-    """It raises an exception with hg's error message."""
-    with pytest.raises(HgError):
+    """It raises an exception."""
+    with pytest.raises(CuttyError):
         hgfetcher(url, store, None, FetchMode.ALWAYS)
 
 
-def test_hgfetcher_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
+def test_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
         hgfetcher(url, store, "invalid", FetchMode.ALWAYS)

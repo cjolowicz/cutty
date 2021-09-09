@@ -34,9 +34,7 @@ def url(tmp_path: pathlib.Path) -> URL:
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
-def test_localgitprovider_happy(
-    url: URL, revision: Optional[str], expected: str
-) -> None:
+def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
     """It provides a repository from a local directory."""
     repository = localgitprovider(url, revision)
     assert repository is not None
@@ -45,27 +43,27 @@ def test_localgitprovider_happy(
     assert text == expected
 
 
-def test_localgitprovider_not_matching(tmp_path: pathlib.Path) -> None:
+def test_local_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the path is not a git repository."""
     url = asurl(tmp_path)
     repository = localgitprovider(url, None)
     assert repository is None
 
 
-def test_localgitprovider_invalid_revision(url: URL) -> None:
+def test_local_invalid_revision(url: URL) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
         localgitprovider(url, "invalid")
 
 
-def test_localgitprovider_revision_tag(url: URL) -> None:
+def test_local_revision_tag(url: URL) -> None:
     """It returns the tag name."""
     repository = localgitprovider(url, "HEAD^")
     assert repository is not None
     assert repository.revision == "v1.0"
 
 
-def test_localgitprovider_revision_commit(url: URL) -> None:
+def test_local_revision_commit(url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
     repository = localgitprovider(url, None)
     assert (
@@ -77,7 +75,7 @@ def test_localgitprovider_revision_commit(url: URL) -> None:
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
-def test_gitproviderfactory_happy(
+def test_remote_happy(
     store: Store, url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a git repository into storage."""
@@ -89,14 +87,14 @@ def test_gitproviderfactory_happy(
     assert text == expected
 
 
-def test_gitproviderfactory_revision_tag(store: Store, url: URL) -> None:
+def test_remote_revision_tag(store: Store, url: URL) -> None:
     """It returns the tag name."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
     repository = gitprovider(url, "HEAD^")
     assert repository is not None and repository.revision == "v1.0"
 
 
-def test_gitproviderfactory_revision_commit(store: Store, url: URL) -> None:
+def test_remote_revision_commit(store: Store, url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)
     repository = gitprovider(url, None)
@@ -108,7 +106,7 @@ def test_gitproviderfactory_revision_commit(store: Store, url: URL) -> None:
     )
 
 
-def test_gitproviderfactory_not_matching(store: Store) -> None:
+def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store, FetchMode.ALWAYS)

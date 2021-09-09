@@ -26,14 +26,14 @@ pytest_plugins = [
 ]
 
 
-def test_repositoryprovider_none(providerstore: ProviderStore, url: URL) -> None:
+def test_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
     registry = ProviderRegistry(providerstore, factories=[])
     with pytest.raises(Exception):
         registry(str(url))
 
 
-def test_repositoryprovider_with_url(
+def test_with_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
@@ -43,7 +43,7 @@ def test_repositoryprovider_with_url(
     assert not list(repository.path.iterdir())
 
 
-def test_repositoryprovider_with_path(
+def test_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
     diskmounter: Mounter,
@@ -64,7 +64,7 @@ def test_repositoryprovider_with_path(
     assert entry.name == "marker"
 
 
-def test_repositoryprovider_with_provider_specific_url(
+def test_with_provider_specific_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
@@ -78,9 +78,7 @@ def test_repositoryprovider_with_provider_specific_url(
         registry(str(url))
 
 
-def test_repositoryprovider_unknown_provider_in_url_scheme(
-    providerstore: ProviderStore, url: URL
-) -> None:
+def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) -> None:
     """It invokes providers with the original scheme."""
     repositorypath = Path(filesystem=DictFilesystem({}))
     repository = Repository("example", repositorypath, None)
@@ -99,9 +97,7 @@ def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
     registry("dict+file:///path/to/repository.zip")  # does not raise
 
 
-def test_repositoryprovider_name_from_url(
-    providerstore: ProviderStore, emptyfetcher: Fetcher
-) -> None:
+def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])

@@ -79,7 +79,8 @@ def timer() -> FakeTimer:
 @pytest.fixture
 def storage(tmp_path: Path, timer: FakeTimer) -> RepositoryStorage:
     """Fixture for a repository storage."""
-    return RepositoryStorage(tmp_path, timer=timer)
+    path = tmp_path / "repository-storage"
+    return RepositoryStorage(path, timer=timer)
 
 
 def test_storage_get_not_found(storage: RepositoryStorage, url: URL) -> None:

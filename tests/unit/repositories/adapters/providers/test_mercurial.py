@@ -40,7 +40,7 @@ def hgrepository(hg: Hg, tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
-def test_hgproviderfactory_happy(
+def test_happy(
     store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a hg repository into storage."""
@@ -57,9 +57,7 @@ def is_mercurial_shorthash(revision: str) -> bool:
     return len(revision) == 12 and all(c in string.hexdigits for c in revision)
 
 
-def test_hgproviderfactory_revision_commit(
-    store: Store, hgrepository: pathlib.Path
-) -> None:
+def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
     """It returns the short changeset identification hash."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
     repository = hgprovider(hgrepository, None)
@@ -70,18 +68,14 @@ def test_hgproviderfactory_revision_commit(
     )
 
 
-def test_hgproviderfactory_revision_tag(
-    store: Store, hgrepository: pathlib.Path
-) -> None:
+def test_revision_tag(store: Store, hgrepository: pathlib.Path) -> None:
     """It returns the tag name."""
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
     repository = hgprovider(hgrepository, "tip~2")
     assert repository is not None and repository.revision == "v1.0"
 
 
-def test_hgproviderfactory_revision_no_tags(
-    store: Store, hg: Hg, tmp_path: pathlib.Path
-) -> None:
+def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     """It returns the changeset hash in a repository without tags."""
     path = tmp_path / "repository"
     path.mkdir()
@@ -100,9 +94,7 @@ def test_hgproviderfactory_revision_no_tags(
     )
 
 
-def test_hgproviderfactory_revision_multiple_tags(
-    store: Store, hg: Hg, tmp_path: pathlib.Path
-) -> None:
+def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     """It returns the tag names separated by colon."""
     path = tmp_path / "repository"
     path.mkdir()
@@ -119,7 +111,7 @@ def test_hgproviderfactory_revision_multiple_tags(
     assert repository is not None and repository.revision == "tag1:tag2"
 
 
-def test_hgproviderfactory_not_matching(store: Store) -> None:
+def test_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store, FetchMode.ALWAYS)
