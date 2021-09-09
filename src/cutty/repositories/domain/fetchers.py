@@ -3,6 +3,7 @@ import enum
 import pathlib
 from collections.abc import Callable
 from typing import Optional
+from typing import Protocol
 
 from yarl import URL
 
@@ -20,7 +21,15 @@ class FetchMode(enum.Enum):
     NEVER = enum.auto()
 
 
-Fetcher = Callable[[URL, Store, Optional[Revision], FetchMode], Optional[pathlib.Path]]
+class Fetcher(Protocol):
+    """The typing protocol for a fetcher."""
+
+    def __call__(
+        self, url: URL, store: Store, revision: Optional[Revision], mode: FetchMode
+    ) -> Optional[pathlib.Path]:
+        """Retrieve the repository at the URL into local storage."""
+
+
 FetchFunction = Callable[[URL, pathlib.Path, Optional[Revision]], None]
 FetchDecorator = Callable[[FetchFunction], Fetcher]
 
