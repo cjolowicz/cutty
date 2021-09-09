@@ -27,7 +27,9 @@ class UnknownLocationError(CuttyError):
 
 
 def provide(
-    providers: Iterable[Provider], location: Location, revision: Optional[Revision]
+    providers: Iterable[Provider],
+    location: Location,
+    revision: Optional[Revision] = None,
 ) -> Repository:
     """Provide the repository located at the given URL."""
     for provider in providers:

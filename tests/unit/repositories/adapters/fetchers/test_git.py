@@ -11,7 +11,6 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.repositories.adapters.fetchers.git import gitfetcher
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.locations import aspath
 from cutty.repositories.domain.locations import asurl
 from cutty.repositories.domain.stores import Store
@@ -35,7 +34,7 @@ def url(tmp_path: pathlib.Path) -> URL:
 
 def test_happy(url: URL, store: Store) -> None:
     """It clones the git repository."""
-    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    destination = gitfetcher(url, store)
     assert destination is not None
 
     path = Path("marker", filesystem=GitFilesystem(destination))
@@ -45,20 +44,20 @@ def test_happy(url: URL, store: Store) -> None:
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    path = gitfetcher(url, store)
     assert path is None
 
 
 def test_update(url: URL, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
-    gitfetcher(url, store, None, FetchMode.ALWAYS)
+    gitfetcher(url, store)
 
     # Remove the marker file.
     removefile(aspath(url) / "marker")
 
     # Second fetch.
-    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    destination = gitfetcher(url, store)
     assert destination is not None
 
     # Check that the marker file is gone.
@@ -103,7 +102,7 @@ def test_broken_head_after_clone(
     url: URL, store: Store, custom_default_branch: str
 ) -> None:
     """It works around a bug in libgit2 resulting in a broken HEAD reference."""
-    destination = gitfetcher(url, store, None, FetchMode.ALWAYS)
+    destination = gitfetcher(url, store)
     assert destination is not None
     repository = Repository.open(destination)
     assert repository.head.name != custom_default_branch
@@ -118,11 +117,11 @@ def test_broken_head_after_clone_unexpected_branch(
     repository.commit()
 
     with pytest.raises(KeyError):
-        gitfetcher(asurl(path), store, None, FetchMode.ALWAYS)
+        gitfetcher(asurl(path), store)
 
 
 def test_fetch_error(store: Store) -> None:
     """It raises an exception with libgit2's error message."""
     url = URL("https://example.invalid/repository.git")
     with pytest.raises(CuttyError):
-        gitfetcher(url, store, None, FetchMode.ALWAYS)
+        gitfetcher(url, store)

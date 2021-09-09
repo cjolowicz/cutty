@@ -12,7 +12,6 @@ from pyftpdlib.servers import FTPServer
 from yarl import URL
 
 from cutty.repositories.adapters.fetchers.ftp import ftpfetcher
-from cutty.repositories.domain.fetchers import FetchMode
 from cutty.repositories.domain.stores import Store
 
 
@@ -63,7 +62,7 @@ def server(repository: Path) -> Iterator[URL]:
 
 def test_happy(server: URL, store: Store, repository: Path) -> None:
     """It downloads the file."""
-    path = ftpfetcher(server, store, None, FetchMode.ALWAYS)
+    path = ftpfetcher(server, store)
     assert path is not None
     assert path.read_text() == repository.read_text()
 
@@ -71,21 +70,21 @@ def test_happy(server: URL, store: Store, repository: Path) -> None:
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use the ftp scheme."""
     url = URL("file:///")
-    path = ftpfetcher(url, store, None, FetchMode.ALWAYS)
+    path = ftpfetcher(url, store)
     assert path is None
 
 
 def test_not_found(server: URL, store: Store) -> None:
     """It raises an exception if the server responds with an error."""
     with pytest.raises(Exception):
-        ftpfetcher(server.with_name("bogus"), store, None, FetchMode.ALWAYS)
+        ftpfetcher(server.with_name("bogus"), store)
 
 
 def test_update(server: URL, store: Store, repository: Path) -> None:
     """It updates a file from a previous fetch."""
-    ftpfetcher(server, store, None, FetchMode.ALWAYS)
+    ftpfetcher(server, store)
     repository.write_text("ipsum")
-    path = ftpfetcher(server, store, None, FetchMode.ALWAYS)
+    path = ftpfetcher(server, store)
 
     assert path is not None
     assert path.read_text() == repository.read_text()
