@@ -30,3 +30,10 @@ def test_project_config(runcutty: RunCutty, project: Path, template: Path) -> No
         runcutty("link", str(template))
 
     assert (project / "cutty.json").is_file()
+
+
+def test_cwd(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It links the project in the specified directory."""
+    runcutty("link", f"--cwd={project}", str(template))
+
+    assert (project / "cutty.json").is_file()
