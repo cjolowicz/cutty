@@ -26,14 +26,28 @@ from cutty.templates.domain.bindings import Binding
     ),
     help="Directory of the generated project.",
 )
+@click.option(
+    "--directory",
+    metavar="DIR",
+    type=click.Path(path_type=pathlib.Path),
+    help=(
+        "Directory within the template repository that contains the "
+        "cookiecutter.json file."
+    ),
+)
 def link(
     template: str,
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
+    directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
     service_link(
-        template, extrabindings=extrabindings, no_input=no_input, projectdir=cwd
+        template,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        projectdir=cwd,
+        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )

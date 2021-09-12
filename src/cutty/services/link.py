@@ -15,6 +15,7 @@ def link(
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
+    directory: Optional[pathlib.PurePosixPath] = None,
     projectdir: Optional[pathlib.Path] = None
 ) -> None:
     """Link project to a Cookiecutter template."""
@@ -32,7 +33,7 @@ def link(
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=None,
-            directory=None,
+            directory=directory,
         )
 
     (project.path / "cutty.json").write_bytes((branch.commit.tree / "cutty.json").data)
