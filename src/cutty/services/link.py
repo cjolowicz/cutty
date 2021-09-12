@@ -24,7 +24,8 @@ def link(
         projectdir = pathlib.Path.cwd()
 
     project = Repository.open(projectdir)
-    branch = project.heads.create(UPDATE_BRANCH)  # XXX orphan branch would be better
+    branch = project.heads.create(UPDATE_BRANCH, force=True)
+    # XXX orphan branch would be better
 
     with project.worktree(branch, checkout=False) as worktree:
         create(
