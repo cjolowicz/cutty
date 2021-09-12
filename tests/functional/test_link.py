@@ -5,6 +5,7 @@ import pytest
 
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.test_update import projectvariable
 from tests.util.files import chdir
 
 
@@ -37,3 +38,10 @@ def test_cwd(runcutty: RunCutty, project: Path, template: Path) -> None:
     runcutty("link", f"--cwd={project}", str(template))
 
     assert (project / "cutty.json").is_file()
+
+
+def test_extra_context(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It allows setting variables on the command-line."""
+    runcutty("link", f"--cwd={project}", str(template), "project=excellent")
+
+    assert "excellent" == projectvariable(project, "project")
