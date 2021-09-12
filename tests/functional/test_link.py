@@ -3,10 +3,12 @@ from pathlib import Path
 
 import pytest
 
+from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.test_update import projectvariable
 from tests.util.files import chdir
+from tests.util.git import move_repository_files_to_subdirectory
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -52,3 +54,14 @@ def test_no_input(runcutty: RunCutty, project: Path, template: Path) -> None:
     runcutty("link", f"--cwd={project}", "--no-input", str(template), input="ignored\n")
 
     assert "example" == projectvariable(project, "project")
+
+
+def test_directory(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It uses the template in the given subdirectory."""
+    directory = "a"
+    move_repository_files_to_subdirectory(template, directory)
+
+    runcutty("link", f"--cwd={project}", f"--directory={directory}", str(template))
+
+    config = readprojectconfigfile(project)
+    assert directory == str(config.directory)
