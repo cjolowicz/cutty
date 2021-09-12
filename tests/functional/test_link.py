@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
+from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
@@ -79,3 +80,19 @@ def test_checkout(runcutty: RunCutty, project: Path, template: Path) -> None:
 
     latest = Repository.open(project).branch(LATEST_BRANCH)
     assert "LICENSE" not in latest.commit.tree
+
+
+def test_update_branch_exists(
+    runcutty: RunCutty, project: Path, template: Path
+) -> None:
+    """It updates an existing update branch."""
+    repository = Repository.open(project)
+    for branch in UPDATE_BRANCH, LATEST_BRANCH:
+        repository.heads.create(branch)
+
+    updatefile(project / "marker")
+
+    runcutty("link", f"--cwd={project}", str(template))
+
+    assert (project / "marker").is_file()
+    assert (project / "cutty.json").is_file()
