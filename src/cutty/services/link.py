@@ -14,6 +14,7 @@ def link(
     template: str,
     *,
     extrabindings: Sequence[Binding] = (),
+    no_input: bool = False,
     projectdir: Optional[pathlib.Path] = None
 ) -> None:
     """Link project to a Cookiecutter template."""
@@ -29,7 +30,7 @@ def link(
             outputdir=worktree,
             outputdirisproject=True,
             extrabindings=extrabindings,
-            no_input=False,
+            no_input=no_input,
             checkout=None,
             directory=None,
         )

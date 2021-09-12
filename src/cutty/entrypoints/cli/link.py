@@ -12,6 +12,12 @@ from cutty.templates.domain.bindings import Binding
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
+    "--no-input",
+    is_flag=True,
+    default=False,
+    help="Do not prompt for template variables.",
+)
+@click.option(
     "-C",
     "--cwd",
     metavar="DIR",
@@ -21,8 +27,13 @@ from cutty.templates.domain.bindings import Binding
     help="Directory of the generated project.",
 )
 def link(
-    template: str, extra_context: dict[str, str], cwd: Optional[pathlib.Path]
+    template: str,
+    extra_context: dict[str, str],
+    no_input: bool,
+    cwd: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
-    service_link(template, extrabindings=extrabindings, projectdir=cwd)
+    service_link(
+        template, extrabindings=extrabindings, no_input=no_input, projectdir=cwd
+    )
