@@ -28,6 +28,10 @@ class RunCutty(Protocol):
         """Invoke the cutty CLI."""
 
 
+class RunCuttyError(Exception):
+    """The cutty CLI exited with a non-zero status."""
+
+
 @pytest.fixture
 def runcutty(runner: CliRunner) -> RunCutty:
     """Fixture for invoking the cutty CLI."""
@@ -36,7 +40,7 @@ def runcutty(runner: CliRunner) -> RunCutty:
         result = runner.invoke(main, args, input=input, catch_exceptions=False)
 
         if result.exit_code != 0:
-            raise RuntimeError(result)
+            raise RunCuttyError(result.output or str(result.exit_code))
 
         return result.output
 
