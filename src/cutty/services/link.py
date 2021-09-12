@@ -1,5 +1,6 @@
 """Link a project to a Cookiecutter template."""
 import pathlib
+from typing import Optional
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
@@ -7,9 +8,12 @@ from cutty.services.create import create
 from cutty.util.git import Repository
 
 
-def link(template: str) -> None:
+def link(template: str, *, projectdir: Optional[pathlib.Path] = None) -> None:
     """Link project to a Cookiecutter template."""
-    project = Repository.open(pathlib.Path.cwd())
+    if projectdir is None:
+        projectdir = pathlib.Path.cwd()
+
+    project = Repository.open(projectdir)
     branch = project.heads.create(UPDATE_BRANCH)  # XXX orphan branch would be better
 
     with project.worktree(branch, checkout=False) as worktree:
