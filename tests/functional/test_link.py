@@ -3,12 +3,14 @@ from pathlib import Path
 
 import pytest
 
+from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.test_update import projectvariable
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import updatefile
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -65,3 +67,15 @@ def test_directory(runcutty: RunCutty, project: Path, template: Path) -> None:
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)
+
+
+def test_checkout(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It uses the specified revision of the template."""
+    initial = Repository.open(template).head.commit.id
+
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("link", f"--cwd={project}", f"--checkout={initial}", str(template))
+
+    latest = Repository.open(project).branch(LATEST_BRANCH)
+    assert "LICENSE" not in latest.commit.tree
