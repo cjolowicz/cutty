@@ -1,14 +1,21 @@
 """Link a project to a Cookiecutter template."""
 import pathlib
+from collections.abc import Sequence
 from typing import Optional
 
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
+from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
 
-def link(template: str, *, projectdir: Optional[pathlib.Path] = None) -> None:
+def link(
+    template: str,
+    *,
+    extrabindings: Sequence[Binding] = (),
+    projectdir: Optional[pathlib.Path] = None
+) -> None:
     """Link project to a Cookiecutter template."""
     if projectdir is None:
         projectdir = pathlib.Path.cwd()
@@ -21,7 +28,7 @@ def link(template: str, *, projectdir: Optional[pathlib.Path] = None) -> None:
             template,
             outputdir=worktree,
             outputdirisproject=True,
-            extrabindings=(),
+            extrabindings=extrabindings,
             no_input=False,
             checkout=None,
             directory=None,
