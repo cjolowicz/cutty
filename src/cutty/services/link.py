@@ -15,6 +15,7 @@ def link(
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
+    checkout: Optional[str] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
     projectdir: Optional[pathlib.Path] = None
 ) -> None:
@@ -32,7 +33,7 @@ def link(
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
-            checkout=None,
+            checkout=checkout,
             directory=directory,
         )
 
