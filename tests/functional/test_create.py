@@ -63,7 +63,7 @@ def test_inplace(runcutty: RunCutty, template: Path) -> None:
     assert template_files(template) == project_files(".") - EXTRA
 
 
-def test_directory(runcutty: RunCutty, template: Path, tmp_path: Path) -> None:
+def test_directory(runcutty: RunCutty, template: Path) -> None:
     """It uses the template in the given subdirectory."""
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
