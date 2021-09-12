@@ -1,6 +1,8 @@
 """Functional tests for `cutty link`."""
 from pathlib import Path
 
+import pytest
+
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
@@ -11,14 +13,20 @@ def test_help(runcutty: RunCutty) -> None:
     runcutty("link", "--help")
 
 
-def test_project_config(runcutty: RunCutty, template: Path) -> None:
-    """It adds a cutty.json to the project."""
+@pytest.fixture
+def project(runcutty: RunCutty, template: Path) -> Path:
+    """Fixture for a project."""
     runcutty("cookiecutter", str(template))
 
     project = Repository.init(Path("example"))
     project.commit(message="Initial")
 
-    with chdir(project.path):
+    return project.path
+
+
+def test_project_config(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It adds a cutty.json to the project."""
+    with chdir(project):
         runcutty("link", str(template))
 
-    assert (project.path / "cutty.json").is_file()
+    assert (project / "cutty.json").is_file()
