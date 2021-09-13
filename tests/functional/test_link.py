@@ -114,3 +114,11 @@ def test_latest_branch_exists(
 
     [actual] = latest.commit.parents
     assert expected == actual
+
+
+def test_commit_message(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It includes the template name in the commit message."""
+    runcutty("link", f"--cwd={project}", str(template))
+
+    repository = Repository.open(project)
+    assert template.name in repository.head.commit.message
