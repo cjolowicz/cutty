@@ -6,6 +6,7 @@ from typing import Optional
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
@@ -39,7 +40,9 @@ def link(
             directory=directory,
         )
 
-    (project.path / "cutty.json").write_bytes((branch.commit.tree / "cutty.json").data)
+    (project.path / PROJECT_CONFIG_FILE).write_bytes(
+        (branch.commit.tree / PROJECT_CONFIG_FILE).data
+    )
     project.commit(message="Link to project template")  # XXX mention name and revision
 
     project.heads[LATEST_BRANCH] = branch.commit
