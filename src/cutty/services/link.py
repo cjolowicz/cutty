@@ -43,6 +43,11 @@ def link(
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
-    project.commit(message="Link to project template")  # XXX mention name and revision
+
+    project.commit(
+        message=update.commit.message,
+        author=update.commit.author,
+        committer=project.default_signature,
+    )
 
     project.heads[LATEST_BRANCH] = update.commit
