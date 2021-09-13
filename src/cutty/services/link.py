@@ -26,10 +26,10 @@ def link(
 
     project = Repository.open(projectdir)
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
-    branch = project.heads.create(UPDATE_BRANCH, latest, force=True)
+    update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     # XXX orphan branch would be better
 
-    with project.worktree(branch, checkout=False) as worktree:
+    with project.worktree(update, checkout=False) as worktree:
         create(
             template,
             outputdir=worktree,
@@ -41,8 +41,8 @@ def link(
         )
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
-        (branch.commit.tree / PROJECT_CONFIG_FILE).data
+        (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
     project.commit(message="Link to project template")  # XXX mention name and revision
 
-    project.heads[LATEST_BRANCH] = branch.commit
+    project.heads[LATEST_BRANCH] = update.commit
