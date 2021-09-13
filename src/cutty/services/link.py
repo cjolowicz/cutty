@@ -25,7 +25,7 @@ def link(
         projectdir = pathlib.Path.cwd()
 
     project = Repository.open(projectdir)
-    latest = project.heads.get(LATEST_BRANCH, project.head.commit)
+    latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
     branch = project.heads.create(UPDATE_BRANCH, latest, force=True)
     # XXX orphan branch would be better
 
