@@ -6,6 +6,7 @@ from typing import Optional
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
@@ -24,11 +25,11 @@ def link(
         projectdir = pathlib.Path.cwd()
 
     project = Repository.open(projectdir)
-    latest = project.heads.get(LATEST_BRANCH, project.head.commit)
-    branch = project.heads.create(UPDATE_BRANCH, latest, force=True)
+    latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
+    update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     # XXX orphan branch would be better
 
-    with project.worktree(branch, checkout=False) as worktree:
+    with project.worktree(update, checkout=False) as worktree:
         create(
             template,
             outputdir=worktree,
@@ -39,7 +40,9 @@ def link(
             directory=directory,
         )
 
-    (project.path / "cutty.json").write_bytes((branch.commit.tree / "cutty.json").data)
+    (project.path / PROJECT_CONFIG_FILE).write_bytes(
+        (update.commit.tree / PROJECT_CONFIG_FILE).data
+    )
     project.commit(message="Link to project template")  # XXX mention name and revision
 
-    project.heads[LATEST_BRANCH] = branch.commit
+    project.heads[LATEST_BRANCH] = update.commit
