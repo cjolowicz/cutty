@@ -1,4 +1,5 @@
 """Link a project to a Cookiecutter template."""
+import contextlib
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -7,6 +8,7 @@ from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
@@ -25,6 +27,11 @@ def link(
         projectdir = pathlib.Path.cwd()
 
     project = Repository.open(projectdir)
+
+    with contextlib.suppress(FileNotFoundError):
+        projectconfig = readcookiecutterjson(project.path)
+        extrabindings = list(projectconfig.bindings) + list(extrabindings)
+
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
     update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     # XXX orphan branch would be better

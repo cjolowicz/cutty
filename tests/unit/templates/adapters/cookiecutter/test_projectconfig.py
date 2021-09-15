@@ -6,9 +6,12 @@ import pathlib
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
+from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.templates.adapters.cookiecutter.projectconfig import COOKIECUTTER_JSON_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
+from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
@@ -104,3 +107,32 @@ def test_createprojectconfigfile_format(
     assert lines[1].startswith('  "')
     assert lines[1].endswith('": {\n')
     assert "}\n" == lines[-1]
+
+
+def createlegacyprojectconfigfile(
+    project: PurePath, projectconfig: ProjectConfig
+) -> RegularFile:
+    """Create a .cookiecutter.json file."""
+    data = {"_template": projectconfig.template} | {
+        binding.name: binding.value for binding in projectconfig.bindings
+    }
+
+    path = project / COOKIECUTTER_JSON_FILE
+    text = json.dumps(data, indent=4)
+
+    return RegularFile(path, text.encode())
+
+
+def test_readcookiecutterjson(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It loads a project configuration from a .cookiecutter.json file."""
+    # The .cookiecutter.json format does not include the template directory.
+    projectconfig = dataclasses.replace(projectconfig, directory=None)
+
+    file = createlegacyprojectconfigfile(PurePath(), projectconfig)
+
+    with storage:
+        storage.add(file)
+
+    assert projectconfig == readcookiecutterjson(storage.root)
