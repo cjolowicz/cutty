@@ -216,23 +216,27 @@ class Repository:
     @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
-        with tempfile.TemporaryDirectory() as directory:
-            name = hashlib.blake2b(branch.name.encode(), digest_size=32).hexdigest()
-            path = Path(directory) / name
-            worktree = self._repository.add_worktree(
-                name, path, self._repository.branches[branch.name]
-            )
 
-            if not checkout:
-                # Emulate `--no-checkout` by checking out an empty tree after the fact.
-                # https://github.com/libgit2/libgit2/issues/5949
-                Repository.open(path)._checkoutemptytree()
+        def _hash(name: str) -> str:
+            return hashlib.blake2b(name.encode(), digest_size=32).hexdigest()
 
-            yield path
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / _hash(branch.name)
+                worktree = self._repository.add_worktree(
+                    path.name, path, self._repository.branches[branch.name]
+                )
 
-        # Prune with `force=True` because libgit2 thinks `worktree.path` still exists.
-        # https://github.com/libgit2/libgit2/issues/5280
-        worktree.prune(True)
+                if not checkout:
+                    # Emulate `--no-checkout` by checking out an empty tree.
+                    # https://github.com/libgit2/libgit2/issues/5949
+                    Repository.open(path)._checkoutemptytree()
+
+                yield path
+        finally:
+            # Prune with `force=True` to work around libgit2 issue.
+            # https://github.com/libgit2/libgit2/issues/5280
+            worktree.prune(True)
 
     def _checkoutemptytree(self) -> None:
         """Check out an empty tree from the repository."""
