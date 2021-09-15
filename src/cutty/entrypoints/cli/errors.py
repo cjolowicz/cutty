@@ -10,6 +10,7 @@ from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.adapters.providers.git import RevisionNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
+from cutty.services.link import TemplateNotSpecifiedError
 from cutty.util.exceptionhandlers import exceptionhandler
 
 
@@ -73,6 +74,11 @@ def _revisionnotfound(error: RevisionNotFoundError) -> NoReturn:
     _die(f"revision not found: {error.revision}")
 
 
+@exceptionhandler
+def _templatenotspecified(error: TemplateNotSpecifiedError) -> NoReturn:
+    _die("template not specified")
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -82,4 +88,5 @@ fatal = (
     >> _filefetcher
     >> _httpfetcher
     >> _revisionnotfound
+    >> _templatenotspecified
 )

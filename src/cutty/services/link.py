@@ -4,6 +4,7 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
+from cutty.errors import CuttyError
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
@@ -13,14 +14,19 @@ from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
 
+class TemplateNotSpecifiedError(CuttyError):
+    """The template was not specified."""
+
+
 def link(
-    template: str,
+    template: Optional[str] = None,
+    /,
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
-    projectdir: Optional[pathlib.Path] = None
+    projectdir: Optional[pathlib.Path] = None,
 ) -> None:
     """Link project to a Cookiecutter template."""
     if projectdir is None:
@@ -31,6 +37,12 @@ def link(
     with contextlib.suppress(FileNotFoundError):
         projectconfig = readcookiecutterjson(project.path)
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
+
+        if template is None:
+            template = projectconfig.template
+
+    if template is None:
+        raise TemplateNotSpecifiedError()
 
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
     update = project.heads.create(UPDATE_BRANCH, latest, force=True)

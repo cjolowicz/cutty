@@ -15,6 +15,7 @@ from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.repositories.adapters.providers.git import RevisionNotFoundError
 from cutty.repositories.domain.mounters import UnsupportedRevisionError
 from cutty.repositories.domain.registry import UnknownLocationError
+from cutty.services.link import TemplateNotSpecifiedError
 
 
 @pytest.mark.parametrize(
@@ -53,6 +54,7 @@ from cutty.repositories.domain.registry import UnknownLocationError
         UnsupportedRevisionError("v1.0.0"),
         UnknownLocationError(URL("invalid://location")),
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
+        TemplateNotSpecifiedError(),
     ],
 )
 def test_errors(error: CuttyError) -> None:
