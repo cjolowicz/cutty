@@ -216,9 +216,13 @@ class Repository:
     @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
+
+        def _hash(name: str) -> str:
+            return hashlib.blake2b(name.encode(), digest_size=32).hexdigest()
+
         try:
             with tempfile.TemporaryDirectory() as directory:
-                name = hashlib.blake2b(branch.name.encode(), digest_size=32).hexdigest()
+                name = _hash(branch.name)
                 path = Path(directory) / name
                 worktree = self._repository.add_worktree(
                     name, path, self._repository.branches[branch.name]
