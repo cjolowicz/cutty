@@ -124,7 +124,7 @@ def test_commit_message(runcutty: RunCutty, project: Path, template: Path) -> No
     assert template.name in repository.head.commit.message
 
 
-def test_legacy_project_config(runcutty: RunCutty, template: Path) -> None:
+def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:
     """It reads bindings from .cookiecutter.json if it exists."""
     updatefile(
         template / "{{ cookiecutter.project }}" / ".cookiecutter.json",
@@ -140,3 +140,18 @@ def test_legacy_project_config(runcutty: RunCutty, template: Path) -> None:
     runcutty("link", f"--cwd={project}", str(template))
 
     assert project.name == projectvariable(project, "project")
+
+
+def test_legacy_project_config_template(runcutty: RunCutty, template: Path) -> None:
+    """It reads the template from .cookiecutter.json if it exists."""
+    updatefile(
+        template / "{{ cookiecutter.project }}" / ".cookiecutter.json",
+        "{{ cookiecutter | jsonify }}",
+    )
+
+    runcutty("cookiecutter", str(template))
+
+    project = Repository.init(Path("example"))
+    project.commit(message="Initial")
+
+    runcutty("link", f"--cwd={project.path}")
