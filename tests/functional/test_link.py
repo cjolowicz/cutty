@@ -8,6 +8,7 @@ from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.functional.test_update import projectvariable
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
@@ -155,3 +156,11 @@ def test_legacy_project_config_template(runcutty: RunCutty, template: Path) -> N
     project.commit(message="Initial")
 
     runcutty("link", f"--cwd={project.path}")
+
+
+def test_template_not_specified(
+    runcutty: RunCutty, project: Path, template: Path
+) -> None:
+    """It exits with an error."""
+    with pytest.raises(RunCuttyError):
+        runcutty("link", f"--cwd={project}")
