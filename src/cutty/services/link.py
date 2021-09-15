@@ -10,7 +10,7 @@ from cutty.templates.adapters.cookiecutter.projectconfig import (
     LEGACY_PROJECT_CONFIG_FILE,
 )
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
-from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
+from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson2
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
@@ -32,7 +32,7 @@ def link(
 
     cookiecutterjson = project.path / LEGACY_PROJECT_CONFIG_FILE
     if cookiecutterjson.is_file():
-        projectconfig = readcookiecutterjson(cookiecutterjson.read_text())
+        projectconfig = readcookiecutterjson2(project.path)
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
