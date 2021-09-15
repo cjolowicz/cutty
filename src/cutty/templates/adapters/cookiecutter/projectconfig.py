@@ -63,3 +63,13 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
         bindings,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
+
+
+def readcookiecutterjson(text: str) -> ProjectConfig:
+    """Load the project configuration from a .cookiecutter.json file."""
+    data = json.loads(text)
+
+    template = data.pop("_template")
+    bindings = [Binding(name, value) for name, value in data.items()]
+
+    return ProjectConfig(template, bindings)
