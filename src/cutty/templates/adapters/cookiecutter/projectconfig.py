@@ -69,11 +69,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
 def readcookiecutterjson2(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration from a .cookiecutter.json file."""
     path = project / LEGACY_PROJECT_CONFIG_FILE
-    return readcookiecutterjson(path.read_text())
-
-
-def readcookiecutterjson(text: str) -> ProjectConfig:
-    """Load the project configuration from a .cookiecutter.json file."""
+    text = path.read_text()
     data = json.loads(text)
 
     template = data.pop("_template")
