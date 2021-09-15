@@ -8,10 +8,8 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.templates.adapters.cookiecutter.projectconfig import COOKIECUTTER_JSON_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
-from cutty.templates.adapters.cookiecutter.projectconfig import (
-    LEGACY_PROJECT_CONFIG_FILE,
-)
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -119,7 +117,7 @@ def createlegacyprojectconfigfile(
         binding.name: binding.value for binding in projectconfig.bindings
     }
 
-    path = project / LEGACY_PROJECT_CONFIG_FILE
+    path = project / COOKIECUTTER_JSON_FILE
     text = json.dumps(data, indent=4)
 
     return RegularFile(path, text.encode())

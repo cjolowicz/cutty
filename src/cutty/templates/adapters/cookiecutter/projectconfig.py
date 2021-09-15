@@ -11,7 +11,7 @@ from cutty.templates.domain.bindings import Binding
 
 
 PROJECT_CONFIG_FILE = "cutty.json"
-LEGACY_PROJECT_CONFIG_FILE = ".cookiecutter.json"
+COOKIECUTTER_JSON_FILE = ".cookiecutter.json"
 
 
 @dataclass
@@ -68,7 +68,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
 
 def readcookiecutterjson(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration from a .cookiecutter.json file."""
-    path = project / LEGACY_PROJECT_CONFIG_FILE
+    path = project / COOKIECUTTER_JSON_FILE
     text = path.read_text()
     data = json.loads(text)
 
