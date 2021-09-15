@@ -1,4 +1,5 @@
 """Link a project to a Cookiecutter template."""
+import contextlib
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -27,11 +28,8 @@ def link(
 
     project = Repository.open(projectdir)
 
-    try:
+    with contextlib.suppress(FileNotFoundError):
         projectconfig = readcookiecutterjson(project.path)
-    except FileNotFoundError:
-        pass
-    else:
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
