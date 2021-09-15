@@ -322,6 +322,18 @@ def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
     assert not worktree.is_dir()
 
 
+def test_worktree_prunes_worktree_on_failure(repository: Repository) -> None:
+    """It removes the administrative files for the worktree on failure."""
+    branch = repository.heads.create("branch")
+
+    with pytest.raises(Exception, match="Boom"):
+        with repository.worktree(branch) as worktree:
+            raise Exception("Boom")
+
+    privatedir = repository.path / ".git" / "worktrees" / worktree.name
+    assert not privatedir.exists()
+
+
 def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
     """It checks out a working tree."""
     updatefile(path)
