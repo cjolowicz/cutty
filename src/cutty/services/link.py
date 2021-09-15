@@ -4,6 +4,7 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
+from cutty.errors import CuttyError
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
@@ -11,6 +12,10 @@ from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_F
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
+
+
+class TemplateNotSpecifiedError(CuttyError):
+    """The template was not specified."""
 
 
 def link(
@@ -36,7 +41,8 @@ def link(
         if template is None:
             template = projectconfig.template
 
-    assert template is not None  # noqa: S101
+    if template is None:
+        raise TemplateNotSpecifiedError()
 
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
     update = project.heads.create(UPDATE_BRANCH, latest, force=True)
