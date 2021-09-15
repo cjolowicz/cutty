@@ -9,7 +9,7 @@ from cutty.services.link import link as service_link
 from cutty.templates.domain.bindings import Binding
 
 
-@click.argument("template")
+@click.argument("template", required=False)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
     "--no-input",
@@ -42,7 +42,7 @@ from cutty.templates.domain.bindings import Binding
     ),
 )
 def link(
-    template: str,
+    template: Optional[str],
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
