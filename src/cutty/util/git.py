@@ -222,10 +222,9 @@ class Repository:
 
         try:
             with tempfile.TemporaryDirectory() as directory:
-                name = _hash(branch.name)
-                path = Path(directory) / name
+                path = Path(directory) / _hash(branch.name)
                 worktree = self._repository.add_worktree(
-                    name, path, self._repository.branches[branch.name]
+                    path.name, path, self._repository.branches[branch.name]
                 )
 
                 if not checkout:
