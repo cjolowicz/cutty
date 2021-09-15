@@ -6,6 +6,9 @@ from typing import Optional
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
+from cutty.templates.adapters.cookiecutter.projectconfig import (
+    LEGACY_PROJECT_CONFIG_FILE,
+)
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
@@ -27,7 +30,7 @@ def link(
 
     project = Repository.open(projectdir)
 
-    cookiecutterjson = project.path / ".cookiecutter.json"
+    cookiecutterjson = project.path / LEGACY_PROJECT_CONFIG_FILE
     if cookiecutterjson.is_file():
         projectconfig = readcookiecutterjson(cookiecutterjson.read_text())
         extrabindings = list(projectconfig.bindings) + list(extrabindings)

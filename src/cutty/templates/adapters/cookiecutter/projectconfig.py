@@ -11,6 +11,7 @@ from cutty.templates.domain.bindings import Binding
 
 
 PROJECT_CONFIG_FILE = "cutty.json"
+LEGACY_PROJECT_CONFIG_FILE = ".cookiecutter.json"
 
 
 @dataclass
