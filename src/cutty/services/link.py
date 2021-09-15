@@ -14,13 +14,14 @@ from cutty.util.git import Repository
 
 
 def link(
-    template: str,
+    template: Optional[str] = None,
+    /,
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
-    projectdir: Optional[pathlib.Path] = None
+    projectdir: Optional[pathlib.Path] = None,
 ) -> None:
     """Link project to a Cookiecutter template."""
     if projectdir is None:
@@ -31,6 +32,11 @@ def link(
     with contextlib.suppress(FileNotFoundError):
         projectconfig = readcookiecutterjson(project.path)
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
+
+        if template is None:
+            template = projectconfig.template
+
+    assert template is not None  # noqa: S101
 
     latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
     update = project.heads.create(UPDATE_BRANCH, latest, force=True)
