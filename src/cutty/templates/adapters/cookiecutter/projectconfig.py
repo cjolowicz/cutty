@@ -66,7 +66,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     )
 
 
-def readcookiecutterjson2(project: pathlib.Path) -> ProjectConfig:
+def readcookiecutterjson(project: pathlib.Path) -> ProjectConfig:
     """Load the project configuration from a .cookiecutter.json file."""
     path = project / LEGACY_PROJECT_CONFIG_FILE
     text = path.read_text()

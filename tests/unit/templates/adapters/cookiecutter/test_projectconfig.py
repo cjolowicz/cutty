@@ -13,7 +13,7 @@ from cutty.templates.adapters.cookiecutter.projectconfig import (
     LEGACY_PROJECT_CONFIG_FILE,
 )
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
-from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson2
+from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
@@ -137,4 +137,4 @@ def test_readcookiecutterjson(
     with storage:
         storage.add(file)
 
-    assert projectconfig == readcookiecutterjson2(storage.root)
+    assert projectconfig == readcookiecutterjson(storage.root)
