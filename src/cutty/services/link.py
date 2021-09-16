@@ -26,9 +26,10 @@ def _create_orphan_branch(project: Repository, name: str) -> Branch:
     author = committer = project.default_signature
     repository = project._repository
     oid = repository.TreeBuilder().write()
-    oid = repository.create_commit(None, author, committer, "initial", oid, [])
-    commit = repository[oid]
-    return project.heads.create(name, commit)
+    oid = repository.create_commit(
+        f"refs/heads/{name}", author, committer, "initial", oid, []
+    )
+    return project.branch(name)
 
 
 def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2.Commit:
