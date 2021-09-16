@@ -4,8 +4,6 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-import pygit2
-
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
@@ -32,8 +30,9 @@ def _create_orphan_branch(project: Repository, name: str) -> Branch:
     return project.branch(name)
 
 
-def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2.Commit:
-    """Copy the given commit, except for its parent."""
+def _squash_branch(project: Repository, branch: Branch) -> None:
+    """Squash the branch."""
+    commit = branch.commit
     repository = project._repository
     oid = repository.create_commit(
         None,
@@ -43,12 +42,7 @@ def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2
         commit.tree.id,
         [],
     )
-    return repository[oid]
-
-
-def _squash_branch(project: Repository, branch: Branch) -> None:
-    """Squash the branch."""
-    branch.commit = _copy_to_orphan_commit(project, branch.commit)
+    branch.commit = repository[oid]
 
 
 def link(
