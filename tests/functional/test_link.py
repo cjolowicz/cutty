@@ -83,6 +83,14 @@ def test_checkout(runcutty: RunCutty, project: Path, template: Path) -> None:
     assert "LICENSE" not in latest.commit.tree
 
 
+def test_orphan_branch(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It creates an orphan branch."""
+    runcutty("link", f"--cwd={project}", str(template))
+
+    repository = Repository.open(project)
+    assert not repository.heads[LATEST_BRANCH].parents
+
+
 def test_update_branch_exists(
     runcutty: RunCutty, project: Path, template: Path
 ) -> None:
