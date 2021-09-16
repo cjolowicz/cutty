@@ -32,17 +32,16 @@ def _create_orphan_branch(project: Repository, name: str) -> Branch:
 
 def _squash_branch(project: Repository, branch: Branch) -> None:
     """Squash the branch."""
-    commit = branch.commit
-    repository = project._repository
-    oid = repository.create_commit(
-        None,
+    name, commit = branch.name, branch.commit
+    del project.heads[name]
+    project._repository.create_commit(
+        f"refs/heads/{name}",
         commit.author,
         commit.committer,
         commit.message,
         commit.tree.id,
         [],
     )
-    branch.commit = repository[oid]
 
 
 def link(
