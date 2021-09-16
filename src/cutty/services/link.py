@@ -46,6 +46,11 @@ def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2
     return repository[oid]
 
 
+def _squash_branch(project: Repository, branch: Branch) -> None:
+    """Squash the branch."""
+    branch.commit = _copy_to_orphan_commit(project, branch.commit)
+
+
 def link(
     template: Optional[str] = None,
     /,
@@ -92,7 +97,7 @@ def link(
 
     if latest is None:
         # Squash the empty initial commit.
-        update.commit = _copy_to_orphan_commit(project, update.commit)
+        _squash_branch(project, update)
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
