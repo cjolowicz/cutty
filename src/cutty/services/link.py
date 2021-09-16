@@ -44,9 +44,15 @@ def link(
     if template is None:
         raise TemplateNotSpecifiedError()
 
-    latest = project.heads.setdefault(LATEST_BRANCH, project.head.commit)
-    update = project.heads.create(UPDATE_BRANCH, latest, force=True)
-    # XXX orphan branch would be better
+    if latest := project.heads.get(LATEST_BRANCH):
+        update = project.heads.create(UPDATE_BRANCH, latest, force=True)
+    else:
+        # create an orphan branch with an empty initial commit
+        author = committer = project.default_signature
+        repository = project._repository
+        oid = repository.TreeBuilder().write()
+        oid = repository.create_commit(None, author, committer, "initial", oid, [])
+        update = project.heads.create(UPDATE_BRANCH, repository[oid])
 
     with project.worktree(update, checkout=False) as worktree:
         create(
@@ -58,6 +64,18 @@ def link(
             checkout=checkout,
             directory=directory,
         )
+
+    if latest is None:
+        # squash the empty initial commit
+        oid = repository.create_commit(
+            None,
+            update.commit.author,
+            update.commit.committer,
+            update.commit.message,
+            update.commit.tree.id,
+            [],
+        )
+        update.commit = repository[oid]
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
