@@ -21,18 +21,13 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
-def _create_empty_orphan_commit(project: Repository) -> pygit2.Commit:
-    """Create an empty commit without parents."""
+def _create_orphan_branch(project: Repository, name: str) -> Branch:
+    """Create an orphan branch with an empty commit."""
     author = committer = project.default_signature
     repository = project._repository
     oid = repository.TreeBuilder().write()
     oid = repository.create_commit(None, author, committer, "initial", oid, [])
-    return repository[oid]
-
-
-def _create_orphan_branch(project: Repository, name: str) -> Branch:
-    """Create an orphan branch with an empty commit."""
-    commit = _create_empty_orphan_commit(project)
+    commit = repository[oid]
     return project.heads.create(name, commit)
 
 
