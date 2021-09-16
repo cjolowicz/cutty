@@ -4,6 +4,8 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
+import pygit2
+
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
@@ -16,6 +18,15 @@ from cutty.util.git import Repository
 
 class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
+
+
+def _create_empty_orphan_commit(project: Repository) -> pygit2.Commit:
+    """Create an empty commit without parents."""
+    author = committer = project.default_signature
+    repository = project._repository
+    oid = repository.TreeBuilder().write()
+    oid = repository.create_commit(None, author, committer, "initial", oid, [])
+    return repository[oid]
 
 
 def link(
@@ -47,12 +58,8 @@ def link(
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
-        # create an orphan branch with an empty initial commit
-        author = committer = project.default_signature
-        repository = project._repository
-        oid = repository.TreeBuilder().write()
-        oid = repository.create_commit(None, author, committer, "initial", oid, [])
-        update = project.heads.create(UPDATE_BRANCH, repository[oid])
+        commit = _create_empty_orphan_commit(project)
+        update = project.heads.create(UPDATE_BRANCH, commit)
 
     with project.worktree(update, checkout=False) as worktree:
         create(
@@ -67,6 +74,7 @@ def link(
 
     if latest is None:
         # squash the empty initial commit
+        repository = project._repository
         oid = repository.create_commit(
             None,
             update.commit.author,
