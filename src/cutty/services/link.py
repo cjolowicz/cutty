@@ -13,6 +13,7 @@ from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
+from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
@@ -27,6 +28,12 @@ def _create_empty_orphan_commit(project: Repository) -> pygit2.Commit:
     oid = repository.TreeBuilder().write()
     oid = repository.create_commit(None, author, committer, "initial", oid, [])
     return repository[oid]
+
+
+def _create_orphan_branch(project: Repository, name: str) -> Branch:
+    """Create an orphan branch with an empty commit."""
+    commit = _create_empty_orphan_commit(project)
+    return project.heads.create(name, commit)
 
 
 def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2.Commit:
@@ -74,8 +81,7 @@ def link(
     else:
         # Unborn branches cannot have worktrees. Create an orphan branch with an
         # empty placeholder commit instead. We'll squash it after project creation.
-        commit = _create_empty_orphan_commit(project)
-        update = project.heads.create(UPDATE_BRANCH, commit)
+        update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
         create(
