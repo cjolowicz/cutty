@@ -23,9 +23,13 @@ def _create_orphan_branch(project: Repository, name: str) -> Branch:
     """Create an orphan branch with an empty commit."""
     author = committer = project.default_signature
     repository = project._repository
-    oid = repository.TreeBuilder().write()
     repository.create_commit(
-        f"refs/heads/{name}", author, committer, "initial", oid, []
+        f"refs/heads/{name}",
+        author,
+        committer,
+        "initial",
+        repository.TreeBuilder().write(),
+        [],
     )
     return project.branch(name)
 
