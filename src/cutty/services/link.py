@@ -29,6 +29,20 @@ def _create_empty_orphan_commit(project: Repository) -> pygit2.Commit:
     return repository[oid]
 
 
+def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2.Commit:
+    """Copy the given commit, except for its parent."""
+    repository = project._repository
+    oid = repository.create_commit(
+        None,
+        commit.author,
+        commit.committer,
+        commit.message,
+        commit.tree.id,
+        [],
+    )
+    return repository[oid]
+
+
 def link(
     template: Optional[str] = None,
     /,
@@ -74,16 +88,7 @@ def link(
 
     if latest is None:
         # squash the empty initial commit
-        repository = project._repository
-        oid = repository.create_commit(
-            None,
-            update.commit.author,
-            update.commit.committer,
-            update.commit.message,
-            update.commit.tree.id,
-            [],
-        )
-        update.commit = repository[oid]
+        update.commit = _copy_to_orphan_commit(project, update.commit)
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
