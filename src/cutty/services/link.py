@@ -19,25 +19,25 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
-def _create_orphan_branch(project: Repository, name: str) -> Branch:
+def _create_orphan_branch(repository: Repository, name: str) -> Branch:
     """Create an orphan branch with an empty commit."""
-    author = committer = project.default_signature
-    project._repository.create_commit(
+    author = committer = repository.default_signature
+    repository._repository.create_commit(
         f"refs/heads/{name}",
         author,
         committer,
         "initial",
-        project._repository.TreeBuilder().write(),
+        repository._repository.TreeBuilder().write(),
         [],
     )
-    return project.branch(name)
+    return repository.branch(name)
 
 
-def _squash_branch(project: Repository, branch: Branch) -> None:
+def _squash_branch(repository: Repository, branch: Branch) -> None:
     """Squash the branch."""
     name, commit = branch.name, branch.commit
-    del project.heads[name]
-    project._repository.create_commit(
+    del repository.heads[name]
+    repository._repository.create_commit(
         f"refs/heads/{name}",
         commit.author,
         commit.committer,
