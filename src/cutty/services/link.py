@@ -72,6 +72,8 @@ def link(
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
+        # Unborn branches cannot have worktrees. Create an orphan branch with an
+        # empty placeholder commit instead. We'll squash it after project creation.
         commit = _create_empty_orphan_commit(project)
         update = project.heads.create(UPDATE_BRANCH, commit)
 
@@ -87,7 +89,7 @@ def link(
         )
 
     if latest is None:
-        # squash the empty initial commit
+        # Squash the empty initial commit.
         update.commit = _copy_to_orphan_commit(project, update.commit)
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
