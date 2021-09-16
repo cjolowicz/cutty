@@ -22,13 +22,12 @@ class TemplateNotSpecifiedError(CuttyError):
 def _create_orphan_branch(project: Repository, name: str) -> Branch:
     """Create an orphan branch with an empty commit."""
     author = committer = project.default_signature
-    repository = project._repository
-    repository.create_commit(
+    project._repository.create_commit(
         f"refs/heads/{name}",
         author,
         committer,
         "initial",
-        repository.TreeBuilder().write(),
+        project._repository.TreeBuilder().write(),
         [],
     )
     return project.branch(name)
