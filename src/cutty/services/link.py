@@ -24,7 +24,7 @@ def _create_orphan_branch(project: Repository, name: str) -> Branch:
     author = committer = project.default_signature
     repository = project._repository
     oid = repository.TreeBuilder().write()
-    oid = repository.create_commit(
+    repository.create_commit(
         f"refs/heads/{name}", author, committer, "initial", oid, []
     )
     return project.branch(name)
