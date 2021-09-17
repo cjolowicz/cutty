@@ -4,8 +4,6 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-import pygit2
-
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
@@ -13,6 +11,7 @@ from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
+from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
@@ -20,27 +19,32 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
-def _create_empty_orphan_commit(project: Repository) -> pygit2.Commit:
-    """Create an empty commit without parents."""
-    author = committer = project.default_signature
-    repository = project._repository
-    oid = repository.TreeBuilder().write()
-    oid = repository.create_commit(None, author, committer, "initial", oid, [])
-    return repository[oid]
+def _create_orphan_branch(repository: Repository, name: str) -> Branch:
+    """Create an orphan branch with an empty commit."""
+    author = committer = repository.default_signature
+    repository._repository.create_commit(
+        f"refs/heads/{name}",
+        author,
+        committer,
+        "initial",
+        repository._repository.TreeBuilder().write(),
+        [],
+    )
+    return repository.branch(name)
 
 
-def _copy_to_orphan_commit(project: Repository, commit: pygit2.Commit) -> pygit2.Commit:
-    """Copy the given commit, except for its parent."""
-    repository = project._repository
-    oid = repository.create_commit(
-        None,
+def _squash_branch(repository: Repository, branch: Branch) -> None:
+    """Squash the branch."""
+    name, commit = branch.name, branch.commit
+    del repository.heads[name]
+    repository._repository.create_commit(
+        f"refs/heads/{name}",
         commit.author,
         commit.committer,
         commit.message,
         commit.tree.id,
         [],
     )
-    return repository[oid]
 
 
 def link(
@@ -74,8 +78,7 @@ def link(
     else:
         # Unborn branches cannot have worktrees. Create an orphan branch with an
         # empty placeholder commit instead. We'll squash it after project creation.
-        commit = _create_empty_orphan_commit(project)
-        update = project.heads.create(UPDATE_BRANCH, commit)
+        update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
         create(
@@ -90,7 +93,7 @@ def link(
 
     if latest is None:
         # Squash the empty initial commit.
-        update.commit = _copy_to_orphan_commit(project, update.commit)
+        _squash_branch(project, update)
 
     (project.path / PROJECT_CONFIG_FILE).write_bytes(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
