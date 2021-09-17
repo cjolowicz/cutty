@@ -56,6 +56,7 @@ def create(
         bindings=extrabindings,
     )
 
+    projectconfig = ProjectConfig(template, bindings, directory=directory)
     projectfiles = lazysequence(
         renderfiles(findcookiecutterpaths(templatedir, config), render, bindings)
     )
@@ -70,7 +71,6 @@ def create(
     hookfiles = lazysequence(
         renderfiles(findcookiecutterhooks(templatedir), render, bindings)
     )
-    projectconfig = ProjectConfig(template, bindings, directory=directory)
     projectconfigfile = (
         createprojectconfigfile(
             PurePath(*projectdir.relative_to(outputdir).parts), projectconfig
