@@ -125,12 +125,22 @@ def test_latest_branch_exists(
     assert expected == actual
 
 
-def test_commit_message(runcutty: RunCutty, project: Path, template: Path) -> None:
+def test_commit_message_template(
+    runcutty: RunCutty, project: Path, template: Path
+) -> None:
     """It includes the template name in the commit message."""
     runcutty("link", f"--cwd={project}", str(template))
 
     repository = Repository.open(project)
     assert template.name in repository.head.commit.message
+
+
+def test_commit_message_verb(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It uses the verb 'Link' in the commit message."""
+    runcutty("link", f"--cwd={project}", str(template))
+
+    repository = Repository.open(project)
+    assert "Link" in repository.head.commit.message
 
 
 def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:

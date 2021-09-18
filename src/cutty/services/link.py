@@ -99,8 +99,9 @@ def link(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
 
+    message = update.commit.message.replace("Initial import from ", "Link to ")
     project.commit(
-        message=update.commit.message,
+        message=message,
         author=update.commit.author,
         committer=project.default_signature,
     )
