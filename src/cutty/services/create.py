@@ -83,9 +83,6 @@ def create(
     if createconfigfile:
         projectdir2 = PurePath(projectfiles[0].path.parts[0])
         projectconfigfile = createprojectconfigfile(projectdir2, projectconfig)
-        if outputdirisproject:
-            path = PurePath(*projectconfigfile.path.parts[1:])
-            projectconfigfile = projectconfigfile.withpath(path)
     else:
         projectconfigfile = None
 
@@ -108,4 +105,8 @@ def create(
             storage.add(projectfile)
 
         if projectconfigfile is not None:
+            if outputdirisproject:
+                path = PurePath(*projectconfigfile.path.parts[1:])
+                projectconfigfile = projectconfigfile.withpath(path)
+
             storage.add(projectconfigfile)
