@@ -75,7 +75,7 @@ def create(
     if outputdirisproject:
         projectdir = outputdir
     else:
-        projectdir = outputdir / projectfiles[0].path.parts[0]
+        projectdir = outputdir / projectdir2
 
     hookfiles = lazysequence(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
