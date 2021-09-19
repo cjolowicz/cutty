@@ -81,8 +81,10 @@ def create(
 
     projectfiles2 = projectfiles.release()
     if createconfigfile:
-        projectdir2 = PurePath(projectfiles[0].path.parts[0])
-        projectconfigfile = createprojectconfigfile(projectdir2, projectconfig)
+        projectdir2 = projectfiles[0].path.parts[0]
+        projectconfigfile = createprojectconfigfile(
+            PurePath(projectdir2), projectconfig
+        )
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     with createcookiecutterstorage(
