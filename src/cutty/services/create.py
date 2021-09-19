@@ -80,6 +80,7 @@ def create(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
+    projectfiles2 = projectfiles.release()
     projectconfigfile: Optional[File]
     if createconfigfile:
         projectdir2 = PurePath(projectfiles[0].path.parts[0])
@@ -87,7 +88,6 @@ def create(
     else:
         projectconfigfile = None
 
-    projectfiles2 = projectfiles.release()
     if projectconfigfile is not None:
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
