@@ -49,11 +49,10 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    template = loadtemplate(location, checkout, directory)
-
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
 
+    template = loadtemplate(location, checkout, directory)
     config = loadcookiecutterconfig(location, template.path)
     render = createcookiecutterrenderer(template.path, config)
     bindings = bindcookiecuttervariables(
