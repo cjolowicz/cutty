@@ -70,11 +70,11 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
-    projectdir2 = projectfiles[0].path.parts[0]
+    projectname = projectfiles[0].path.parts[0]
     projectfiles2 = projectfiles.release()
     if createconfigfile:
         projectconfigfile = createprojectconfigfile(
-            PurePath(projectdir2), projectconfig
+            PurePath(projectname), projectconfig
         )
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
@@ -84,7 +84,7 @@ def create(
 
     with createcookiecutterstorage(
         outputdir,
-        outputdir if outputdirisproject else outputdir / projectdir2,
+        outputdir if outputdirisproject else outputdir / projectname,
         overwrite_if_exists,
         skip_if_file_exists,
         hookfiles,
