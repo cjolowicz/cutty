@@ -49,8 +49,8 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    templaterepository = loadtemplate(location, checkout, directory)
-    templatedir = templaterepository.path
+    template = loadtemplate(location, checkout, directory)
+    templatedir = template.path
 
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
@@ -94,8 +94,8 @@ def create(
         skip_if_file_exists,
         hookfiles,
         createrepository,
-        templaterepository.name,
-        templaterepository.revision,
+        template.name,
+        template.revision,
     ) as storage:
         for projectfile in projectfiles.release():
             if outputdirisproject:
