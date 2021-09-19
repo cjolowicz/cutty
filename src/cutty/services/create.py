@@ -9,7 +9,6 @@ from lazysequence import lazysequence
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
-from cutty.filestorage.domain.observers import observe
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
@@ -89,14 +88,6 @@ def create(
         outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
     )
 
-    if createrepository:
-        storage = observe(
-            storage,
-            GitRepositoryObserver(
-                project=project_dir, template=template.name, revision=template.revision
-            ),
-        )
-
     with storage:
         for projectfile in projectfiles2:
             if outputdirisproject:
@@ -104,3 +95,8 @@ def create(
                 projectfile = projectfile.withpath(path)
 
             storage.add(projectfile)
+
+    if createrepository:
+        GitRepositoryObserver(
+            project=project_dir, template=template.name, revision=template.revision
+        ).commit()
