@@ -9,6 +9,7 @@ from lazysequence import lazysequence
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
+from cutty.repositories.domain.repository import Repository
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -18,6 +19,19 @@ from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
+
+
+def loadtemplate(
+    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
+) -> Repository:
+    """Load a template repository."""
+    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+    repositoryprovider = getdefaultrepositoryprovider(cachedir)
+    return repositoryprovider(
+        template,
+        revision=checkout,
+        directory=(PurePath(*directory.parts) if directory is not None else None),
+    )
 
 
 def create(
@@ -35,13 +49,7 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    templaterepository = repositoryprovider(
-        template,
-        revision=checkout,
-        directory=(PurePath(*directory.parts) if directory is not None else None),
-    )
+    templaterepository = loadtemplate(template, checkout, directory)
     templatedir = templaterepository.path
 
     if outputdir is None:
