@@ -50,13 +50,12 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     template = loadtemplate(location, checkout, directory)
-    templatedir = template.path
 
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
 
-    config = loadcookiecutterconfig(location, templatedir)
-    render = createcookiecutterrenderer(templatedir, config)
+    config = loadcookiecutterconfig(location, template.path)
+    render = createcookiecutterrenderer(template.path, config)
     bindings = bindcookiecuttervariables(
         config.variables,
         render,
@@ -66,7 +65,7 @@ def create(
 
     projectconfig = ProjectConfig(location, bindings, directory=directory)
     projectfiles = lazysequence(
-        renderfiles(findcookiecutterpaths(templatedir, config), render, bindings)
+        renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
         return
@@ -77,7 +76,7 @@ def create(
         projectdir = outputdir / projectfiles[0].path.parts[0]
 
     hookfiles = lazysequence(
-        renderfiles(findcookiecutterhooks(templatedir), render, bindings)
+        renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
     projectconfigfile = (
         createprojectconfigfile(
