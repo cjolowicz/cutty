@@ -71,22 +71,21 @@ def create(
         return
 
     projectdir2 = projectfiles[0].path.parts[0]
-
-    if outputdirisproject:
-        projectdir = outputdir
-    else:
-        projectdir = outputdir / projectdir2
-
-    hookfiles = lazysequence(
-        renderfiles(findcookiecutterhooks(template.path), render, bindings)
-    )
-
     projectfiles2 = projectfiles.release()
     if createconfigfile:
         projectconfigfile = createprojectconfigfile(
             PurePath(projectdir2), projectconfig
         )
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
+
+    hookfiles = lazysequence(
+        renderfiles(findcookiecutterhooks(template.path), render, bindings)
+    )
+
+    if outputdirisproject:
+        projectdir = outputdir
+    else:
+        projectdir = outputdir / projectdir2
 
     with createcookiecutterstorage(
         outputdir,
