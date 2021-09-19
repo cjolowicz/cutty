@@ -48,7 +48,8 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
 
 
 def _transform_commit_message(message: str) -> str:
-    """Transform the commit message from the latest branch."""
+    if message.startswith("Update"):
+        return message.replace(" to ", " ").replace("Update ", "Link to ")
     return message.replace("Initial import from ", "Link to ")
 
 
