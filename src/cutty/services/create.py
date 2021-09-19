@@ -7,7 +7,9 @@ from typing import Optional
 import platformdirs
 from lazysequence import lazysequence
 
-from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
+from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage2
+from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
+from cutty.filestorage.domain.observers import observe
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
@@ -82,16 +84,20 @@ def create(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
-    with createcookiecutterstorage(
-        outputdir,
-        outputdir if outputdirisproject else outputdir / projectname,
-        overwrite_if_exists,
-        skip_if_file_exists,
-        hookfiles,
-        createrepository,
-        template.name,
-        template.revision,
-    ) as storage:
+    project_dir = outputdir if outputdirisproject else outputdir / projectname
+    storage = createcookiecutterstorage2(
+        outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
+    )
+
+    if createrepository:
+        storage = observe(
+            storage,
+            GitRepositoryObserver(
+                project=project_dir, template=template.name, revision=template.revision
+            ),
+        )
+
+    with storage:
         for projectfile in projectfiles2:
             if outputdirisproject:
                 path = PurePath(*projectfile.path.parts[1:])
