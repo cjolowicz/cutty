@@ -40,20 +40,24 @@ class GitRepositoryObserver(FileStorageObserver):
             if head != UPDATE_BRANCH:
                 raise RuntimeError(f"unexpected HEAD: {head}")
 
-        message = _commitmessage(self, update=LATEST_BRANCH in repository.heads)
+        message = _commitmessage(
+            self, self.revision, update=LATEST_BRANCH in repository.heads
+        )
 
         repository.commit(message=message)
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
 
-def _commitmessage(self: GitRepositoryObserver, update: bool) -> str:
-    if update and self.revision:
-        return f"Update {self.template} to {self.revision}"
+def _commitmessage(
+    self: GitRepositoryObserver, revision: Optional[str], update: bool
+) -> str:
+    if update and revision:
+        return f"Update {self.template} to {revision}"
 
     if update:
         return f"Update {self.template}"
 
-    if self.revision:
-        return f"Initial import from {self.template} {self.revision}"
+    if revision:
+        return f"Initial import from {self.template} {revision}"
 
     return f"Initial import from {self.template}"
