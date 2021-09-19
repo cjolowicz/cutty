@@ -8,7 +8,6 @@ import platformdirs
 from lazysequence import lazysequence
 
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
-from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
@@ -81,14 +80,9 @@ def create(
     )
 
     projectfiles2 = projectfiles.release()
-    projectconfigfile: Optional[File]
     if createconfigfile:
         projectdir2 = PurePath(projectfiles[0].path.parts[0])
         projectconfigfile = createprojectconfigfile(projectdir2, projectconfig)
-    else:
-        projectconfigfile = None
-
-    if projectconfigfile is not None:
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     with createcookiecutterstorage(
