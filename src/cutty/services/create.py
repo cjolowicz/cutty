@@ -81,10 +81,9 @@ def create(
 
     projectconfigfile: Optional[File]
     if createconfigfile:
+        projectdir2 = PurePath(projectfiles[0].path.parts[0])
         if outputdirisproject:
             projectdir2 = PurePath()
-        else:
-            projectdir2 = PurePath(projectfiles[0].path.parts[0])
         projectconfigfile = createprojectconfigfile(projectdir2, projectconfig)
     else:
         projectconfigfile = None
