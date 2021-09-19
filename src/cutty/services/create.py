@@ -35,7 +35,7 @@ def loadtemplate(
 
 
 def create(
-    template: str,
+    location: str,
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
@@ -49,13 +49,13 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    templaterepository = loadtemplate(template, checkout, directory)
+    templaterepository = loadtemplate(location, checkout, directory)
     templatedir = templaterepository.path
 
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
 
-    config = loadcookiecutterconfig(template, templatedir)
+    config = loadcookiecutterconfig(location, templatedir)
     render = createcookiecutterrenderer(templatedir, config)
     bindings = bindcookiecuttervariables(
         config.variables,
@@ -64,7 +64,7 @@ def create(
         bindings=extrabindings,
     )
 
-    projectconfig = ProjectConfig(template, bindings, directory=directory)
+    projectconfig = ProjectConfig(location, bindings, directory=directory)
     projectfiles = lazysequence(
         renderfiles(findcookiecutterpaths(templatedir, config), render, bindings)
     )
