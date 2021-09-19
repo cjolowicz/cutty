@@ -70,6 +70,8 @@ def create(
     if not projectfiles:  # pragma: no cover
         return
 
+    projectdir2 = projectfiles[0].path.parts[0]
+
     if outputdirisproject:
         projectdir = outputdir
     else:
@@ -81,7 +83,6 @@ def create(
 
     projectfiles2 = projectfiles.release()
     if createconfigfile:
-        projectdir2 = projectfiles[0].path.parts[0]
         projectconfigfile = createprojectconfigfile(
             PurePath(projectdir2), projectconfig
         )
