@@ -85,6 +85,7 @@ def create(
         else None
     )
 
+    projectfiles2 = projectfiles.release()
     with createcookiecutterstorage(
         outputdir,
         projectdir,
@@ -95,7 +96,7 @@ def create(
         template.name,
         template.revision,
     ) as storage:
-        for projectfile in projectfiles.release():
+        for projectfile in projectfiles2:
             if outputdirisproject:
                 path = PurePath(*projectfile.path.parts[1:])
                 projectfile = projectfile.withpath(path)
