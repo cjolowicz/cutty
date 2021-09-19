@@ -143,6 +143,22 @@ def test_commit_message_verb(runcutty: RunCutty, project: Path, template: Path) 
     assert "Link" in repository.head.commit.message
 
 
+def test_commit_message_verb_branch_exists(
+    runcutty: RunCutty, project: Path, template: Path
+) -> None:
+    """It uses the verb 'Link' when the update branch already exists."""
+    repository = Repository.open(project)
+    for branch in UPDATE_BRANCH, LATEST_BRANCH:
+        repository.heads.create(branch)
+
+    updatefile(project / "marker")
+
+    runcutty("link", f"--cwd={project}", str(template))
+
+    repository = Repository.open(project)
+    assert "Link" in repository.head.commit.message
+
+
 def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:
     """It reads bindings from .cookiecutter.json if it exists."""
     updatefile(

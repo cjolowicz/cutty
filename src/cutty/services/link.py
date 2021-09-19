@@ -47,6 +47,12 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
+def _transform_commit_message(message: str) -> str:
+    if message.startswith("Update"):
+        return message.replace(" to ", " ").replace("Update ", "Link to ")
+    return message.replace("Initial import from ", "Link to ")
+
+
 def link(
     template: Optional[str] = None,
     /,
@@ -99,7 +105,7 @@ def link(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
 
-    message = update.commit.message.replace("Initial import from ", "Link to ")
+    message = _transform_commit_message(update.commit.message)
     project.commit(
         message=message,
         author=update.commit.author,
