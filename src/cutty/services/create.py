@@ -82,10 +82,7 @@ def create(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
-    if outputdirisproject:
-        projectdir = outputdir
-    else:
-        projectdir = outputdir / projectdir2
+    projectdir = outputdir if outputdirisproject else outputdir / projectdir2
 
     with createcookiecutterstorage(
         outputdir,
