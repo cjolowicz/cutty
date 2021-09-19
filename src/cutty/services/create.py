@@ -82,7 +82,7 @@ def create(
     projectconfigfile: Optional[File]
     if createconfigfile:
         if outputdirisproject:
-            projectdir2 = PurePath(*outputdir.relative_to(outputdir).parts)
+            projectdir2 = PurePath()
         else:
             projectdir2 = PurePath(
                 *(outputdir / projectfiles[0].path.parts[0])
