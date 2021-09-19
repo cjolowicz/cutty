@@ -78,10 +78,12 @@ def create(
     hookfiles = lazysequence(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
+
     projectconfigfile: Optional[File]
     if createconfigfile:
+        projectdir2 = projectdir
         projectconfigfile = createprojectconfigfile(
-            PurePath(*projectdir.relative_to(outputdir).parts), projectconfig
+            PurePath(*projectdir2.relative_to(outputdir).parts), projectconfig
         )
     else:
         projectconfigfile = None
