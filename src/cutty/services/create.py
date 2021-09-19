@@ -1,4 +1,5 @@
 """Create a project from a Cookiecutter template."""
+import itertools
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -87,6 +88,9 @@ def create(
         projectconfigfile = None
 
     projectfiles2 = projectfiles.release()
+    if projectconfigfile is not None:
+        projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
+
     with createcookiecutterstorage(
         outputdir,
         projectdir,
@@ -103,10 +107,3 @@ def create(
                 projectfile = projectfile.withpath(path)
 
             storage.add(projectfile)
-
-        if projectconfigfile is not None:
-            if outputdirisproject:
-                path = PurePath(*projectconfigfile.path.parts[1:])
-                projectconfigfile = projectconfigfile.withpath(path)
-
-            storage.add(projectconfigfile)
