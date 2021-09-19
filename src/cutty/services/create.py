@@ -7,7 +7,7 @@ from typing import Optional
 import platformdirs
 from lazysequence import lazysequence
 
-from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage2
+from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filesystems.domain.purepath import PurePath
@@ -85,7 +85,7 @@ def create(
     )
 
     project_dir = outputdir if outputdirisproject else outputdir / projectname
-    storage = createcookiecutterstorage2(
+    storage = createcookiecutterstorage(
         outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
     )
 
