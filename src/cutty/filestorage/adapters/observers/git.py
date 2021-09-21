@@ -29,23 +29,28 @@ class GitRepositoryObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
-        try:
-            repository = Repository.open(self.project)
-        except pygit2.GitError:
-            repository = Repository.init(self.project)
+        _commit(self)
 
-        if UPDATE_BRANCH in repository.heads:
-            # HEAD must point to update branch if it exists.
-            head = repository.head.name
-            if head != UPDATE_BRANCH:
-                raise RuntimeError(f"unexpected HEAD: {head}")
 
-        message = _commitmessage(
-            self.template, self.revision, update=LATEST_BRANCH in repository.heads
-        )
+def _commit(self: GitRepositoryObserver) -> None:
+    """A storage transaction was completed."""
+    try:
+        repository = Repository.open(self.project)
+    except pygit2.GitError:
+        repository = Repository.init(self.project)
 
-        repository.commit(message=message)
-        repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
+    if UPDATE_BRANCH in repository.heads:
+        # HEAD must point to update branch if it exists.
+        head = repository.head.name
+        if head != UPDATE_BRANCH:
+            raise RuntimeError(f"unexpected HEAD: {head}")
+
+    message = _commitmessage(
+        self.template, self.revision, update=LATEST_BRANCH in repository.heads
+    )
+
+    repository.commit(message=message)
+    repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
 
 def _commitmessage(template: str, revision: Optional[str], update: bool) -> str:
