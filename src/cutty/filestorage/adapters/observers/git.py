@@ -29,11 +29,13 @@ class GitRepositoryObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
-        _commit(self.project, self.template, self.revision)
+        creategitrepository(self.project, self.template, self.revision)
 
 
-def _commit(project: pathlib.Path, template: str, revision: Optional[str]) -> None:
-    """A storage transaction was completed."""
+def creategitrepository(
+    project: pathlib.Path, template: str, revision: Optional[str]
+) -> None:
+    """Create a git repository."""
     try:
         repository = Repository.open(project)
     except pygit2.GitError:
