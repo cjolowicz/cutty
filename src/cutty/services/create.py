@@ -53,7 +53,7 @@ def createproject(
     outputdirisproject: bool = False,
     createrepository: bool = True,
     createconfigfile: bool = True,
-) -> Optional[tuple[pathlib.Path, Repository]]:
+) -> tuple[pathlib.Path, Repository]:
     """Generate a project from a Cookiecutter template."""
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
@@ -119,7 +119,7 @@ def create(
 ) -> None:
     """Generate a project from a Cookiecutter template."""
     try:
-        result = createproject(
+        project_dir, template = createproject(
             location,
             extrabindings=extrabindings,
             no_input=no_input,
@@ -131,8 +131,7 @@ def create(
             outputdirisproject=outputdirisproject,
             createconfigfile=createconfigfile,
         )
-        if result and createrepository:
-            project_dir, template = result
+        if createrepository:
             creategitrepository(project_dir, template.name, template.revision)
     except EmptyTemplateError:  # pragma: no cover
         pass
