@@ -36,6 +36,10 @@ def loadtemplate(
     )
 
 
+class EmptyTemplateError(Exception):
+    """The template contains no project files."""
+
+
 def createproject(
     location: str,
     *,
@@ -69,7 +73,7 @@ def createproject(
         renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
-        return None
+        raise EmptyTemplateError()
 
     projectname = projectfiles[0].path.parts[0]
     projectfiles2 = projectfiles.release()
@@ -114,18 +118,21 @@ def create(
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
-    result = createproject(
-        location,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        checkout=checkout,
-        outputdir=outputdir,
-        directory=directory,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=outputdirisproject,
-        createconfigfile=createconfigfile,
-    )
-    if result and createrepository:
-        project_dir, template = result
-        creategitrepository(project_dir, template.name, template.revision)
+    try:
+        result = createproject(
+            location,
+            extrabindings=extrabindings,
+            no_input=no_input,
+            checkout=checkout,
+            outputdir=outputdir,
+            directory=directory,
+            overwrite_if_exists=overwrite_if_exists,
+            skip_if_file_exists=skip_if_file_exists,
+            outputdirisproject=outputdirisproject,
+            createconfigfile=createconfigfile,
+        )
+        if result and createrepository:
+            project_dir, template = result
+            creategitrepository(project_dir, template.name, template.revision)
+    except EmptyTemplateError:  # pragma: no cover
+        pass
