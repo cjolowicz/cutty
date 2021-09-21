@@ -29,17 +29,20 @@ class GitRepositoryObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
-        _commit(self, self.template, self.revision)
+        _commit(self, self.project, self.template, self.revision)
 
 
 def _commit(
-    self: GitRepositoryObserver, template: str, revision: Optional[str]
+    self: GitRepositoryObserver,
+    project: pathlib.Path,
+    template: str,
+    revision: Optional[str],
 ) -> None:
     """A storage transaction was completed."""
     try:
-        repository = Repository.open(self.project)
+        repository = Repository.open(project)
     except pygit2.GitError:
-        repository = Repository.init(self.project)
+        repository = Repository.init(project)
 
     if UPDATE_BRANCH in repository.heads:
         # HEAD must point to update branch if it exists.
