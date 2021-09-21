@@ -4,32 +4,11 @@ from typing import Optional
 
 import pygit2
 
-from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.util.git import Repository
 
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
-
-
-class GitRepositoryObserver(FileStorageObserver):
-    """Storage observer creating a git repository."""
-
-    def __init__(
-        self,
-        *,
-        project: pathlib.Path,
-        template: str = "template",
-        revision: Optional[str] = None,
-    ) -> None:
-        """Initialize."""
-        self.project = project
-        self.template = template
-        self.revision = revision
-
-    def commit(self) -> None:
-        """A storage transaction was completed."""
-        creategitrepository(self.project, self.template, self.revision)
 
 
 def creategitrepository(

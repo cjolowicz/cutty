@@ -1,19 +1,41 @@
 """Unit tests for cutty.filestorage.adapters.observers.git."""
 import pathlib
+from typing import Optional
 
 import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
-from cutty.filestorage.adapters.observers.git import GitRepositoryObserver
+from cutty.filestorage.adapters.observers.git import creategitrepository
 from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
 from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.filestorage.domain.files import RegularFile
+from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.util.git import Repository
 from tests.util.git import createbranches
+
+
+class GitRepositoryObserver(FileStorageObserver):
+    """Storage observer creating a git repository."""
+
+    def __init__(
+        self,
+        *,
+        project: pathlib.Path,
+        template: str = "template",
+        revision: Optional[str] = None,
+    ) -> None:
+        """Initialize."""
+        self.project = project
+        self.template = template
+        self.revision = revision
+
+    def commit(self) -> None:
+        """A storage transaction was completed."""
+        creategitrepository(self.project, self.template, self.revision)
 
 
 @pytest.fixture
