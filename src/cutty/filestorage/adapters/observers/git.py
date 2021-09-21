@@ -29,10 +29,12 @@ class GitRepositoryObserver(FileStorageObserver):
 
     def commit(self) -> None:
         """A storage transaction was completed."""
-        _commit(self, self.revision)
+        _commit(self, self.template, self.revision)
 
 
-def _commit(self: GitRepositoryObserver, revision: Optional[str]) -> None:
+def _commit(
+    self: GitRepositoryObserver, template: str, revision: Optional[str]
+) -> None:
     """A storage transaction was completed."""
     try:
         repository = Repository.open(self.project)
@@ -46,7 +48,7 @@ def _commit(self: GitRepositoryObserver, revision: Optional[str]) -> None:
             raise RuntimeError(f"unexpected HEAD: {head}")
 
     message = _commitmessage(
-        self.template, revision, update=LATEST_BRANCH in repository.heads
+        template, revision, update=LATEST_BRANCH in repository.heads
     )
 
     repository.commit(message=message)
