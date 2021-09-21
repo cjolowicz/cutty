@@ -36,7 +36,7 @@ def loadtemplate(
     )
 
 
-def create(
+def createproject(
     location: str,
     *,
     extrabindings: Sequence[Binding] = (),
@@ -49,7 +49,7 @@ def create(
     outputdirisproject: bool = False,
     createrepository: bool = True,
     createconfigfile: bool = True,
-) -> None:
+) -> Optional[tuple[pathlib.Path, Repository]]:
     """Generate a project from a Cookiecutter template."""
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
@@ -69,7 +69,7 @@ def create(
         renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
-        return
+        return None
 
     projectname = projectfiles[0].path.parts[0]
     projectfiles2 = projectfiles.release()
@@ -96,5 +96,36 @@ def create(
 
             storage.add(projectfile)
 
-    if createrepository:
+    return project_dir, template
+
+
+def create(
+    location: str,
+    *,
+    extrabindings: Sequence[Binding] = (),
+    no_input: bool = False,
+    checkout: Optional[str] = None,
+    outputdir: Optional[pathlib.Path] = None,
+    directory: Optional[pathlib.PurePosixPath] = None,
+    overwrite_if_exists: bool = False,
+    skip_if_file_exists: bool = False,
+    outputdirisproject: bool = False,
+    createrepository: bool = True,
+    createconfigfile: bool = True,
+) -> None:
+    """Generate a project from a Cookiecutter template."""
+    result = createproject(
+        location,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        outputdir=outputdir,
+        directory=directory,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=outputdirisproject,
+        createconfigfile=createconfigfile,
+    )
+    if result and createrepository:
+        project_dir, template = result
         creategitrepository(project_dir, template.name, template.revision)
