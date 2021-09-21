@@ -5,7 +5,9 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.services.create import create
+from cutty.services.create import createproject
+from cutty.services.create import EmptyTemplateError
+from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -87,15 +89,19 @@ def link(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        create(
-            template,
-            outputdir=worktree,
-            outputdirisproject=True,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            checkout=checkout,
-            directory=directory,
-        )
+        try:
+            project_dir, template2 = createproject(
+                template,
+                outputdir=worktree,
+                outputdirisproject=True,
+                extrabindings=extrabindings,
+                no_input=no_input,
+                checkout=checkout,
+                directory=directory,
+            )
+            creategitrepository(project_dir, template2.name, template2.revision)
+        except EmptyTemplateError:  # pragma: no cover
+            pass
 
     if latest is None:
         # Squash the empty initial commit.
