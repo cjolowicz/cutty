@@ -114,7 +114,6 @@ def create(
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
     outputdirisproject: bool = False,
-    createrepository: bool = True,
     createconfigfile: bool = True,
 ) -> None:
     """Generate a project from a Cookiecutter template."""
@@ -131,7 +130,6 @@ def create(
             outputdirisproject=outputdirisproject,
             createconfigfile=createconfigfile,
         )
-        if createrepository:
-            creategitrepository(project_dir, template.name, template.revision)
+        creategitrepository(project_dir, template.name, template.revision)
     except EmptyTemplateError:  # pragma: no cover
         pass
