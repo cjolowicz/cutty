@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.services.create import createproject
+from cutty.services.create import create
 from cutty.services.create import EmptyTemplateError
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
@@ -90,7 +90,7 @@ def link(
 
     with project.worktree(update, checkout=False) as worktree:
         try:
-            project_dir, template2 = createproject(
+            project_dir, template2 = create(
                 template,
                 outputdir=worktree,
                 outputdirisproject=True,

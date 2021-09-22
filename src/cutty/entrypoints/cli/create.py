@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from cutty.services.create import createproject
+from cutty.services.create import create as service_create
 from cutty.services.create import EmptyTemplateError
 from cutty.services.git import creategitrepository
 from cutty.templates.domain.bindings import Binding
@@ -95,7 +95,7 @@ def create(
     """Generate projects from Cookiecutter templates."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
     try:
-        project_dir, template2 = createproject(
+        project_dir, template2 = service_create(
             template,
             extrabindings=extrabindings,
             no_input=no_input,

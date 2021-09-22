@@ -39,7 +39,7 @@ class EmptyTemplateError(Exception):
     """The template contains no project files."""
 
 
-def createproject(
+def create(
     location: str,
     *,
     extrabindings: Sequence[Binding] = (),

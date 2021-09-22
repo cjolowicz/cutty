@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.create import createproject
+from cutty.services.create import create
 from cutty.services.create import EmptyTemplateError
 from cutty.templates.domain.bindings import Binding
 
@@ -68,7 +68,7 @@ def cookiecutter(
     """Generate projects from Cookiecutter templates."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
     try:
-        createproject(
+        create(
             template,
             extrabindings=extrabindings,
             no_input=no_input,

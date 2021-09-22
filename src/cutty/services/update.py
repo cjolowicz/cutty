@@ -4,7 +4,7 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.services.create import createproject
+from cutty.services.create import create
 from cutty.services.create import EmptyTemplateError
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
@@ -38,7 +38,7 @@ def update(
 
     with repository.worktree(branch, checkout=False) as worktree:
         try:
-            project_dir, template = createproject(
+            project_dir, template = create(
                 projectconfig.template,
                 outputdir=worktree,
                 outputdirisproject=True,
