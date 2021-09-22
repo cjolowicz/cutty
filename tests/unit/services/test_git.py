@@ -1,4 +1,4 @@
-"""Unit tests for cutty.filestorage.adapters.observers.git."""
+"""Unit tests for cutty.services.git."""
 import pathlib
 from typing import Optional
 
@@ -6,14 +6,14 @@ import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
-from cutty.filestorage.adapters.observers.git import creategitrepository
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.services.git import creategitrepository
+from cutty.services.git import LATEST_BRANCH
+from cutty.services.git import UPDATE_BRANCH
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 
