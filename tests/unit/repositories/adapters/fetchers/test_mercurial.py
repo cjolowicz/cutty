@@ -1,6 +1,8 @@
 """Unit tests for cutty.repositories.adapters.fetchers.hg."""
+import os
 import pathlib
 
+import httpx
 import pytest
 from yarl import URL
 
@@ -72,6 +74,20 @@ def test_update(url: URL, hg: Hg, store: Store) -> None:
     assert not (path / "marker").is_file()
 
 
+@pytest.fixture(scope="session")
+def skip_on_http_errors() -> None:
+    """Skip a test if HTTP requests don't succeed within a configurable timeout."""
+    if envvar := os.environ.get("CUTTY_TESTS_HTTP_TIMEOUT"):
+        timeout = float(envvar)
+    else:
+        timeout = 1
+
+    try:
+        httpx.get("https://example.com/", timeout=timeout)
+    except httpx.HTTPError as error:
+        pytest.skip(f"HTTP failure: {error}")
+
+
 @pytest.mark.parametrize(
     "url",
     [
@@ -80,7 +96,7 @@ def test_update(url: URL, hg: Hg, store: Store) -> None:
         URL("https://example.com/index.html"),
     ],
 )
-def test_fetch_error(url: URL, hg: Hg, store: Store) -> None:
+def test_fetch_error(url: URL, hg: Hg, store: Store, skip_on_http_errors: None) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
         hgfetcher(url, store)
