@@ -110,6 +110,7 @@ def skip_on_http_errors() -> None:
         URL("https://example.com/repository.git"),
         URL("https://example.com/index.html"),
     ],
+    ids=str,
 )
 def test_fetch_error(url: URL, hg: Hg, store: Store, skip_on_http_errors: None) -> None:
     """It raises an exception."""
