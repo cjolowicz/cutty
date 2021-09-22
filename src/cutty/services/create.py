@@ -11,7 +11,6 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
-from cutty.services.git import creategitrepository
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -36,6 +35,10 @@ def loadtemplate(
     )
 
 
+class EmptyTemplateError(Exception):
+    """The template contains no project files."""
+
+
 def create(
     location: str,
     *,
@@ -49,7 +52,7 @@ def create(
     outputdirisproject: bool = False,
     createrepository: bool = True,
     createconfigfile: bool = True,
-) -> None:
+) -> tuple[pathlib.Path, Repository]:
     """Generate a project from a Cookiecutter template."""
     if outputdir is None:
         outputdir = pathlib.Path.cwd()
@@ -69,7 +72,7 @@ def create(
         renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
     )
     if not projectfiles:  # pragma: no cover
-        return
+        raise EmptyTemplateError()
 
     projectname = projectfiles[0].path.parts[0]
     projectfiles2 = projectfiles.release()
@@ -96,5 +99,4 @@ def create(
 
             storage.add(projectfile)
 
-    if createrepository:
-        creategitrepository(project_dir, template.name, template.revision)
+    return project_dir, template
