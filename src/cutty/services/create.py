@@ -11,7 +11,6 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
-from cutty.services.git import creategitrepository
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -101,35 +100,3 @@ def createproject(
             storage.add(projectfile)
 
     return project_dir, template
-
-
-def create(
-    location: str,
-    *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    outputdir: Optional[pathlib.Path] = None,
-    directory: Optional[pathlib.PurePosixPath] = None,
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
-    outputdirisproject: bool = False,
-    createconfigfile: bool = True,
-) -> None:
-    """Generate a project from a Cookiecutter template."""
-    try:
-        project_dir, template = createproject(
-            location,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            checkout=checkout,
-            outputdir=outputdir,
-            directory=directory,
-            overwrite_if_exists=overwrite_if_exists,
-            skip_if_file_exists=skip_if_file_exists,
-            outputdirisproject=outputdirisproject,
-            createconfigfile=createconfigfile,
-        )
-        creategitrepository(project_dir, template.name, template.revision)
-    except EmptyTemplateError:  # pragma: no cover
-        pass
