@@ -4,9 +4,9 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.filestorage.adapters.observers.git import LATEST_BRANCH
-from cutty.filestorage.adapters.observers.git import UPDATE_BRANCH
 from cutty.services.create import create
+from cutty.services.git import LATEST_BRANCH
+from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository

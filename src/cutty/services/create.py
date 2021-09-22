@@ -11,6 +11,7 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
+from cutty.services.git import creategitrepository
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -82,19 +83,18 @@ def create(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
-    with createcookiecutterstorage(
-        outputdir,
-        outputdir if outputdirisproject else outputdir / projectname,
-        overwrite_if_exists,
-        skip_if_file_exists,
-        hookfiles,
-        createrepository,
-        template.name,
-        template.revision,
-    ) as storage:
+    project_dir = outputdir if outputdirisproject else outputdir / projectname
+    storage = createcookiecutterstorage(
+        outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
+    )
+
+    with storage:
         for projectfile in projectfiles2:
             if outputdirisproject:
                 path = PurePath(*projectfile.path.parts[1:])
                 projectfile = projectfile.withpath(path)
 
             storage.add(projectfile)
+
+    if createrepository:
+        creategitrepository(project_dir, template.name, template.revision)
