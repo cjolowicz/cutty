@@ -5,7 +5,7 @@ import platform
 import pytest
 
 
-@pytest.fixture(autouse=platform.system() == "Windows")
+@pytest.fixture(autouse=True)
 def set_hg_user(monkeypatch: pytest.MonkeyPatch) -> None:
     """Provide author information to ``hg commit``."""
     monkeypatch.setenv("HGUSER", "you@example.com")
