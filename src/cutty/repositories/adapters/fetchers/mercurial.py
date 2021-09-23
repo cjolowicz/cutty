@@ -1,4 +1,5 @@
 """Fetcher for Mercurial repositories."""
+import os
 import pathlib
 import shutil
 import subprocess  # noqa: S404
@@ -38,7 +39,7 @@ class Hg(Protocol):
         """Invoke hg."""
 
 
-def findhg() -> Hg:
+def findhg(env: Optional[dict[str, str]] = None) -> Hg:
     """Return a function for running hg commands."""
     if not (path := shutil.which("hg")):
         raise HgNotFoundError()
@@ -49,9 +50,16 @@ def findhg() -> Hg:
         *args: str, cwd: Optional[pathlib.Path] = None
     ) -> subprocess.CompletedProcess[str]:
         """Run a hg command."""
+        _env = os.environ | env if env is not None else None
+
         try:
             return subprocess.run(  # noqa: S603
-                [executable, *args], check=True, capture_output=True, text=True, cwd=cwd
+                [executable, *args],
+                check=True,
+                capture_output=True,
+                text=True,
+                cwd=cwd,
+                env=_env,
             )
         except subprocess.CalledProcessError as error:
             raise HgError(
