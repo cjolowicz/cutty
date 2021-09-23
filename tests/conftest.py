@@ -6,12 +6,6 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def set_hg_user(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Provide author information to ``hg commit``."""
-    monkeypatch.setenv("HGUSER", "you@example.com")
-
-
-@pytest.fixture(autouse=True)
 def set_git_user(monkeypatch: pytest.MonkeyPatch) -> None:
     """Provide author information to git."""
     monkeypatch.setenv("GIT_AUTHOR_NAME", "You")
