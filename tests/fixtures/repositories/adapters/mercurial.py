@@ -6,7 +6,7 @@ from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def hg() -> Hg:
     """Fixture for a hg command."""
     try:
