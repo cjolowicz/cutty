@@ -6,10 +6,10 @@ from cutty.repositories.adapters.fetchers.mercurial import Hg
 from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def hg() -> Hg:
     """Fixture for a hg command."""
     try:
-        return findhg()
+        return findhg(env={"HGUSER": "you@example.com"})
     except HgNotFoundError:
         pytest.skip("cannot locate hg")
