@@ -14,10 +14,10 @@ from cutty.repositories.domain.stores import Store
 pytest_plugins = ["tests.fixtures.repositories.adapters.mercurial"]
 
 
-@pytest.fixture
-def hgrepository(hg: Hg, tmp_path: pathlib.Path) -> pathlib.Path:
-    """Fixture for a Mercurial repository."""
-    path = tmp_path / "repository"
+@pytest.fixture(scope="session")
+def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
+    """Session fixture for a Mercurial repository."""
+    path = session_tmp_path / "repository"
     path.mkdir()
 
     hg("init", cwd=path)
