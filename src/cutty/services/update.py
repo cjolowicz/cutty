@@ -1,4 +1,5 @@
 """Update a project with changes from its Cookiecutter template."""
+from collections.abc import Callable
 from collections.abc import Sequence
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -44,6 +45,14 @@ def update(
         )
         return template
 
+    updateproject(projectdir, createproject)
+
+
+CreateProject = Callable[[Path], Template]
+
+
+def updateproject(projectdir: Path, createproject: CreateProject) -> None:
+    """Update a project by applying changes between the generated trees."""
     repository = Repository.open(projectdir)
     repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
     branch = repository.branch(UPDATE_BRANCH)
