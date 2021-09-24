@@ -61,7 +61,6 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
 
         repository = Repository.open(worktree)
         repository.commit(message=_commitmessage(template))
-        repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     project.cherrypick(branch.commit)
     project.heads[LATEST_BRANCH] = branch.commit
