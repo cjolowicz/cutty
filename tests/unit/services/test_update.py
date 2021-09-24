@@ -163,9 +163,9 @@ def test_updateproject_commit(
 
 
 def test_updateproject_commit_message_template(
-    project: Repository, createproject: CreateProject
+    project: Repository, createproject: CreateProject, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
     updateproject(project.path, createproject)
 
-    assert "template" in project.head.commit.message
+    assert template.name in project.head.commit.message
