@@ -4,6 +4,7 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
@@ -35,16 +36,20 @@ def update(
     repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
     branch = repository.branch(UPDATE_BRANCH)
 
-    with repository.worktree(branch, checkout=False) as worktree:
+    def createproject(outputdir: Path) -> Template:
         _, template = create(
             projectconfig.template,
-            outputdir=worktree,
+            outputdir=outputdir,
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=checkout,
             directory=directory,
         )
+        return template
+
+    with repository.worktree(branch, checkout=False) as worktree:
+        template = createproject(worktree)
         creategitrepository(worktree, template.name, template.revision)
 
     repository.cherrypick(branch.commit)
