@@ -1,4 +1,5 @@
 """Unit tests for cutty.services.update."""
+import dataclasses
 from pathlib import Path
 
 import pytest
@@ -169,3 +170,18 @@ def test_updateproject_commit_message_template(
     updateproject(project.path, createproject)
 
     assert template.name in project.head.commit.message
+
+
+def test_updateproject_commit_message_revision(
+    project: Repository, template: Template
+) -> None:
+    """It includes the template name in the commit message."""
+    template = dataclasses.replace(template, revision="1.0.0")
+
+    def createproject(project: Path) -> Template:
+        (project / "marker").touch()
+        return template
+
+    updateproject(project.path, createproject)
+
+    assert template.revision in project.head.commit.message
