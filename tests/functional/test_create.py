@@ -6,6 +6,7 @@ import pytest
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
@@ -97,3 +98,9 @@ def test_cutty_error(runcutty: RunCutty) -> None:
     """It prints an error message for known exceptions."""
     with pytest.raises(Exception, match="unknown location"):
         runcutty("create", "invalid://location")
+
+
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
+    """It exits with a non-zero status code."""
+    with pytest.raises(RunCuttyError):
+        runcutty("create", str(emptytemplate))

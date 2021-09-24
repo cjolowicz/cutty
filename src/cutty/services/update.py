@@ -5,7 +5,6 @@ from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.services.create import create
-from cutty.services.create import EmptyTemplateError
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
@@ -37,19 +36,16 @@ def update(
     branch = repository.branch(UPDATE_BRANCH)
 
     with repository.worktree(branch, checkout=False) as worktree:
-        try:
-            project_dir, template = create(
-                projectconfig.template,
-                outputdir=worktree,
-                outputdirisproject=True,
-                extrabindings=extrabindings,
-                no_input=no_input,
-                checkout=checkout,
-                directory=directory,
-            )
-            creategitrepository(project_dir, template.name, template.revision)
-        except EmptyTemplateError:  # pragma: no cover
-            pass
+        project_dir, template = create(
+            projectconfig.template,
+            outputdir=worktree,
+            outputdirisproject=True,
+            extrabindings=extrabindings,
+            no_input=no_input,
+            checkout=checkout,
+            directory=directory,
+        )
+        creategitrepository(project_dir, template.name, template.revision)
 
     repository.cherrypick(branch.commit)
     repository.heads[LATEST_BRANCH] = branch.commit

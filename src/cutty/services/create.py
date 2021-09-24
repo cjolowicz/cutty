@@ -7,6 +7,7 @@ from typing import Optional
 import platformdirs
 from lazysequence import lazysequence
 
+from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
@@ -35,7 +36,7 @@ def loadtemplate(
     )
 
 
-class EmptyTemplateError(Exception):
+class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 

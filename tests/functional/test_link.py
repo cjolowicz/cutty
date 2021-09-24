@@ -198,3 +198,18 @@ def test_template_not_specified(
     """It exits with an error."""
     with pytest.raises(RunCuttyError):
         runcutty("link", f"--cwd={project}")
+
+
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
+    """It exits with a non-zero status code."""
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
+
+    runcutty("cookiecutter", str(emptytemplate))
+
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").unlink()
+
+    project = Repository.init(Path("project"))
+    project.commit(message="Initial")
+
+    with pytest.raises(RunCuttyError):
+        runcutty("link", "--cwd=project", str(emptytemplate))

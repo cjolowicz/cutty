@@ -8,6 +8,7 @@ import pytest
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.util.files import chdir
 from tests.util.git import appendfile
 from tests.util.git import move_repository_files_to_subdirectory
@@ -348,3 +349,15 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
 
     assert (project / "LICENSE").read_text() == "a"
     assert (project / "INSTALL").is_file()
+
+
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
+    """It exits with a non-zero status code."""
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
+
+    runcutty("create", str(emptytemplate))
+
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").unlink()
+
+    with pytest.raises(RunCuttyError):
+        runcutty("update", "--cwd=project")

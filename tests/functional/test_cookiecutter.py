@@ -6,6 +6,7 @@ import pytest
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
@@ -123,3 +124,9 @@ def test_skip(runcutty: RunCutty, template: Path) -> None:
     )
 
     assert readme.read_text() == ""
+
+
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
+    """It exits with a non-zero status code."""
+    with pytest.raises(RunCuttyError):
+        runcutty("cookiecutter", str(emptytemplate))

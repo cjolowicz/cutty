@@ -90,3 +90,15 @@ def template(template_directory: Path) -> Path:
     repository = Repository.init(template_directory)
     repository.commit(message="Initial")
     return template_directory
+
+
+@pytest.fixture
+def emptytemplate(tmp_path: Path) -> Path:
+    """Fixture for a template without project files."""
+    template = tmp_path / "template"
+    template.mkdir()
+
+    (template / "cookiecutter.json").write_text('{"project": "project"}')
+    (template / "{{ cookiecutter.project }}").mkdir()
+
+    return template
