@@ -134,13 +134,19 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def createproject() -> CreateProject:
+def template() -> Template:
+    """Fixture for a `Template` instance."""
+    templatepath = VirtualPath(filesystem=DictFilesystem({}))
+    return Template("template", templatepath, None)
+
+
+@pytest.fixture
+def createproject(template: Template) -> CreateProject:
     """Fixture for a `createproject` function."""
 
     def _(project: Path) -> Template:
         (project / "marker").touch()
-        templatepath = VirtualPath(filesystem=DictFilesystem({}))
-        return Template("template", templatepath, None)
+        return template
 
     return _
 
