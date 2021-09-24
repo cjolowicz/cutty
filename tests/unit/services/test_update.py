@@ -207,3 +207,12 @@ def test_updateproject_update_branch(
     updateproject(project.path, createproject)
 
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
+
+
+def test_updateproject_no_changes(project: Repository, template: Template) -> None:
+    """It does not create an empty commit."""
+    tip = project.head.commit
+
+    updateproject(project.path, lambda _: template)
+
+    assert tip == project.head.commit
