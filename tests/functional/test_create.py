@@ -100,13 +100,7 @@ def test_cutty_error(runcutty: RunCutty) -> None:
         runcutty("create", "invalid://location")
 
 
-def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It prints an error message."""
-    template = tmp_path / "template"
-    template.mkdir()
-
-    (template / "cookiecutter.json").write_text('{"project": "project"}')
-    (template / "{{ cookiecutter.project }}").mkdir()
-
     with pytest.raises(RunCuttyError):
-        runcutty("create", str(template))
+        runcutty("create", str(emptytemplate))
