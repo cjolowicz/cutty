@@ -60,10 +60,7 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
         template = createproject(worktree)
 
         repository = Repository.open(worktree)
-
-        message = _commitmessage(template)
-
-        repository.commit(message=message)
+        repository.commit(message=_commitmessage(template))
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     project.cherrypick(branch.commit)
