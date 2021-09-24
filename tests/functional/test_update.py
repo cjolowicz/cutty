@@ -351,18 +351,13 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     assert (project / "INSTALL").is_file()
 
 
-def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It prints an error message."""
-    template = tmp_path / "template"
-    template.mkdir()
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
 
-    (template / "cookiecutter.json").write_text('{"project": "project"}')
-    (template / "{{ cookiecutter.project }}").mkdir()
-    (template / "{{ cookiecutter.project }}" / "marker").touch()
+    runcutty("create", str(emptytemplate))
 
-    runcutty("create", str(template))
-
-    (template / "{{ cookiecutter.project }}" / "marker").unlink()
+    (emptytemplate / "{{ cookiecutter.project }}" / "marker").unlink()
 
     with pytest.raises(RunCuttyError):
         runcutty("update", "--cwd=project")
