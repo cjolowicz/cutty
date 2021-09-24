@@ -352,7 +352,7 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
 
 
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
-    """It prints an error message."""
+    """It exits with a non-zero status code."""
     (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
 
     runcutty("create", str(emptytemplate))

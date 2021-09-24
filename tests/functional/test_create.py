@@ -101,6 +101,6 @@ def test_cutty_error(runcutty: RunCutty) -> None:
 
 
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
-    """It prints an error message."""
+    """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
         runcutty("create", str(emptytemplate))
