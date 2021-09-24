@@ -198,3 +198,12 @@ def test_updateproject_latest_branch(
     updateproject(project.path, createproject)
 
     assert [tip] == project.heads[LATEST_BRANCH].parents
+
+
+def test_updateproject_update_branch(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It creates the update branch."""
+    updateproject(project.path, createproject)
+
+    assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
