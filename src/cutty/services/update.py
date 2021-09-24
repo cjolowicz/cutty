@@ -32,10 +32,6 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = Repository.open(projectdir)
-    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
-    branch = repository.branch(UPDATE_BRANCH)
-
     def createproject(outputdir: Path) -> Template:
         _, template = create(
             projectconfig.template,
@@ -47,6 +43,10 @@ def update(
             directory=directory,
         )
         return template
+
+    repository = Repository.open(projectdir)
+    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
+    branch = repository.branch(UPDATE_BRANCH)
 
     with repository.worktree(branch, checkout=False) as worktree:
         template = createproject(worktree)
