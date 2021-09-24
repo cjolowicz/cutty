@@ -66,16 +66,10 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
         except pygit2.GitError:
             repository = Repository.init(worktree)
 
-        update = LATEST_BRANCH in repository.heads
-
-        if update and template.revision:
+        if template.revision:
             message = f"Update {template.name} to {template.revision}"
-        elif update:
-            message = f"Update {template.name}"
-        elif template.revision:
-            message = f"Initial import from {template.name} {template.revision}"
         else:
-            message = f"Initial import from {template.name}"
+            message = f"Update {template.name}"
 
         repository.commit(message=message)
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
