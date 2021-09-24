@@ -145,6 +145,12 @@ def createproject() -> CreateProject:
     return _
 
 
-def test_updateproject(project: Repository, createproject: CreateProject) -> None:
-    """It works."""
+def test_updateproject_commit(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It creates a commit on the current branch."""
+    tip = project.head.commit
+
     updateproject(project.path, createproject)
+
+    assert [tip] == project.head.commit.parents
