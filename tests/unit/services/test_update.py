@@ -185,3 +185,16 @@ def test_updateproject_commit_message_revision(
     updateproject(project.path, createproject)
 
     assert template.revision in project.head.commit.message
+
+
+def test_updateproject_latest_branch(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It updates the latest branch."""
+    updatefile(project.path / "initial")
+
+    tip = project.heads[LATEST_BRANCH]
+
+    updateproject(project.path, createproject)
+
+    assert [tip] == project.heads[LATEST_BRANCH].parents
