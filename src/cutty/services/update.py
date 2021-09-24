@@ -5,8 +5,6 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-import pygit2
-
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.services.git import LATEST_BRANCH
@@ -61,10 +59,7 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
     with project.worktree(branch, checkout=False) as worktree:
         template = createproject(worktree)
 
-        try:
-            repository = Repository.open(worktree)
-        except pygit2.GitError:
-            repository = Repository.init(worktree)
+        repository = Repository.open(worktree)
 
         if template.revision:
             message = f"Update {template.name} to {template.revision}"
