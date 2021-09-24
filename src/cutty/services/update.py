@@ -53,10 +53,9 @@ CreateProject = Callable[[Path], Template]
 def updateproject(projectdir: Path, createproject: CreateProject) -> None:
     """Update a project by applying changes between the generated trees."""
     project = Repository.open(projectdir)
-    project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
 
     latestbranch = project.branch(LATEST_BRANCH)
-    updatebranch = project.branch(UPDATE_BRANCH)
+    updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
 
     with project.worktree(updatebranch, checkout=False) as worktree:
         template = createproject(worktree)
