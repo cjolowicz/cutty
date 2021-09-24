@@ -54,6 +54,8 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
     """Update a project by applying changes between the generated trees."""
     project = Repository.open(projectdir)
     project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
+
+    latestbranch = project.branch(LATEST_BRANCH)
     updatebranch = project.branch(UPDATE_BRANCH)
 
     with project.worktree(updatebranch, checkout=False) as worktree:
@@ -61,7 +63,8 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
         Repository.open(worktree).commit(message=_commitmessage(template))
 
     project.cherrypick(updatebranch.commit)
-    project.heads[LATEST_BRANCH] = updatebranch.commit
+
+    latestbranch.commit = updatebranch.commit
 
 
 def _commitmessage(template: Template) -> str:
