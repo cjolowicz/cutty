@@ -5,10 +5,10 @@ from typing import Any
 
 import pytest
 
-from cutty.services.create import EmptyTemplateError
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.util.files import chdir
 from tests.util.git import appendfile
 from tests.util.git import move_repository_files_to_subdirectory
@@ -364,5 +364,5 @@ def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
 
     (template / "{{ cookiecutter.project }}" / "marker").unlink()
 
-    with pytest.raises(EmptyTemplateError):
+    with pytest.raises(RunCuttyError):
         runcutty("update", "--cwd=project")

@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from cutty.services.create import EmptyTemplateError
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
+from tests.functional.conftest import RunCuttyError
 from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
@@ -127,12 +127,12 @@ def test_skip(runcutty: RunCutty, template: Path) -> None:
 
 
 def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
-    """It prints an error message."""
+    """It exits with a non-zero status code."""
     template = tmp_path / "template"
     template.mkdir()
 
     (template / "cookiecutter.json").write_text('{"project": "project"}')
     (template / "{{ cookiecutter.project }}").mkdir()
 
-    with pytest.raises(EmptyTemplateError):
+    with pytest.raises(RunCuttyError):
         runcutty("cookiecutter", str(template))

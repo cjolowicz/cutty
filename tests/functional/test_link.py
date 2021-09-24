@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from cutty.services.create import EmptyTemplateError
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -217,5 +216,5 @@ def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
     project = Repository.init(Path("project"))
     project.commit(message="Initial")
 
-    with pytest.raises(EmptyTemplateError):
+    with pytest.raises(RunCuttyError):
         runcutty("link", "--cwd=project", str(template))
