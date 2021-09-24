@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from cutty.services.create import EmptyTemplateError
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
@@ -348,3 +349,20 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
 
     assert (project / "LICENSE").read_text() == "a"
     assert (project / "INSTALL").is_file()
+
+
+def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+    """It prints an error message."""
+    template = tmp_path / "template"
+    template.mkdir()
+
+    (template / "cookiecutter.json").write_text('{"project": "project"}')
+    (template / "{{ cookiecutter.project }}").mkdir()
+    (template / "{{ cookiecutter.project }}" / "marker").touch()
+
+    runcutty("create", str(template))
+
+    (template / "{{ cookiecutter.project }}" / "marker").unlink()
+
+    with pytest.raises(EmptyTemplateError):
+        runcutty("update", "--cwd=project")
