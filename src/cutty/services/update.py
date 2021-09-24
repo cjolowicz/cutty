@@ -66,12 +66,6 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
         except pygit2.GitError:
             repository = Repository.init(worktree)
 
-        if UPDATE_BRANCH in repository.heads:
-            # HEAD must point to update branch if it exists.
-            head = repository.head.name
-            if head != UPDATE_BRANCH:
-                raise RuntimeError(f"unexpected HEAD: {head}")
-
         update = LATEST_BRANCH in repository.heads
 
         if update and template.revision:
