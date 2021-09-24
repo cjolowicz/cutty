@@ -119,3 +119,10 @@ def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -
     assert (
         repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]
     )
+
+
+@pytest.fixture
+def project(repository: Repository) -> Repository:
+    """Fixture for a project repository."""
+    repository.heads.create(LATEST_BRANCH)
+    return repository
