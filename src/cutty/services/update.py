@@ -36,7 +36,7 @@ def update(
     branch = repository.branch(UPDATE_BRANCH)
 
     with repository.worktree(branch, checkout=False) as worktree:
-        project_dir, template = create(
+        _, template = create(
             projectconfig.template,
             outputdir=worktree,
             outputdirisproject=True,
@@ -45,7 +45,7 @@ def update(
             checkout=checkout,
             directory=directory,
         )
-        creategitrepository(project_dir, template.name, template.revision)
+        creategitrepository(worktree, template.name, template.revision)
 
     repository.cherrypick(branch.commit)
     repository.heads[LATEST_BRANCH] = branch.commit
