@@ -69,7 +69,7 @@ def create(
     projectfiles = lazysequence(
         renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
     )
-    if not projectfiles:  # pragma: no cover
+    if not projectfiles:
         raise EmptyTemplateError()
 
     projectname = projectfiles[0].path.parts[0]
