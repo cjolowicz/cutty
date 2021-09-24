@@ -12,6 +12,7 @@ from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import CreateProject
 from cutty.services.update import skipupdate
+from cutty.services.update import updateproject
 from cutty.util.git import Repository
 from tests.util.files import chdir
 from tests.util.git import createbranches
@@ -142,3 +143,8 @@ def createproject() -> CreateProject:
         return Template("template", templatepath, None)
 
     return _
+
+
+def test_updateproject(project: Repository, createproject: CreateProject) -> None:
+    """It works."""
+    updateproject(project.path, createproject)
