@@ -61,16 +61,20 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
 
         repository = Repository.open(worktree)
 
-        if template.revision:
-            message = f"Update {template.name} to {template.revision}"
-        else:
-            message = f"Update {template.name}"
+        message = _commitmessage(template)
 
         repository.commit(message=message)
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     project.cherrypick(branch.commit)
     project.heads[LATEST_BRANCH] = branch.commit
+
+
+def _commitmessage(template: Template) -> str:
+    if template.revision:
+        return f"Update {template.name} to {template.revision}"
+    else:
+        return f"Update {template.name}"
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:
