@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from cutty.services.create import EmptyTemplateError
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -198,3 +199,23 @@ def test_template_not_specified(
     """It exits with an error."""
     with pytest.raises(RunCuttyError):
         runcutty("link", f"--cwd={project}")
+
+
+def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+    """It prints an error message."""
+    template = tmp_path / "template"
+    template.mkdir()
+
+    (template / "cookiecutter.json").write_text('{"project": "project"}')
+    (template / "{{ cookiecutter.project }}").mkdir()
+    (template / "{{ cookiecutter.project }}" / "marker").touch()
+
+    runcutty("cookiecutter", str(template))
+
+    (template / "{{ cookiecutter.project }}" / "marker").unlink()
+
+    project = Repository.init(Path("project"))
+    project.commit(message="Initial")
+
+    with pytest.raises(EmptyTemplateError):
+        runcutty("link", "--cwd=project", str(template))
