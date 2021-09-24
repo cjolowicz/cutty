@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from cutty.services.create import EmptyTemplateError
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
@@ -97,3 +98,15 @@ def test_cutty_error(runcutty: RunCutty) -> None:
     """It prints an error message for known exceptions."""
     with pytest.raises(Exception, match="unknown location"):
         runcutty("create", "invalid://location")
+
+
+def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+    """It prints an error message."""
+    template = tmp_path / "template"
+    template.mkdir()
+
+    (template / "cookiecutter.json").write_text('{"project": "project"}')
+    (template / "{{ cookiecutter.project }}").mkdir()
+
+    with pytest.raises(EmptyTemplateError):
+        runcutty("create", str(template))
