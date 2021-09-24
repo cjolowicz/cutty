@@ -163,6 +163,15 @@ def test_updateproject_commit(
     assert [tip] == project.head.commit.parents
 
 
+def test_updateproject_commit_message(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It uses a commit message indicating an update."""
+    updateproject(project.path, createproject)
+
+    assert "update" in project.head.commit.message.lower()
+
+
 def test_updateproject_commit_message_template(
     project: Repository, createproject: CreateProject, template: Template
 ) -> None:
