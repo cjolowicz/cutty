@@ -58,9 +58,7 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
 
     with project.worktree(branch, checkout=False) as worktree:
         template = createproject(worktree)
-
-        repository = Repository.open(worktree)
-        repository.commit(message=_commitmessage(template))
+        Repository.open(worktree).commit(message=_commitmessage(template))
 
     project.cherrypick(branch.commit)
     project.heads[LATEST_BRANCH] = branch.commit
