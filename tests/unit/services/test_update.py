@@ -154,3 +154,12 @@ def test_updateproject_commit(
     updateproject(project.path, createproject)
 
     assert [tip] == project.head.commit.parents
+
+
+def test_updateproject_commit_message_template(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It includes the template name in the commit message."""
+    updateproject(project.path, createproject)
+
+    assert "template" in project.head.commit.message
