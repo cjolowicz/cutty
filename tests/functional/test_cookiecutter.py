@@ -126,13 +126,7 @@ def test_skip(runcutty: RunCutty, template: Path) -> None:
     assert readme.read_text() == ""
 
 
-def test_empty_template(tmp_path: Path, runcutty: RunCutty) -> None:
+def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It exits with a non-zero status code."""
-    template = tmp_path / "template"
-    template.mkdir()
-
-    (template / "cookiecutter.json").write_text('{"project": "project"}')
-    (template / "{{ cookiecutter.project }}").mkdir()
-
     with pytest.raises(RunCuttyError):
-        runcutty("cookiecutter", str(template))
+        runcutty("cookiecutter", str(emptytemplate))
