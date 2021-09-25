@@ -1,11 +1,12 @@
 """Update a project with changes from its Cookiecutter template."""
+from collections.abc import Callable
 from collections.abc import Sequence
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
-from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -31,24 +32,45 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = Repository.open(projectdir)
-    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
-    branch = repository.branch(UPDATE_BRANCH)
-
-    with repository.worktree(branch, checkout=False) as worktree:
-        project_dir, template = create(
+    def createproject(outputdir: Path) -> Template:
+        _, template = create(
             projectconfig.template,
-            outputdir=worktree,
+            outputdir=outputdir,
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=checkout,
             directory=directory,
         )
-        creategitrepository(project_dir, template.name, template.revision)
+        return template
 
-    repository.cherrypick(branch.commit)
-    repository.heads[LATEST_BRANCH] = branch.commit
+    updateproject(projectdir, createproject)
+
+
+CreateProject = Callable[[Path], Template]
+
+
+def updateproject(projectdir: Path, createproject: CreateProject) -> None:
+    """Update a project by applying changes between the generated trees."""
+    project = Repository.open(projectdir)
+
+    latestbranch = project.branch(LATEST_BRANCH)
+    updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
+
+    with project.worktree(updatebranch, checkout=False) as worktree:
+        template = createproject(worktree)
+        Repository.open(worktree).commit(message=_commitmessage(template))
+
+    project.cherrypick(updatebranch.commit)
+
+    latestbranch.commit = updatebranch.commit
+
+
+def _commitmessage(template: Template) -> str:
+    if template.revision:
+        return f"Update {template.name} to {template.revision}"
+    else:
+        return f"Update {template.name}"
 
 
 def continueupdate(*, projectdir: Optional[Path] = None) -> None:

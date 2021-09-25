@@ -26,22 +26,16 @@ def creategitrepository(
         if head != UPDATE_BRANCH:
             raise RuntimeError(f"unexpected HEAD: {head}")
 
-    message = _commitmessage(
-        template, revision, update=LATEST_BRANCH in repository.heads
-    )
+    update = LATEST_BRANCH in repository.heads
+
+    if update and revision:
+        message = f"Update {template} to {revision}"
+    elif update:
+        message = f"Update {template}"
+    elif revision:
+        message = f"Initial import from {template} {revision}"
+    else:
+        message = f"Initial import from {template}"
 
     repository.commit(message=message)
     repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
-
-
-def _commitmessage(template: str, revision: Optional[str], update: bool) -> str:
-    if update and revision:
-        return f"Update {template} to {revision}"
-
-    if update:
-        return f"Update {template}"
-
-    if revision:
-        return f"Initial import from {template} {revision}"
-
-    return f"Initial import from {template}"
