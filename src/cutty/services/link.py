@@ -54,30 +54,6 @@ def _transform_commit_message(message: str) -> str:
     return message.replace("Initial import from ", "Link to ")
 
 
-def link(
-    template: Optional[str] = None,
-    /,
-    *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    directory: Optional[pathlib.PurePosixPath] = None,
-    projectdir: Optional[pathlib.Path] = None,
-) -> None:
-    """Link project to a Cookiecutter template."""
-    if projectdir is None:
-        projectdir = pathlib.Path.cwd()
-
-    link2(
-        template,
-        projectdir,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        checkout=checkout,
-        directory=directory,
-    )
-
-
 def link2(
     template: Optional[str],
     projectdir: pathlib.Path,
