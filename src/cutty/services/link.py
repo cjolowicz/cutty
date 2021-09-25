@@ -109,8 +109,8 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        template2 = createproject(worktree)
-        creategitrepository(worktree, template2.name, template2.revision)
+        template = createproject(worktree)
+        creategitrepository(worktree, template.name, template.revision)
 
     if latest is None:
         # Squash the empty initial commit.
