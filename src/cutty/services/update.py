@@ -96,7 +96,11 @@ def abortupdate(*, projectdir: Optional[Path] = None) -> None:
     """Abort an update with conflicts."""
     if projectdir is None:
         projectdir = Path.cwd()
+    abortupdate2(projectdir)
 
+
+def abortupdate2(projectdir: Path) -> None:
+    """Abort an update with conflicts."""
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
 
