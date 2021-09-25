@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.update import abortupdate2
+from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
 from cutty.services.update import update as service_update
@@ -91,7 +91,7 @@ def update(
         if cwd is None:
             cwd = pathlib.Path.cwd()
 
-        abortupdate2(cwd)
+        abortupdate(cwd)
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]

@@ -9,7 +9,7 @@ from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
-from cutty.services.update import abortupdate2
+from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import CreateProject
 from cutty.services.update import skipupdate
@@ -112,7 +112,7 @@ def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -
 
     latesthead = repository.heads[LATEST_BRANCH]
 
-    abortupdate2(repository.path)
+    abortupdate(repository.path)
 
     assert (
         repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]
