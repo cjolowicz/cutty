@@ -57,6 +57,16 @@ def test_cutty_json_already_exists(runcutty: RunCutty, template: Path) -> None:
         runcutty("create", str(template))
 
 
+def test_output_dir(runcutty: RunCutty, template: Path) -> None:
+    """It creates the project directory in the output directory."""
+    outputdir = Path("output")
+    outputdir.mkdir()
+
+    runcutty("create", f"--output-dir={outputdir}", str(template))
+
+    assert template_files(template) == project_files(outputdir / "example") - EXTRA
+
+
 def test_inplace(runcutty: RunCutty, template: Path) -> None:
     """It generates the project files in the current directory."""
     runcutty("create", "--no-input", "--in-place", str(template))
