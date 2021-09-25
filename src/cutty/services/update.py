@@ -14,7 +14,7 @@ from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
 
 
-def update2(
+def update(
     projectdir: Path,
     *,
     extrabindings: Sequence[Binding] = (),

@@ -8,7 +8,7 @@ from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import skipupdate
-from cutty.services.update import update2 as service_update
+from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
 
