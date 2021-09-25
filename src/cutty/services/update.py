@@ -72,29 +72,29 @@ def _commitmessage(template: Template) -> str:
 
 def continueupdate(projectdir: Path) -> None:
     """Continue an update after conflict resolution."""
-    repository = Repository.open(projectdir)
+    project = Repository.open(projectdir)
 
-    if commit := repository.cherrypickhead:
-        repository.commit(
+    if commit := project.cherrypickhead:
+        project.commit(
             message=commit.message,
             author=commit.author,
-            committer=repository.default_signature,
+            committer=project.default_signature,
         )
 
-    repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
+    project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
 
 
 def skipupdate(projectdir: Path) -> None:
     """Skip an update with conflicts."""
-    repository = Repository.open(projectdir)
-    repository.resetcherrypick()
+    project = Repository.open(projectdir)
+    project.resetcherrypick()
 
-    repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
+    project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
 
 
 def abortupdate(projectdir: Path) -> None:
     """Abort an update with conflicts."""
-    repository = Repository.open(projectdir)
-    repository.resetcherrypick()
+    project = Repository.open(projectdir)
+    project.resetcherrypick()
 
-    repository.heads[UPDATE_BRANCH] = repository.heads[LATEST_BRANCH]
+    project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
