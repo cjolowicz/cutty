@@ -68,6 +68,27 @@ def link(
     if projectdir is None:
         projectdir = pathlib.Path.cwd()
 
+    link2(
+        template,
+        projectdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        directory=directory,
+    )
+
+
+def link2(
+    template: Optional[str],
+    projectdir: pathlib.Path,
+    /,
+    *,
+    extrabindings: Sequence[Binding] = (),
+    no_input: bool = False,
+    checkout: Optional[str] = None,
+    directory: Optional[pathlib.PurePosixPath] = None,
+) -> None:
+    """Link project to a Cookiecutter template."""
     project = Repository.open(projectdir)
 
     with contextlib.suppress(FileNotFoundError):
