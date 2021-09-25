@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from cutty.services.create import create as service_create
+from cutty.services.create import create2 as service_create
 from cutty.services.git import creategitrepository
 from cutty.templates.domain.bindings import Binding
 
@@ -94,12 +94,15 @@ def create(
     """Generate projects from Cookiecutter templates."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
+    if output_dir is None:
+        output_dir = pathlib.Path.cwd()
+
     project_dir, template2 = service_create(
         template,
+        output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
-        outputdir=output_dir,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,

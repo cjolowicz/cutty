@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.create import create
+from cutty.services.create import create2
 from cutty.templates.domain.bindings import Binding
 
 
@@ -66,12 +66,16 @@ def cookiecutter(
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
-    create(
+
+    if output_dir is None:
+        output_dir = Path.cwd()
+
+    create2(
         template,
+        output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
-        outputdir=output_dir,
         directory=PurePosixPath(directory) if directory is not None else None,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,

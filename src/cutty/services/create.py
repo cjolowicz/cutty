@@ -40,39 +40,6 @@ class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 
-def create(
-    location: str,
-    *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    outputdir: Optional[pathlib.Path] = None,
-    directory: Optional[pathlib.PurePosixPath] = None,
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
-    outputdirisproject: bool = False,
-    createrepository: bool = True,
-    createconfigfile: bool = True,
-) -> tuple[pathlib.Path, Repository]:
-    """Generate a project from a Cookiecutter template."""
-    if outputdir is None:
-        outputdir = pathlib.Path.cwd()
-
-    return create2(
-        location,
-        outputdir,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        checkout=checkout,
-        directory=directory,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=outputdirisproject,
-        createrepository=createrepository,
-        createconfigfile=createconfigfile,
-    )
-
-
 def create2(
     location: str,
     outputdir: pathlib.Path,
