@@ -75,6 +75,11 @@ def continueupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
+    continueupdate2(projectdir)
+
+
+def continueupdate2(projectdir: Path) -> None:
+    """Continue an update after conflict resolution."""
     repository = Repository.open(projectdir)
 
     if commit := repository.cherrypickhead:
