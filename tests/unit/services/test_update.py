@@ -10,7 +10,7 @@ from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
-from cutty.services.update import continueupdate2
+from cutty.services.update import continueupdate
 from cutty.services.update import CreateProject
 from cutty.services.update import skipupdate
 from cutty.services.update import updateproject
@@ -47,7 +47,7 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate2(repository.path)
+    continueupdate(repository.path)
 
     blob = repository.head.commit.tree / path.name
     assert blob.data == b"b"
@@ -58,7 +58,7 @@ def test_continueupdate_preserves_metainfo(repository: Repository, path: Path) -
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate2(repository.path)
+    continueupdate(repository.path)
 
     assert repository.heads[UPDATE_BRANCH].message == repository.head.commit.message
 
@@ -68,7 +68,7 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate2(repository.path)
+    continueupdate(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
@@ -81,7 +81,7 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
     # The user invokes `git cherry-pick --continue` before `cutty update --continue`.
     repository.commit()
 
-    continueupdate2(repository.path)
+    continueupdate(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
@@ -91,7 +91,7 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate2(repository.path)
+    continueupdate(repository.path)
 
     assert repository.cherrypickhead is None
 
