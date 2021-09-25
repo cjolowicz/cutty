@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.link import link2 as service_link
+from cutty.services.link import link as service_link
 from cutty.templates.domain.bindings import Binding
 
 

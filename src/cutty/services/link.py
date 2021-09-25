@@ -54,7 +54,7 @@ def _transform_commit_message(message: str) -> str:
     return message.replace("Initial import from ", "Link to ")
 
 
-def link2(
+def link(
     template: Optional[str],
     projectdir: pathlib.Path,
     /,
