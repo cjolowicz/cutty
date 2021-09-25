@@ -89,6 +89,11 @@ def skipupdate(*, projectdir: Optional[Path] = None) -> None:
     if projectdir is None:
         projectdir = Path.cwd()
 
+    skipupdate2(projectdir)
+
+
+def skipupdate2(projectdir: Path) -> None:
+    """Skip an update with conflicts."""
     repository = Repository.open(projectdir)
     repository.resetcherrypick()
 
