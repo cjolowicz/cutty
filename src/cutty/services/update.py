@@ -84,7 +84,7 @@ def continueupdate(projectdir: Path) -> None:
     repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
 
 
-def skipupdate2(projectdir: Path) -> None:
+def skipupdate(projectdir: Path) -> None:
     """Skip an update with conflicts."""
     repository = Repository.open(projectdir)
     repository.resetcherrypick()

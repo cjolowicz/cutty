@@ -7,7 +7,7 @@ import click
 from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
-from cutty.services.update import skipupdate2
+from cutty.services.update import skipupdate
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
@@ -84,7 +84,7 @@ def update(
         if cwd is None:
             cwd = pathlib.Path.cwd()
 
-        skipupdate2(cwd)
+        skipupdate(cwd)
         return
 
     if abort:
