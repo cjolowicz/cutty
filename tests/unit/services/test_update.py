@@ -12,7 +12,7 @@ from cutty.services.git import UPDATE_BRANCH
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
 from cutty.services.update import CreateProject
-from cutty.services.update import skipupdate
+from cutty.services.update import skipupdate2
 from cutty.services.update import updateproject
 from cutty.util.git import Repository
 from tests.util.files import chdir
@@ -102,8 +102,7 @@ def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> N
 
     updatehead = repository.heads[UPDATE_BRANCH]
 
-    with chdir(repository.path):
-        skipupdate()
+    skipupdate2(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == updatehead
 

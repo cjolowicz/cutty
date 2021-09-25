@@ -84,14 +84,6 @@ def continueupdate(projectdir: Path) -> None:
     repository.heads[LATEST_BRANCH] = repository.heads[UPDATE_BRANCH]
 
 
-def skipupdate(*, projectdir: Optional[Path] = None) -> None:
-    """Skip an update with conflicts."""
-    if projectdir is None:
-        projectdir = Path.cwd()
-
-    skipupdate2(projectdir)
-
-
 def skipupdate2(projectdir: Path) -> None:
     """Skip an update with conflicts."""
     repository = Repository.open(projectdir)
