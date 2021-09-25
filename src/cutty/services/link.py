@@ -78,13 +78,6 @@ def link(
     if template is None:
         raise TemplateNotSpecifiedError()
 
-    if latest := project.heads.get(LATEST_BRANCH):
-        update = project.heads.create(UPDATE_BRANCH, latest, force=True)
-    else:
-        # Unborn branches cannot have worktrees. Create an orphan branch with an
-        # empty placeholder commit instead. We'll squash it after project creation.
-        update = _create_orphan_branch(project, UPDATE_BRANCH)
-
     def createproject(outputdir: pathlib.Path) -> Template:
         assert template is not None  # noqa: S101
 
@@ -98,6 +91,13 @@ def link(
             directory=directory,
         )
         return template2
+
+    if latest := project.heads.get(LATEST_BRANCH):
+        update = project.heads.create(UPDATE_BRANCH, latest, force=True)
+    else:
+        # Unborn branches cannot have worktrees. Create an orphan branch with an
+        # empty placeholder commit instead. We'll squash it after project creation.
+        update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
         template2 = createproject(worktree)
