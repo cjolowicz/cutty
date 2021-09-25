@@ -91,9 +91,9 @@ def update(
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
     service_update(
+        cwd,
         extrabindings=extrabindings,
         no_input=no_input,
-        projectdir=cwd,
         checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
