@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.create import create2
+from cutty.services.create import create
 from cutty.templates.domain.bindings import Binding
 
 
@@ -70,7 +70,7 @@ def cookiecutter(
     if output_dir is None:
         output_dir = Path.cwd()
 
-    create2(
+    create(
         template,
         output_dir,
         extrabindings=extrabindings,

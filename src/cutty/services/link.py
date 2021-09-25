@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.services.create import create2
+from cutty.services.create import create
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
@@ -88,7 +88,7 @@ def link(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        project_dir, template2 = create2(
+        project_dir, template2 = create(
             template,
             worktree,
             outputdirisproject=True,

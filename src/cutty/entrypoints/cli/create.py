@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from cutty.services.create import create2 as service_create
+from cutty.services.create import create as service_create
 from cutty.services.git import creategitrepository
 from cutty.templates.domain.bindings import Binding
 

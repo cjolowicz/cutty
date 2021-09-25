@@ -40,7 +40,7 @@ class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 
-def create2(
+def create(
     location: str,
     outputdir: pathlib.Path,
     *,
