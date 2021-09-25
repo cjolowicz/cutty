@@ -73,31 +73,22 @@ def update(
     abort: bool,
 ) -> None:
     """Update a project with changes from its template."""
-    if continue_:
-        if cwd is None:
-            cwd = pathlib.Path.cwd()
+    if cwd is None:
+        cwd = pathlib.Path.cwd()
 
+    if continue_:
         continueupdate(cwd)
         return
 
     if skip:
-        if cwd is None:
-            cwd = pathlib.Path.cwd()
-
         skipupdate(cwd)
         return
 
     if abort:
-        if cwd is None:
-            cwd = pathlib.Path.cwd()
-
         abortupdate(cwd)
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
-
-    if cwd is None:
-        cwd = pathlib.Path.cwd()
 
     service_update(
         extrabindings=extrabindings,
