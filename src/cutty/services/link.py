@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
@@ -84,16 +85,22 @@ def link(
         # empty placeholder commit instead. We'll squash it after project creation.
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
-    with project.worktree(update, checkout=False) as worktree:
+    def createproject(outputdir: pathlib.Path) -> Template:
+        assert template is not None  # noqa: S101
+
         _, template2 = create(
             template,
-            worktree,
+            outputdir,
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=checkout,
             directory=directory,
         )
+        return template2
+
+    with project.worktree(update, checkout=False) as worktree:
+        template2 = createproject(worktree)
         creategitrepository(worktree, template2.name, template2.revision)
 
     if latest is None:
