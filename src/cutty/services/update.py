@@ -26,6 +26,24 @@ def update(
     if projectdir is None:
         projectdir = Path.cwd()
 
+    update2(
+        projectdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        directory=directory,
+    )
+
+
+def update2(
+    projectdir: Path,
+    *,
+    extrabindings: Sequence[Binding] = (),
+    no_input: bool = False,
+    checkout: Optional[str] = None,
+    directory: Optional[PurePosixPath] = None,
+) -> None:
+    """Update a project with changes from its Cookiecutter template."""
     projectconfig = readprojectconfigfile(projectdir)
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
