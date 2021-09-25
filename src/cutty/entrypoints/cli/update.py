@@ -73,23 +73,27 @@ def update(
     abort: bool,
 ) -> None:
     """Update a project with changes from its template."""
+    if cwd is None:
+        cwd = pathlib.Path.cwd()
+
     if continue_:
-        continueupdate(projectdir=cwd)
+        continueupdate(cwd)
         return
 
     if skip:
-        skipupdate(projectdir=cwd)
+        skipupdate(cwd)
         return
 
     if abort:
-        abortupdate(projectdir=cwd)
+        abortupdate(cwd)
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+
     service_update(
+        cwd,
         extrabindings=extrabindings,
         no_input=no_input,
-        projectdir=cwd,
         checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )

@@ -50,12 +50,16 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
+    if cwd is None:
+        cwd = pathlib.Path.cwd()
+
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
+
     service_link(
         template,
+        cwd,
         extrabindings=extrabindings,
         no_input=no_input,
-        projectdir=cwd,
         checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )

@@ -15,7 +15,6 @@ from cutty.services.update import CreateProject
 from cutty.services.update import skipupdate
 from cutty.services.update import updateproject
 from cutty.util.git import Repository
-from tests.util.files import chdir
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
@@ -47,8 +46,7 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    with chdir(repository.path):
-        continueupdate()
+    continueupdate(repository.path)
 
     blob = repository.head.commit.tree / path.name
     assert blob.data == b"b"
@@ -59,8 +57,7 @@ def test_continueupdate_preserves_metainfo(repository: Repository, path: Path) -
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    with chdir(repository.path):
-        continueupdate()
+    continueupdate(repository.path)
 
     assert repository.heads[UPDATE_BRANCH].message == repository.head.commit.message
 
@@ -70,8 +67,7 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    with chdir(repository.path):
-        continueupdate()
+    continueupdate(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
@@ -84,8 +80,7 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
     # The user invokes `git cherry-pick --continue` before `cutty update --continue`.
     repository.commit()
 
-    with chdir(repository.path):
-        continueupdate()
+    continueupdate(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
 
@@ -95,8 +90,7 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    with chdir(repository.path):
-        continueupdate()
+    continueupdate(repository.path)
 
     assert repository.cherrypickhead is None
 
@@ -107,8 +101,7 @@ def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> N
 
     updatehead = repository.heads[UPDATE_BRANCH]
 
-    with chdir(repository.path):
-        skipupdate()
+    skipupdate(repository.path)
 
     assert repository.heads[LATEST_BRANCH] == updatehead
 
@@ -119,8 +112,7 @@ def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -
 
     latesthead = repository.heads[LATEST_BRANCH]
 
-    with chdir(repository.path):
-        abortupdate()
+    abortupdate(repository.path)
 
     assert (
         repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]

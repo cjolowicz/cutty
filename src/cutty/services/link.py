@@ -55,19 +55,16 @@ def _transform_commit_message(message: str) -> str:
 
 
 def link(
-    template: Optional[str] = None,
+    template: Optional[str],
+    projectdir: pathlib.Path,
     /,
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
-    projectdir: Optional[pathlib.Path] = None,
 ) -> None:
     """Link project to a Cookiecutter template."""
-    if projectdir is None:
-        projectdir = pathlib.Path.cwd()
-
     project = Repository.open(projectdir)
 
     with contextlib.suppress(FileNotFoundError):
@@ -90,7 +87,7 @@ def link(
     with project.worktree(update, checkout=False) as worktree:
         project_dir, template2 = create(
             template,
-            outputdir=worktree,
+            worktree,
             outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,

@@ -42,11 +42,11 @@ class EmptyTemplateError(CuttyError):
 
 def create(
     location: str,
+    outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding] = (),
     no_input: bool = False,
     checkout: Optional[str] = None,
-    outputdir: Optional[pathlib.Path] = None,
     directory: Optional[pathlib.PurePosixPath] = None,
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
@@ -55,9 +55,6 @@ def create(
     createconfigfile: bool = True,
 ) -> tuple[pathlib.Path, Repository]:
     """Generate a project from a Cookiecutter template."""
-    if outputdir is None:
-        outputdir = pathlib.Path.cwd()
-
     template = loadtemplate(location, checkout, directory)
     config = loadcookiecutterconfig(location, template.path)
     render = createcookiecutterrenderer(template.path, config)
