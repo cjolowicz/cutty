@@ -1,6 +1,7 @@
 """Link a project to a Cookiecutter template."""
 import contextlib
 import pathlib
+from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
@@ -55,6 +56,9 @@ def _transform_commit_message(message: str) -> str:
     return message.replace("Initial import from ", "Link to ")
 
 
+CreateProject = Callable[[pathlib.Path], Template]
+
+
 def link(
     template: Optional[str],
     projectdir: pathlib.Path,
@@ -92,6 +96,11 @@ def link(
         )
         return template2
 
+    linkproject(project, createproject)
+
+
+def linkproject(project: Repository, createproject: CreateProject) -> None:
+    """Link a project to a Cookiecutter template."""
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
