@@ -6,7 +6,7 @@ import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.services.update import abortupdate
-from cutty.services.update import continueupdate
+from cutty.services.update import continueupdate2
 from cutty.services.update import skipupdate
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
@@ -74,7 +74,10 @@ def update(
 ) -> None:
     """Update a project with changes from its template."""
     if continue_:
-        continueupdate(projectdir=cwd)
+        if cwd is None:
+            cwd = pathlib.Path.cwd()
+
+        continueupdate2(cwd)
         return
 
     if skip:

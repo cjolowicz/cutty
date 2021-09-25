@@ -70,14 +70,6 @@ def _commitmessage(template: Template) -> str:
         return f"Update {template.name}"
 
 
-def continueupdate(*, projectdir: Optional[Path] = None) -> None:
-    """Continue an update after conflict resolution."""
-    if projectdir is None:
-        projectdir = Path.cwd()
-
-    continueupdate2(projectdir)
-
-
 def continueupdate2(projectdir: Path) -> None:
     """Continue an update after conflict resolution."""
     repository = Repository.open(projectdir)
