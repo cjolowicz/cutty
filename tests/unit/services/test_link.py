@@ -54,3 +54,12 @@ def test_linkproject_commit_message(
     linkproject(project, createproject)
 
     assert "link" in project.head.commit.message.lower()
+
+
+def test_linkproject_commit_message_template(
+    project: Repository, createproject: CreateProject, template: Template
+) -> None:
+    """It includes the template name in the commit message."""
+    linkproject(project, createproject)
+
+    assert template.name in project.head.commit.message
