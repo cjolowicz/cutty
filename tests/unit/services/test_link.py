@@ -1,4 +1,5 @@
 """Unit tests for cutty.services.link."""
+import dataclasses
 from pathlib import Path
 
 import pytest
@@ -63,3 +64,18 @@ def test_linkproject_commit_message_template(
     linkproject(project, createproject)
 
     assert template.name in project.head.commit.message
+
+
+def test_linkproject_commit_message_revision(
+    project: Repository, template: Template
+) -> None:
+    """It includes the template name in the commit message."""
+    template = dataclasses.replace(template, revision="1.0.0")
+
+    def createproject(project: Path) -> Template:
+        (project / "cutty.json").touch()
+        return template
+
+    linkproject(project, createproject)
+
+    assert template.revision in project.head.commit.message
