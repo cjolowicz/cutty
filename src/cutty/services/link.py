@@ -117,14 +117,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         except pygit2.GitError:
             repository = Repository.init(worktree)
 
-        if latest and template.revision:
-            message = f"Update {template.name} to {template.revision}"
-        elif latest:
-            message = f"Update {template.name}"
-        elif template.revision:
-            message = f"Initial import from {template.name} {template.revision}"
-        else:
-            message = f"Initial import from {template.name}"
+        message = _commitmessage(template, latest is not None)
 
         repository.commit(message=message)
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
@@ -145,3 +138,15 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.heads[LATEST_BRANCH] = update.commit
+
+
+def _commitmessage(template: Template, latest: bool) -> str:
+    if latest and template.revision:
+        message = f"Update {template.name} to {template.revision}"
+    elif latest:
+        message = f"Update {template.name}"
+    elif template.revision:
+        message = f"Initial import from {template.name} {template.revision}"
+    else:
+        message = f"Initial import from {template.name}"
+    return message
