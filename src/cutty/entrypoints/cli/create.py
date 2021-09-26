@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from cutty.services.create import create2
+from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 
 
@@ -98,7 +98,7 @@ def create(
 
     directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
 
-    create2(
+    createproject(
         template,
         output_dir,
         extrabindings=extrabindings,
