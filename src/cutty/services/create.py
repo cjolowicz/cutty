@@ -13,8 +13,6 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
-from cutty.services.git import LATEST_BRANCH
-from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -25,6 +23,10 @@ from cutty.templates.adapters.cookiecutter.render import createcookiecutterrende
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.util import git
+
+
+LATEST_BRANCH = "cutty/latest"
+UPDATE_BRANCH = "cutty/update"
 
 
 def loadtemplate(
