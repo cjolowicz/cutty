@@ -79,17 +79,17 @@ def creategitrepository(
 ) -> None:
     """Create a git repository."""
     try:
-        repository = git.Repository.open(projectdir)
+        project = git.Repository.open(projectdir)
     except pygit2.GitError:
-        repository = git.Repository.init(projectdir)
+        project = git.Repository.init(projectdir)
 
-    if UPDATE_BRANCH in repository.heads:
+    if UPDATE_BRANCH in project.heads:
         # HEAD must point to update branch if it exists.
-        head = repository.head.name
+        head = project.head.name
         if head != UPDATE_BRANCH:
             raise RuntimeError(f"unexpected HEAD: {head}")
 
-    update = LATEST_BRANCH in repository.heads
+    update = LATEST_BRANCH in project.heads
 
     if update and revision:
         message = f"Update {template} to {revision}"
@@ -100,8 +100,8 @@ def creategitrepository(
     else:
         message = f"Initial import from {template}"
 
-    repository.commit(message=message)
-    repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
+    project.commit(message=message)
+    project.heads.setdefault(LATEST_BRANCH, project.head.commit)
 
 
 def create(
