@@ -2,12 +2,10 @@
 import pathlib
 from typing import Iterator
 from typing import Optional
-from typing import Sequence
 
 import click
 
-from cutty.services.create import create as service_create
-from cutty.services.git import creategitrepository
+from cutty.services.create import create2
 from cutty.templates.domain.bindings import Binding
 
 
@@ -109,31 +107,3 @@ def create(
         skip_if_file_exists=skip_if_file_exists,
         in_place=in_place,
     )
-
-
-def create2(
-    template: str,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    no_input: bool,
-    checkout: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    in_place: bool,
-) -> None:
-    """Generate projects from Cookiecutter templates."""
-    project_dir, template2 = service_create(
-        template,
-        outputdir,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        checkout=checkout,
-        directory=directory,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=in_place,
-    )
-
-    creategitrepository(project_dir, template2.name, template2.revision)
