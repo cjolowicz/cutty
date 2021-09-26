@@ -1,14 +1,11 @@
 """Unit tests for cutty.services.create."""
 import pathlib
-from typing import Optional
 
 import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
-from cutty.filestorage.domain.observers import FileStorageObserver
-from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.services.create import creategitrepository
@@ -16,26 +13,6 @@ from cutty.services.create import LATEST_BRANCH
 from cutty.services.create import UPDATE_BRANCH
 from cutty.util.git import Repository
 from tests.util.git import createbranches
-
-
-class GitRepositoryObserver(FileStorageObserver):
-    """Storage observer creating a git repository."""
-
-    def __init__(
-        self,
-        *,
-        project: pathlib.Path,
-        template: str = "template",
-        revision: Optional[str] = None,
-    ) -> None:
-        """Initialize."""
-        self.project = project
-        self.template = template
-        self.revision = revision
-
-    def commit(self) -> None:
-        """A storage transaction was completed."""
-        creategitrepository(self.project, self.template, self.revision)
 
 
 @pytest.fixture
@@ -48,14 +25,6 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 def storage2(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     return DiskFileStorage(project.parent)
-
-
-@pytest.fixture
-def storage(project: pathlib.Path) -> FileStorage:
-    """Fixture for a storage."""
-    observer = GitRepositoryObserver(project=project)
-    storage = DiskFileStorage(project.parent)
-    return observe(storage, observer)
 
 
 @pytest.fixture
