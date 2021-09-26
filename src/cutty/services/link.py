@@ -49,12 +49,6 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
-def _transform_commit_message(message: str) -> str:
-    if message.startswith("Update"):
-        return message.replace(" to ", " ").replace("Update ", "Link to ")
-    return message.replace("Initial import from ", "Link to ")
-
-
 CreateProject = Callable[[pathlib.Path], Template]
 
 
@@ -131,6 +125,12 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.heads[LATEST_BRANCH] = update.commit
+
+
+def _transform_commit_message(message: str) -> str:
+    if message.startswith("Update"):
+        return message.replace(" to ", " ").replace("Update ", "Link to ")
+    return message.replace("Initial import from ", "Link to ")
 
 
 def _commitmessage(template: Template, action: str) -> str:
