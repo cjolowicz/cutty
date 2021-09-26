@@ -5,8 +5,6 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
-import pygit2
-
 from cutty.errors import CuttyError
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
@@ -112,11 +110,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
 
-        try:
-            repository = Repository.open(worktree)
-        except pygit2.GitError:
-            repository = Repository.init(worktree)
-
+        repository = Repository.open(worktree)
         repository.commit(message=_commitmessage(template, latest is not None))
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
