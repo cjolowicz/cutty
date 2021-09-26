@@ -47,7 +47,7 @@ class EmptyTemplateError(CuttyError):
 
 
 def createproject(
-    template: str,
+    location: str,
     outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding],
@@ -60,7 +60,7 @@ def createproject(
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     projectdir, template2 = create(
-        template,
+        location,
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
