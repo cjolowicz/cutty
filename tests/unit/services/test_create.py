@@ -45,6 +45,12 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
+def storage2(project: pathlib.Path) -> FileStorage:
+    """Fixture for a storage."""
+    return DiskFileStorage(project.parent)
+
+
+@pytest.fixture
 def storage(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     observer = GitRepositoryObserver(project=project)
