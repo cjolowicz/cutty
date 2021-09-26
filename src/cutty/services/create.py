@@ -75,13 +75,13 @@ def createproject(
 
 
 def creategitrepository(
-    project: pathlib.Path, template: str, revision: Optional[str]
+    projectdir: pathlib.Path, template: str, revision: Optional[str]
 ) -> None:
     """Create a git repository."""
     try:
-        repository = git.Repository.open(project)
+        repository = git.Repository.open(projectdir)
     except pygit2.GitError:
-        repository = git.Repository.init(project)
+        repository = git.Repository.init(projectdir)
 
     if UPDATE_BRANCH in repository.heads:
         # HEAD must point to update branch if it exists.
