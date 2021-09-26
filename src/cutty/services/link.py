@@ -1,12 +1,13 @@
 """Link a project to a Cookiecutter template."""
 import contextlib
 import pathlib
+from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
-from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -48,10 +49,7 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
-def _transform_commit_message(message: str) -> str:
-    if message.startswith("Update"):
-        return message.replace(" to ", " ").replace("Update ", "Link to ")
-    return message.replace("Initial import from ", "Link to ")
+CreateProject = Callable[[pathlib.Path], Template]
 
 
 def link(
@@ -77,6 +75,25 @@ def link(
     if template is None:
         raise TemplateNotSpecifiedError()
 
+    def createproject(outputdir: pathlib.Path) -> Template:
+        assert template is not None  # noqa: S101
+
+        _, template2 = create(
+            template,
+            outputdir,
+            outputdirisproject=True,
+            extrabindings=extrabindings,
+            no_input=no_input,
+            checkout=checkout,
+            directory=directory,
+        )
+        return template2
+
+    linkproject(project, createproject)
+
+
+def linkproject(project: Repository, createproject: CreateProject) -> None:
+    """Link a project to a Cookiecutter template."""
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
@@ -85,16 +102,10 @@ def link(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        project_dir, template2 = create(
-            template,
-            worktree,
-            outputdirisproject=True,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            checkout=checkout,
-            directory=directory,
+        template = createproject(worktree)
+        Repository.open(worktree).commit(
+            message=_commitmessage(template, action="update" if latest else "import")
         )
-        creategitrepository(project_dir, template2.name, template2.revision)
 
     if latest is None:
         # Squash the empty initial commit.
@@ -104,11 +115,32 @@ def link(
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
 
-    message = _transform_commit_message(update.commit.message)
     project.commit(
-        message=message,
+        message=_commitmessage(template, action="link"),
         author=update.commit.author,
         committer=project.default_signature,
     )
 
     project.heads[LATEST_BRANCH] = update.commit
+
+
+def _commitmessage(template: Template, action: str) -> str:
+    if action == "link":
+        return (
+            f"Link to {template.name} {template.revision}"
+            if template.revision
+            else f"Link to {template.name}"
+        )
+
+    if action == "update":
+        return (
+            f"Update {template.name} to {template.revision}"
+            if template.revision
+            else f"Update {template.name}"
+        )
+
+    return (
+        f"Initial import from {template.name} {template.revision}"
+        if template.revision
+        else f"Initial import from {template.name}"
+    )
