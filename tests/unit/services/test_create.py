@@ -1,4 +1,4 @@
-"""Unit tests for cutty.services.git."""
+"""Unit tests for cutty.services.create."""
 import pathlib
 from typing import Optional
 
