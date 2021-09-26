@@ -112,7 +112,6 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
 
         repository = Repository.open(worktree)
         repository.commit(message=_commitmessage(template, latest is not None))
-        repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     if latest is None:
         # Squash the empty initial commit.
