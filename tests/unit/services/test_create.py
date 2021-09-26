@@ -22,7 +22,7 @@ def project(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
-def storage2(project: pathlib.Path) -> FileStorage:
+def storage(project: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     return DiskFileStorage(project.parent)
 
@@ -35,23 +35,21 @@ def file(project: pathlib.Path) -> RegularFile:
 
 
 def test_repository(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates a repository."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
     Repository.open(project)  # does not raise
 
 
-def test_commit(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It creates a commit."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -60,11 +58,11 @@ def test_commit(
 
 
 def test_commit_message_template(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It includes the template name in the commit message."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     template = "awesome-template"
     creategitrepository(project, template, None)
@@ -74,11 +72,11 @@ def test_commit_message_template(
 
 
 def test_commit_message_revision(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It includes the revision in the commit message."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     revision = "1.0.0"
     creategitrepository(project, "template", revision)
@@ -87,10 +85,10 @@ def test_commit_message_revision(
     assert revision in repository.head.commit.message
 
 
-def test_index(storage2: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
+def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It updates the index."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -104,11 +102,11 @@ def tree(repository: Repository) -> pygit2.Tree:
 
 
 def test_hook_edits(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It commits file modifications applied by hooks."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
         (project / file.path.name).write_bytes(b"teapot")
 
     creategitrepository(project, "template", None)
@@ -119,11 +117,11 @@ def test_hook_edits(
 
 
 def test_hook_deletes(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It does not commit files deleted by hooks."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
         (project / file.path.name).unlink()
 
     creategitrepository(project, "template", None)
@@ -132,9 +130,9 @@ def test_hook_deletes(
     assert file.path.name not in tree(repository)
 
 
-def test_hook_additions(storage2: FileStorage, project: pathlib.Path) -> None:
+def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
     """It commits files created by hooks."""
-    with storage2:
+    with storage:
         project.mkdir()
         (project / "marker").touch()
 
@@ -145,26 +143,24 @@ def test_hook_additions(storage2: FileStorage, project: pathlib.Path) -> None:
 
 
 def test_existing_repository(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It creates the commit in an existing repository."""
     repository = Repository.init(project)
     repository.commit()
 
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
     assert file.path.name in tree(repository)
 
 
-def test_branch(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
     """It creates a branch pointing to the initial commit."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -173,11 +169,11 @@ def test_branch(
 
 
 def test_branch_not_checked_out(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It does not check out the `latest` branch."""
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -186,7 +182,7 @@ def test_branch_not_checked_out(
 
 
 def test_existing_branch(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It updates the `update` branch if it exists."""
     repository = Repository.init(project)
@@ -195,8 +191,8 @@ def test_existing_branch(
     branch = repository.heads.create(UPDATE_BRANCH)
     repository.checkout(branch)
 
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -204,7 +200,7 @@ def test_existing_branch(
 
 
 def test_existing_branch_not_head(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It raises an exception if `update` exists but HEAD points elsewhere."""
     repository = Repository.init(project)
@@ -213,8 +209,8 @@ def test_existing_branch_not_head(
     repository.heads.create(UPDATE_BRANCH)
 
     with pytest.raises(Exception):
-        with storage2:
-            storage2.add(file)
+        with storage:
+            storage.add(file)
 
         creategitrepository(project, "template", None)
 
@@ -222,7 +218,7 @@ def test_existing_branch_not_head(
 
 
 def test_existing_branch_commit_message(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It uses a different commit message on updates."""
     repository = Repository.init(project)
@@ -231,8 +227,8 @@ def test_existing_branch_commit_message(
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
     repository.checkout(update)
 
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     creategitrepository(project, "template", None)
 
@@ -240,7 +236,7 @@ def test_existing_branch_commit_message(
 
 
 def test_existing_branch_commit_message_template(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It includes the template name in the commit message."""
     repository = Repository.init(project)
@@ -249,8 +245,8 @@ def test_existing_branch_commit_message_template(
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
     repository.checkout(update)
 
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     template = "awesome-template"
     creategitrepository(project, template, None)
@@ -259,7 +255,7 @@ def test_existing_branch_commit_message_template(
 
 
 def test_existing_branch_commit_message_revision(
-    storage2: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
     """It includes the revision in the commit message."""
     repository = Repository.init(project)
@@ -268,8 +264,8 @@ def test_existing_branch_commit_message_revision(
     update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
     repository.checkout(update)
 
-    with storage2:
-        storage2.add(file)
+    with storage:
+        storage.add(file)
 
     revision = "1.0.0"
     creategitrepository(project, "template", revision)
@@ -278,7 +274,7 @@ def test_existing_branch_commit_message_revision(
 
 
 def test_existing_branch_no_changes(
-    storage2: FileStorage, project: pathlib.Path
+    storage: FileStorage, project: pathlib.Path
 ) -> None:
     """It does not create an empty commit."""
     repository = Repository.init(project)
@@ -288,7 +284,7 @@ def test_existing_branch_no_changes(
     repository.checkout(branch)
     oldhead = repository.head.commit
 
-    with storage2:
+    with storage:
         pass
 
     creategitrepository(project, "template", None)
