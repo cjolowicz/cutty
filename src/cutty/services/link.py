@@ -125,19 +125,22 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
 
 
 def _commitmessage(template: Template, action: str) -> str:
-    if action == "link" and template.revision:
-        return f"Link to {template.name} {template.revision}"
-
     if action == "link":
-        return f"Link to {template.name}"
-
-    if action == "update" and template.revision:
-        return f"Update {template.name} to {template.revision}"
+        return (
+            f"Link to {template.name} {template.revision}"
+            if template.revision
+            else f"Link to {template.name}"
+        )
 
     if action == "update":
-        return f"Update {template.name}"
+        return (
+            f"Update {template.name} to {template.revision}"
+            if template.revision
+            else f"Update {template.name}"
+        )
 
-    if template.revision:
-        return f"Initial import from {template.name} {template.revision}"
-
-    return f"Initial import from {template.name}"
+    return (
+        f"Initial import from {template.name} {template.revision}"
+        if template.revision
+        else f"Initial import from {template.name}"
+    )
