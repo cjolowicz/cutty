@@ -45,3 +45,12 @@ def test_linkproject_commit(project: Repository, createproject: CreateProject) -
     linkproject(project, createproject)
 
     assert [tip] == project.head.commit.parents
+
+
+def test_linkproject_commit_message(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It uses a commit message indicating the linkage."""
+    linkproject(project, createproject)
+
+    assert "link" in project.head.commit.message.lower()
