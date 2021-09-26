@@ -117,9 +117,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         except pygit2.GitError:
             repository = Repository.init(worktree)
 
-        message = _commitmessage(template, latest is not None)
-
-        repository.commit(message=message)
+        repository.commit(message=_commitmessage(template, latest is not None))
         repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     if latest is None:
