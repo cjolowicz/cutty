@@ -104,9 +104,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
         Repository.open(worktree).commit(
-            message=_commitmessage(
-                template, "update" if latest is not None else "import"
-            )
+            message=_commitmessage(template, action="update" if latest else "import")
         )
 
     if latest is None:
