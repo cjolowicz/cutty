@@ -5,10 +5,11 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
+import pygit2
+
 from cutty.errors import CuttyError
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
-from cutty.services.git import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -110,7 +111,31 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
 
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
-        creategitrepository(worktree, template.name, template.revision)
+
+        try:
+            repository = Repository.open(worktree)
+        except pygit2.GitError:
+            repository = Repository.init(worktree)
+
+        if UPDATE_BRANCH in repository.heads:
+            # HEAD must point to update branch if it exists.
+            head = repository.head.name
+            if head != UPDATE_BRANCH:
+                raise RuntimeError(f"unexpected HEAD: {head}")
+
+        update2 = LATEST_BRANCH in repository.heads
+
+        if update2 and template.revision:
+            message = f"Update {template.name} to {template.revision}"
+        elif update2:
+            message = f"Update {template.name}"
+        elif template.revision:
+            message = f"Initial import from {template.name} {template.revision}"
+        else:
+            message = f"Initial import from {template.name}"
+
+        repository.commit(message=message)
+        repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
     if latest is None:
         # Squash the empty initial commit.
