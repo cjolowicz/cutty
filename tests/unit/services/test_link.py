@@ -8,6 +8,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.git import LATEST_BRANCH
+from cutty.services.git import UPDATE_BRANCH
 from cutty.services.link import CreateProject
 from cutty.services.link import linkproject
 from cutty.util.git import Repository
@@ -92,3 +93,14 @@ def test_linkproject_latest_branch(
     linkproject(project, createproject)
 
     assert LATEST_BRANCH in project.heads
+
+
+def test_linkproject_update_branch(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It creates the update branch."""
+    updatefile(project.path / "initial")
+
+    linkproject(project, createproject)
+
+    assert UPDATE_BRANCH in project.heads
