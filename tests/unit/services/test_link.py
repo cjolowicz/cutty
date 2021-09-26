@@ -106,6 +106,19 @@ def test_linkproject_latest_branch_commit_message(
     assert "initial" in project.heads[LATEST_BRANCH].message.lower()
 
 
+def test_linkproject_latest_branch_commit_message_update(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It uses a commit message indicating an update if the branch exists."""
+    project.heads.create(LATEST_BRANCH)
+
+    updatefile(project.path / "initial")
+
+    linkproject(project, createproject)
+
+    assert "update" in project.heads[LATEST_BRANCH].message.lower()
+
+
 def test_linkproject_update_branch(
     project: Repository, createproject: CreateProject
 ) -> None:
