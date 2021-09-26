@@ -117,7 +117,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
 
-    message = _transform_commit_message(update.commit.message)
+    message = _commitmessage(template, action="link")
     project.commit(
         message=message,
         author=update.commit.author,
@@ -127,13 +127,13 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     project.heads[LATEST_BRANCH] = update.commit
 
 
-def _transform_commit_message(message: str) -> str:
-    if message.startswith("Update"):
-        return message.replace(" to ", " ").replace("Update ", "Link to ")
-    return message.replace("Initial import from ", "Link to ")
-
-
 def _commitmessage(template: Template, action: str) -> str:
+    if action == "link" and template.revision:
+        return f"Link to {template.name} {template.revision}"
+
+    if action == "link":
+        return f"Link to {template.name}"
+
     if action == "update" and template.revision:
         return f"Update {template.name} to {template.revision}"
 
