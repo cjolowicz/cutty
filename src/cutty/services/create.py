@@ -54,7 +54,7 @@ def create2(
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    project_dir, template2 = create(
+    projectdir, template2 = create(
         template,
         outputdir,
         extrabindings=extrabindings,
@@ -66,7 +66,7 @@ def create2(
         outputdirisproject=in_place,
     )
 
-    creategitrepository(project_dir, template2.name, template2.revision)
+    creategitrepository(projectdir, template2.name, template2.revision)
 
 
 def create(
