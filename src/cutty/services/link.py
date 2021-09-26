@@ -110,7 +110,9 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
         Repository.open(worktree).commit(
-            message=_commitmessage(template, latest is not None)
+            message=_commitmessage(
+                template, "update" if latest is not None else "import"
+            )
         )
 
     if latest is None:
@@ -131,11 +133,11 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     project.heads[LATEST_BRANCH] = update.commit
 
 
-def _commitmessage(template: Template, latest: bool) -> str:
-    if latest and template.revision:
+def _commitmessage(template: Template, action: str) -> str:
+    if action == "update" and template.revision:
         return f"Update {template.name} to {template.revision}"
 
-    if latest:
+    if action == "update":
         return f"Update {template.name}"
 
     if template.revision:
