@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 import platformdirs
+import pygit2
 from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
@@ -12,7 +13,8 @@ from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository
-from cutty.services.git import creategitrepository
+from cutty.services.git import LATEST_BRANCH
+from cutty.services.git import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -22,6 +24,7 @@ from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.util import git
 
 
 def loadtemplate(
@@ -67,6 +70,36 @@ def createproject(
     )
 
     creategitrepository(projectdir, template2.name, template2.revision)
+
+
+def creategitrepository(
+    project: pathlib.Path, template: str, revision: Optional[str]
+) -> None:
+    """Create a git repository."""
+    try:
+        repository = git.Repository.open(project)
+    except pygit2.GitError:
+        repository = git.Repository.init(project)
+
+    if UPDATE_BRANCH in repository.heads:
+        # HEAD must point to update branch if it exists.
+        head = repository.head.name
+        if head != UPDATE_BRANCH:
+            raise RuntimeError(f"unexpected HEAD: {head}")
+
+    update = LATEST_BRANCH in repository.heads
+
+    if update and revision:
+        message = f"Update {template} to {revision}"
+    elif update:
+        message = f"Update {template}"
+    elif revision:
+        message = f"Initial import from {template} {revision}"
+    else:
+        message = f"Initial import from {template}"
+
+    repository.commit(message=message)
+    repository.heads.setdefault(LATEST_BRANCH, repository.head.commit)
 
 
 def create(

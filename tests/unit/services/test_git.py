@@ -11,7 +11,7 @@ from cutty.filestorage.domain.observers import FileStorageObserver
 from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.services.git import creategitrepository
+from cutty.services.create import creategitrepository
 from cutty.services.git import LATEST_BRANCH
 from cutty.services.git import UPDATE_BRANCH
 from cutty.util.git import Repository
