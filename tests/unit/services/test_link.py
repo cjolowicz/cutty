@@ -95,6 +95,17 @@ def test_linkproject_latest_branch(
     assert LATEST_BRANCH in project.heads
 
 
+def test_linkproject_latest_branch_commit_message(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It uses a commit message indicating an initial import."""
+    updatefile(project.path / "initial")
+
+    linkproject(project, createproject)
+
+    assert "initial" in project.heads[LATEST_BRANCH].message.lower()
+
+
 def test_linkproject_update_branch(
     project: Repository, createproject: CreateProject
 ) -> None:
