@@ -96,13 +96,15 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()
 
+    directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
+
     create2(
         template,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        directory=directory2,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         in_place=in_place,
