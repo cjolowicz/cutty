@@ -142,11 +142,12 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
 
 def _commitmessage(template: Template, latest: bool) -> str:
     if latest and template.revision:
-        message = f"Update {template.name} to {template.revision}"
-    elif latest:
-        message = f"Update {template.name}"
-    elif template.revision:
-        message = f"Initial import from {template.name} {template.revision}"
-    else:
-        message = f"Initial import from {template.name}"
-    return message
+        return f"Update {template.name} to {template.revision}"
+
+    if latest:
+        return f"Update {template.name}"
+
+    if template.revision:
+        return f"Initial import from {template.name} {template.revision}"
+
+    return f"Initial import from {template.name}"
