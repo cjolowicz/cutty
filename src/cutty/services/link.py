@@ -117,9 +117,8 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         (update.commit.tree / PROJECT_CONFIG_FILE).data
     )
 
-    message = _commitmessage(template, action="link")
     project.commit(
-        message=message,
+        message=_commitmessage(template, action="link"),
         author=update.commit.author,
         committer=project.default_signature,
     )
