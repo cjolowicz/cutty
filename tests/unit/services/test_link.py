@@ -7,9 +7,11 @@ import pytest
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.repositories.domain.repository import Repository as Template
+from cutty.services.git import LATEST_BRANCH
 from cutty.services.link import CreateProject
 from cutty.services.link import linkproject
 from cutty.util.git import Repository
+from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
@@ -79,3 +81,14 @@ def test_linkproject_commit_message_revision(
     linkproject(project, createproject)
 
     assert template.revision in project.head.commit.message
+
+
+def test_linkproject_latest_branch(
+    project: Repository, createproject: CreateProject
+) -> None:
+    """It creates the latest branch."""
+    updatefile(project.path / "initial")
+
+    linkproject(project, createproject)
+
+    assert LATEST_BRANCH in project.heads
