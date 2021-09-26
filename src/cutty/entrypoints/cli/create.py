@@ -2,6 +2,7 @@
 import pathlib
 from typing import Iterator
 from typing import Optional
+from typing import Sequence
 
 import click
 
@@ -97,13 +98,39 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()
 
-    project_dir, template2 = service_create(
+    create2(
         template,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
+        in_place=in_place,
+    )
+
+
+def create2(
+    template: str,
+    outputdir: pathlib.Path,
+    *,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.PurePosixPath],
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    in_place: bool,
+) -> None:
+    """Generate projects from Cookiecutter templates."""
+    project_dir, template2 = service_create(
+        template,
+        outputdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        directory=directory,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=in_place,
