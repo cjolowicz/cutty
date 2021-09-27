@@ -90,16 +90,16 @@ def tree(repository: Repository) -> pygit2.Tree:
 
 
 def test_existing_repository(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, projectpath: pathlib.Path
 ) -> None:
     """It creates the commit in an existing repository."""
-    repository = Repository.init(project)
+    repository = Repository.init(projectpath)
     repository.commit()
 
     with storage:
         storage.add(file)
 
-    creategitrepository(project, "template", None)
+    creategitrepository(projectpath, "template", None)
 
     assert file.path.name in tree(repository)
 
