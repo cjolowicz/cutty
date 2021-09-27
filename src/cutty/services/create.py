@@ -81,9 +81,7 @@ def creategitrepository(projectdir: pathlib.Path, template: Template) -> None:
     except pygit2.GitError:
         project = git.Repository.init(projectdir)
 
-    message = _commitmessage(template)
-
-    project.commit(message=message)
+    project.commit(message=_commitmessage(template))
     project.heads.setdefault(LATEST_BRANCH, project.head.commit)
 
 
