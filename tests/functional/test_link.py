@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from cutty.services.git import LATEST_BRANCH
-from cutty.services.git import UPDATE_BRANCH
+from cutty.services.create import LATEST_BRANCH
+from cutty.services.create import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty

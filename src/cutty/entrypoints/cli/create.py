@@ -5,8 +5,7 @@ from typing import Optional
 
 import click
 
-from cutty.services.create import create as service_create
-from cutty.services.git import creategitrepository
+from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 
 
@@ -97,16 +96,16 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()
 
-    project_dir, template2 = service_create(
+    directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
+
+    createproject(
         template,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        directory=directory2,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=in_place,
+        in_place=in_place,
     )
-
-    creategitrepository(project_dir, template2.name, template2.revision)
