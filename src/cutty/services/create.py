@@ -82,7 +82,7 @@ def creategitrepository(projectdir: pathlib.Path, template: Template) -> None:
         project = git.Repository.init(projectdir)
 
     project.commit(message=_commitmessage(template))
-    project.heads.setdefault(LATEST_BRANCH, project.head.commit)
+    project.heads[LATEST_BRANCH] = project.head.commit
 
 
 def _commitmessage(template: Template) -> str:
