@@ -78,14 +78,6 @@ def test_commit_message_revision(project2: pathlib.Path) -> None:
     assert revision in repository.head.commit.message
 
 
-def test_index(file: RegularFile, project2: pathlib.Path) -> None:
-    """It updates the index."""
-    creategitrepository(project2, "template", None)
-
-    repository = Repository.open(project2)
-    assert file.path.name in repository._repository.index
-
-
 def tree(repository: Repository) -> pygit2.Tree:
     """Return the tree at the HEAD of the repository."""
     return repository.head.commit.tree
