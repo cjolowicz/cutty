@@ -16,9 +16,15 @@ from tests.util.git import createbranches
 
 
 @pytest.fixture
-def project(tmp_path: pathlib.Path) -> pathlib.Path:
+def projectpath(tmp_path: pathlib.Path) -> pathlib.Path:
     """Fixture for a project path."""
     return tmp_path / "project"
+
+
+@pytest.fixture
+def project(projectpath: pathlib.Path) -> pathlib.Path:
+    """Fixture for a project path."""
+    return projectpath
 
 
 @pytest.fixture
