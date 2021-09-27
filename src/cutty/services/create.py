@@ -83,13 +83,7 @@ def creategitrepository(
     except pygit2.GitError:
         project = git.Repository.init(projectdir)
 
-    update = LATEST_BRANCH in project.heads
-
-    if update and revision:
-        message = f"Update {template} to {revision}"
-    elif update:
-        message = f"Update {template}"
-    elif revision:
+    if revision:
         message = f"Initial import from {template} {revision}"
     else:
         message = f"Initial import from {template}"
