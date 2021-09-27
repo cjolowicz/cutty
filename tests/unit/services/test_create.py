@@ -42,13 +42,13 @@ def file(project: pathlib.Path) -> RegularFile:
 
 @pytest.fixture
 def project2(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
+    storage: FileStorage, file: RegularFile, projectpath: pathlib.Path
 ) -> pathlib.Path:
     """Fixture for a project path."""
     with storage:
         storage.add(file)
 
-    return project
+    return projectpath
 
 
 def test_repository(project2: pathlib.Path) -> None:
