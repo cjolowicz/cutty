@@ -83,12 +83,6 @@ def creategitrepository(
     except pygit2.GitError:
         project = git.Repository.init(projectdir)
 
-    if UPDATE_BRANCH in project.heads:
-        # HEAD must point to update branch if it exists.
-        head = project.head.name
-        if head != UPDATE_BRANCH:
-            raise RuntimeError(f"unexpected HEAD: {head}")
-
     update = LATEST_BRANCH in project.heads
 
     if update and revision:
