@@ -12,7 +12,7 @@ from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
-from cutty.repositories.domain.repository import Repository
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -31,7 +31,7 @@ UPDATE_BRANCH = "cutty/update"
 
 def loadtemplate(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Repository:
+) -> Template:
     """Load a template repository."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     repositoryprovider = getdefaultrepositoryprovider(cachedir)
@@ -105,7 +105,7 @@ def create(
     outputdirisproject: bool = False,
     createrepository: bool = True,
     createconfigfile: bool = True,
-) -> tuple[pathlib.Path, Repository]:
+) -> tuple[pathlib.Path, Template]:
     """Generate a project from a Cookiecutter template."""
     template = loadtemplate(location, checkout, directory)
     config = loadcookiecutterconfig(location, template.path)
