@@ -34,65 +34,55 @@ def file(project: pathlib.Path) -> RegularFile:
     return RegularFile(path, b"")
 
 
-def test_repository(
+@pytest.fixture
+def project2(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+) -> pathlib.Path:
+    """Fixture for a project path."""
+    with storage:
+        storage.add(file)
+
+    return project
+
+
+def test_repository(project2: pathlib.Path) -> None:
     """It creates a repository."""
-    with storage:
-        storage.add(file)
+    creategitrepository(project2, "template", None)
 
-    creategitrepository(project, "template", None)
-
-    Repository.open(project)  # does not raise
+    Repository.open(project2)  # does not raise
 
 
-def test_commit(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
+def test_commit(project2: pathlib.Path) -> None:
     """It creates a commit."""
-    with storage:
-        storage.add(file)
+    creategitrepository(project2, "template", None)
 
-    creategitrepository(project, "template", None)
-
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     repository.head.commit  # does not raise
 
 
-def test_commit_message_template(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_commit_message_template(project2: pathlib.Path) -> None:
     """It includes the template name in the commit message."""
-    with storage:
-        storage.add(file)
-
     template = "awesome-template"
-    creategitrepository(project, template, None)
+    creategitrepository(project2, template, None)
 
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert template in repository.head.commit.message
 
 
-def test_commit_message_revision(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_commit_message_revision(project2: pathlib.Path) -> None:
     """It includes the revision in the commit message."""
-    with storage:
-        storage.add(file)
-
     revision = "1.0.0"
-    creategitrepository(project, "template", revision)
+    creategitrepository(project2, "template", revision)
 
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert revision in repository.head.commit.message
 
 
-def test_index(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
+def test_index(file: RegularFile, project2: pathlib.Path) -> None:
     """It updates the index."""
-    with storage:
-        storage.add(file)
+    creategitrepository(project2, "template", None)
 
-    creategitrepository(project, "template", None)
-
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert file.path.name in repository._repository.index
 
 
@@ -101,44 +91,34 @@ def tree(repository: Repository) -> pygit2.Tree:
     return repository.head.commit.tree
 
 
-def test_hook_edits(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_hook_edits(file: RegularFile, project2: pathlib.Path) -> None:
     """It commits file modifications applied by hooks."""
-    with storage:
-        storage.add(file)
-        (project / file.path.name).write_bytes(b"teapot")
+    (project2 / file.path.name).write_bytes(b"teapot")
 
-    creategitrepository(project, "template", None)
+    creategitrepository(project2, "template", None)
 
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     blob = tree(repository) / file.path.name
     assert b"teapot" == blob.data
 
 
-def test_hook_deletes(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_hook_deletes(file: RegularFile, project2: pathlib.Path) -> None:
     """It does not commit files deleted by hooks."""
-    with storage:
-        storage.add(file)
-        (project / file.path.name).unlink()
+    (project2 / file.path.name).unlink()
 
-    creategitrepository(project, "template", None)
+    creategitrepository(project2, "template", None)
 
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert file.path.name not in tree(repository)
 
 
-def test_hook_additions(storage: FileStorage, project: pathlib.Path) -> None:
+def test_hook_additions(project2: pathlib.Path) -> None:
     """It commits files created by hooks."""
-    with storage:
-        project.mkdir()
-        (project / "marker").touch()
+    (project2 / "marker").touch()
 
-    creategitrepository(project, "template", None)
+    creategitrepository(project2, "template", None)
 
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert "marker" in tree(repository)
 
 
@@ -157,27 +137,19 @@ def test_existing_repository(
     assert file.path.name in tree(repository)
 
 
-def test_branch(storage: FileStorage, file: RegularFile, project: pathlib.Path) -> None:
+def test_branch(project2: pathlib.Path) -> None:
     """It creates a branch pointing to the initial commit."""
-    with storage:
-        storage.add(file)
+    creategitrepository(project2, "template", None)
 
-    creategitrepository(project, "template", None)
-
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert repository.head.commit == repository.heads[LATEST_BRANCH]
 
 
-def test_branch_not_checked_out(
-    storage: FileStorage, file: RegularFile, project: pathlib.Path
-) -> None:
+def test_branch_not_checked_out(project2: pathlib.Path) -> None:
     """It does not check out the `latest` branch."""
-    with storage:
-        storage.add(file)
+    creategitrepository(project2, "template", None)
 
-    creategitrepository(project, "template", None)
-
-    repository = Repository.open(project)
+    repository = Repository.open(project2)
     assert repository.head.name != LATEST_BRANCH
 
 
