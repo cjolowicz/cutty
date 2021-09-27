@@ -37,7 +37,7 @@ def file(projectpath: pathlib.Path) -> RegularFile:
 
 
 @pytest.fixture
-def project2(
+def project(
     storage: FileStorage, file: RegularFile, projectpath: pathlib.Path
 ) -> pathlib.Path:
     """Fixture for a project path."""
@@ -54,35 +54,35 @@ def template() -> Template:
     return Template("template", templatepath, None)
 
 
-def test_repository(project2: pathlib.Path, template: Template) -> None:
+def test_repository(project: pathlib.Path, template: Template) -> None:
     """It creates a repository."""
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    Repository.open(project2)  # does not raise
+    Repository.open(project)  # does not raise
 
 
-def test_commit(project2: pathlib.Path, template: Template) -> None:
+def test_commit(project: pathlib.Path, template: Template) -> None:
     """It creates a commit."""
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    repository = Repository.open(project2)
+    repository = Repository.open(project)
     repository.head.commit  # does not raise
 
 
-def test_commit_message_template(project2: pathlib.Path, template: Template) -> None:
+def test_commit_message_template(project: pathlib.Path, template: Template) -> None:
     """It includes the template name in the commit message."""
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    repository = Repository.open(project2)
+    repository = Repository.open(project)
     assert template.name in repository.head.commit.message
 
 
-def test_commit_message_revision(project2: pathlib.Path, template: Template) -> None:
+def test_commit_message_revision(project: pathlib.Path, template: Template) -> None:
     """It includes the revision in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    repository = Repository.open(project2)
+    repository = Repository.open(project)
     assert template.revision in repository.head.commit.message
 
 
@@ -109,17 +109,17 @@ def test_existing_repository(
     assert file.path.name in tree(repository)
 
 
-def test_branch(project2: pathlib.Path, template: Template) -> None:
+def test_branch(project: pathlib.Path, template: Template) -> None:
     """It creates a branch pointing to the initial commit."""
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    repository = Repository.open(project2)
+    repository = Repository.open(project)
     assert repository.head.commit == repository.heads[LATEST_BRANCH]
 
 
-def test_branch_not_checked_out(project2: pathlib.Path, template: Template) -> None:
+def test_branch_not_checked_out(project: pathlib.Path, template: Template) -> None:
     """It does not check out the `latest` branch."""
-    creategitrepository(project2, template)
+    creategitrepository(project, template)
 
-    repository = Repository.open(project2)
+    repository = Repository.open(project)
     assert repository.head.name != LATEST_BRANCH
