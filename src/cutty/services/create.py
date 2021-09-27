@@ -78,15 +78,21 @@ def creategitrepository(
     projectdir: pathlib.Path, template: str, revision: Optional[str]
 ) -> None:
     """Create a git repository."""
+    template2 = Template(template, None, revision)  # type: ignore
+    creategitrepository2(projectdir, template2)
+
+
+def creategitrepository2(projectdir: pathlib.Path, template: Template) -> None:
+    """Create a git repository."""
     try:
         project = git.Repository.open(projectdir)
     except pygit2.GitError:
         project = git.Repository.init(projectdir)
 
-    if revision:
-        message = f"Initial import from {template} {revision}"
+    if template.revision:
+        message = f"Initial import from {template.name} {template.revision}"
     else:
-        message = f"Initial import from {template}"
+        message = f"Initial import from {template.name}"
 
     project.commit(message=message)
     project.heads.setdefault(LATEST_BRANCH, project.head.commit)
