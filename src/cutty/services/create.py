@@ -71,15 +71,7 @@ def createproject(
         outputdirisproject=in_place,
     )
 
-    creategitrepository(projectdir, template.name, template.revision)
-
-
-def creategitrepository(
-    projectdir: pathlib.Path, template: str, revision: Optional[str]
-) -> None:
-    """Create a git repository."""
-    template2 = Template(template, None, revision)  # type: ignore
-    creategitrepository2(projectdir, template2)
+    creategitrepository2(projectdir, template)
 
 
 def creategitrepository2(projectdir: pathlib.Path, template: Template) -> None:
