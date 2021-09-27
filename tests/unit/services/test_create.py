@@ -30,15 +30,15 @@ def project(projectpath: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
-def storage(project: pathlib.Path) -> FileStorage:
+def storage(projectpath: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
-    return DiskFileStorage(project.parent)
+    return DiskFileStorage(projectpath.parent)
 
 
 @pytest.fixture
-def file(project: pathlib.Path) -> RegularFile:
+def file(projectpath: pathlib.Path) -> RegularFile:
     """Fixture for a regular file."""
-    path = PurePath(project.name, "README.md")
+    path = PurePath(projectpath.name, "README.md")
     return RegularFile(path, b"")
 
 
