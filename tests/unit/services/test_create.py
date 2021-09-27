@@ -2,7 +2,6 @@
 import dataclasses
 import pathlib
 
-import pygit2
 import pytest
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
@@ -86,11 +85,6 @@ def test_commit_message_revision(project: pathlib.Path, template: Template) -> N
     assert template.revision in repository.head.commit.message
 
 
-def tree(repository: Repository) -> pygit2.Tree:
-    """Return the tree at the HEAD of the repository."""
-    return repository.head.commit.tree
-
-
 def test_existing_repository(
     storage: FileStorage,
     file: RegularFile,
@@ -106,7 +100,7 @@ def test_existing_repository(
 
     creategitrepository(projectpath, template)
 
-    assert file.path.name in tree(repository)
+    assert file.path.name in repository.head.commit.tree
 
 
 def test_branch(project: pathlib.Path, template: Template) -> None:
