@@ -24,12 +24,6 @@ def projectpath(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
-def project(projectpath: pathlib.Path) -> pathlib.Path:
-    """Fixture for a project path."""
-    return projectpath
-
-
-@pytest.fixture
 def storage(projectpath: pathlib.Path) -> FileStorage:
     """Fixture for a storage."""
     return DiskFileStorage(projectpath.parent)
