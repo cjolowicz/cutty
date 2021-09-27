@@ -7,7 +7,10 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filesystems.adapters.dict import DictFilesystem
+from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import creategitrepository
 from cutty.services.create import LATEST_BRANCH
 from cutty.util.git import Repository
@@ -47,6 +50,13 @@ def project2(
         storage.add(file)
 
     return projectpath
+
+
+@pytest.fixture
+def template() -> Template:
+    """Fixture for a `Template` instance."""
+    templatepath = VirtualPath(filesystem=DictFilesystem({}))
+    return Template("template", templatepath, None)
 
 
 def test_repository(project2: pathlib.Path) -> None:
