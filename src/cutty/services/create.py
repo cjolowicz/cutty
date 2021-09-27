@@ -71,10 +71,10 @@ def createproject(
         outputdirisproject=in_place,
     )
 
-    creategitrepository2(projectdir, template)
+    creategitrepository(projectdir, template)
 
 
-def creategitrepository2(projectdir: pathlib.Path, template: Template) -> None:
+def creategitrepository(projectdir: pathlib.Path, template: Template) -> None:
     """Create a git repository."""
     try:
         project = git.Repository.open(projectdir)
