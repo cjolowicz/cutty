@@ -81,13 +81,17 @@ def creategitrepository(projectdir: pathlib.Path, template: Template) -> None:
     except pygit2.GitError:
         project = git.Repository.init(projectdir)
 
-    if template.revision:
-        message = f"Initial import from {template.name} {template.revision}"
-    else:
-        message = f"Initial import from {template.name}"
+    message = _commitmessage(template)
 
     project.commit(message=message)
     project.heads.setdefault(LATEST_BRANCH, project.head.commit)
+
+
+def _commitmessage(template: Template) -> str:
+    if template.revision:
+        return f"Initial import from {template.name} {template.revision}"
+    else:
+        return f"Initial import from {template.name}"
 
 
 def create(
