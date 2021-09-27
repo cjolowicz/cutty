@@ -83,37 +83,6 @@ def tree(repository: Repository) -> pygit2.Tree:
     return repository.head.commit.tree
 
 
-def test_hook_edits(file: RegularFile, project2: pathlib.Path) -> None:
-    """It commits file modifications applied by hooks."""
-    (project2 / file.path.name).write_bytes(b"teapot")
-
-    creategitrepository(project2, "template", None)
-
-    repository = Repository.open(project2)
-    blob = tree(repository) / file.path.name
-    assert b"teapot" == blob.data
-
-
-def test_hook_deletes(file: RegularFile, project2: pathlib.Path) -> None:
-    """It does not commit files deleted by hooks."""
-    (project2 / file.path.name).unlink()
-
-    creategitrepository(project2, "template", None)
-
-    repository = Repository.open(project2)
-    assert file.path.name not in tree(repository)
-
-
-def test_hook_additions(project2: pathlib.Path) -> None:
-    """It commits files created by hooks."""
-    (project2 / "marker").touch()
-
-    creategitrepository(project2, "template", None)
-
-    repository = Repository.open(project2)
-    assert "marker" in tree(repository)
-
-
 def test_existing_repository(
     storage: FileStorage, file: RegularFile, project: pathlib.Path
 ) -> None:
