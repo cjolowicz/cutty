@@ -12,7 +12,7 @@ UPDATE_BRANCH = "cutty/update"
 CreateProject = Callable[[Path], Template]
 
 
-def commitmessage(template: Template) -> str:
+def createcommitmessage(template: Template) -> str:
     """Return the commit message for importing the template."""
     if template.revision:
         return f"Initial import from {template.name} {template.revision}"
