@@ -4,12 +4,9 @@ from pathlib import Path
 
 import pygit2
 
+from cutty.projects.common import LATEST_BRANCH
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.util import git
-
-
-LATEST_BRANCH = "cutty/latest"
-UPDATE_BRANCH = "cutty/update"
 
 
 CreateProject = Callable[[Path], Template]

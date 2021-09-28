@@ -10,8 +10,8 @@ from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.create import creategitrepository
-from cutty.projects.create import LATEST_BRANCH
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.util.git import Repository
 
