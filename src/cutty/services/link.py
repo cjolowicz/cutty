@@ -6,10 +6,10 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.create import CreateProject
+from cutty.projects.create import LATEST_BRANCH
+from cutty.projects.create import UPDATE_BRANCH
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
-from cutty.services.create import LATEST_BRANCH
-from cutty.services.create import UPDATE_BRANCH
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding

@@ -11,6 +11,7 @@ from lazysequence import lazysequence
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.projects.create import LATEST_BRANCH
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
@@ -23,10 +24,6 @@ from cutty.templates.adapters.cookiecutter.render import createcookiecutterrende
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.util import git
-
-
-LATEST_BRANCH = "cutty/latest"
-UPDATE_BRANCH = "cutty/update"
 
 
 def loadtemplate(
