@@ -5,9 +5,9 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.update import abortupdate
-from cutty.services.update import continueupdate
-from cutty.services.update import skipupdate
+from cutty.projects.update import abortupdate
+from cutty.projects.update import continueupdate
+from cutty.projects.update import skipupdate
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 

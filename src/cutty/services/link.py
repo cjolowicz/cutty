@@ -1,55 +1,20 @@
 """Link a project to a Cookiecutter template."""
 import contextlib
 import pathlib
-from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.projects.link import linkproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
-from cutty.services.create import LATEST_BRANCH
-from cutty.services.create import UPDATE_BRANCH
-from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
 class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
-
-
-def _create_orphan_branch(repository: Repository, name: str) -> Branch:
-    """Create an orphan branch with an empty commit."""
-    author = committer = repository.default_signature
-    repository._repository.create_commit(
-        f"refs/heads/{name}",
-        author,
-        committer,
-        "initial",
-        repository._repository.TreeBuilder().write(),
-        [],
-    )
-    return repository.branch(name)
-
-
-def _squash_branch(repository: Repository, branch: Branch) -> None:
-    """Squash the branch."""
-    name, commit = branch.name, branch.commit
-    del repository.heads[name]
-    repository._repository.create_commit(
-        f"refs/heads/{name}",
-        commit.author,
-        commit.committer,
-        commit.message,
-        commit.tree.id,
-        [],
-    )
-
-
-CreateProject = Callable[[pathlib.Path], Template]
 
 
 def link(
@@ -90,57 +55,3 @@ def link(
         return template2
 
     linkproject(project, createproject)
-
-
-def linkproject(project: Repository, createproject: CreateProject) -> None:
-    """Link a project to a Cookiecutter template."""
-    if latest := project.heads.get(LATEST_BRANCH):
-        update = project.heads.create(UPDATE_BRANCH, latest, force=True)
-    else:
-        # Unborn branches cannot have worktrees. Create an orphan branch with an
-        # empty placeholder commit instead. We'll squash it after project creation.
-        update = _create_orphan_branch(project, UPDATE_BRANCH)
-
-    with project.worktree(update, checkout=False) as worktree:
-        template = createproject(worktree)
-        Repository.open(worktree).commit(
-            message=_commitmessage(template, action="update" if latest else "import")
-        )
-
-    if latest is None:
-        # Squash the empty initial commit.
-        _squash_branch(project, update)
-
-    (project.path / PROJECT_CONFIG_FILE).write_bytes(
-        (update.commit.tree / PROJECT_CONFIG_FILE).data
-    )
-
-    project.commit(
-        message=_commitmessage(template, action="link"),
-        author=update.commit.author,
-        committer=project.default_signature,
-    )
-
-    project.heads[LATEST_BRANCH] = update.commit
-
-
-def _commitmessage(template: Template, action: str) -> str:
-    if action == "link":
-        return (
-            f"Link to {template.name} {template.revision}"
-            if template.revision
-            else f"Link to {template.name}"
-        )
-
-    if action == "update":
-        return (
-            f"Update {template.name} to {template.revision}"
-            if template.revision
-            else f"Update {template.name}"
-        )
-
-    return (
-        f"Initial import from {template.name} {template.revision}"
-        if template.revision
-        else f"Initial import from {template.name}"
-    )
