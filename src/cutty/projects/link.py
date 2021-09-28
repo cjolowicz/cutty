@@ -2,7 +2,7 @@
 from cutty.projects.common import createcommitmessage
 from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
-from cutty.projects.common import linkcommitmessage2
+from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
@@ -64,7 +64,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.commit(
-        message=linkcommitmessage2(template),
+        message=linkcommitmessage(template),
         author=update.commit.author,
         committer=project.default_signature,
     )
