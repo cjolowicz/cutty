@@ -1,11 +1,11 @@
 """Link a project to a Cookiecutter template."""
 import contextlib
 import pathlib
-from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.projects.create import CreateProject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.services.create import LATEST_BRANCH
@@ -47,9 +47,6 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
         commit.tree.id,
         [],
     )
-
-
-CreateProject = Callable[[pathlib.Path], Template]
 
 
 def link(

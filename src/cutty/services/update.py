@@ -1,10 +1,10 @@
 """Update a project with changes from its Cookiecutter template."""
-from collections.abc import Callable
 from collections.abc import Sequence
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
+from cutty.projects.create import CreateProject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.services.create import LATEST_BRANCH
@@ -42,9 +42,6 @@ def update(
         return template
 
     updateproject(projectdir, createproject)
-
-
-CreateProject = Callable[[Path], Template]
 
 
 def updateproject(projectdir: Path, createproject: CreateProject) -> None:

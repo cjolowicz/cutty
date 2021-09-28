@@ -6,12 +6,12 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
+from cutty.projects.create import CreateProject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import LATEST_BRANCH
 from cutty.services.create import UPDATE_BRANCH
 from cutty.services.update import abortupdate
 from cutty.services.update import continueupdate
-from cutty.services.update import CreateProject
 from cutty.services.update import skipupdate
 from cutty.services.update import updateproject
 from cutty.util.git import Repository
