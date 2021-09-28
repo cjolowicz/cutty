@@ -4,9 +4,9 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.projects.create import CreateProject
 from cutty.projects.create import LATEST_BRANCH
 from cutty.projects.create import UPDATE_BRANCH
+from cutty.projects.update import updateproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -42,29 +42,6 @@ def update(
         return template
 
     updateproject(projectdir, createproject)
-
-
-def updateproject(projectdir: Path, createproject: CreateProject) -> None:
-    """Update a project by applying changes between the generated trees."""
-    project = Repository.open(projectdir)
-
-    latestbranch = project.branch(LATEST_BRANCH)
-    updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
-
-    with project.worktree(updatebranch, checkout=False) as worktree:
-        template = createproject(worktree)
-        Repository.open(worktree).commit(message=_commitmessage(template))
-
-    project.cherrypick(updatebranch.commit)
-
-    latestbranch.commit = updatebranch.commit
-
-
-def _commitmessage(template: Template) -> str:
-    if template.revision:
-        return f"Update {template.name} to {template.revision}"
-    else:
-        return f"Update {template.name}"
 
 
 def continueupdate(projectdir: Path) -> None:
