@@ -43,3 +43,11 @@ def continueupdate(projectdir: Path) -> None:
         )
 
     project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
+
+
+def skipupdate(projectdir: Path) -> None:
+    """Skip an update with conflicts."""
+    project = Repository.open(projectdir)
+    project.resetcherrypick()
+
+    project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]

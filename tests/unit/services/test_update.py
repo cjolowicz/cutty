@@ -10,10 +10,10 @@ from cutty.projects.create import CreateProject
 from cutty.projects.create import LATEST_BRANCH
 from cutty.projects.create import UPDATE_BRANCH
 from cutty.projects.update import continueupdate
+from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.update import abortupdate
-from cutty.services.update import skipupdate
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
