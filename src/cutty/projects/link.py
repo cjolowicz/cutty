@@ -49,11 +49,12 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
 
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
-        Repository.open(worktree).commit(
-            message=updatecommitmessage(template)
-            if latest
+        message = (
+            updatecommitmessage(template)
+            if latest is not None
             else createcommitmessage(template)
         )
+        Repository.open(worktree).commit(message=message)
 
     if latest is None:
         # Squash the empty initial commit.
