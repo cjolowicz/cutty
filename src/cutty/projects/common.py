@@ -43,11 +43,7 @@ def linkcommitmessage(template: Template, action: str) -> str:
         return linkcommitmessage2(template)
 
     if action == "update":
-        return (
-            f"Update {template.name} to {template.revision}"
-            if template.revision
-            else f"Update {template.name}"
-        )
+        return updatecommitmessage(template)
 
     return (
         f"Initial import from {template.name} {template.revision}"
