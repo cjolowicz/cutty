@@ -1,4 +1,4 @@
-"""Unit tests for cutty.services.update."""
+"""Unit tests for cutty.projects.update."""
 import dataclasses
 from pathlib import Path
 
