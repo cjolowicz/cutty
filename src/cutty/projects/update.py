@@ -29,3 +29,17 @@ def _commitmessage(template: Template) -> str:
         return f"Update {template.name} to {template.revision}"
     else:
         return f"Update {template.name}"
+
+
+def continueupdate(projectdir: Path) -> None:
+    """Continue an update after conflict resolution."""
+    project = Repository.open(projectdir)
+
+    if commit := project.cherrypickhead:
+        project.commit(
+            message=commit.message,
+            author=commit.author,
+            committer=project.default_signature,
+        )
+
+    project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
