@@ -1,8 +1,8 @@
 """Linking projects to their templates."""
 from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
+from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
@@ -48,7 +48,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
         Repository.open(worktree).commit(
-            message=_commitmessage(template, action="update" if latest else "import")
+            message=linkcommitmessage(template, action="update" if latest else "import")
         )
 
     if latest is None:
@@ -60,31 +60,9 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.commit(
-        message=_commitmessage(template, action="link"),
+        message=linkcommitmessage(template, action="link"),
         author=update.commit.author,
         committer=project.default_signature,
     )
 
     project.heads[LATEST_BRANCH] = update.commit
-
-
-def _commitmessage(template: Template, action: str) -> str:
-    if action == "link":
-        return (
-            f"Link to {template.name} {template.revision}"
-            if template.revision
-            else f"Link to {template.name}"
-        )
-
-    if action == "update":
-        return (
-            f"Update {template.name} to {template.revision}"
-            if template.revision
-            else f"Update {template.name}"
-        )
-
-    return (
-        f"Initial import from {template.name} {template.revision}"
-        if template.revision
-        else f"Initial import from {template.name}"
-    )
