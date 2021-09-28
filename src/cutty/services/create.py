@@ -24,19 +24,6 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
 
 
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Template:
-    """Load a template repository."""
-    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    return repositoryprovider(
-        template,
-        revision=checkout,
-        directory=(PurePath(*directory.parts) if directory is not None else None),
-    )
-
-
 class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
@@ -127,3 +114,16 @@ def create(
             storage.add(projectfile)
 
     return project_dir, template
+
+
+def loadtemplate(
+    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
+) -> Template:
+    """Load a template repository."""
+    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+    repositoryprovider = getdefaultrepositoryprovider(cachedir)
+    return repositoryprovider(
+        template,
+        revision=checkout,
+        directory=(PurePath(*directory.parts) if directory is not None else None),
+    )
