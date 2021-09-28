@@ -30,8 +30,7 @@ def updatecommitmessage(template: Template) -> str:
 
 def linkcommitmessage(template: Template) -> str:
     """Return the commit message for linking the template."""
-    return (
-        f"Link to {template.name} {template.revision}"
-        if template.revision
-        else f"Link to {template.name}"
-    )
+    if template.revision:
+        return f"Link to {template.name} {template.revision}"
+    else:
+        return f"Link to {template.name}"
