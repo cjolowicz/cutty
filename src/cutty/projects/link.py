@@ -50,9 +50,9 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
         message = (
-            updatecommitmessage(template)
-            if latest is not None
-            else createcommitmessage(template)
+            createcommitmessage(template)
+            if latest is None
+            else updatecommitmessage(template)
         )
         Repository.open(worktree).commit(message=message)
 
