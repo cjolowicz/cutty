@@ -5,13 +5,12 @@ from collections.abc import Sequence
 from typing import Optional
 
 import platformdirs
-import pygit2
 from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.projects.create import LATEST_BRANCH
+from cutty.projects.create import creategitrepository
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
@@ -23,7 +22,6 @@ from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.util import git
 
 
 def loadtemplate(
@@ -69,24 +67,6 @@ def createproject(
     )
 
     creategitrepository(projectdir, template)
-
-
-def creategitrepository(projectdir: pathlib.Path, template: Template) -> None:
-    """Create a git repository."""
-    try:
-        project = git.Repository.open(projectdir)
-    except pygit2.GitError:
-        project = git.Repository.init(projectdir)
-
-    project.commit(message=_commitmessage(template))
-    project.heads[LATEST_BRANCH] = project.head.commit
-
-
-def _commitmessage(template: Template) -> str:
-    if template.revision:
-        return f"Initial import from {template.name} {template.revision}"
-    else:
-        return f"Initial import from {template.name}"
 
 
 def create(
