@@ -51,3 +51,11 @@ def skipupdate(projectdir: Path) -> None:
     project.resetcherrypick()
 
     project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
+
+
+def abortupdate(projectdir: Path) -> None:
+    """Abort an update with conflicts."""
+    project = Repository.open(projectdir)
+    project.resetcherrypick()
+
+    project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]

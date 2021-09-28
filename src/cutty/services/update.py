@@ -4,14 +4,11 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.projects.create import LATEST_BRANCH
-from cutty.projects.create import UPDATE_BRANCH
 from cutty.projects.update import updateproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.create import create
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import Repository
 
 
 def update(
@@ -42,11 +39,3 @@ def update(
         return template
 
     updateproject(projectdir, createproject)
-
-
-def abortupdate(projectdir: Path) -> None:
-    """Abort an update with conflicts."""
-    project = Repository.open(projectdir)
-    project.resetcherrypick()
-
-    project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
