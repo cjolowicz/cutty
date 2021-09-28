@@ -6,9 +6,9 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
+from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.create import CreateProject
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate

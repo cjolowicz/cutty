@@ -1,9 +1,9 @@
 """Updating projects with changes from their templates."""
 from pathlib import Path
 
+from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.create import CreateProject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.util.git import Repository
 

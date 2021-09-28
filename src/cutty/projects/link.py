@@ -1,7 +1,7 @@
 """Linking projects to their templates."""
+from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.create import CreateProject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch

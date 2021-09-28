@@ -1,5 +1,4 @@
 """Creating projects from templates."""
-from collections.abc import Callable
 from pathlib import Path
 
 import pygit2
@@ -7,9 +6,6 @@ import pygit2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.util import git
-
-
-CreateProject = Callable[[Path], Template]
 
 
 def creategitrepository(projectdir: Path, template: Template) -> None:
