@@ -18,3 +18,11 @@ def commitmessage(template: Template) -> str:
         return f"Initial import from {template.name} {template.revision}"
     else:
         return f"Initial import from {template.name}"
+
+
+def updatecommitmessage(template: Template) -> str:
+    """Return the commit message for updating the template."""
+    if template.revision:
+        return f"Update {template.name} to {template.revision}"
+    else:
+        return f"Update {template.name}"

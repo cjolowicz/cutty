@@ -4,7 +4,7 @@ from pathlib import Path
 from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.repositories.domain.repository import Repository as Template
+from cutty.projects.common import updatecommitmessage
 from cutty.util.git import Repository
 
 
@@ -17,18 +17,11 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
 
     with project.worktree(updatebranch, checkout=False) as worktree:
         template = createproject(worktree)
-        Repository.open(worktree).commit(message=_commitmessage(template))
+        Repository.open(worktree).commit(message=updatecommitmessage(template))
 
     project.cherrypick(updatebranch.commit)
 
     latestbranch.commit = updatebranch.commit
-
-
-def _commitmessage(template: Template) -> str:
-    if template.revision:
-        return f"Update {template.name} to {template.revision}"
-    else:
-        return f"Update {template.name}"
 
 
 def continueupdate(projectdir: Path) -> None:
