@@ -1,8 +1,10 @@
 """Linking projects to their templates."""
+from cutty.projects.common import createcommitmessage
 from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
-from cutty.projects.common import linkcommitmessage
+from cutty.projects.common import linkcommitmessage2
 from cutty.projects.common import UPDATE_BRANCH
+from cutty.projects.common import updatecommitmessage
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
@@ -48,7 +50,9 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     with project.worktree(update, checkout=False) as worktree:
         template = createproject(worktree)
         Repository.open(worktree).commit(
-            message=linkcommitmessage(template, action="update" if latest else "import")
+            message=updatecommitmessage(template)
+            if latest
+            else createcommitmessage(template)
         )
 
     if latest is None:
@@ -60,7 +64,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.commit(
-        message=linkcommitmessage(template, action="link"),
+        message=linkcommitmessage2(template),
         author=update.commit.author,
         committer=project.default_signature,
     )
