@@ -28,14 +28,19 @@ def updatecommitmessage(template: Template) -> str:
         return f"Update {template.name}"
 
 
+def linkcommitmessage2(template: Template) -> str:
+    """Return the commit message for linking the template."""
+    return (
+        f"Link to {template.name} {template.revision}"
+        if template.revision
+        else f"Link to {template.name}"
+    )
+
+
 def linkcommitmessage(template: Template, action: str) -> str:
     """Return the commit message for linking the template."""
     if action == "link":
-        return (
-            f"Link to {template.name} {template.revision}"
-            if template.revision
-            else f"Link to {template.name}"
-        )
+        return linkcommitmessage2(template)
 
     if action == "update":
         return (
