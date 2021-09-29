@@ -7,6 +7,7 @@ import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.services.generate import generate
+from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 
@@ -70,13 +71,17 @@ def cookiecutter(
     if output_dir is None:
         output_dir = Path.cwd()
 
+    directory2 = PurePosixPath(directory) if directory is not None else None
+    template2 = loadtemplate(template, checkout, directory2)
+
     generate(
         template,
+        template2,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
-        directory=PurePosixPath(directory) if directory is not None else None,
+        directory=directory2,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=False,

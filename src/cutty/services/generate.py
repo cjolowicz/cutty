@@ -4,13 +4,11 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-import platformdirs
 from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
@@ -29,6 +27,7 @@ class EmptyTemplateError(CuttyError):
 
 def generate(
     location: str,
+    template: Template,
     outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding],
@@ -39,9 +38,8 @@ def generate(
     skip_if_file_exists: bool,
     outputdirisproject: bool,
     createconfigfile: bool,
-) -> tuple[pathlib.Path, Template]:
+) -> pathlib.Path:
     """Generate a project from a Cookiecutter template."""
-    template = loadtemplate(location, checkout, directory)
     config = loadcookiecutterconfig(location, template.path)
     render = createcookiecutterrenderer(template.path, config)
     bindings = bindcookiecuttervariables(
@@ -70,9 +68,9 @@ def generate(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
-    project_dir = outputdir if outputdirisproject else outputdir / projectname
+    projectdir = outputdir if outputdirisproject else outputdir / projectname
     storage = createcookiecutterstorage(
-        outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
+        outputdir, projectdir, overwrite_if_exists, skip_if_file_exists, hookfiles
     )
 
     with storage:
@@ -83,17 +81,4 @@ def generate(
 
             storage.add(projectfile)
 
-    return project_dir, template
-
-
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Template:
-    """Load a template repository."""
-    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    return repositoryprovider(
-        template,
-        revision=checkout,
-        directory=(PurePath(*directory.parts) if directory is not None else None),
-    )
+    return projectdir

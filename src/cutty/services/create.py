@@ -8,6 +8,7 @@ from cutty.services.generate import (  # noqa: F401
     EmptyTemplateError as EmptyTemplateError,
 )
 from cutty.services.generate import generate
+from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 
@@ -24,8 +25,11 @@ def createproject(
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    projectdir, template = generate(
+    template = loadtemplate(location, checkout, directory)
+
+    projectdir = generate(
         location,
+        template,
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,

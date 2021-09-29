@@ -25,7 +25,7 @@ def fileexistspolicy(
 
 def createcookiecutterstorage(
     outputdir: pathlib.Path,
-    project_dir: pathlib.Path,
+    projectdir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     hookfiles: Sequence[File],
@@ -36,7 +36,7 @@ def createcookiecutterstorage(
 
     if hookfiles:  # pragma: no branch
         observer = CookiecutterHooksObserver(
-            hookfiles=hookfiles, project=project_dir, fileexists=fileexists
+            hookfiles=hookfiles, project=projectdir, fileexists=fileexists
         )
         storage = observe(storage, observer)
 

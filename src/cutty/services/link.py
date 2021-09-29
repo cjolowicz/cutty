@@ -8,6 +8,7 @@ from cutty.errors import CuttyError
 from cutty.projects.link import linkproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.generate import generate
+from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
@@ -40,11 +41,14 @@ def link(
     if template is None:
         raise TemplateNotSpecifiedError()
 
+    template2 = loadtemplate(template, checkout, directory)
+
     def createproject(outputdir: pathlib.Path) -> Template:
         assert template is not None  # noqa: S101
 
-        _, template2 = generate(
+        generate(
             template,
+            template2,
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
