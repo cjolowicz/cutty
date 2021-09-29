@@ -31,14 +31,14 @@ def generate(
     location: str,
     outputdir: pathlib.Path,
     *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    directory: Optional[pathlib.PurePosixPath] = None,
-    overwrite_if_exists: bool = False,
-    skip_if_file_exists: bool = False,
-    outputdirisproject: bool = False,
-    createconfigfile: bool = True,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.PurePosixPath],
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    outputdirisproject: bool,
+    createconfigfile: bool,
 ) -> tuple[pathlib.Path, Template]:
     """Generate a project from a Cookiecutter template."""
     template = loadtemplate(location, checkout, directory)

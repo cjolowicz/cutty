@@ -46,11 +46,14 @@ def link(
         _, template2 = generate(
             template,
             outputdir,
-            outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=checkout,
             directory=directory,
+            overwrite_if_exists=False,
+            skip_if_file_exists=False,
+            outputdirisproject=True,
+            createconfigfile=True,
         )
         return template2
 
