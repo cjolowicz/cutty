@@ -10,7 +10,7 @@ from cutty.util import git
 
 
 def creategitrepository(projectdir: Path, template: Template) -> None:
-    """Create a git repository."""
+    """Initialize the git repository for a project."""
     try:
         project = git.Repository.open(projectdir)
     except pygit2.GitError:

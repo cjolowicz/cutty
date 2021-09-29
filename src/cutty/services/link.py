@@ -7,7 +7,7 @@ from typing import Optional
 from cutty.errors import CuttyError
 from cutty.projects.link import linkproject
 from cutty.repositories.domain.repository import Repository as Template
-from cutty.services.create import create
+from cutty.services.generate import generate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository
@@ -43,7 +43,7 @@ def link(
     def createproject(outputdir: pathlib.Path) -> Template:
         assert template is not None  # noqa: S101
 
-        _, template2 = create(
+        _, template2 = generate(
             template,
             outputdir,
             outputdirisproject=True,
