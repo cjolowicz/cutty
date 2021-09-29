@@ -41,10 +41,11 @@ def link(
     if template is None:
         raise TemplateNotSpecifiedError()
 
+    template2 = loadtemplate(template, checkout, directory)
+
     def createproject(outputdir: pathlib.Path) -> Template:
         assert template is not None  # noqa: S101
 
-        template2 = loadtemplate(template, checkout, directory)
         generate(
             template,
             template2,
