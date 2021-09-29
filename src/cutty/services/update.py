@@ -14,10 +14,10 @@ from cutty.templates.domain.bindings import Binding
 def update(
     projectdir: Path,
     *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    directory: Optional[PurePosixPath] = None,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[PurePosixPath],
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectconfig = readprojectconfigfile(projectdir)
@@ -30,11 +30,14 @@ def update(
         _, template = generate(
             projectconfig.template,
             outputdir,
-            outputdirisproject=True,
             extrabindings=extrabindings,
             no_input=no_input,
             checkout=checkout,
             directory=directory,
+            overwrite_if_exists=False,
+            skip_if_file_exists=False,
+            outputdirisproject=True,
+            createconfigfile=True,
         )
         return template
 
