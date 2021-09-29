@@ -38,7 +38,6 @@ def generate(
     overwrite_if_exists: bool = False,
     skip_if_file_exists: bool = False,
     outputdirisproject: bool = False,
-    createrepository: bool = True,
     createconfigfile: bool = True,
 ) -> tuple[pathlib.Path, Template]:
     """Generate a project from a Cookiecutter template."""
