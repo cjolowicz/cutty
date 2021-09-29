@@ -7,7 +7,7 @@ from typing import Optional
 from cutty.errors import CuttyError
 from cutty.projects.link import linkproject
 from cutty.repositories.domain.repository import Repository as Template
-from cutty.services.generate import generate2
+from cutty.services.generate import generate
 from cutty.services.generate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
@@ -45,7 +45,7 @@ def link(
         assert template is not None  # noqa: S101
 
         template2 = loadtemplate(template, checkout, directory)
-        generate2(
+        generate(
             template,
             template2,
             outputdir,
