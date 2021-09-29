@@ -22,10 +22,10 @@ def link(
     projectdir: pathlib.Path,
     /,
     *,
-    extrabindings: Sequence[Binding] = (),
-    no_input: bool = False,
-    checkout: Optional[str] = None,
-    directory: Optional[pathlib.PurePosixPath] = None,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.PurePosixPath],
 ) -> None:
     """Link project to a Cookiecutter template."""
     project = Repository.open(projectdir)
