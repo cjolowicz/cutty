@@ -42,6 +42,37 @@ def generate(
 ) -> tuple[pathlib.Path, Template]:
     """Generate a project from a Cookiecutter template."""
     template = loadtemplate(location, checkout, directory)
+    projectdir = generate2(
+        location,
+        template,
+        outputdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        directory=directory,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=outputdirisproject,
+        createconfigfile=createconfigfile,
+    )
+    return projectdir, template
+
+
+def generate2(
+    location: str,
+    template: Template,
+    outputdir: pathlib.Path,
+    *,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.PurePosixPath],
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    outputdirisproject: bool,
+    createconfigfile: bool,
+) -> pathlib.Path:
+    """Generate a project from a Cookiecutter template."""
     config = loadcookiecutterconfig(location, template.path)
     render = createcookiecutterrenderer(template.path, config)
     bindings = bindcookiecuttervariables(
@@ -83,7 +114,7 @@ def generate(
 
             storage.add(projectfile)
 
-    return project_dir, template
+    return project_dir
 
 
 def loadtemplate(
