@@ -27,8 +27,9 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
+    template = loadtemplate(projectconfig.template, checkout, directory)
+
     def createproject(outputdir: Path) -> Template:
-        template = loadtemplate(projectconfig.template, checkout, directory)
         generate(
             projectconfig.template,
             template,
