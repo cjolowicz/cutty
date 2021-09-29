@@ -8,7 +8,7 @@ from cutty.errors import CuttyError
 from cutty.projects.link import linkproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.generate import generate
-from cutty.services.generate import loadtemplate
+from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 from cutty.util.git import Repository

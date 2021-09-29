@@ -4,13 +4,11 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-import platformdirs
 from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
@@ -84,16 +82,3 @@ def generate(
             storage.add(projectfile)
 
     return project_dir
-
-
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Template:
-    """Load a template repository."""
-    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    return repositoryprovider(
-        template,
-        revision=checkout,
-        directory=(PurePath(*directory.parts) if directory is not None else None),
-    )

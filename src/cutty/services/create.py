@@ -8,7 +8,7 @@ from cutty.services.generate import (  # noqa: F401
     EmptyTemplateError as EmptyTemplateError,
 )
 from cutty.services.generate import generate
-from cutty.services.generate import loadtemplate
+from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 
