@@ -68,9 +68,9 @@ def generate(
         renderfiles(findcookiecutterhooks(template.path), render, bindings)
     )
 
-    project_dir = outputdir if outputdirisproject else outputdir / projectname
+    projectdir = outputdir if outputdirisproject else outputdir / projectname
     storage = createcookiecutterstorage(
-        outputdir, project_dir, overwrite_if_exists, skip_if_file_exists, hookfiles
+        outputdir, projectdir, overwrite_if_exists, skip_if_file_exists, hookfiles
     )
 
     with storage:
@@ -81,4 +81,4 @@ def generate(
 
             storage.add(projectfile)
 
-    return project_dir
+    return projectdir
