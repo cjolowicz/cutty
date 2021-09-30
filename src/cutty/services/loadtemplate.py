@@ -8,7 +8,6 @@ import platformdirs
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
-from cutty.repositories.domain.repository import Repository
 from cutty.repositories.domain.revisions import Revision
 
 
@@ -29,11 +28,6 @@ class Template:
 
     metadata: TemplateMetadata
     root: Path
-
-    @property
-    def repository(self) -> Repository:
-        """Convert to a Repository instance."""
-        return Repository(self.metadata.name, self.root, self.metadata.revision)
 
 
 def loadtemplate(
