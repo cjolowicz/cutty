@@ -128,7 +128,7 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def template2() -> Template:
+def template() -> Template:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
     location = "https://example.com/template"
@@ -147,76 +147,76 @@ def createproject() -> CreateProject2:
 
 
 def test_updateproject_commit(
-    project: Repository, createproject: CreateProject2, template2: Template
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
 
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
     assert [tip] == project.head.commit.parents
 
 
 def test_updateproject_commit_message(
-    project: Repository, createproject: CreateProject2, template2: Template
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It uses a commit message indicating an update."""
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
     assert "update" in project.head.commit.message.lower()
 
 
 def test_updateproject_commit_message_template(
-    project: Repository, createproject: CreateProject2, template2: Template
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
-    assert template2.metadata.name in project.head.commit.message
+    assert template.metadata.name in project.head.commit.message
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, template2: Template
+    project: Repository, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
-    template2 = dataclasses.replace(
-        template2, metadata=dataclasses.replace(template2.metadata, revision="1.0.0")
+    template = dataclasses.replace(
+        template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
     )
 
     def createproject(project: Path) -> None:
         (project / "marker").touch()
 
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
-    assert template2.metadata.revision in project.head.commit.message
+    assert template.metadata.revision in project.head.commit.message
 
 
 def test_updateproject_latest_branch(
-    project: Repository, createproject: CreateProject2, template2: Template
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It updates the latest branch."""
     updatefile(project.path / "initial")
 
     tip = project.heads[LATEST_BRANCH]
 
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
     assert [tip] == project.heads[LATEST_BRANCH].parents
 
 
 def test_updateproject_update_branch(
-    project: Repository, createproject: CreateProject2, template2: Template
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It creates the update branch."""
-    updateproject(project.path, createproject, template2)
+    updateproject(project.path, createproject, template)
 
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
 
-def test_updateproject_no_changes(project: Repository, template2: Template) -> None:
+def test_updateproject_no_changes(project: Repository, template: Template) -> None:
     """It does not create an empty commit."""
     tip = project.head.commit
 
-    updateproject(project.path, lambda _: None, template2)
+    updateproject(project.path, lambda _: None, template)
 
     assert tip == project.head.commit
