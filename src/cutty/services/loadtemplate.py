@@ -30,17 +30,17 @@ class Template:
     metadata: TemplateMetadata
     root: Path
 
+    @property
+    def repository(self) -> Repository:
+        """Convert to a Repository instance."""
+        return Repository(self.metadata.name, self.root, self.metadata.revision)
+
 
 def loadtemplate(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
 ) -> Repository:
     """Load a template repository."""
-    template2 = loadtemplate2(template, checkout, directory)
-    return Repository(
-        template2.metadata.name,
-        template2.root,
-        template2.metadata.revision,
-    )
+    return loadtemplate2(template, checkout, directory).repository
 
 
 def loadtemplate2(
