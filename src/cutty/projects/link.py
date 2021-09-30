@@ -1,14 +1,10 @@
 """Linking projects to their templates."""
-import pathlib
-
 from cutty.projects.common import createcommitmessage
-from cutty.projects.common import CreateProject
 from cutty.projects.common import CreateProject2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
-from cutty.repositories.domain.repository import Repository as Repository2
 from cutty.services.loadtemplate import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
@@ -49,20 +45,6 @@ def linkproject(
     template: Template,
 ) -> None:
     """Link a project to a project template."""
-
-    def createproject2(outputdir: pathlib.Path) -> Repository2:
-        createproject(outputdir)
-        return template.repository
-
-    linkproject2(project, createproject2, template)
-
-
-def linkproject2(
-    project: Repository,
-    createproject: CreateProject,
-    template: Template,
-) -> None:
-    """Link a project to a Cookiecutter template."""
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
@@ -71,7 +53,7 @@ def linkproject2(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        _ = createproject(worktree)
+        createproject(worktree)
         message = (
             createcommitmessage(template.repository)
             if latest is None
