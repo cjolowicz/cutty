@@ -3,7 +3,7 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-from cutty.projects.create import creategitrepository2
+from cutty.projects.create import creategitrepository
 from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
@@ -35,4 +35,4 @@ def createproject(
         createconfigfile=True,
     )
 
-    creategitrepository2(projectdir, template)
+    creategitrepository(projectdir, template)

@@ -9,7 +9,7 @@ from cutty.services.loadtemplate import Template as Template2
 from cutty.util import git
 
 
-def creategitrepository2(projectdir: Path, template: Template2) -> None:
+def creategitrepository(projectdir: Path, template: Template2) -> None:
     """Initialize the git repository for a project."""
     try:
         project = git.Repository.open(projectdir)
