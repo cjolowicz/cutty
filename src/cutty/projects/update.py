@@ -1,7 +1,7 @@
 """Updating projects with changes from their templates."""
 from pathlib import Path
 
-from cutty.projects.common import CreateProject2
+from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
@@ -10,7 +10,7 @@ from cutty.util.git import Repository
 
 
 def updateproject(
-    projectdir: Path, createproject: CreateProject2, template: Template
+    projectdir: Path, createproject: CreateProject, template: Template
 ) -> None:
     """Update a project by applying changes between the generated trees."""
     project = Repository.open(projectdir)
