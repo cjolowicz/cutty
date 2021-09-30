@@ -9,7 +9,7 @@ LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
 
 
-CreateProject = Callable[[Path], None]
+GenerateProject = Callable[[Path], None]
 
 
 def createcommitmessage(template: Template) -> str:

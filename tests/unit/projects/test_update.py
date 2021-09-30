@@ -6,7 +6,7 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
-from cutty.projects.common import CreateProject
+from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.update import abortupdate
@@ -137,8 +137,8 @@ def template() -> Template:
 
 
 @pytest.fixture
-def createproject() -> CreateProject:
-    """Fixture for a `createproject` function."""
+def generateproject() -> GenerateProject:
+    """Fixture for a `generateproject` function."""
 
     def _(project: Path) -> None:
         (project / "marker").touch()
@@ -147,30 +147,30 @@ def createproject() -> CreateProject:
 
 
 def test_updateproject_commit(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
 
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert [tip] == project.head.commit.parents
 
 
 def test_updateproject_commit_message(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It uses a commit message indicating an update."""
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert "update" in project.head.commit.message.lower()
 
 
 def test_updateproject_commit_message_template(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert template.metadata.name in project.head.commit.message
 
@@ -183,32 +183,32 @@ def test_updateproject_commit_message_revision(
         template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
     )
 
-    def createproject(project: Path) -> None:
+    def generateproject(project: Path) -> None:
         (project / "marker").touch()
 
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert template.metadata.revision in project.head.commit.message
 
 
 def test_updateproject_latest_branch(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It updates the latest branch."""
     updatefile(project.path / "initial")
 
     tip = project.heads[LATEST_BRANCH]
 
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert [tip] == project.heads[LATEST_BRANCH].parents
 
 
 def test_updateproject_update_branch(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It creates the update branch."""
-    updateproject(project.path, createproject, template)
+    updateproject(project.path, generateproject, template)
 
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
