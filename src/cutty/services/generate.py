@@ -9,7 +9,7 @@ from lazysequence import lazysequence
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.services.loadtemplate import Template as Template2
+from cutty.services.loadtemplate import Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -26,7 +26,7 @@ class EmptyTemplateError(CuttyError):
 
 
 def generate(
-    template: Template2,
+    template: Template,
     outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding],
