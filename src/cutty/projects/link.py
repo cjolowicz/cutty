@@ -5,6 +5,7 @@ from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
+from cutty.services.loadtemplate import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
@@ -71,3 +72,12 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.heads[LATEST_BRANCH] = update.commit
+
+
+def linkproject2(
+    project: Repository,
+    createproject: CreateProject,
+    template: Template,
+) -> None:
+    """Link a project to a Cookiecutter template."""
+    linkproject(project, createproject)
