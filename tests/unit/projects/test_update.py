@@ -6,13 +6,13 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
-from cutty.projects.common import CreateProject
+from cutty.projects.common import CreateProject2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
-from cutty.projects.update import updateproject2
+from cutty.projects.update import updateproject
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.loadtemplate import Template as Template2
 from cutty.services.loadtemplate import TemplateMetadata
@@ -145,44 +145,43 @@ def template2() -> Template2:
 
 
 @pytest.fixture
-def createproject(template: Template) -> CreateProject:
+def createproject() -> CreateProject2:
     """Fixture for a `createproject` function."""
 
-    def _(project: Path) -> Template:
+    def _(project: Path) -> None:
         (project / "marker").touch()
-        return template
 
     return _
 
 
 def test_updateproject_commit(
-    project: Repository, createproject: CreateProject, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template2
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
 
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert [tip] == project.head.commit.parents
 
 
 def test_updateproject_commit_message(
-    project: Repository, createproject: CreateProject, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template2
 ) -> None:
     """It uses a commit message indicating an update."""
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert "update" in project.head.commit.message.lower()
 
 
 def test_updateproject_commit_message_template(
     project: Repository,
-    createproject: CreateProject,
+    createproject: CreateProject2,
     template2: Template2,
     template: Template,
 ) -> None:
     """It includes the template name in the commit message."""
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert template.name in project.head.commit.message
 
@@ -196,33 +195,32 @@ def test_updateproject_commit_message_revision(
         template2, metadata=dataclasses.replace(template2.metadata, revision="1.0.0")
     )
 
-    def createproject(project: Path) -> Template:
+    def createproject(project: Path) -> None:
         (project / "marker").touch()
-        return template
 
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert template.revision in project.head.commit.message
 
 
 def test_updateproject_latest_branch(
-    project: Repository, createproject: CreateProject, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template2
 ) -> None:
     """It updates the latest branch."""
     updatefile(project.path / "initial")
 
     tip = project.heads[LATEST_BRANCH]
 
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert [tip] == project.heads[LATEST_BRANCH].parents
 
 
 def test_updateproject_update_branch(
-    project: Repository, createproject: CreateProject, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template2
 ) -> None:
     """It creates the update branch."""
-    updateproject2(project.path, createproject, template2)
+    updateproject(project.path, createproject, template2)
 
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
@@ -233,6 +231,6 @@ def test_updateproject_no_changes(
     """It does not create an empty commit."""
     tip = project.head.commit
 
-    updateproject2(project.path, lambda _: template, template2)
+    updateproject(project.path, lambda _: None, template2)
 
     assert tip == project.head.commit
