@@ -13,19 +13,16 @@ def updateproject2(
     projectdir: Path, createproject: CreateProject, template: Template
 ) -> None:
     """Update a project by applying changes between the generated trees."""
-    updateproject(projectdir, createproject)
-
-
-def updateproject(projectdir: Path, createproject: CreateProject) -> None:
-    """Update a project by applying changes between the generated trees."""
     project = Repository.open(projectdir)
 
     latestbranch = project.branch(LATEST_BRANCH)
     updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
 
     with project.worktree(updatebranch, checkout=False) as worktree:
-        template = createproject(worktree)
-        Repository.open(worktree).commit(message=updatecommitmessage(template))
+        _ = createproject(worktree)
+        Repository.open(worktree).commit(
+            message=updatecommitmessage(template.repository)
+        )
 
     project.cherrypick(updatebranch.commit)
 
