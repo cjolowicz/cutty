@@ -2,7 +2,6 @@
 import itertools
 import pathlib
 from collections.abc import Sequence
-from typing import Optional
 
 from lazysequence import lazysequence
 
@@ -31,7 +30,6 @@ def generate(
     *,
     extrabindings: Sequence[Binding],
     no_input: bool,
-    directory: Optional[pathlib.PurePosixPath],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     outputdirisproject: bool,
@@ -48,7 +46,7 @@ def generate(
     )
 
     projectconfig = ProjectConfig(
-        template.metadata.location, bindings, directory=directory
+        template.metadata.location, bindings, directory=template.metadata.directory
     )
     projectfiles = lazysequence(
         renderfiles(findcookiecutterpaths(template.root, config), render, bindings)
