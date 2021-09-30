@@ -5,8 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.projects.link import linkproject2
-from cutty.repositories.domain.repository import Repository as Template
+from cutty.projects.link import linkproject
 from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
@@ -43,9 +42,7 @@ def link(
 
     template2 = loadtemplate(template, checkout, directory)
 
-    def createproject(outputdir: pathlib.Path) -> Template:
-        assert template is not None  # noqa: S101
-
+    def createproject(outputdir: pathlib.Path) -> None:
         generate(
             template2,
             outputdir,
@@ -56,6 +53,5 @@ def link(
             outputdirisproject=True,
             createconfigfile=True,
         )
-        return template2.repository
 
-    linkproject2(project, createproject, template2)
+    linkproject(project, createproject, template2)
