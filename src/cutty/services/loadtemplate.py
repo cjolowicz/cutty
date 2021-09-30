@@ -36,7 +36,7 @@ class Template:
         return Repository(self.metadata.name, self.root, self.metadata.revision)
 
 
-def loadtemplate2(
+def loadtemplate(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
 ) -> Template:
     """Load a project template."""
