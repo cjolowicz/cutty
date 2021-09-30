@@ -72,10 +72,10 @@ def cookiecutter(
         output_dir = Path.cwd()
 
     directory2 = PurePosixPath(directory) if directory is not None else None
-    template2 = loadtemplate(location, checkout, directory2)
+    template = loadtemplate(location, checkout, directory2)
 
     generate(
-        template2,
+        template,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
