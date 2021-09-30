@@ -79,7 +79,6 @@ def cookiecutter(
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
-        checkout=checkout,
         directory=directory2,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,

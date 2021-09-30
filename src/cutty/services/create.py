@@ -32,7 +32,6 @@ def createproject(
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
-        checkout=checkout,
         directory=directory,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,

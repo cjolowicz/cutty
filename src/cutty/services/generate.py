@@ -31,7 +31,6 @@ def generate(
     *,
     extrabindings: Sequence[Binding],
     no_input: bool,
-    checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,

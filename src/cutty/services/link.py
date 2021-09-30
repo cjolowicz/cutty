@@ -51,7 +51,6 @@ def link(
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
-            checkout=checkout,
             directory=directory,
             overwrite_if_exists=False,
             skip_if_file_exists=False,
