@@ -39,7 +39,11 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
-def linkproject(project: Repository, createproject: CreateProject) -> None:
+def linkproject2(
+    project: Repository,
+    createproject: CreateProject,
+    template: Template,
+) -> None:
     """Link a project to a Cookiecutter template."""
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
@@ -49,11 +53,11 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        template = createproject(worktree)
+        template2 = createproject(worktree)
         message = (
-            createcommitmessage(template)
+            createcommitmessage(template2)
             if latest is None
-            else updatecommitmessage(template)
+            else updatecommitmessage(template2)
         )
         Repository.open(worktree).commit(message=message)
 
@@ -66,18 +70,9 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.commit(
-        message=linkcommitmessage(template),
+        message=linkcommitmessage(template2),
         author=update.commit.author,
         committer=project.default_signature,
     )
 
     project.heads[LATEST_BRANCH] = update.commit
-
-
-def linkproject2(
-    project: Repository,
-    createproject: CreateProject,
-    template: Template,
-) -> None:
-    """Link a project to a Cookiecutter template."""
-    linkproject(project, createproject)
