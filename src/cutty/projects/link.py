@@ -53,7 +53,8 @@ def linkproject2(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        template2 = createproject(worktree)
+        _ = createproject(worktree)
+        template2 = template.repository
         message = (
             createcommitmessage(template2)
             if latest is None
