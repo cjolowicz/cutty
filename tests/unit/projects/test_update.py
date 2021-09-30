@@ -14,6 +14,8 @@ from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
 from cutty.repositories.domain.repository import Repository as Template
+from cutty.services.loadtemplate import Template as Template2
+from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -131,6 +133,15 @@ def template() -> Template:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
     return Template("template", templatepath, None)
+
+
+@pytest.fixture
+def template2() -> Template2:
+    """Fixture for a `Template` instance."""
+    templatepath = VirtualPath(filesystem=DictFilesystem({}))
+    location = "https://example.com/template"
+    metadata = TemplateMetadata(location, None, None, "template", None)
+    return Template2(metadata, templatepath)
 
 
 @pytest.fixture
