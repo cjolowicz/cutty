@@ -11,7 +11,7 @@ from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 
-@click.argument("template")
+@click.argument("location", metavar="TEMPLATE")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
     "--no-input",
@@ -56,7 +56,7 @@ from cutty.templates.domain.bindings import Binding
     help="Skip the files in the corresponding directories if they already exist.",
 )
 def cookiecutter(
-    template: str,
+    location: str,
     extra_context: dict[str, str],
     no_input: bool,
     checkout: Optional[str],
@@ -72,7 +72,7 @@ def cookiecutter(
         output_dir = Path.cwd()
 
     directory2 = PurePosixPath(directory) if directory is not None else None
-    template2 = loadtemplate(template, checkout, directory2)
+    template2 = loadtemplate(location, checkout, directory2)
 
     generate(
         template2,
