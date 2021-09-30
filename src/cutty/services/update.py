@@ -28,7 +28,7 @@ def update(
 
     template = loadtemplate(projectconfig.template, checkout, directory)
 
-    def createproject(outputdir: Path) -> None:
+    def generateproject(outputdir: Path) -> None:
         generate(
             template,
             outputdir,
@@ -40,4 +40,4 @@ def update(
             createconfigfile=True,
         )
 
-    updateproject(projectdir, createproject, template)
+    updateproject(projectdir, generateproject, template)

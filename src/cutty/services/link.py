@@ -42,7 +42,7 @@ def link(
 
     template2 = loadtemplate(template, checkout, directory)
 
-    def createproject(outputdir: pathlib.Path) -> None:
+    def generateproject(outputdir: pathlib.Path) -> None:
         generate(
             template2,
             outputdir,
@@ -54,4 +54,4 @@ def link(
             createconfigfile=True,
         )
 
-    linkproject(project, createproject, template2)
+    linkproject(project, generateproject, template2)

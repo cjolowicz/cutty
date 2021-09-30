@@ -1,6 +1,6 @@
 """Linking projects to their templates."""
 from cutty.projects.common import createcommitmessage
-from cutty.projects.common import CreateProject
+from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
@@ -41,7 +41,7 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
 
 def linkproject(
     project: Repository,
-    createproject: CreateProject,
+    generateproject: GenerateProject,
     template: Template,
 ) -> None:
     """Link a project to a project template."""
@@ -53,7 +53,7 @@ def linkproject(
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        createproject(worktree)
+        generateproject(worktree)
         message = (
             createcommitmessage(template.repository)
             if latest is None

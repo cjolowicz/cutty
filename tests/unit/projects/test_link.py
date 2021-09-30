@@ -6,7 +6,7 @@ import pytest
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path as VirtualPath
-from cutty.projects.common import CreateProject
+from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.link import linkproject
@@ -35,8 +35,8 @@ def template() -> Template:
 
 
 @pytest.fixture
-def createproject() -> CreateProject:
-    """Fixture for a `createproject` function."""
+def generateproject() -> GenerateProject:
+    """Fixture for a `generateproject` function."""
 
     def _(project: Path) -> None:
         (project / "cutty.json").touch()
@@ -45,32 +45,32 @@ def createproject() -> CreateProject:
 
 
 def test_linkproject_commit(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert [tip] == project.head.commit.parents
 
 
 def test_linkproject_commit_message(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It uses a commit message indicating the linkage."""
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert "link" in project.head.commit.message.lower()
 
 
 def test_linkproject_commit_message_template(
     project: Repository,
-    createproject: CreateProject,
+    generateproject: GenerateProject,
     template: Template,
 ) -> None:
     """It includes the template name in the commit message."""
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert template.metadata.name in project.head.commit.message
 
@@ -83,55 +83,55 @@ def test_linkproject_commit_message_revision(
         template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
     )
 
-    def createproject(project: Path) -> None:
+    def generateproject(project: Path) -> None:
         (project / "cutty.json").touch()
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert template.metadata.revision in project.head.commit.message
 
 
 def test_linkproject_latest_branch(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It creates the latest branch."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert LATEST_BRANCH in project.heads
 
 
 def test_linkproject_latest_branch_commit_message(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It uses a commit message indicating an initial import."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert "initial" in project.heads[LATEST_BRANCH].message.lower()
 
 
 def test_linkproject_latest_branch_commit_message_update(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It uses a commit message indicating an update if the branch exists."""
     project.heads.create(LATEST_BRANCH)
 
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert "update" in project.heads[LATEST_BRANCH].message.lower()
 
 
 def test_linkproject_update_branch(
-    project: Repository, createproject: CreateProject, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It creates the update branch."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template)
+    linkproject(project, generateproject, template)
 
     assert UPDATE_BRANCH in project.heads
