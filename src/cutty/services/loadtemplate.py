@@ -35,17 +35,26 @@ def loadtemplate(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
 ) -> Repository:
     """Load a template repository."""
-    return loadtemplate2(template, checkout, directory)
+    template2 = loadtemplate2(template, checkout, directory)
+    return Repository(
+        template2.metadata.name,
+        template2.root,
+        template2.metadata.revision,
+    )
 
 
 def loadtemplate2(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Repository:
-    """Load a template repository."""
+) -> Template:
+    """Load a project template."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    return repositoryprovider(
+    repository = repositoryprovider(
         template,
         revision=checkout,
         directory=(PurePath(*directory.parts) if directory is not None else None),
     )
+    metadata = TemplateMetadata(
+        template, checkout, directory, repository.name, repository.revision
+    )
+    return Template(metadata, repository.path)
