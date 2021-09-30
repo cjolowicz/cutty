@@ -4,7 +4,7 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.projects.update import updateproject
+from cutty.projects.update import updateproject2
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
@@ -42,4 +42,4 @@ def update(
         )
         return template.repository
 
-    updateproject(projectdir, createproject)
+    updateproject2(projectdir, createproject, template)
