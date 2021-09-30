@@ -29,10 +29,9 @@ def project(repository: Repository) -> Repository:
 def template() -> Template2:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    template = Template("template", templatepath, None)
     location = "https://example.com/template"
-    metadata = TemplateMetadata(location, None, None, template.name, template.revision)
-    return Template2(metadata, template.path)
+    metadata = TemplateMetadata(location, None, None, "template", None)
+    return Template2(metadata, templatepath)
 
 
 @pytest.fixture
