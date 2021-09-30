@@ -45,21 +45,21 @@ def createproject() -> CreateProject2:
 
 
 def test_linkproject_commit(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert [tip] == project.head.commit.parents
 
 
 def test_linkproject_commit_message(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It uses a commit message indicating the linkage."""
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert "link" in project.head.commit.message.lower()
 
@@ -67,71 +67,71 @@ def test_linkproject_commit_message(
 def test_linkproject_commit_message_template(
     project: Repository,
     createproject: CreateProject2,
-    template2: Template2,
+    template: Template2,
 ) -> None:
     """It includes the template name in the commit message."""
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
-    assert template2.metadata.name in project.head.commit.message
+    assert template.metadata.name in project.head.commit.message
 
 
 def test_linkproject_commit_message_revision(
-    project: Repository, template2: Template2
+    project: Repository, template: Template2
 ) -> None:
     """It includes the template name in the commit message."""
-    template2 = dataclasses.replace(
-        template2, metadata=dataclasses.replace(template2.metadata, revision="1.0.0")
+    template = dataclasses.replace(
+        template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
     )
 
     def createproject(project: Path) -> None:
         (project / "cutty.json").touch()
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
-    assert template2.metadata.revision in project.head.commit.message
+    assert template.metadata.revision in project.head.commit.message
 
 
 def test_linkproject_latest_branch(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It creates the latest branch."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert LATEST_BRANCH in project.heads
 
 
 def test_linkproject_latest_branch_commit_message(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It uses a commit message indicating an initial import."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert "initial" in project.heads[LATEST_BRANCH].message.lower()
 
 
 def test_linkproject_latest_branch_commit_message_update(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It uses a commit message indicating an update if the branch exists."""
     project.heads.create(LATEST_BRANCH)
 
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert "update" in project.heads[LATEST_BRANCH].message.lower()
 
 
 def test_linkproject_update_branch(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template: Template2
 ) -> None:
     """It creates the update branch."""
     updatefile(project.path / "initial")
 
-    linkproject(project, createproject, template2)
+    linkproject(project, createproject, template)
 
     assert UPDATE_BRANCH in project.heads
