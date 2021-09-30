@@ -1,10 +1,11 @@
 """Linking projects to their templates."""
 from cutty.projects.common import createcommitmessage
-from cutty.projects.common import CreateProject
+from cutty.projects.common import CreateProject2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
+from cutty.services.loadtemplate import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
@@ -38,8 +39,12 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
-def linkproject(project: Repository, createproject: CreateProject) -> None:
-    """Link a project to a Cookiecutter template."""
+def linkproject(
+    project: Repository,
+    createproject: CreateProject2,
+    template: Template,
+) -> None:
+    """Link a project to a project template."""
     if latest := project.heads.get(LATEST_BRANCH):
         update = project.heads.create(UPDATE_BRANCH, latest, force=True)
     else:
@@ -48,11 +53,11 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
         update = _create_orphan_branch(project, UPDATE_BRANCH)
 
     with project.worktree(update, checkout=False) as worktree:
-        template = createproject(worktree)
+        createproject(worktree)
         message = (
-            createcommitmessage(template)
+            createcommitmessage(template.repository)
             if latest is None
-            else updatecommitmessage(template)
+            else updatecommitmessage(template.repository)
         )
         Repository.open(worktree).commit(message=message)
 
@@ -65,7 +70,7 @@ def linkproject(project: Repository, createproject: CreateProject) -> None:
     )
 
     project.commit(
-        message=linkcommitmessage(template),
+        message=linkcommitmessage(template.repository),
         author=update.commit.author,
         committer=project.default_signature,
     )
