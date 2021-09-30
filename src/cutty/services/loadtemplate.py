@@ -36,13 +36,6 @@ class Template:
         return Repository(self.metadata.name, self.root, self.metadata.revision)
 
 
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Repository:
-    """Load a template repository."""
-    return loadtemplate2(template, checkout, directory).repository
-
-
 def loadtemplate2(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
 ) -> Template:
