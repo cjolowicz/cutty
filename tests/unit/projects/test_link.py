@@ -10,7 +10,7 @@ from cutty.projects.common import CreateProject2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.link import linkproject
-from cutty.services.loadtemplate import Template as Template2
+from cutty.services.loadtemplate import Template
 from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 from tests.util.git import updatefile
@@ -26,12 +26,12 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def template() -> Template2:
+def template() -> Template:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
     location = "https://example.com/template"
     metadata = TemplateMetadata(location, None, None, "template", None)
-    return Template2(metadata, templatepath)
+    return Template(metadata, templatepath)
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def createproject() -> CreateProject2:
 
 
 def test_linkproject_commit(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
@@ -56,7 +56,7 @@ def test_linkproject_commit(
 
 
 def test_linkproject_commit_message(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It uses a commit message indicating the linkage."""
     linkproject(project, createproject, template)
@@ -67,7 +67,7 @@ def test_linkproject_commit_message(
 def test_linkproject_commit_message_template(
     project: Repository,
     createproject: CreateProject2,
-    template: Template2,
+    template: Template,
 ) -> None:
     """It includes the template name in the commit message."""
     linkproject(project, createproject, template)
@@ -76,7 +76,7 @@ def test_linkproject_commit_message_template(
 
 
 def test_linkproject_commit_message_revision(
-    project: Repository, template: Template2
+    project: Repository, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
     template = dataclasses.replace(
@@ -92,7 +92,7 @@ def test_linkproject_commit_message_revision(
 
 
 def test_linkproject_latest_branch(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It creates the latest branch."""
     updatefile(project.path / "initial")
@@ -103,7 +103,7 @@ def test_linkproject_latest_branch(
 
 
 def test_linkproject_latest_branch_commit_message(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It uses a commit message indicating an initial import."""
     updatefile(project.path / "initial")
@@ -114,7 +114,7 @@ def test_linkproject_latest_branch_commit_message(
 
 
 def test_linkproject_latest_branch_commit_message_update(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It uses a commit message indicating an update if the branch exists."""
     project.heads.create(LATEST_BRANCH)
@@ -127,7 +127,7 @@ def test_linkproject_latest_branch_commit_message_update(
 
 
 def test_linkproject_update_branch(
-    project: Repository, createproject: CreateProject2, template: Template2
+    project: Repository, createproject: CreateProject2, template: Template
 ) -> None:
     """It creates the update branch."""
     updatefile(project.path / "initial")
