@@ -12,7 +12,6 @@ from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.create import creategitrepository2
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.loadtemplate import Template as Template2
 from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
@@ -46,13 +45,6 @@ def project(
         storage.add(file)
 
     return projectpath
-
-
-@pytest.fixture
-def template() -> Template:
-    """Fixture for a `Template` instance."""
-    templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    return Template("template", templatepath, None)
 
 
 @pytest.fixture
