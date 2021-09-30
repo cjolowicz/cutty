@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.projects.link import linkproject
+from cutty.projects.link import linkproject2
 from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
@@ -58,4 +58,4 @@ def link(
         )
         return template2.repository
 
-    linkproject(project, createproject)
+    linkproject2(project, createproject, template2)
