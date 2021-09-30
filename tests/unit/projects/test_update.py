@@ -13,7 +13,7 @@ from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
-from cutty.services.loadtemplate import Template as Template2
+from cutty.services.loadtemplate import Template
 from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 from tests.util.git import createbranches
@@ -128,12 +128,12 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def template2() -> Template2:
+def template2() -> Template:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
     location = "https://example.com/template"
     metadata = TemplateMetadata(location, None, None, "template", None)
-    return Template2(metadata, templatepath)
+    return Template(metadata, templatepath)
 
 
 @pytest.fixture
@@ -147,7 +147,7 @@ def createproject() -> CreateProject2:
 
 
 def test_updateproject_commit(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
@@ -158,7 +158,7 @@ def test_updateproject_commit(
 
 
 def test_updateproject_commit_message(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template
 ) -> None:
     """It uses a commit message indicating an update."""
     updateproject(project.path, createproject, template2)
@@ -167,7 +167,7 @@ def test_updateproject_commit_message(
 
 
 def test_updateproject_commit_message_template(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template
 ) -> None:
     """It includes the template name in the commit message."""
     updateproject(project.path, createproject, template2)
@@ -176,7 +176,7 @@ def test_updateproject_commit_message_template(
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, template2: Template2
+    project: Repository, template2: Template
 ) -> None:
     """It includes the template name in the commit message."""
     template2 = dataclasses.replace(
@@ -192,7 +192,7 @@ def test_updateproject_commit_message_revision(
 
 
 def test_updateproject_latest_branch(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template
 ) -> None:
     """It updates the latest branch."""
     updatefile(project.path / "initial")
@@ -205,7 +205,7 @@ def test_updateproject_latest_branch(
 
 
 def test_updateproject_update_branch(
-    project: Repository, createproject: CreateProject2, template2: Template2
+    project: Repository, createproject: CreateProject2, template2: Template
 ) -> None:
     """It creates the update branch."""
     updateproject(project.path, createproject, template2)
@@ -213,7 +213,7 @@ def test_updateproject_update_branch(
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
 
-def test_updateproject_no_changes(project: Repository, template2: Template2) -> None:
+def test_updateproject_no_changes(project: Repository, template2: Template) -> None:
     """It does not create an empty commit."""
     tip = project.head.commit
 
