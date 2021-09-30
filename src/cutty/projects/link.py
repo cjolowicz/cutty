@@ -54,11 +54,10 @@ def linkproject2(
 
     with project.worktree(update, checkout=False) as worktree:
         _ = createproject(worktree)
-        template2 = template.repository
         message = (
-            createcommitmessage(template2)
+            createcommitmessage(template.repository)
             if latest is None
-            else updatecommitmessage(template2)
+            else updatecommitmessage(template.repository)
         )
         Repository.open(worktree).commit(message=message)
 
@@ -71,7 +70,7 @@ def linkproject2(
     )
 
     project.commit(
-        message=linkcommitmessage(template2),
+        message=linkcommitmessage(template.repository),
         author=update.commit.author,
         committer=project.default_signature,
     )
