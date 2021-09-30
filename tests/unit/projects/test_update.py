@@ -13,7 +13,6 @@ from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.loadtemplate import Template as Template2
 from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
@@ -129,13 +128,6 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def template() -> Template:
-    """Fixture for a `Template` instance."""
-    templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    return Template("template", templatepath, None)
-
-
-@pytest.fixture
 def template2() -> Template2:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
@@ -175,22 +167,18 @@ def test_updateproject_commit_message(
 
 
 def test_updateproject_commit_message_template(
-    project: Repository,
-    createproject: CreateProject2,
-    template2: Template2,
-    template: Template,
+    project: Repository, createproject: CreateProject2, template2: Template2
 ) -> None:
     """It includes the template name in the commit message."""
     updateproject(project.path, createproject, template2)
 
-    assert template.name in project.head.commit.message
+    assert template2.metadata.name in project.head.commit.message
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, template: Template, template2: Template2
+    project: Repository, template2: Template2
 ) -> None:
     """It includes the template name in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
     template2 = dataclasses.replace(
         template2, metadata=dataclasses.replace(template2.metadata, revision="1.0.0")
     )
@@ -200,7 +188,7 @@ def test_updateproject_commit_message_revision(
 
     updateproject(project.path, createproject, template2)
 
-    assert template.revision in project.head.commit.message
+    assert template2.metadata.revision in project.head.commit.message
 
 
 def test_updateproject_latest_branch(
@@ -225,9 +213,7 @@ def test_updateproject_update_branch(
     assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
 
-def test_updateproject_no_changes(
-    project: Repository, template: Template, template2: Template2
-) -> None:
+def test_updateproject_no_changes(project: Repository, template2: Template2) -> None:
     """It does not create an empty commit."""
     tip = project.head.commit
 
