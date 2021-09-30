@@ -7,7 +7,7 @@ from cutty.projects.create import creategitrepository
 from cutty.services.generate import (  # noqa: F401
     EmptyTemplateError as EmptyTemplateError,
 )
-from cutty.services.generate import generate
+from cutty.services.generate import generate2
 from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
@@ -27,9 +27,8 @@ def createproject(
     """Generate projects from Cookiecutter templates."""
     template = loadtemplate(location, checkout, directory)
 
-    projectdir = generate(
-        location,
-        template.repository,
+    projectdir = generate2(
+        template,
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,

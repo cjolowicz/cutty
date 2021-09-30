@@ -10,6 +10,7 @@ from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.domain.repository import Repository as Template
+from cutty.services.loadtemplate import Template as Template2
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
@@ -23,6 +24,35 @@ from cutty.templates.domain.renderfiles import renderfiles
 
 class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
+
+
+def generate2(
+    template: Template2,
+    outputdir: pathlib.Path,
+    *,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.PurePosixPath],
+    overwrite_if_exists: bool,
+    skip_if_file_exists: bool,
+    outputdirisproject: bool,
+    createconfigfile: bool,
+) -> pathlib.Path:
+    """Generate a project from a project template."""
+    return generate(
+        template.metadata.location,
+        template.repository,
+        outputdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        checkout=checkout,
+        directory=directory,
+        overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=outputdirisproject,
+        createconfigfile=createconfigfile,
+    )
 
 
 def generate(
