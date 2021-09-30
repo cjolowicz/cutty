@@ -4,14 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.link import linkproject
 from cutty.services.loadtemplate import Template
-from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 from tests.util.git import updatefile
 
@@ -23,25 +20,6 @@ pytest_plugins = ["tests.fixtures.git"]
 def project(repository: Repository) -> Repository:
     """Fixture for a project repository."""
     return repository
-
-
-@pytest.fixture
-def template() -> Template:
-    """Fixture for a `Template` instance."""
-    templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    location = "https://example.com/template"
-    metadata = TemplateMetadata(location, None, None, "template", None)
-    return Template(metadata, templatepath)
-
-
-@pytest.fixture
-def generateproject() -> GenerateProject:
-    """Fixture for a `generateproject` function."""
-
-    def _(project: Path) -> None:
-        (project / "cutty.json").touch()
-
-    return _
 
 
 def test_linkproject_commit(
