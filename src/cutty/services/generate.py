@@ -9,7 +9,6 @@ from lazysequence import lazysequence
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.loadtemplate import Template as Template2
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
@@ -40,38 +39,10 @@ def generate2(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    return generate(
-        template.metadata.location,
-        template.repository,
-        outputdir,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        checkout=checkout,
-        directory=directory,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=outputdirisproject,
-        createconfigfile=createconfigfile,
+    config = loadcookiecutterconfig(
+        template.metadata.location, template.repository.path
     )
-
-
-def generate(
-    location: str,
-    template: Template,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    no_input: bool,
-    checkout: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    outputdirisproject: bool,
-    createconfigfile: bool,
-) -> pathlib.Path:
-    """Generate a project from a Cookiecutter template."""
-    config = loadcookiecutterconfig(location, template.path)
-    render = createcookiecutterrenderer(template.path, config)
+    render = createcookiecutterrenderer(template.repository.path, config)
     bindings = bindcookiecuttervariables(
         config.variables,
         render,
@@ -79,9 +50,13 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectconfig = ProjectConfig(location, bindings, directory=directory)
+    projectconfig = ProjectConfig(
+        template.metadata.location, bindings, directory=directory
+    )
     projectfiles = lazysequence(
-        renderfiles(findcookiecutterpaths(template.path, config), render, bindings)
+        renderfiles(
+            findcookiecutterpaths(template.repository.path, config), render, bindings
+        )
     )
     if not projectfiles:
         raise EmptyTemplateError()
@@ -95,7 +70,7 @@ def generate(
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     hookfiles = lazysequence(
-        renderfiles(findcookiecutterhooks(template.path), render, bindings)
+        renderfiles(findcookiecutterhooks(template.repository.path), render, bindings)
     )
 
     projectdir = outputdir if outputdirisproject else outputdir / projectname
