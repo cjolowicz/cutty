@@ -5,7 +5,15 @@ from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
+from cutty.services.loadtemplate import Template
 from cutty.util.git import Repository
+
+
+def updateproject2(
+    projectdir: Path, createproject: CreateProject, template: Template
+) -> None:
+    """Update a project by applying changes between the generated trees."""
+    updateproject(projectdir, createproject)
 
 
 def updateproject(projectdir: Path, createproject: CreateProject) -> None:
