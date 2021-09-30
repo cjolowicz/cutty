@@ -12,7 +12,8 @@ from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.create import creategitrepository
-from cutty.repositories.domain.repository import Repository as Template
+from cutty.services.loadtemplate import Template
+from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 
 
@@ -50,7 +51,9 @@ def project(
 def template() -> Template:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    return Template("template", templatepath, None)
+    location = "https://example.com/template"
+    metadata = TemplateMetadata(location, None, None, "template", None)
+    return Template(metadata, templatepath)
 
 
 def test_repository(project: pathlib.Path, template: Template) -> None:
@@ -73,16 +76,18 @@ def test_commit_message_template(project: pathlib.Path, template: Template) -> N
     creategitrepository(project, template)
 
     repository = Repository.open(project)
-    assert template.name in repository.head.commit.message
+    assert template.metadata.name in repository.head.commit.message
 
 
 def test_commit_message_revision(project: pathlib.Path, template: Template) -> None:
     """It includes the revision in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
+    template = dataclasses.replace(
+        template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
+    )
     creategitrepository(project, template)
 
     repository = Repository.open(project)
-    assert template.revision in repository.head.commit.message
+    assert template.metadata.revision in repository.head.commit.message
 
 
 def test_existing_repository(

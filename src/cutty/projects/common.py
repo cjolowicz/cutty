@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from cutty.repositories.domain.repository import Repository as Template
+from cutty.services.loadtemplate import TemplateMetadata
 
 
 LATEST_BRANCH = "cutty/latest"
@@ -12,7 +12,7 @@ UPDATE_BRANCH = "cutty/update"
 GenerateProject = Callable[[Path], None]
 
 
-def createcommitmessage(template: Template) -> str:
+def createcommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for importing the template."""
     if template.revision:
         return f"Initial import from {template.name} {template.revision}"
@@ -20,7 +20,7 @@ def createcommitmessage(template: Template) -> str:
         return f"Initial import from {template.name}"
 
 
-def updatecommitmessage(template: Template) -> str:
+def updatecommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for updating the template."""
     if template.revision:
         return f"Update {template.name} to {template.revision}"
@@ -28,7 +28,7 @@ def updatecommitmessage(template: Template) -> str:
         return f"Update {template.name}"
 
 
-def linkcommitmessage(template: Template) -> str:
+def linkcommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for linking the template."""
     if template.revision:
         return f"Link to {template.name} {template.revision}"

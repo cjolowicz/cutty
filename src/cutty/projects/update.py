@@ -20,9 +20,7 @@ def updateproject(
 
     with project.worktree(updatebranch, checkout=False) as worktree:
         generateproject(worktree)
-        Repository.open(worktree).commit(
-            message=updatecommitmessage(template.repository)
-        )
+        Repository.open(worktree).commit(message=updatecommitmessage(template.metadata))
 
     project.cherrypick(updatebranch.commit)
 
