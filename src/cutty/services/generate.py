@@ -39,10 +39,8 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    config = loadcookiecutterconfig(
-        template.metadata.location, template.repository.path
-    )
-    render = createcookiecutterrenderer(template.repository.path, config)
+    config = loadcookiecutterconfig(template.metadata.location, template.root)
+    render = createcookiecutterrenderer(template.root, config)
     bindings = bindcookiecuttervariables(
         config.variables,
         render,
@@ -54,9 +52,7 @@ def generate(
         template.metadata.location, bindings, directory=directory
     )
     projectfiles = lazysequence(
-        renderfiles(
-            findcookiecutterpaths(template.repository.path, config), render, bindings
-        )
+        renderfiles(findcookiecutterpaths(template.root, config), render, bindings)
     )
     if not projectfiles:
         raise EmptyTemplateError()
@@ -70,7 +66,7 @@ def generate(
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     hookfiles = lazysequence(
-        renderfiles(findcookiecutterhooks(template.repository.path), render, bindings)
+        renderfiles(findcookiecutterhooks(template.root), render, bindings)
     )
 
     projectdir = outputdir if outputdirisproject else outputdir / projectname
