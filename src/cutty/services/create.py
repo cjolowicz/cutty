@@ -28,17 +28,14 @@ def createproject(
     template = loadtemplate(location, checkout, directory)
 
     projectdir = generate(
-        location,
         template,
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
-        checkout=checkout,
-        directory=directory,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=in_place,
         createconfigfile=True,
     )
 
-    creategitrepository(projectdir, template)
+    creategitrepository(projectdir, template.repository)

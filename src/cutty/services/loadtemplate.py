@@ -1,22 +1,53 @@
 """Loading templates."""
 import pathlib
+from dataclasses import dataclass
 from typing import Optional
 
 import platformdirs
 
+from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
-from cutty.repositories.domain.repository import Repository as Template
+from cutty.repositories.domain.repository import Repository
+from cutty.repositories.domain.revisions import Revision
+
+
+@dataclass
+class TemplateMetadata:
+    """Metadata for a project template."""
+
+    location: str
+    checkout: Optional[str]
+    directory: Optional[pathlib.PurePosixPath]
+    name: str
+    revision: Optional[Revision]
+
+
+@dataclass
+class Template:
+    """Project template."""
+
+    metadata: TemplateMetadata
+    root: Path
+
+    @property
+    def repository(self) -> Repository:
+        """Convert to a Repository instance."""
+        return Repository(self.metadata.name, self.root, self.metadata.revision)
 
 
 def loadtemplate(
     template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
 ) -> Template:
-    """Load a template repository."""
+    """Load a project template."""
     cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
     repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    return repositoryprovider(
+    repository = repositoryprovider(
         template,
         revision=checkout,
         directory=(PurePath(*directory.parts) if directory is not None else None),
     )
+    metadata = TemplateMetadata(
+        template, checkout, directory, repository.name, repository.revision
+    )
+    return Template(metadata, repository.path)

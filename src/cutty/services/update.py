@@ -31,18 +31,15 @@ def update(
 
     def createproject(outputdir: Path) -> Template:
         generate(
-            projectconfig.template,
             template,
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
-            checkout=checkout,
-            directory=directory,
             overwrite_if_exists=False,
             skip_if_file_exists=False,
             outputdirisproject=True,
             createconfigfile=True,
         )
-        return template
+        return template.repository
 
     updateproject(projectdir, createproject)
