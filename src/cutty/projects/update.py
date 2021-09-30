@@ -5,10 +5,13 @@ from cutty.projects.common import CreateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
+from cutty.services.loadtemplate import Template
 from cutty.util.git import Repository
 
 
-def updateproject(projectdir: Path, createproject: CreateProject) -> None:
+def updateproject(
+    projectdir: Path, createproject: CreateProject, template: Template
+) -> None:
     """Update a project by applying changes between the generated trees."""
     project = Repository.open(projectdir)
 
@@ -16,8 +19,10 @@ def updateproject(projectdir: Path, createproject: CreateProject) -> None:
     updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
 
     with project.worktree(updatebranch, checkout=False) as worktree:
-        template = createproject(worktree)
-        Repository.open(worktree).commit(message=updatecommitmessage(template))
+        createproject(worktree)
+        Repository.open(worktree).commit(
+            message=updatecommitmessage(template.repository)
+        )
 
     project.cherrypick(updatebranch.commit)
 

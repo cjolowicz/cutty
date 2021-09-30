@@ -5,7 +5,6 @@ from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.projects.update import updateproject
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -29,7 +28,7 @@ def update(
 
     template = loadtemplate(projectconfig.template, checkout, directory)
 
-    def createproject(outputdir: Path) -> Template:
+    def createproject(outputdir: Path) -> None:
         generate(
             template,
             outputdir,
@@ -40,6 +39,5 @@ def update(
             outputdirisproject=True,
             createconfigfile=True,
         )
-        return template.repository
 
-    updateproject(projectdir, createproject)
+    updateproject(projectdir, createproject, template)
