@@ -10,7 +10,6 @@ from cutty.projects.common import CreateProject2
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.link import linkproject
-from cutty.repositories.domain.repository import Repository as Template
 from cutty.services.loadtemplate import Template as Template2
 from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
@@ -27,15 +26,10 @@ def project(repository: Repository) -> Repository:
 
 
 @pytest.fixture
-def template() -> Template:
+def template() -> Template2:
     """Fixture for a `Template` instance."""
     templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    return Template("template", templatepath, None)
-
-
-@pytest.fixture
-def template2(template: Template) -> Template2:
-    """Fixture for a `Template` instance."""
+    template = Template("template", templatepath, None)
     location = "https://example.com/template"
     metadata = TemplateMetadata(location, None, None, template.name, template.revision)
     return Template2(metadata, template.path)
@@ -75,19 +69,17 @@ def test_linkproject_commit_message_template(
     project: Repository,
     createproject: CreateProject2,
     template2: Template2,
-    template: Template,
 ) -> None:
     """It includes the template name in the commit message."""
     linkproject(project, createproject, template2)
 
-    assert template.name in project.head.commit.message
+    assert template2.metadata.name in project.head.commit.message
 
 
 def test_linkproject_commit_message_revision(
-    project: Repository, template2: Template2, template: Template
+    project: Repository, template2: Template2
 ) -> None:
     """It includes the template name in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
     template2 = dataclasses.replace(
         template2, metadata=dataclasses.replace(template2.metadata, revision="1.0.0")
     )
@@ -97,7 +89,7 @@ def test_linkproject_commit_message_revision(
 
     linkproject(project, createproject, template2)
 
-    assert template.revision in project.head.commit.message
+    assert template2.metadata.revision in project.head.commit.message
 
 
 def test_linkproject_latest_branch(
