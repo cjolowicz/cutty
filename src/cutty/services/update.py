@@ -5,7 +5,7 @@ from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.projects.generate import generate2
+from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -30,7 +30,7 @@ def update(
     template = Template.load(projectconfig.template, checkout, directory)
 
     def generateproject(outputdir: Path) -> None:
-        generate2(
+        generate(
             template,
             outputdir,
             extrabindings=extrabindings,

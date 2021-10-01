@@ -27,7 +27,7 @@ class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 
-def generate2(
+def generate(
     template: Template,
     outputdir: pathlib.Path,
     *,

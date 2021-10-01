@@ -6,7 +6,7 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.projects.generate import generate2
+from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
@@ -41,7 +41,7 @@ def link(
     template = Template.load(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
-        generate2(
+        generate(
             template,
             outputdir,
             extrabindings=extrabindings,
