@@ -352,6 +352,23 @@ def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
         assert not (worktree.path / path.name).is_file()
 
 
+def test_worktree_tempfile_failure(
+    repository: Repository, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """It does not crash when `tempfile` fails."""
+    import tempfile
+
+    def raise_() -> None:
+        raise Exception("boom")
+
+    monkeypatch.setattr(tempfile, "TemporaryDirectory", raise_)
+    branch = repository.heads.create("branch")
+
+    with pytest.raises(Exception, match="boom"):
+        with repository.worktree(branch, checkout=False):
+            pass
+
+
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:
     """It cherry-picks the commit onto the current branch."""
     main = repository.head
