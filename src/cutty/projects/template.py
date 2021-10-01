@@ -15,21 +15,20 @@ from cutty.repositories.domain.revisions import Revision
 
 
 @dataclass
-class TemplateMetadata:
-    """Metadata for a project template."""
-
-    location: str
-    checkout: Optional[str]
-    directory: Optional[pathlib.PurePosixPath]
-    name: str
-    revision: Optional[Revision]
-
-
-@dataclass
 class Template:
     """Project template."""
 
-    metadata: TemplateMetadata
+    @dataclass
+    class Metadata:
+        """Metadata for a project template."""
+
+        location: str
+        checkout: Optional[str]
+        directory: Optional[pathlib.PurePosixPath]
+        name: str
+        revision: Optional[Revision]
+
+    metadata: Metadata
     root: Path
 
     @classmethod
@@ -48,6 +47,9 @@ class Template:
             directory=(PurePath(*directory.parts) if directory is not None else None),
         )
         return _createtemplate(template, checkout, directory, repository)
+
+
+TemplateMetadata = Template.Metadata
 
 
 def _createtemplate(
