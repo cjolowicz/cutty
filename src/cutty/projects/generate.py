@@ -27,30 +27,6 @@ class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 
-def generate(
-    template: Template,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    no_input: bool,
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    outputdirisproject: bool,
-    createconfigfile: bool,
-) -> pathlib.Path:
-    """Generate a project from a project template."""
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    return generate2(
-        template,
-        outputdir,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        fileexists=fileexists,
-        outputdirisproject=outputdirisproject,
-        createconfigfile=createconfigfile,
-    )
-
-
 def generate2(
     template: Template,
     outputdir: pathlib.Path,
