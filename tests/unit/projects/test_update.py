@@ -10,7 +10,6 @@ from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.update import abortupdate
-from cutty.projects.update import skipupdate
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -33,6 +32,12 @@ def continueupdate(projectdir: Path) -> None:
     """Continue an update after conflict resolution."""
     project = ProjectRepository(projectdir)
     project.continueupdate()
+
+
+def skipupdate(projectdir: Path) -> None:
+    """Skip an update with conflicts."""
+    project = ProjectRepository(projectdir)
+    project.skipupdate()
 
 
 def createconflict(
