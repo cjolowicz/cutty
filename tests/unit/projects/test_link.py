@@ -4,15 +4,25 @@ import dataclasses
 import pytest
 
 from cutty.projects.common import GenerateProject
-from cutty.projects.common import LATEST_BRANCH
-from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.link import linkproject
 from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.repository import LATEST_BRANCH
+from cutty.projects.repository import ProjectRepository
+from cutty.projects.repository import UPDATE_BRANCH
 from cutty.util.git import Repository
 from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
+
+
+def linkproject(
+    project: Repository,
+    generateproject: GenerateProject,
+    template: TemplateMetadata,
+) -> None:
+    """Link a project to a project template."""
+    repository = ProjectRepository(project.path)
+    repository.link(generateproject, template)
 
 
 @pytest.fixture

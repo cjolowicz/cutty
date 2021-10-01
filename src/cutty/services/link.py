@@ -6,11 +6,10 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
-from cutty.projects.link import linkproject
 from cutty.projects.loadtemplate import loadtemplate
+from cutty.projects.repository import ProjectRepository
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
-from cutty.util.git import Repository
 
 
 class TemplateNotSpecifiedError(CuttyError):
@@ -28,10 +27,8 @@ def link(
     directory: Optional[pathlib.PurePosixPath],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    project = Repository.open(projectdir)
-
     with contextlib.suppress(FileNotFoundError):
-        projectconfig = readcookiecutterjson(project.path)
+        projectconfig = readcookiecutterjson(projectdir)
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
         if location is None:
@@ -54,4 +51,5 @@ def link(
             createconfigfile=True,
         )
 
-    linkproject(project, generateproject, template.metadata)
+    project = ProjectRepository(projectdir)
+    project.link(generateproject, template.metadata)
