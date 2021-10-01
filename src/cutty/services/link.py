@@ -5,8 +5,8 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.projects.generate import generate
 from cutty.projects.link import linkproject
-from cutty.services.generate import generate
 from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
