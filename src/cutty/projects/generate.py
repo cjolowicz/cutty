@@ -66,6 +66,7 @@ def generate(
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
     return storeproject(
         projectname,
@@ -73,8 +74,7 @@ def generate(
         hookfiles,
         outputdir,
         outputdirisproject,
-        overwrite_if_exists,
-        skip_if_file_exists,
+        fileexists,
     )
 
 
@@ -97,12 +97,10 @@ def storeproject(
     hookfiles: Iterable[File],
     outputdir: pathlib.Path,
     outputdirisproject: bool,
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
+    fileexists: FileExistsPolicy,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
     projectdir = outputdir if outputdirisproject else outputdir / projectname
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     storage = createcookiecutterstorage(outputdir, projectdir, fileexists, hookfiles)
 
     with storage:
