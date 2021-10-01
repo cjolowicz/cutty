@@ -18,7 +18,7 @@ class TemplateNotSpecifiedError(CuttyError):
 
 
 def link(
-    template: Optional[str],
+    location: Optional[str],
     projectdir: pathlib.Path,
     /,
     *,
@@ -34,13 +34,13 @@ def link(
         projectconfig = readcookiecutterjson(project.path)
         extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
-        if template is None:
-            template = projectconfig.template
+        if location is None:
+            location = projectconfig.template
 
-    if template is None:
+    if location is None:
         raise TemplateNotSpecifiedError()
 
-    template2 = loadtemplate(template, checkout, directory)
+    template2 = loadtemplate(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
         generate(
