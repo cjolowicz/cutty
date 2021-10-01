@@ -32,16 +32,17 @@ class ProjectGenerator:
         template: Template,
         *,
         extrabindings: Sequence[Binding],
+        no_input: bool,
     ) -> None:
         """Initialize."""
         self.template = template
         self.extrabindings = extrabindings
+        self.no_input = no_input
 
     def generate(
         self,
         outputdir: pathlib.Path,
         *,
-        no_input: bool,
         overwrite_if_exists: bool,
         skip_if_file_exists: bool,
         outputdirisproject: bool,
@@ -55,7 +56,7 @@ class ProjectGenerator:
         bindings = bindcookiecuttervariables(
             config.variables,
             render,
-            interactive=not no_input,
+            interactive=not self.no_input,
             bindings=self.extrabindings,
         )
 
@@ -112,9 +113,10 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    return ProjectGenerator(template, extrabindings=extrabindings).generate(
+    return ProjectGenerator(
+        template, extrabindings=extrabindings, no_input=no_input
+    ).generate(
         outputdir,
-        no_input=no_input,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=outputdirisproject,
