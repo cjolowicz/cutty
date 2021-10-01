@@ -39,6 +39,29 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
+    return generate2(
+        template,
+        outputdir,
+        extrabindings=extrabindings,
+        no_input=no_input,
+        fileexists=fileexists,
+        outputdirisproject=outputdirisproject,
+        createconfigfile=createconfigfile,
+    )
+
+
+def generate2(
+    template: Template,
+    outputdir: pathlib.Path,
+    *,
+    extrabindings: Sequence[Binding],
+    no_input: bool,
+    fileexists: FileExistsPolicy,
+    outputdirisproject: bool,
+    createconfigfile: bool,
+) -> pathlib.Path:
+    """Generate a project from a project template."""
     config = loadcookiecutterconfig(template.metadata.location, template.root)
     render = createcookiecutterrenderer(template.root, config)
     bindings = bindcookiecuttervariables(
@@ -66,7 +89,6 @@ def generate(
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
     return storeproject(
         projectname,
