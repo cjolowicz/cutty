@@ -13,7 +13,6 @@ from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
-from cutty.projects.update import updateproject
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util import git
 from cutty.util.git import Branch
@@ -42,7 +41,20 @@ class ProjectRepository:
         self, generateproject: GenerateProject, template: TemplateMetadata
     ) -> None:
         """Update a project by applying changes between the generated trees."""
-        updateproject(self.path, generateproject, template)
+        project = Repository.open(self.path)
+
+        latestbranch = project.branch(LATEST_BRANCH)
+        updatebranch = project.heads.create(
+            UPDATE_BRANCH, latestbranch.commit, force=True
+        )
+
+        with project.worktree(updatebranch, checkout=False) as worktree:
+            generateproject(worktree)
+            Repository.open(worktree).commit(message=updatecommitmessage(template))
+
+        project.cherrypick(updatebranch.commit)
+
+        latestbranch.commit = updatebranch.commit
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""

@@ -1,30 +1,9 @@
 """Updating projects with changes from their templates."""
 from pathlib import Path
 
-from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.common import updatecommitmessage
-from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
-
-
-def updateproject(
-    projectdir: Path, generateproject: GenerateProject, template: TemplateMetadata
-) -> None:
-    """Update a project by applying changes between the generated trees."""
-    project = Repository.open(projectdir)
-
-    latestbranch = project.branch(LATEST_BRANCH)
-    updatebranch = project.heads.create(UPDATE_BRANCH, latestbranch.commit, force=True)
-
-    with project.worktree(updatebranch, checkout=False) as worktree:
-        generateproject(worktree)
-        Repository.open(worktree).commit(message=updatecommitmessage(template))
-
-    project.cherrypick(updatebranch.commit)
-
-    latestbranch.commit = updatebranch.commit
 
 
 def continueupdate(projectdir: Path) -> None:
