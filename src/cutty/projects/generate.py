@@ -103,26 +103,3 @@ class ProjectGenerator:
                 storage.add(projectfile)
 
         return projectdir
-
-
-def generate(
-    template: Template,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    no_input: bool,
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    outputdirisproject: bool,
-    createconfigfile: bool,
-) -> pathlib.Path:
-    """Generate a project from a project template."""
-    return ProjectGenerator(
-        template,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
-        outputdirisproject=outputdirisproject,
-        createconfigfile=createconfigfile,
-    ).generate(outputdir)
