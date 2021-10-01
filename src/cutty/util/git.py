@@ -222,6 +222,8 @@ class Repository:
         def _hash(name: str) -> str:
             return hashlib.blake2b(name.encode(), digest_size=32).hexdigest()
 
+        worktree = None
+
         try:
             with tempfile.TemporaryDirectory() as directory:
                 path = Path(directory) / _hash(branch.name)
@@ -238,9 +240,10 @@ class Repository:
 
                 yield repository
         finally:
-            # Prune with `force=True` to work around libgit2 issue.
-            # https://github.com/libgit2/libgit2/issues/5280
-            worktree.prune(True)
+            if worktree is not None:
+                # Prune with `force=True` to work around libgit2 issue.
+                # https://github.com/libgit2/libgit2/issues/5280
+                worktree.prune(True)
 
     def _checkoutemptytree(self) -> None:
         """Check out an empty tree from the repository."""
