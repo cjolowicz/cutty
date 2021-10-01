@@ -4,14 +4,14 @@ import pathlib
 import pytest
 
 from cutty.projects.common import GenerateProject
-from cutty.projects.template import TemplateMetadata
+from cutty.projects.template import Template
 
 
 @pytest.fixture
-def template() -> TemplateMetadata:
+def template() -> Template.Metadata:
     """Fixture for a `Template` instance."""
     location = "https://example.com/template"
-    return TemplateMetadata(location, None, None, "template", None)
+    return Template.Metadata(location, None, None, "template", None)
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ from cutty.projects.common import GenerateProject
 from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.repository import UPDATE_BRANCH
-from cutty.projects.template import TemplateMetadata
+from cutty.projects.template import Template
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -20,7 +20,7 @@ pytest_plugins = ["tests.fixtures.git"]
 
 
 def updateproject(
-    projectdir: Path, generateproject: GenerateProject, template: TemplateMetadata
+    projectdir: Path, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
@@ -148,7 +148,7 @@ def project(repository: Repository) -> Repository:
 
 
 def test_updateproject_commit(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
@@ -159,7 +159,7 @@ def test_updateproject_commit(
 
 
 def test_updateproject_commit_message(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It uses a commit message indicating an update."""
     updateproject(project.path, generateproject, template)
@@ -168,7 +168,7 @@ def test_updateproject_commit_message(
 
 
 def test_updateproject_commit_message_template(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
     updateproject(project.path, generateproject, template)
@@ -177,7 +177,7 @@ def test_updateproject_commit_message_template(
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
@@ -188,7 +188,7 @@ def test_updateproject_commit_message_revision(
 
 
 def test_updateproject_latest_branch(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It updates the latest branch."""
     updatefile(project.path / "initial")
@@ -201,7 +201,7 @@ def test_updateproject_latest_branch(
 
 
 def test_updateproject_update_branch(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It creates the update branch."""
     updateproject(project.path, generateproject, template)
@@ -210,7 +210,7 @@ def test_updateproject_update_branch(
 
 
 def test_updateproject_no_changes(
-    project: Repository, template: TemplateMetadata
+    project: Repository, template: Template.Metadata
 ) -> None:
     """It does not create an empty commit."""
     tip = project.head.commit
