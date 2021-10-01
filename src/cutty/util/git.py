@@ -218,12 +218,6 @@ class Repository:
         self, branch: Branch, *, checkout: bool = True
     ) -> Iterator[Repository]:
         """Create a worktree for the branch in the repository."""
-        with self.worktree(branch, checkout=checkout) as path:
-            yield self.open(path)
-
-    @contextmanager
-    def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
-        """Create a worktree for the branch in the repository."""
 
         def _hash(name: str) -> str:
             return hashlib.blake2b(name.encode(), digest_size=32).hexdigest()
@@ -240,7 +234,7 @@ class Repository:
                     # https://github.com/libgit2/libgit2/issues/5949
                     Repository.open(path)._checkoutemptytree()
 
-                yield path
+                yield self.open(path)
         finally:
             # Prune with `force=True` to work around libgit2 issue.
             # https://github.com/libgit2/libgit2/issues/5280
