@@ -9,9 +9,14 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import LATEST_BRANCH
-from cutty.projects.create import creategitrepository
+from cutty.projects.create import creategitrepository as creategitrepository2
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
+
+
+def creategitrepository(projectdir: pathlib.Path, template: TemplateMetadata) -> None:
+    """Initialize the git repository for a project."""
+    return creategitrepository2(projectdir, template)
 
 
 @pytest.fixture
