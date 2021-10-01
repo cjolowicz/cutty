@@ -11,7 +11,7 @@ from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
-from cutty.projects.update import updateproject
+from cutty.projects.update import updateproject2
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -20,6 +20,13 @@ from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
+
+
+def updateproject(
+    projectdir: Path, generateproject: GenerateProject, template: TemplateMetadata
+) -> None:
+    """Update a project by applying changes between the generated trees."""
+    updateproject2(projectdir, generateproject, template)
 
 
 def createconflict(
