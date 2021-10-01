@@ -6,8 +6,8 @@ import pytest
 from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
-from cutty.projects.link import linkproject as linkproject2
 from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.repository import ProjectRepository
 from cutty.util.git import Repository
 from tests.util.git import updatefile
 
@@ -21,7 +21,8 @@ def linkproject(
     template: TemplateMetadata,
 ) -> None:
     """Link a project to a project template."""
-    return linkproject2(project, generateproject, template)
+    repository = ProjectRepository(project.path)
+    repository.link(generateproject, template)
 
 
 @pytest.fixture
