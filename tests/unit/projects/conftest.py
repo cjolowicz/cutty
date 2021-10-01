@@ -4,7 +4,7 @@ import pathlib
 import pytest
 
 from cutty.projects.common import GenerateProject
-from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.template import TemplateMetadata
 
 
 @pytest.fixture

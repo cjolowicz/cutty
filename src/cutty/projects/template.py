@@ -1,4 +1,6 @@
 """Loading templates."""
+from __future__ import annotations
+
 import pathlib
 from dataclasses import dataclass
 from typing import Optional
@@ -30,6 +32,23 @@ class Template:
     metadata: TemplateMetadata
     root: Path
 
+    @classmethod
+    def load(
+        cls,
+        template: str,
+        checkout: Optional[str],
+        directory: Optional[pathlib.PurePosixPath],
+    ) -> Template:
+        """Load a project template."""
+        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+        repositoryprovider = getdefaultrepositoryprovider(cachedir)
+        repository = repositoryprovider(
+            template,
+            revision=checkout,
+            directory=(PurePath(*directory.parts) if directory is not None else None),
+        )
+        return _createtemplate(template, checkout, directory, repository)
+
 
 def _createtemplate(
     template: str,
@@ -41,17 +60,3 @@ def _createtemplate(
         template, checkout, directory, repository.name, repository.revision
     )
     return Template(metadata, repository.path)
-
-
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Template:
-    """Load a project template."""
-    cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-    repositoryprovider = getdefaultrepositoryprovider(cachedir)
-    repository = repositoryprovider(
-        template,
-        revision=checkout,
-        directory=(PurePath(*directory.parts) if directory is not None else None),
-    )
-    return _createtemplate(template, checkout, directory, repository)
