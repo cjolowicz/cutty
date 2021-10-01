@@ -23,7 +23,7 @@ def fileexistspolicy(
     )
 
 
-def createcookiecutterstorage2(
+def createcookiecutterstorage(
     outputdir: pathlib.Path,
     projectdir: pathlib.Path,
     fileexists: FileExistsPolicy,
