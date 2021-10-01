@@ -27,12 +27,12 @@ class EmptyTemplateError(CuttyError):
 class ProjectGenerator:
     """Project generator."""
 
-    def __init__(self) -> None:
+    def __init__(self, template: Template) -> None:
         """Initialize."""
+        self.template = template
 
     def generate(
         self,
-        template: Template,
         outputdir: pathlib.Path,
         *,
         extrabindings: Sequence[Binding],
@@ -43,8 +43,10 @@ class ProjectGenerator:
         createconfigfile: bool,
     ) -> pathlib.Path:
         """Generate a project from a project template."""
-        config = loadcookiecutterconfig(template.metadata.location, template.root)
-        render = createcookiecutterrenderer(template.root, config)
+        config = loadcookiecutterconfig(
+            self.template.metadata.location, self.template.root
+        )
+        render = createcookiecutterrenderer(self.template.root, config)
         bindings = bindcookiecuttervariables(
             config.variables,
             render,
@@ -53,10 +55,14 @@ class ProjectGenerator:
         )
 
         projectconfig = ProjectConfig(
-            template.metadata.location, bindings, directory=template.metadata.directory
+            self.template.metadata.location,
+            bindings,
+            directory=self.template.metadata.directory,
         )
         projectfiles = lazysequence(
-            renderfiles(findcookiecutterpaths(template.root, config), render, bindings)
+            renderfiles(
+                findcookiecutterpaths(self.template.root, config), render, bindings
+            )
         )
         if not projectfiles:
             raise EmptyTemplateError()
@@ -70,7 +76,7 @@ class ProjectGenerator:
             projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
         hookfiles = lazysequence(
-            renderfiles(findcookiecutterhooks(template.root), render, bindings)
+            renderfiles(findcookiecutterhooks(self.template.root), render, bindings)
         )
 
         projectdir = outputdir if outputdirisproject else outputdir / projectname
@@ -101,8 +107,7 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    return ProjectGenerator().generate(
-        template,
+    return ProjectGenerator(template).generate(
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
