@@ -11,7 +11,6 @@ from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.update import abortupdate
-from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util import git
@@ -58,7 +57,16 @@ class ProjectRepository:
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
-        continueupdate(self.path)
+        project = Repository.open(self.path)
+
+        if commit := project.cherrypickhead:
+            project.commit(
+                message=commit.message,
+                author=commit.author,
+                committer=project.default_signature,
+            )
+
+        project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
 
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
