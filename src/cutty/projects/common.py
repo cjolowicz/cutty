@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from cutty.services.loadtemplate import TemplateMetadata
+from cutty.projects.loadtemplate import TemplateMetadata
 
 
 LATEST_BRANCH = "cutty/latest"

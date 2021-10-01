@@ -5,7 +5,7 @@ from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
-from cutty.services.loadtemplate import Template
+from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
@@ -42,7 +42,7 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
 def linkproject(
     project: Repository,
     generateproject: GenerateProject,
-    template: Template,
+    template: TemplateMetadata,
 ) -> None:
     """Link a project to a project template."""
     if latest := project.heads.get(LATEST_BRANCH):
@@ -55,9 +55,9 @@ def linkproject(
     with project.worktree(update, checkout=False) as worktree:
         generateproject(worktree)
         message = (
-            createcommitmessage(template.metadata)
+            createcommitmessage(template)
             if latest is None
-            else updatecommitmessage(template.metadata)
+            else updatecommitmessage(template)
         )
         Repository.open(worktree).commit(message=message)
 
@@ -70,7 +70,7 @@ def linkproject(
     )
 
     project.commit(
-        message=linkcommitmessage(template.metadata),
+        message=linkcommitmessage(template),
         author=update.commit.author,
         committer=project.default_signature,
     )

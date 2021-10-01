@@ -6,12 +6,9 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
-from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import GenerateProject
-from cutty.services.loadtemplate import Template
-from cutty.services.loadtemplate import TemplateMetadata
+from cutty.projects.loadtemplate import TemplateMetadata
 
 
 @pytest.fixture
@@ -45,12 +42,10 @@ def project(
 
 
 @pytest.fixture
-def template() -> Template:
+def template() -> TemplateMetadata:
     """Fixture for a `Template` instance."""
-    templatepath = VirtualPath(filesystem=DictFilesystem({}))
     location = "https://example.com/template"
-    metadata = TemplateMetadata(location, None, None, "template", None)
-    return Template(metadata, templatepath)
+    return TemplateMetadata(location, None, None, "template", None)
 
 
 @pytest.fixture

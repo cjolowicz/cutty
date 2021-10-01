@@ -6,8 +6,8 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.generate import generate
-from cutty.services.loadtemplate import loadtemplate
+from cutty.projects.generate import generate
+from cutty.projects.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 
