@@ -2,12 +2,46 @@
 import dataclasses
 import pathlib
 
+import pytest
+
+from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
+from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.create import creategitrepository
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
+
+
+@pytest.fixture
+def projectpath(tmp_path: pathlib.Path) -> pathlib.Path:
+    """Fixture for a project path."""
+    return tmp_path / "project"
+
+
+@pytest.fixture
+def storage(projectpath: pathlib.Path) -> FileStorage:
+    """Fixture for a storage."""
+    return DiskFileStorage(projectpath.parent)
+
+
+@pytest.fixture
+def file(projectpath: pathlib.Path) -> RegularFile:
+    """Fixture for a regular file."""
+    path = PurePath(projectpath.name, "README.md")
+    return RegularFile(path, b"")
+
+
+@pytest.fixture
+def project(
+    storage: FileStorage, file: RegularFile, projectpath: pathlib.Path
+) -> pathlib.Path:
+    """Fixture for a project path."""
+    with storage:
+        storage.add(file)
+
+    return projectpath
 
 
 def test_repository(project: pathlib.Path, template: TemplateMetadata) -> None:
