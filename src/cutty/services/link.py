@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.projects.generate import generate
+from cutty.projects.generate import ProjectGenerator
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
@@ -40,9 +40,8 @@ def link(
     template = Template.load(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
-        generate(
+        generator = ProjectGenerator(
             template,
-            outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
             overwrite_if_exists=False,
@@ -50,6 +49,8 @@ def link(
             outputdirisproject=True,
             createconfigfile=True,
         )
+
+        generator.generate(outputdir)
 
     project = ProjectRepository(projectdir)
     project.link(generateproject, template.metadata)
