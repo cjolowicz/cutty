@@ -64,9 +64,7 @@ def generate(
         )
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
-    hookfiles = lazysequence(
-        renderfiles(findcookiecutterhooks(template.root), render, bindings)
-    )
+    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
 
     return storeproject(
         projectname,
@@ -82,7 +80,7 @@ def generate(
 def storeproject(
     projectname: str,
     projectfiles: Iterable[File],
-    hookfiles: Sequence[File],
+    hookfiles: Iterable[File],
     outputdir: pathlib.Path,
     outputdirisproject: bool,
     overwrite_if_exists: bool,

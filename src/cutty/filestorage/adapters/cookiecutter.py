@@ -1,6 +1,6 @@
 """File storage for Cookiecutter projects."""
 import pathlib
-from collections.abc import Sequence
+from collections.abc import Iterable
 
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
@@ -28,7 +28,7 @@ def createcookiecutterstorage(
     projectdir: pathlib.Path,
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
-    hookfiles: Sequence[File],
+    hookfiles: Iterable[File],
 ) -> FileStorage:
     """Create storage for Cookiecutter project files."""
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
