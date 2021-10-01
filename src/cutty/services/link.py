@@ -40,11 +40,11 @@ def link(
     if location is None:
         raise TemplateNotSpecifiedError()
 
-    template2 = loadtemplate(location, checkout, directory)
+    template = loadtemplate(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
         generate(
-            template2,
+            template,
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
@@ -54,4 +54,4 @@ def link(
             createconfigfile=True,
         )
 
-    linkproject(project, generateproject, template2.metadata)
+    linkproject(project, generateproject, template.metadata)
