@@ -5,10 +5,6 @@ from pathlib import Path
 from cutty.projects.loadtemplate import TemplateMetadata
 
 
-LATEST_BRANCH = "cutty/latest"
-UPDATE_BRANCH = "cutty/update"
-
-
 GenerateProject = Callable[[Path], None]
 
 

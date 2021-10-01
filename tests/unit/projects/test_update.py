@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 
 from cutty.projects.common import GenerateProject
-from cutty.projects.common import LATEST_BRANCH
-from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
+from cutty.projects.repository import UPDATE_BRANCH
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts

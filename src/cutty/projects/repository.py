@@ -5,14 +5,16 @@ import pygit2
 
 from cutty.projects.common import createcommitmessage
 from cutty.projects.common import GenerateProject
-from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
-from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
+
+
+LATEST_BRANCH = "cutty/latest"
+UPDATE_BRANCH = "cutty/update"
 
 
 class ProjectRepository:
