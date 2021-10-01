@@ -8,10 +8,10 @@ from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.repository import ProjectRepository
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
-from cutty.projects.update import updateproject2
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -26,7 +26,8 @@ def updateproject(
     projectdir: Path, generateproject: GenerateProject, template: TemplateMetadata
 ) -> None:
     """Update a project by applying changes between the generated trees."""
-    updateproject2(projectdir, generateproject, template)
+    project = ProjectRepository(projectdir)
+    project.update(generateproject, template)
 
 
 def createconflict(
