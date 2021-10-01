@@ -5,9 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.projects.update import abortupdate
-from cutty.projects.update import continueupdate
-from cutty.projects.update import skipupdate
+from cutty.projects.repository import ProjectRepository
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
@@ -76,16 +74,18 @@ def update(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
+    project = ProjectRepository(cwd)
+
     if continue_:
-        continueupdate(cwd)
+        project.continueupdate()
         return
 
     if skip:
-        skipupdate(cwd)
+        project.skipupdate()
         return
 
     if abort:
-        abortupdate(cwd)
+        project.abortupdate()
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
