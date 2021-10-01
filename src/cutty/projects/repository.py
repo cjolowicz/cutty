@@ -1,14 +1,20 @@
 """Project repositories."""
 from pathlib import Path
 
+from cutty.projects.common import createcommitmessage
 from cutty.projects.common import GenerateProject
+from cutty.projects.common import LATEST_BRANCH
+from cutty.projects.common import linkcommitmessage
+from cutty.projects.common import UPDATE_BRANCH
+from cutty.projects.common import updatecommitmessage
 from cutty.projects.create import creategitrepository
-from cutty.projects.link import linkproject
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
+from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
@@ -49,4 +55,63 @@ class ProjectRepository:
     ) -> None:
         """Link a project to a project template."""
         project = Repository.open(self.path)
-        linkproject(project, generateproject, template)
+
+        if latest := project.heads.get(LATEST_BRANCH):
+            update = project.heads.create(UPDATE_BRANCH, latest, force=True)
+        else:
+            # Unborn branches cannot have worktrees. Create an orphan branch with an
+            # empty placeholder commit instead. We'll squash it after project creation.
+            update = _create_orphan_branch(project, UPDATE_BRANCH)
+
+        with project.worktree(update, checkout=False) as worktree:
+            generateproject(worktree)
+            message = (
+                createcommitmessage(template)
+                if latest is None
+                else updatecommitmessage(template)
+            )
+            Repository.open(worktree).commit(message=message)
+
+        if latest is None:
+            # Squash the empty initial commit.
+            _squash_branch(project, update)
+
+        (project.path / PROJECT_CONFIG_FILE).write_bytes(
+            (update.commit.tree / PROJECT_CONFIG_FILE).data
+        )
+
+        project.commit(
+            message=linkcommitmessage(template),
+            author=update.commit.author,
+            committer=project.default_signature,
+        )
+
+        project.heads[LATEST_BRANCH] = update.commit
+
+
+def _create_orphan_branch(repository: Repository, name: str) -> Branch:
+    """Create an orphan branch with an empty commit."""
+    author = committer = repository.default_signature
+    repository._repository.create_commit(
+        f"refs/heads/{name}",
+        author,
+        committer,
+        "initial",
+        repository._repository.TreeBuilder().write(),
+        [],
+    )
+    return repository.branch(name)
+
+
+def _squash_branch(repository: Repository, branch: Branch) -> None:
+    """Squash the branch."""
+    name, commit = branch.name, branch.commit
+    del repository.heads[name]
+    repository._repository.create_commit(
+        f"refs/heads/{name}",
+        commit.author,
+        commit.committer,
+        commit.message,
+        commit.tree.id,
+        [],
+    )
