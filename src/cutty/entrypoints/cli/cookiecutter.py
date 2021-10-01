@@ -1,14 +1,33 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
+from collections.abc import Iterator
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
 import click
 
-from cutty.entrypoints.cli.create import extra_context_callback
 from cutty.projects.generate import fileexistspolicy
 from cutty.services.cookiecutter import createproject
 from cutty.templates.domain.bindings import Binding
+
+
+def extra_context_callback(
+    context: click.Context, parameter: click.Parameter, args: tuple[str, ...]
+) -> dict[str, str]:
+    """Callback for the EXTRA_CONTEXT argument."""
+
+    def _generate() -> Iterator[tuple[str, str]]:
+        for arg in args:
+            try:
+                key, value = arg.split("=", 1)
+                yield key, value
+            except ValueError:
+                raise click.BadParameter(
+                    "EXTRA_CONTEXT should contain items of the form key=value; "
+                    f"'{arg}' doesn't match that form"
+                )
+
+    return dict(_generate())
 
 
 @click.argument("location", metavar="TEMPLATE")
