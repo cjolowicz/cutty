@@ -60,10 +60,3 @@ def _createtemplate(
         template, checkout, directory, repository.name, repository.revision
     )
     return Template(metadata, repository.path)
-
-
-def loadtemplate(
-    template: str, checkout: Optional[str], directory: Optional[pathlib.PurePosixPath]
-) -> Template:
-    """Load a project template."""
-    return Template.load(template, checkout, directory)

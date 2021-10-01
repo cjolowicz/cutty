@@ -6,7 +6,7 @@ from typing import Optional
 
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.template import loadtemplate
+from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
@@ -26,7 +26,7 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    template = loadtemplate(projectconfig.template, checkout, directory)
+    template = Template.load(projectconfig.template, checkout, directory)
 
     def generateproject(outputdir: Path) -> None:
         generate(

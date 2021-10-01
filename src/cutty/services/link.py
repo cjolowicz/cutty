@@ -7,7 +7,7 @@ from typing import Optional
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.template import loadtemplate
+from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 
@@ -37,7 +37,7 @@ def link(
     if location is None:
         raise TemplateNotSpecifiedError()
 
-    template = loadtemplate(location, checkout, directory)
+    template = Template.load(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
         generate(
