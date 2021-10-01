@@ -3,7 +3,7 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-from cutty.projects.generate import generate
+from cutty.projects.generate import ProjectGenerator
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
@@ -22,9 +22,8 @@ def createproject(
     """Generate projects from Cookiecutter templates."""
     template = Template.load(location, checkout, directory)
 
-    generate(
+    generator = ProjectGenerator(
         template,
-        outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
         overwrite_if_exists=overwrite_if_exists,
@@ -32,3 +31,5 @@ def createproject(
         outputdirisproject=False,
         createconfigfile=False,
     )
+
+    generator.generate(outputdir)
