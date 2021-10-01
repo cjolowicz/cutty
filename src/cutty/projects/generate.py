@@ -35,6 +35,7 @@ class ProjectGenerator:
         no_input: bool,
         overwrite_if_exists: bool,
         skip_if_file_exists: bool,
+        outputdirisproject: bool,
     ) -> None:
         """Initialize."""
         self.template = template
@@ -42,12 +43,12 @@ class ProjectGenerator:
         self.no_input = no_input
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
+        self.outputdirisproject = outputdirisproject
 
     def generate(
         self,
         outputdir: pathlib.Path,
         *,
-        outputdirisproject: bool,
         createconfigfile: bool,
     ) -> pathlib.Path:
         """Generate a project from a project template."""
@@ -87,7 +88,7 @@ class ProjectGenerator:
             renderfiles(findcookiecutterhooks(self.template.root), render, bindings)
         )
 
-        projectdir = outputdir if outputdirisproject else outputdir / projectname
+        projectdir = outputdir if self.outputdirisproject else outputdir / projectname
         storage = createcookiecutterstorage(
             outputdir,
             projectdir,
@@ -98,7 +99,7 @@ class ProjectGenerator:
 
         with storage:
             for projectfile in projectfiles2:
-                if outputdirisproject:
+                if self.outputdirisproject:
                     path = PurePath(*projectfile.path.parts[1:])
                     projectfile = projectfile.withpath(path)
 
@@ -125,8 +126,8 @@ def generate(
         no_input=no_input,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
+        outputdirisproject=outputdirisproject,
     ).generate(
         outputdir,
-        outputdirisproject=outputdirisproject,
         createconfigfile=createconfigfile,
     )
