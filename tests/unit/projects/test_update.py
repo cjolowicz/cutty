@@ -4,8 +4,6 @@ from pathlib import Path
 
 import pytest
 
-from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.domain.path import Path as VirtualPath
 from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
@@ -14,7 +12,6 @@ from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
 from cutty.services.loadtemplate import Template
-from cutty.services.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
@@ -127,25 +124,6 @@ def project(repository: Repository) -> Repository:
     return repository
 
 
-@pytest.fixture
-def template() -> Template:
-    """Fixture for a `Template` instance."""
-    templatepath = VirtualPath(filesystem=DictFilesystem({}))
-    location = "https://example.com/template"
-    metadata = TemplateMetadata(location, None, None, "template", None)
-    return Template(metadata, templatepath)
-
-
-@pytest.fixture
-def generateproject() -> GenerateProject:
-    """Fixture for a `generateproject` function."""
-
-    def _(project: Path) -> None:
-        (project / "marker").touch()
-
-    return _
-
-
 def test_updateproject_commit(
     project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
@@ -176,15 +154,12 @@ def test_updateproject_commit_message_template(
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, template: Template
+    project: Repository, generateproject: GenerateProject, template: Template
 ) -> None:
     """It includes the template name in the commit message."""
     template = dataclasses.replace(
         template, metadata=dataclasses.replace(template.metadata, revision="1.0.0")
     )
-
-    def generateproject(project: Path) -> None:
-        (project / "marker").touch()
 
     updateproject(project.path, generateproject, template)
 
