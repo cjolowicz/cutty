@@ -3,10 +3,7 @@ from pathlib import Path
 
 import pygit2
 
-from cutty.projects.common import createcommitmessage
 from cutty.projects.common import GenerateProject
-from cutty.projects.common import linkcommitmessage
-from cutty.projects.common import updatecommitmessage
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
@@ -138,3 +135,27 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
         commit.tree.id,
         [],
     )
+
+
+def createcommitmessage(template: TemplateMetadata) -> str:
+    """Return the commit message for importing the template."""
+    if template.revision:
+        return f"Initial import from {template.name} {template.revision}"
+    else:
+        return f"Initial import from {template.name}"
+
+
+def updatecommitmessage(template: TemplateMetadata) -> str:
+    """Return the commit message for updating the template."""
+    if template.revision:
+        return f"Update {template.name} to {template.revision}"
+    else:
+        return f"Update {template.name}"
+
+
+def linkcommitmessage(template: TemplateMetadata) -> str:
+    """Return the commit message for linking the template."""
+    if template.revision:
+        return f"Link to {template.name} {template.revision}"
+    else:
+        return f"Link to {template.name}"
