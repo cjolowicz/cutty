@@ -27,15 +27,20 @@ class EmptyTemplateError(CuttyError):
 class ProjectGenerator:
     """Project generator."""
 
-    def __init__(self, template: Template) -> None:
+    def __init__(
+        self,
+        template: Template,
+        *,
+        extrabindings: Sequence[Binding],
+    ) -> None:
         """Initialize."""
         self.template = template
+        self.extrabindings = extrabindings
 
     def generate(
         self,
         outputdir: pathlib.Path,
         *,
-        extrabindings: Sequence[Binding],
         no_input: bool,
         overwrite_if_exists: bool,
         skip_if_file_exists: bool,
@@ -51,7 +56,7 @@ class ProjectGenerator:
             config.variables,
             render,
             interactive=not no_input,
-            bindings=extrabindings,
+            bindings=self.extrabindings,
         )
 
         projectconfig = ProjectConfig(
@@ -107,9 +112,8 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    return ProjectGenerator(template).generate(
+    return ProjectGenerator(template, extrabindings=extrabindings).generate(
         outputdir,
-        extrabindings=extrabindings,
         no_input=no_input,
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
