@@ -10,7 +10,7 @@ from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
-def createproject2(
+def createproject(
     location: str,
     outputdir: pathlib.Path,
     *,

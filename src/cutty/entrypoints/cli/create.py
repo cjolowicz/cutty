@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.projects.generate import fileexistspolicy
-from cutty.services.create import createproject2
+from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 
 
@@ -100,7 +100,7 @@ def create(
     directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    createproject2(
+    createproject(
         template,
         output_dir,
         extrabindings=extrabindings,
