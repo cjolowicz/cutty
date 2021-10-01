@@ -1,19 +1,21 @@
 """Project repositories."""
 from pathlib import Path
 
+import pygit2
+
 from cutty.projects.common import createcommitmessage
 from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
-from cutty.projects.create import creategitrepository
 from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.projects.update import abortupdate
 from cutty.projects.update import continueupdate
 from cutty.projects.update import skipupdate
 from cutty.projects.update import updateproject
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.util import git
 from cutty.util.git import Branch
 from cutty.util.git import Repository
 
@@ -28,7 +30,13 @@ class ProjectRepository:
     @classmethod
     def create(cls, projectdir: Path, template: TemplateMetadata) -> None:
         """Initialize the git repository for a project."""
-        creategitrepository(projectdir, template)
+        try:
+            project = git.Repository.open(projectdir)
+        except pygit2.GitError:
+            project = git.Repository.init(projectdir)
+
+        project.commit(message=createcommitmessage(template))
+        project.heads[LATEST_BRANCH] = project.head.commit
 
     def update(
         self, generateproject: GenerateProject, template: TemplateMetadata
