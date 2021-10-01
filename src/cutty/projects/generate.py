@@ -7,7 +7,8 @@ from collections.abc import Sequence
 from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
-from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
+from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage2
+from cutty.filestorage.adapters.cookiecutter import fileexistspolicy
 from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.template import Template
@@ -88,9 +89,8 @@ def storeproject(
 ) -> pathlib.Path:
     """Store a project in the output directory."""
     projectdir = outputdir if outputdirisproject else outputdir / projectname
-    storage = createcookiecutterstorage(
-        outputdir, projectdir, overwrite_if_exists, skip_if_file_exists, hookfiles
-    )
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
+    storage = createcookiecutterstorage2(outputdir, projectdir, fileexists, hookfiles)
 
     with storage:
         for projectfile in projectfiles:

@@ -23,18 +23,6 @@ def fileexistspolicy(
     )
 
 
-def createcookiecutterstorage(
-    outputdir: pathlib.Path,
-    projectdir: pathlib.Path,
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
-    hookfiles: Iterable[File],
-) -> FileStorage:
-    """Create storage for Cookiecutter project files."""
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    return createcookiecutterstorage2(outputdir, projectdir, fileexists, hookfiles)
-
-
 def createcookiecutterstorage2(
     outputdir: pathlib.Path,
     projectdir: pathlib.Path,
