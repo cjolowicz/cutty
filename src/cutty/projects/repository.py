@@ -45,7 +45,7 @@ class ProjectRepository:
             # empty placeholder commit instead. We'll squash it after project creation.
             update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
-        with self.project.worktree2(update, checkout=False) as worktree:
+        with self.project.worktree(update, checkout=False) as worktree:
             generateproject(worktree.path)
             message = (
                 _createcommitmessage(template)
@@ -79,7 +79,7 @@ class ProjectRepository:
             UPDATE_BRANCH, latestbranch.commit, force=True
         )
 
-        with self.project.worktree2(updatebranch, checkout=False) as worktree:
+        with self.project.worktree(updatebranch, checkout=False) as worktree:
             generateproject(worktree.path)
             worktree.commit(message=_updatecommitmessage(template))
 

@@ -308,7 +308,7 @@ def test_worktree_creates_worktree(repository: Repository) -> None:
     """It creates a worktree."""
     branch = repository.heads.create("branch")
 
-    with repository.worktree2(branch) as worktree:
+    with repository.worktree(branch) as worktree:
         assert (worktree.path / ".git").is_file()
 
 
@@ -316,7 +316,7 @@ def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
     """It removes the worktree on exit."""
     branch = repository.heads.create("branch")
 
-    with repository.worktree2(branch) as worktree:
+    with repository.worktree(branch) as worktree:
         pass
 
     assert not worktree.path.is_dir()
@@ -327,7 +327,7 @@ def test_worktree_prunes_worktree_on_failure(repository: Repository) -> None:
     branch = repository.heads.create("branch")
 
     with pytest.raises(Exception, match="Boom"):
-        with repository.worktree2(branch) as worktree:
+        with repository.worktree(branch) as worktree:
             raise Exception("Boom")
 
     privatedir = repository.path / ".git" / "worktrees" / worktree.path.name
@@ -339,7 +339,7 @@ def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
     updatefile(path)
     branch = repository.heads.create("branch")
 
-    with repository.worktree2(branch) as worktree:
+    with repository.worktree(branch) as worktree:
         assert (worktree.path / path.name).is_file()
 
 
@@ -348,7 +348,7 @@ def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
     updatefile(path)
     branch = repository.heads.create("branch")
 
-    with repository.worktree2(branch, checkout=False) as worktree:
+    with repository.worktree(branch, checkout=False) as worktree:
         assert not (worktree.path / path.name).is_file()
 
 
