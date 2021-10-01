@@ -5,7 +5,7 @@ from cutty.projects.common import GenerateProject
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
-from cutty.services.loadtemplate import TemplateMetadata
+from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 
 

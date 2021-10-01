@@ -5,8 +5,8 @@ from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.projects.generate import generate
+from cutty.projects.loadtemplate import loadtemplate
 from cutty.projects.update import updateproject
-from cutty.services.loadtemplate import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 

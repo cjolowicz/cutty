@@ -6,7 +6,7 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.projects.common import LATEST_BRANCH
 from cutty.projects.create import creategitrepository
-from cutty.services.loadtemplate import TemplateMetadata
+from cutty.projects.loadtemplate import TemplateMetadata
 from cutty.util.git import Repository
 
 

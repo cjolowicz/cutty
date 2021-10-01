@@ -5,7 +5,7 @@ from typing import Optional
 
 from cutty.projects.create import creategitrepository
 from cutty.projects.generate import generate
-from cutty.services.loadtemplate import loadtemplate
+from cutty.projects.loadtemplate import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 

@@ -8,7 +8,7 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.common import GenerateProject
-from cutty.services.loadtemplate import TemplateMetadata
+from cutty.projects.loadtemplate import TemplateMetadata
 
 
 @pytest.fixture
