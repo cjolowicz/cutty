@@ -6,7 +6,8 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.create import extra_context_callback
-from cutty.services.cookiecutter import createproject
+from cutty.projects.generate import fileexistspolicy
+from cutty.services.cookiecutter import createproject2
 from cutty.templates.domain.bindings import Binding
 
 
@@ -71,14 +72,14 @@ def cookiecutter(
         output_dir = Path.cwd()
 
     directory2 = PurePosixPath(directory) if directory is not None else None
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
-    createproject(
+    createproject2(
         location,
         output_dir,
         extrabindings=extrabindings,
         no_input=no_input,
         checkout=checkout,
         directory=directory2,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
+        fileexists=fileexists,
     )
