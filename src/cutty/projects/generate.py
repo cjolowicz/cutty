@@ -36,6 +36,7 @@ class ProjectGenerator:
         overwrite_if_exists: bool,
         skip_if_file_exists: bool,
         outputdirisproject: bool,
+        createconfigfile: bool,
     ) -> None:
         """Initialize."""
         self.template = template
@@ -44,13 +45,9 @@ class ProjectGenerator:
         self.overwrite_if_exists = overwrite_if_exists
         self.skip_if_file_exists = skip_if_file_exists
         self.outputdirisproject = outputdirisproject
+        self.createconfigfile = createconfigfile
 
-    def generate(
-        self,
-        outputdir: pathlib.Path,
-        *,
-        createconfigfile: bool,
-    ) -> pathlib.Path:
+    def generate(self, outputdir: pathlib.Path) -> pathlib.Path:
         """Generate a project from a project template."""
         config = loadcookiecutterconfig(
             self.template.metadata.location, self.template.root
@@ -78,7 +75,7 @@ class ProjectGenerator:
 
         projectname = projectfiles[0].path.parts[0]
         projectfiles2 = projectfiles.release()
-        if createconfigfile:
+        if self.createconfigfile:
             projectconfigfile = createprojectconfigfile(
                 PurePath(projectname), projectconfig
             )
@@ -127,7 +124,5 @@ def generate(
         overwrite_if_exists=overwrite_if_exists,
         skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=outputdirisproject,
-    ).generate(
-        outputdir,
         createconfigfile=createconfigfile,
-    )
+    ).generate(outputdir)
