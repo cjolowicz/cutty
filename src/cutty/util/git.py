@@ -229,12 +229,14 @@ class Repository:
                     path.name, path, self._repository.branches[branch.name]
                 )
 
+                repository = Repository.open(path)
+
                 if not checkout:
                     # Emulate `--no-checkout` by checking out an empty tree.
                     # https://github.com/libgit2/libgit2/issues/5949
-                    Repository.open(path)._checkoutemptytree()
+                    repository._checkoutemptytree()
 
-                yield self.open(path)
+                yield repository
         finally:
             # Prune with `force=True` to work around libgit2 issue.
             # https://github.com/libgit2/libgit2/issues/5280
