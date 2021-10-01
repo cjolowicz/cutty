@@ -309,7 +309,7 @@ def test_worktree_creates_worktree(repository: Repository) -> None:
     branch = repository.heads.create("branch")
 
     with repository.worktree(branch) as worktree:
-        assert (worktree / ".git").is_file()
+        assert (worktree.path / ".git").is_file()
 
 
 def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
@@ -319,7 +319,7 @@ def test_worktree_removes_worktree_on_exit(repository: Repository) -> None:
     with repository.worktree(branch) as worktree:
         pass
 
-    assert not worktree.is_dir()
+    assert not worktree.path.is_dir()
 
 
 def test_worktree_prunes_worktree_on_failure(repository: Repository) -> None:
@@ -330,7 +330,7 @@ def test_worktree_prunes_worktree_on_failure(repository: Repository) -> None:
         with repository.worktree(branch) as worktree:
             raise Exception("Boom")
 
-    privatedir = repository.path / ".git" / "worktrees" / worktree.name
+    privatedir = repository.path / ".git" / "worktrees" / worktree.path.name
     assert not privatedir.exists()
 
 
@@ -340,7 +340,7 @@ def test_worktree_does_checkout(repository: Repository, path: Path) -> None:
     branch = repository.heads.create("branch")
 
     with repository.worktree(branch) as worktree:
-        assert (worktree / path.name).is_file()
+        assert (worktree.path / path.name).is_file()
 
 
 def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
@@ -349,7 +349,7 @@ def test_worktree_no_checkout(repository: Repository, path: Path) -> None:
     branch = repository.heads.create("branch")
 
     with repository.worktree(branch, checkout=False) as worktree:
-        assert not (worktree / path.name).is_file()
+        assert not (worktree.path / path.name).is_file()
 
 
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:

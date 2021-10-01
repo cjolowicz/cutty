@@ -46,13 +46,13 @@ class ProjectRepository:
             update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
-            generateproject(worktree)
+            generateproject(worktree.path)
             message = (
                 _createcommitmessage(template)
                 if latest is None
                 else _updatecommitmessage(template)
             )
-            Repository.open(worktree).commit(message=message)
+            worktree.commit(message=message)
 
         if latest is None:
             # Squash the empty initial commit.
@@ -80,8 +80,8 @@ class ProjectRepository:
         )
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
-            generateproject(worktree)
-            Repository.open(worktree).commit(message=_updatecommitmessage(template))
+            generateproject(worktree.path)
+            worktree.commit(message=_updatecommitmessage(template))
 
         self.project.cherrypick(updatebranch.commit)
 

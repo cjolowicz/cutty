@@ -214,7 +214,9 @@ class Repository:
         repository.state_cleanup()
 
     @contextmanager
-    def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
+    def worktree(
+        self, branch: Branch, *, checkout: bool = True
+    ) -> Iterator[Repository]:
         """Create a worktree for the branch in the repository."""
 
         def _hash(name: str) -> str:
@@ -227,12 +229,14 @@ class Repository:
                     path.name, path, self._repository.branches[branch.name]
                 )
 
+                repository = Repository.open(path)
+
                 if not checkout:
                     # Emulate `--no-checkout` by checking out an empty tree.
                     # https://github.com/libgit2/libgit2/issues/5949
-                    Repository.open(path)._checkoutemptytree()
+                    repository._checkoutemptytree()
 
-                yield path
+                yield repository
         finally:
             # Prune with `force=True` to work around libgit2 issue.
             # https://github.com/libgit2/libgit2/issues/5280
