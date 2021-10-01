@@ -54,4 +54,4 @@ def link(
             createconfigfile=True,
         )
 
-    linkproject(project, generateproject, template2)
+    linkproject(project, generateproject, template2.metadata)

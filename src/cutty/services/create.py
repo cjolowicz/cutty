@@ -35,4 +35,4 @@ def createproject(
         createconfigfile=True,
     )
 
-    creategitrepository(projectdir, template)
+    creategitrepository(projectdir, template.metadata)

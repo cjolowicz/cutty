@@ -40,4 +40,4 @@ def update(
             createconfigfile=True,
         )
 
-    updateproject(projectdir, generateproject, template)
+    updateproject(projectdir, generateproject, template.metadata)
