@@ -34,18 +34,19 @@ class ProjectGenerator:
         extrabindings: Sequence[Binding],
         no_input: bool,
         overwrite_if_exists: bool,
+        skip_if_file_exists: bool,
     ) -> None:
         """Initialize."""
         self.template = template
         self.extrabindings = extrabindings
         self.no_input = no_input
         self.overwrite_if_exists = overwrite_if_exists
+        self.skip_if_file_exists = skip_if_file_exists
 
     def generate(
         self,
         outputdir: pathlib.Path,
         *,
-        skip_if_file_exists: bool,
         outputdirisproject: bool,
         createconfigfile: bool,
     ) -> pathlib.Path:
@@ -91,7 +92,7 @@ class ProjectGenerator:
             outputdir,
             projectdir,
             self.overwrite_if_exists,
-            skip_if_file_exists,
+            self.skip_if_file_exists,
             hookfiles,
         )
 
@@ -123,9 +124,9 @@ def generate(
         extrabindings=extrabindings,
         no_input=no_input,
         overwrite_if_exists=overwrite_if_exists,
+        skip_if_file_exists=skip_if_file_exists,
     ).generate(
         outputdir,
-        skip_if_file_exists=skip_if_file_exists,
         outputdirisproject=outputdirisproject,
         createconfigfile=createconfigfile,
     )
