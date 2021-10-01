@@ -29,7 +29,7 @@ class ProjectRepository:
         except pygit2.GitError:
             project = Repository.init(projectdir)
 
-        project.commit(message=createcommitmessage(template))
+        project.commit(message=_createcommitmessage(template))
         project.heads[LATEST_BRANCH] = project.head.commit
 
     def update(
@@ -43,7 +43,7 @@ class ProjectRepository:
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
             generateproject(worktree)
-            Repository.open(worktree).commit(message=updatecommitmessage(template))
+            Repository.open(worktree).commit(message=_updatecommitmessage(template))
 
         self.project.cherrypick(updatebranch.commit)
 
@@ -86,9 +86,9 @@ class ProjectRepository:
         with self.project.worktree(update, checkout=False) as worktree:
             generateproject(worktree)
             message = (
-                createcommitmessage(template)
+                _createcommitmessage(template)
                 if latest is None
-                else updatecommitmessage(template)
+                else _updatecommitmessage(template)
             )
             Repository.open(worktree).commit(message=message)
 
@@ -101,7 +101,7 @@ class ProjectRepository:
         )
 
         self.project.commit(
-            message=linkcommitmessage(template),
+            message=_linkcommitmessage(template),
             author=update.commit.author,
             committer=self.project.default_signature,
         )
@@ -137,7 +137,7 @@ def _squash_branch(repository: Repository, branch: Branch) -> None:
     )
 
 
-def createcommitmessage(template: TemplateMetadata) -> str:
+def _createcommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for importing the template."""
     if template.revision:
         return f"Initial import from {template.name} {template.revision}"
@@ -145,7 +145,7 @@ def createcommitmessage(template: TemplateMetadata) -> str:
         return f"Initial import from {template.name}"
 
 
-def updatecommitmessage(template: TemplateMetadata) -> str:
+def _updatecommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for updating the template."""
     if template.revision:
         return f"Update {template.name} to {template.revision}"
@@ -153,7 +153,7 @@ def updatecommitmessage(template: TemplateMetadata) -> str:
         return f"Update {template.name}"
 
 
-def linkcommitmessage(template: TemplateMetadata) -> str:
+def _linkcommitmessage(template: TemplateMetadata) -> str:
     """Return the commit message for linking the template."""
     if template.revision:
         return f"Link to {template.name} {template.revision}"
