@@ -7,7 +7,7 @@ from cutty.projects.common import GenerateProject
 from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.repository import UPDATE_BRANCH
-from cutty.projects.template import TemplateMetadata
+from cutty.projects.template import Template
 from cutty.util.git import Repository
 from tests.util.git import updatefile
 
@@ -18,7 +18,7 @@ pytest_plugins = ["tests.fixtures.git"]
 def linkproject(
     project: Repository,
     generateproject: GenerateProject,
-    template: TemplateMetadata,
+    template: Template.Metadata,
 ) -> None:
     """Link a project to a project template."""
     repository = ProjectRepository(project.path)
@@ -32,7 +32,7 @@ def project(repository: Repository) -> Repository:
 
 
 def test_linkproject_commit(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It creates a commit on the current branch."""
     tip = project.head.commit
@@ -43,7 +43,7 @@ def test_linkproject_commit(
 
 
 def test_linkproject_commit_message(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It uses a commit message indicating the linkage."""
     linkproject(project, generateproject, template)
@@ -54,7 +54,7 @@ def test_linkproject_commit_message(
 def test_linkproject_commit_message_template(
     project: Repository,
     generateproject: GenerateProject,
-    template: TemplateMetadata,
+    template: Template.Metadata,
 ) -> None:
     """It includes the template name in the commit message."""
     linkproject(project, generateproject, template)
@@ -63,7 +63,7 @@ def test_linkproject_commit_message_template(
 
 
 def test_linkproject_commit_message_revision(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
@@ -74,7 +74,7 @@ def test_linkproject_commit_message_revision(
 
 
 def test_linkproject_latest_branch(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It creates the latest branch."""
     updatefile(project.path / "initial")
@@ -85,7 +85,7 @@ def test_linkproject_latest_branch(
 
 
 def test_linkproject_latest_branch_commit_message(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It uses a commit message indicating an initial import."""
     updatefile(project.path / "initial")
@@ -96,7 +96,7 @@ def test_linkproject_latest_branch_commit_message(
 
 
 def test_linkproject_latest_branch_commit_message_update(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It uses a commit message indicating an update if the branch exists."""
     project.heads.create(LATEST_BRANCH)
@@ -109,7 +109,7 @@ def test_linkproject_latest_branch_commit_message_update(
 
 
 def test_linkproject_update_branch(
-    project: Repository, generateproject: GenerateProject, template: TemplateMetadata
+    project: Repository, generateproject: GenerateProject, template: Template.Metadata
 ) -> None:
     """It creates the update branch."""
     updatefile(project.path / "initial")

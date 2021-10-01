@@ -10,11 +10,11 @@ from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.template import TemplateMetadata
+from cutty.projects.template import Template
 from cutty.util.git import Repository
 
 
-def creategitrepository(projectdir: pathlib.Path, template: TemplateMetadata) -> None:
+def creategitrepository(projectdir: pathlib.Path, template: Template.Metadata) -> None:
     """Initialize the git repository for a project."""
     ProjectRepository.create(projectdir, template)
 
@@ -49,14 +49,14 @@ def project(
     return projectpath
 
 
-def test_repository(project: pathlib.Path, template: TemplateMetadata) -> None:
+def test_repository(project: pathlib.Path, template: Template.Metadata) -> None:
     """It creates a repository."""
     creategitrepository(project, template)
 
     Repository.open(project)  # does not raise
 
 
-def test_commit(project: pathlib.Path, template: TemplateMetadata) -> None:
+def test_commit(project: pathlib.Path, template: Template.Metadata) -> None:
     """It creates a commit."""
     creategitrepository(project, template)
 
@@ -65,7 +65,7 @@ def test_commit(project: pathlib.Path, template: TemplateMetadata) -> None:
 
 
 def test_commit_message_template(
-    project: pathlib.Path, template: TemplateMetadata
+    project: pathlib.Path, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
     creategitrepository(project, template)
@@ -75,7 +75,7 @@ def test_commit_message_template(
 
 
 def test_commit_message_revision(
-    project: pathlib.Path, template: TemplateMetadata
+    project: pathlib.Path, template: Template.Metadata
 ) -> None:
     """It includes the revision in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
@@ -89,7 +89,7 @@ def test_existing_repository(
     storage: FileStorage,
     file: RegularFile,
     projectpath: pathlib.Path,
-    template: TemplateMetadata,
+    template: Template.Metadata,
 ) -> None:
     """It creates the commit in an existing repository."""
     repository = Repository.init(projectpath)
@@ -103,7 +103,7 @@ def test_existing_repository(
     assert file.path.name in repository.head.commit.tree
 
 
-def test_branch(project: pathlib.Path, template: TemplateMetadata) -> None:
+def test_branch(project: pathlib.Path, template: Template.Metadata) -> None:
     """It creates a branch pointing to the initial commit."""
     creategitrepository(project, template)
 
@@ -112,7 +112,7 @@ def test_branch(project: pathlib.Path, template: TemplateMetadata) -> None:
 
 
 def test_branch_not_checked_out(
-    project: pathlib.Path, template: TemplateMetadata
+    project: pathlib.Path, template: Template.Metadata
 ) -> None:
     """It does not check out the `latest` branch."""
     creategitrepository(project, template)

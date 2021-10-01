@@ -49,16 +49,13 @@ class Template:
         return _createtemplate(template, checkout, directory, repository)
 
 
-TemplateMetadata = Template.Metadata
-
-
 def _createtemplate(
     template: str,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
     repository: Repository,
 ) -> Template:
-    metadata = TemplateMetadata(
+    metadata = Template.Metadata(
         template, checkout, directory, repository.name, repository.revision
     )
     return Template(metadata, repository.path)
