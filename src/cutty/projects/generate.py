@@ -8,7 +8,7 @@ from lazysequence import lazysequence
 
 from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
-from cutty.filestorage.adapters.cookiecutter import fileexistspolicy
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.template import Template
@@ -75,6 +75,19 @@ def generate(
         outputdirisproject,
         overwrite_if_exists,
         skip_if_file_exists,
+    )
+
+
+def fileexistspolicy(
+    overwrite_if_exists: bool, skip_if_file_exists: bool
+) -> FileExistsPolicy:
+    """Return the policy for overwriting existing files."""
+    return (
+        FileExistsPolicy.RAISE
+        if not overwrite_if_exists
+        else FileExistsPolicy.SKIP
+        if skip_if_file_exists
+        else FileExistsPolicy.OVERWRITE
     )
 
 

@@ -10,19 +10,6 @@ from cutty.filestorage.domain.observers import observe
 from cutty.filestorage.domain.storage import FileStorage
 
 
-def fileexistspolicy(
-    overwrite_if_exists: bool, skip_if_file_exists: bool
-) -> FileExistsPolicy:
-    """Return the policy for overwriting existing files."""
-    return (
-        FileExistsPolicy.RAISE
-        if not overwrite_if_exists
-        else FileExistsPolicy.SKIP
-        if skip_if_file_exists
-        else FileExistsPolicy.OVERWRITE
-    )
-
-
 def createcookiecutterstorage(
     outputdir: pathlib.Path,
     projectdir: pathlib.Path,
