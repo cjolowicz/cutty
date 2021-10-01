@@ -10,7 +10,6 @@ from cutty.projects.common import linkcommitmessage
 from cutty.projects.common import UPDATE_BRANCH
 from cutty.projects.common import updatecommitmessage
 from cutty.projects.loadtemplate import TemplateMetadata
-from cutty.projects.update import abortupdate
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util import git
 from cutty.util.git import Branch
@@ -76,7 +75,10 @@ class ProjectRepository:
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
-        abortupdate(self.path)
+        project = Repository.open(self.path)
+        project.resetcherrypick()
+
+        project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
 
     def link(
         self,
