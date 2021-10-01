@@ -6,8 +6,8 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
-from cutty.projects.loadtemplate import loadtemplate
 from cutty.projects.repository import ProjectRepository
+from cutty.projects.template import loadtemplate
 from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 

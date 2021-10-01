@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.projects.generate import generate
-from cutty.projects.loadtemplate import loadtemplate
+from cutty.projects.template import loadtemplate
 from cutty.templates.domain.bindings import Binding
 
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import pygit2
 
 from cutty.projects.common import GenerateProject
-from cutty.projects.loadtemplate import TemplateMetadata
+from cutty.projects.template import TemplateMetadata
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
