@@ -214,6 +214,14 @@ class Repository:
         repository.state_cleanup()
 
     @contextmanager
+    def worktree2(
+        self, branch: Branch, *, checkout: bool = True
+    ) -> Iterator[Repository]:
+        """Create a worktree for the branch in the repository."""
+        with self.worktree(branch, checkout=checkout) as path:
+            yield self.open(path)
+
+    @contextmanager
     def worktree(self, branch: Branch, *, checkout: bool = True) -> Iterator[Path]:
         """Create a worktree for the branch in the repository."""
 
