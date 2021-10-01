@@ -32,44 +32,6 @@ class ProjectRepository:
         project.commit(message=_createcommitmessage(template))
         project.heads[LATEST_BRANCH] = project.head.commit
 
-    def update(
-        self, generateproject: GenerateProject, template: TemplateMetadata
-    ) -> None:
-        """Update a project by applying changes between the generated trees."""
-        latestbranch = self.project.branch(LATEST_BRANCH)
-        updatebranch = self.project.heads.create(
-            UPDATE_BRANCH, latestbranch.commit, force=True
-        )
-
-        with self.project.worktree(updatebranch, checkout=False) as worktree:
-            generateproject(worktree)
-            Repository.open(worktree).commit(message=_updatecommitmessage(template))
-
-        self.project.cherrypick(updatebranch.commit)
-
-        latestbranch.commit = updatebranch.commit
-
-    def continueupdate(self) -> None:
-        """Continue an update after conflict resolution."""
-        if commit := self.project.cherrypickhead:
-            self.project.commit(
-                message=commit.message,
-                author=commit.author,
-                committer=self.project.default_signature,
-            )
-
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
-
-    def skipupdate(self) -> None:
-        """Skip an update with conflicts."""
-        self.project.resetcherrypick()
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
-
-    def abortupdate(self) -> None:
-        """Abort an update with conflicts."""
-        self.project.resetcherrypick()
-        self.project.heads[UPDATE_BRANCH] = self.project.heads[LATEST_BRANCH]
-
     def link(
         self,
         generateproject: GenerateProject,
@@ -107,6 +69,44 @@ class ProjectRepository:
         )
 
         self.project.heads[LATEST_BRANCH] = update.commit
+
+    def update(
+        self, generateproject: GenerateProject, template: TemplateMetadata
+    ) -> None:
+        """Update a project by applying changes between the generated trees."""
+        latestbranch = self.project.branch(LATEST_BRANCH)
+        updatebranch = self.project.heads.create(
+            UPDATE_BRANCH, latestbranch.commit, force=True
+        )
+
+        with self.project.worktree(updatebranch, checkout=False) as worktree:
+            generateproject(worktree)
+            Repository.open(worktree).commit(message=_updatecommitmessage(template))
+
+        self.project.cherrypick(updatebranch.commit)
+
+        latestbranch.commit = updatebranch.commit
+
+    def continueupdate(self) -> None:
+        """Continue an update after conflict resolution."""
+        if commit := self.project.cherrypickhead:
+            self.project.commit(
+                message=commit.message,
+                author=commit.author,
+                committer=self.project.default_signature,
+            )
+
+        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
+
+    def skipupdate(self) -> None:
+        """Skip an update with conflicts."""
+        self.project.resetcherrypick()
+        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
+
+    def abortupdate(self) -> None:
+        """Abort an update with conflicts."""
+        self.project.resetcherrypick()
+        self.project.heads[UPDATE_BRANCH] = self.project.heads[LATEST_BRANCH]
 
 
 def _create_orphan_branch(repository: Repository, name: str) -> Branch:
