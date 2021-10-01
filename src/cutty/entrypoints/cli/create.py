@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
-from cutty.projects.generate import fileexistspolicy
+from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
 from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 

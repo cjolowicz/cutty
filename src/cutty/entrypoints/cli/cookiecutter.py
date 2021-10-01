@@ -6,7 +6,7 @@ from typing import Optional
 
 import click
 
-from cutty.projects.generate import fileexistspolicy
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.services.cookiecutter import createproject
 from cutty.templates.domain.bindings import Binding
 
@@ -28,6 +28,19 @@ def extra_context_callback(
                 )
 
     return dict(_generate())
+
+
+def fileexistspolicy(
+    overwrite_if_exists: bool, skip_if_file_exists: bool
+) -> FileExistsPolicy:
+    """Return the policy for overwriting existing files."""
+    return (
+        FileExistsPolicy.RAISE
+        if not overwrite_if_exists
+        else FileExistsPolicy.SKIP
+        if skip_if_file_exists
+        else FileExistsPolicy.OVERWRITE
+    )
 
 
 @click.argument("location", metavar="TEMPLATE")

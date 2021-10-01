@@ -76,19 +76,6 @@ def generate(
     )
 
 
-def fileexistspolicy(
-    overwrite_if_exists: bool, skip_if_file_exists: bool
-) -> FileExistsPolicy:
-    """Return the policy for overwriting existing files."""
-    return (
-        FileExistsPolicy.RAISE
-        if not overwrite_if_exists
-        else FileExistsPolicy.SKIP
-        if skip_if_file_exists
-        else FileExistsPolicy.OVERWRITE
-    )
-
-
 def storeproject(
     projectname: str,
     projectfiles: Iterable[File],
