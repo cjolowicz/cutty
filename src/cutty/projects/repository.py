@@ -20,7 +20,7 @@ class ProjectRepository:
 
     def __init__(self, path: Path) -> None:
         """Initialize."""
-        self.path = path
+        self.project = Repository.open(path)
 
     @classmethod
     def create(cls, projectdir: Path, template: TemplateMetadata) -> None:
@@ -37,47 +37,39 @@ class ProjectRepository:
         self, generateproject: GenerateProject, template: TemplateMetadata
     ) -> None:
         """Update a project by applying changes between the generated trees."""
-        project = Repository.open(self.path)
-
-        latestbranch = project.branch(LATEST_BRANCH)
-        updatebranch = project.heads.create(
+        latestbranch = self.project.branch(LATEST_BRANCH)
+        updatebranch = self.project.heads.create(
             UPDATE_BRANCH, latestbranch.commit, force=True
         )
 
-        with project.worktree(updatebranch, checkout=False) as worktree:
+        with self.project.worktree(updatebranch, checkout=False) as worktree:
             generateproject(worktree)
             Repository.open(worktree).commit(message=updatecommitmessage(template))
 
-        project.cherrypick(updatebranch.commit)
+        self.project.cherrypick(updatebranch.commit)
 
         latestbranch.commit = updatebranch.commit
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
-        project = Repository.open(self.path)
-
-        if commit := project.cherrypickhead:
-            project.commit(
+        if commit := self.project.cherrypickhead:
+            self.project.commit(
                 message=commit.message,
                 author=commit.author,
-                committer=project.default_signature,
+                committer=self.project.default_signature,
             )
 
-        project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
+        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
 
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
-        project = Repository.open(self.path)
-        project.resetcherrypick()
-
-        project.heads[LATEST_BRANCH] = project.heads[UPDATE_BRANCH]
+        self.project.resetcherrypick()
+        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
-        project = Repository.open(self.path)
-        project.resetcherrypick()
-
-        project.heads[UPDATE_BRANCH] = project.heads[LATEST_BRANCH]
+        self.project.resetcherrypick()
+        self.project.heads[UPDATE_BRANCH] = self.project.heads[LATEST_BRANCH]
 
     def link(
         self,
@@ -85,16 +77,14 @@ class ProjectRepository:
         template: TemplateMetadata,
     ) -> None:
         """Link a project to a project template."""
-        project = Repository.open(self.path)
-
-        if latest := project.heads.get(LATEST_BRANCH):
-            update = project.heads.create(UPDATE_BRANCH, latest, force=True)
+        if latest := self.project.heads.get(LATEST_BRANCH):
+            update = self.project.heads.create(UPDATE_BRANCH, latest, force=True)
         else:
             # Unborn branches cannot have worktrees. Create an orphan branch with an
             # empty placeholder commit instead. We'll squash it after project creation.
-            update = _create_orphan_branch(project, UPDATE_BRANCH)
+            update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
-        with project.worktree(update, checkout=False) as worktree:
+        with self.project.worktree(update, checkout=False) as worktree:
             generateproject(worktree)
             message = (
                 createcommitmessage(template)
@@ -105,19 +95,19 @@ class ProjectRepository:
 
         if latest is None:
             # Squash the empty initial commit.
-            _squash_branch(project, update)
+            _squash_branch(self.project, update)
 
-        (project.path / PROJECT_CONFIG_FILE).write_bytes(
+        (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (update.commit.tree / PROJECT_CONFIG_FILE).data
         )
 
-        project.commit(
+        self.project.commit(
             message=linkcommitmessage(template),
             author=update.commit.author,
-            committer=project.default_signature,
+            committer=self.project.default_signature,
         )
 
-        project.heads[LATEST_BRANCH] = update.commit
+        self.project.heads[LATEST_BRANCH] = update.commit
 
 
 def _create_orphan_branch(repository: Repository, name: str) -> Branch:
