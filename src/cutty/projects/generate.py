@@ -48,8 +48,8 @@ class Project:
         except IndexError:
             raise EmptyTemplateError()
 
-        name = first.path.parts[0]
         files = fileseq.release()
+        name = first.path.parts[0]
         return Project(name, files, hooks)
 
 
