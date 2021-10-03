@@ -3,7 +3,7 @@ import pathlib
 
 import pytest
 
-from cutty.projects.common import GenerateProject
+from cutty.projects.repository import GenerateProject
 from cutty.projects.template import Template
 
 
