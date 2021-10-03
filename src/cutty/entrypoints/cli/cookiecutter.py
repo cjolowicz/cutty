@@ -110,7 +110,7 @@ def cookiecutter(
         location,
         output_dir,
         extrabindings=extrabindings,
-        no_input=no_input,
+        interactive=not no_input,
         checkout=checkout,
         directory=directory2,
         fileexists=fileexists,
