@@ -4,6 +4,7 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
@@ -34,8 +35,7 @@ def update(
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
-            overwrite_if_exists=False,
-            skip_if_file_exists=False,
+            fileexists=FileExistsPolicy.RAISE,
             outputdirisproject=True,
             createconfigfile=True,
         )

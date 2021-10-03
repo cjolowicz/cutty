@@ -1,13 +1,46 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
+from collections.abc import Iterator
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
 import click
 
-from cutty.entrypoints.cli.create import extra_context_callback
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.services.cookiecutter import createproject
 from cutty.templates.domain.bindings import Binding
+
+
+def extra_context_callback(
+    context: click.Context, parameter: click.Parameter, args: tuple[str, ...]
+) -> dict[str, str]:
+    """Callback for the EXTRA_CONTEXT argument."""
+
+    def _generate() -> Iterator[tuple[str, str]]:
+        for arg in args:
+            try:
+                key, value = arg.split("=", 1)
+                yield key, value
+            except ValueError:
+                raise click.BadParameter(
+                    "EXTRA_CONTEXT should contain items of the form key=value; "
+                    f"'{arg}' doesn't match that form"
+                )
+
+    return dict(_generate())
+
+
+def fileexistspolicy(
+    overwrite_if_exists: bool, skip_if_file_exists: bool
+) -> FileExistsPolicy:
+    """Return the policy for overwriting existing files."""
+    return (
+        FileExistsPolicy.RAISE
+        if not overwrite_if_exists
+        else FileExistsPolicy.SKIP
+        if skip_if_file_exists
+        else FileExistsPolicy.OVERWRITE
+    )
 
 
 @click.argument("location", metavar="TEMPLATE")
@@ -71,6 +104,7 @@ def cookiecutter(
         output_dir = Path.cwd()
 
     directory2 = PurePosixPath(directory) if directory is not None else None
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
     createproject(
         location,
@@ -79,6 +113,5 @@ def cookiecutter(
         no_input=no_input,
         checkout=checkout,
         directory=directory2,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
+        fileexists=fileexists,
     )

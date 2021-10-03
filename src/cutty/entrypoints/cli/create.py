@@ -1,31 +1,13 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
 import pathlib
-from typing import Iterator
 from typing import Optional
 
 import click
 
+from cutty.entrypoints.cli.cookiecutter import extra_context_callback
+from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
 from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
-
-
-def extra_context_callback(
-    context: click.Context, parameter: click.Parameter, args: tuple[str, ...]
-) -> dict[str, str]:
-    """Callback for the EXTRA_CONTEXT argument."""
-
-    def _generate() -> Iterator[tuple[str, str]]:
-        for arg in args:
-            try:
-                key, value = arg.split("=", 1)
-                yield key, value
-            except ValueError:
-                raise click.BadParameter(
-                    "EXTRA_CONTEXT should contain items of the form key=value; "
-                    f"'{arg}' doesn't match that form"
-                )
-
-    return dict(_generate())
 
 
 @click.argument("template")
@@ -98,6 +80,7 @@ def create(
 
     directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
 
+    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     createproject(
         template,
         output_dir,
@@ -105,7 +88,6 @@ def create(
         no_input=no_input,
         checkout=checkout,
         directory=directory2,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
+        fileexists=fileexists,
         in_place=in_place,
     )

@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
@@ -45,8 +46,7 @@ def link(
             outputdir,
             extrabindings=extrabindings,
             no_input=no_input,
-            overwrite_if_exists=False,
-            skip_if_file_exists=False,
+            fileexists=FileExistsPolicy.RAISE,
             outputdirisproject=True,
             createconfigfile=True,
         )

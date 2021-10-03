@@ -4,7 +4,7 @@ from typing import Optional
 
 import click
 
-from cutty.entrypoints.cli.create import extra_context_callback
+from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.projects.repository import ProjectRepository
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding

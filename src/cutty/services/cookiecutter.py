@@ -3,6 +3,7 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
+from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
@@ -16,8 +17,7 @@ def createproject(
     no_input: bool,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
+    fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
     template = Template.load(location, checkout, directory)
@@ -27,8 +27,7 @@ def createproject(
         outputdir,
         extrabindings=extrabindings,
         no_input=no_input,
-        overwrite_if_exists=overwrite_if_exists,
-        skip_if_file_exists=skip_if_file_exists,
+        fileexists=fileexists,
         outputdirisproject=False,
         createconfigfile=False,
     )
