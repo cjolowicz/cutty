@@ -94,8 +94,9 @@ def generate(
         bindings=extrabindings,
     )
 
+    projectpaths = findcookiecutterpaths(template.root, generator.config)
     projectfiles = renderfiles(
-        findcookiecutterpaths(template.root, generator.config),
+        projectpaths,
         generator.render,
         bindings,
     )
