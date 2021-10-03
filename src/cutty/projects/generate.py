@@ -68,7 +68,7 @@ class ProjectGenerator:
 
     _template: Template
     _config: Config
-    render: Renderer
+    renderer: Renderer
     paths: Iterable[Path]
     hooks: Iterable[Path]
 
@@ -90,10 +90,10 @@ class ProjectGenerator:
         """Generate a project using the given bindings."""
         projectfiles = renderfiles(
             self.paths,
-            self.render,
+            self.renderer,
             bindings,
         )
-        hookfiles = renderfiles(self.hooks, self.render, bindings)
+        hookfiles = renderfiles(self.hooks, self.renderer, bindings)
         return Project.create(projectfiles, hookfiles)
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
@@ -123,7 +123,7 @@ def generate(
     generator = ProjectGenerator.create(template)
     bindings = bindcookiecuttervariables(
         generator.variables,
-        generator.render,
+        generator.renderer,
         interactive=not no_input,
         bindings=extrabindings,
     )
