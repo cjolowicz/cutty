@@ -8,22 +8,6 @@ from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariab
 from cutty.templates.domain.bindings import Binding
 
 
-def generate(
-    template: Template,
-    *,
-    extrabindings: Sequence[Binding],
-    no_input: bool,
-    createconfigfile: bool = True,
-) -> Project:
-    """Generate a project from a project template."""
-    return generate2(
-        template,
-        extrabindings=extrabindings,
-        interactive=not no_input,
-        createconfigfile=createconfigfile,
-    )
-
-
 def generate2(
     template: Template,
     *,
