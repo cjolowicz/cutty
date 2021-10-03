@@ -2,7 +2,7 @@
 import pathlib
 from typing import NoReturn
 
-from cutty.projects.generate import EmptyTemplateError
+from cutty.projects.project import EmptyTemplateError
 from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
