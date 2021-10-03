@@ -68,6 +68,7 @@ class ProjectGenerator:
     config: Config
     render: Renderer
     paths: Iterable[Path]
+    hookpaths: Iterable[Path]
 
     @classmethod
     def create(cls, template: Template) -> ProjectGenerator:
@@ -75,7 +76,8 @@ class ProjectGenerator:
         config = loadcookiecutterconfig(template.metadata.location, template.root)
         render = createcookiecutterrenderer(template.root, config)
         paths = findcookiecutterpaths(template.root, config)
-        return cls(config, render, paths)
+        hookpaths = findcookiecutterhooks(template.root)
+        return cls(config, render, paths, hookpaths)
 
 
 def generate(
@@ -102,8 +104,7 @@ def generate(
         generator.render,
         bindings,
     )
-    hookpaths = findcookiecutterhooks(template.root)
-    hookfiles = renderfiles(hookpaths, generator.render, bindings)
+    hookfiles = renderfiles(generator.hookpaths, generator.render, bindings)
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
