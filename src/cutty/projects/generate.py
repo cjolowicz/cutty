@@ -67,15 +67,15 @@ class ProjectGenerator:
 
     config: Config
     render: Renderer
-    projectpaths: Iterable[Path]
+    paths: Iterable[Path]
 
     @classmethod
     def create(cls, template: Template) -> ProjectGenerator:
         """Create a project generator."""
         config = loadcookiecutterconfig(template.metadata.location, template.root)
         render = createcookiecutterrenderer(template.root, config)
-        projectpaths = findcookiecutterpaths(template.root, config)
-        return cls(config, render, projectpaths)
+        paths = findcookiecutterpaths(template.root, config)
+        return cls(config, render, paths)
 
 
 def generate(
@@ -98,7 +98,7 @@ def generate(
     )
 
     projectfiles = renderfiles(
-        generator.projectpaths,
+        generator.paths,
         generator.render,
         bindings,
     )
