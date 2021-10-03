@@ -11,7 +11,7 @@ def storeproject(
     project: Project,
     outputdir: pathlib.Path,
     outputdirisproject: bool,
-    fileexists: FileExistsPolicy,
+    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
     projectdir = outputdir if outputdirisproject else outputdir / project.name
