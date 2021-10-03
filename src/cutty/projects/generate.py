@@ -8,7 +8,7 @@ from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariab
 from cutty.templates.domain.bindings import Binding
 
 
-def generate2(
+def generate(
     template: Template,
     *,
     extrabindings: Sequence[Binding],

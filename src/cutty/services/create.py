@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.projects.generate import generate2
+from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -25,7 +25,7 @@ def createproject(
     """Generate projects from Cookiecutter templates."""
     template = Template.load(location, checkout, directory)
 
-    project = generate2(
+    project = generate(
         template,
         extrabindings=extrabindings,
         no_input=no_input,
