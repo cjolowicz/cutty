@@ -80,10 +80,8 @@ def generate(
 ) -> pathlib.Path:
     """Generate a project from a project template."""
     config = loadcookiecutterconfig(template.metadata.location, template.root)
-    generator = ProjectGenerator(
-        config,
-        render=createcookiecutterrenderer(template.root, config),
-    )
+    render = createcookiecutterrenderer(template.root, config)
+    generator = ProjectGenerator(config, render)
     bindings = bindcookiecuttervariables(
         generator.config.variables,
         generator.render,
