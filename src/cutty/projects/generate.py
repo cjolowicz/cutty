@@ -28,6 +28,7 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.templates.domain.variables import Variable
 
 
 class EmptyTemplateError(CuttyError):
@@ -80,6 +81,11 @@ class ProjectGenerator:
         hooks = findcookiecutterhooks(template.root)
         return cls(template, config, render, paths, hooks)
 
+    @property
+    def variables(self) -> Sequence[Variable]:
+        """Return the template variables."""
+        return self.config.variables
+
     def generate(self, bindings: Sequence[Binding], createconfigfile: bool) -> Project:
         """Generate a project using the given bindings."""
         projectfiles = renderfiles(
@@ -116,7 +122,7 @@ def generate(
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
     bindings = bindcookiecuttervariables(
-        generator.config.variables,
+        generator.variables,
         generator.render,
         interactive=not no_input,
         bindings=extrabindings,
