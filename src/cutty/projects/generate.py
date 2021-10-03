@@ -67,7 +67,7 @@ class ProjectGenerator:
     """A project generator."""
 
     _template: Template
-    config: Config
+    _config: Config
     render: Renderer
     paths: Iterable[Path]
     hooks: Iterable[Path]
@@ -84,7 +84,7 @@ class ProjectGenerator:
     @property
     def variables(self) -> Sequence[Variable]:
         """Return the template variables."""
-        return self.config.variables
+        return self._config.variables
 
     def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
