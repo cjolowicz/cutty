@@ -79,6 +79,31 @@ class ProjectGenerator:
         hooks = findcookiecutterhooks(template.root)
         return cls(config, render, paths, hooks)
 
+    def generate(
+        self, bindings: Sequence[Binding], template: Template, createconfigfile: bool
+    ) -> Project:
+        """Generate a project using the given bindings."""
+        projectfiles = renderfiles(
+            self.paths,
+            self.render,
+            bindings,
+        )
+        hookfiles = renderfiles(self.hooks, self.render, bindings)
+        project = Project.create(projectfiles, hookfiles)
+
+        if createconfigfile:
+            projectconfig = ProjectConfig(
+                template.metadata.location,
+                bindings,
+                directory=template.metadata.directory,
+            )
+            projectconfigfile = createprojectconfigfile(
+                PurePath(project.name), projectconfig
+            )
+            project = project.add(projectconfigfile)
+
+        return project
+
 
 def generate(
     template: Template,
@@ -99,23 +124,7 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectfiles = renderfiles(
-        generator.paths,
-        generator.render,
-        bindings,
-    )
-    hookfiles = renderfiles(generator.hooks, generator.render, bindings)
-    project = Project.create(projectfiles, hookfiles)
-
-    if createconfigfile:
-        projectconfig = ProjectConfig(
-            template.metadata.location, bindings, directory=template.metadata.directory
-        )
-        projectconfigfile = createprojectconfigfile(
-            PurePath(project.name), projectconfig
-        )
-        project = project.add(projectconfigfile)
-
+    project = generator.generate(bindings, template, createconfigfile)
     return storeproject(
         project,
         outputdir,
