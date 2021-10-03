@@ -28,6 +28,7 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.templates.domain.variables import Variable
 
 
 class EmptyTemplateError(CuttyError):
@@ -65,6 +66,7 @@ class Project:
 class ProjectGenerator:
     """A project generator."""
 
+    template: Template
     config: Config
     render: Renderer
     paths: Iterable[Path]
@@ -77,11 +79,14 @@ class ProjectGenerator:
         render = createcookiecutterrenderer(template.root, config)
         paths = findcookiecutterpaths(template.root, config)
         hooks = findcookiecutterhooks(template.root)
-        return cls(config, render, paths, hooks)
+        return cls(template, config, render, paths, hooks)
 
-    def generate(
-        self, bindings: Sequence[Binding], template: Template, createconfigfile: bool
-    ) -> Project:
+    @property
+    def variables(self) -> Sequence[Variable]:
+        """Return the template variables."""
+        return self.config.variables
+
+    def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
         projectfiles = renderfiles(
             self.paths,
@@ -89,20 +94,19 @@ class ProjectGenerator:
             bindings,
         )
         hookfiles = renderfiles(self.hooks, self.render, bindings)
-        project = Project.create(projectfiles, hookfiles)
+        return Project.create(projectfiles, hookfiles)
 
-        if createconfigfile:
-            projectconfig = ProjectConfig(
-                template.metadata.location,
-                bindings,
-                directory=template.metadata.directory,
-            )
-            projectconfigfile = createprojectconfigfile(
-                PurePath(project.name), projectconfig
-            )
-            project = project.add(projectconfigfile)
-
-        return project
+    def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
+        """Add a configuration file to the project."""
+        projectconfig = ProjectConfig(
+            self.template.metadata.location,
+            bindings,
+            directory=self.template.metadata.directory,
+        )
+        projectconfigfile = createprojectconfigfile(
+            PurePath(project.name), projectconfig
+        )
+        return project.add(projectconfigfile)
 
 
 def generate(
@@ -118,13 +122,17 @@ def generate(
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
     bindings = bindcookiecuttervariables(
-        generator.config.variables,
+        generator.variables,
         generator.render,
         interactive=not no_input,
         bindings=extrabindings,
     )
 
-    project = generator.generate(bindings, template, createconfigfile)
+    project = generator.generate(bindings)
+
+    if createconfigfile:
+        project = generator.addconfig(project, bindings)
+
     return storeproject(
         project,
         outputdir,
