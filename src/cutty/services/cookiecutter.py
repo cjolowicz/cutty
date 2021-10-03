@@ -15,7 +15,7 @@ def createproject(
     outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
     fileexists: FileExistsPolicy,
@@ -26,7 +26,7 @@ def createproject(
     project = generate(
         template,
         extrabindings=extrabindings,
-        no_input=no_input,
+        interactive=interactive,
         createconfigfile=False,
     )
 

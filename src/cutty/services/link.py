@@ -5,7 +5,6 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -24,7 +23,7 @@ def link(
     /,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
 ) -> None:
@@ -43,17 +42,9 @@ def link(
 
     def generateproject(outputdir: pathlib.Path) -> None:
         project = generate(
-            template,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            createconfigfile=True,
+            template, extrabindings=extrabindings, interactive=interactive
         )
-        storeproject(
-            project,
-            outputdir,
-            outputdirisproject=True,
-            fileexists=FileExistsPolicy.RAISE,
-        )
+        storeproject(project, outputdir, outputdirisproject=True)
 
     project = ProjectRepository(projectdir)
     project.link(generateproject, template.metadata)

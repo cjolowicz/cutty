@@ -4,7 +4,6 @@ from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Optional
 
-from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -17,7 +16,7 @@ def update(
     projectdir: Path,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[PurePosixPath],
 ) -> None:
@@ -32,17 +31,9 @@ def update(
 
     def generateproject(outputdir: Path) -> None:
         project = generate(
-            template,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            createconfigfile=True,
+            template, extrabindings=extrabindings, interactive=interactive
         )
-        storeproject(
-            project,
-            outputdir,
-            outputdirisproject=True,
-            fileexists=FileExistsPolicy.RAISE,
-        )
+        storeproject(project, outputdir, outputdirisproject=True)
 
     project = ProjectRepository(projectdir)
     project.update(generateproject, template.metadata)
