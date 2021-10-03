@@ -16,7 +16,7 @@ def update(
     projectdir: Path,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[PurePosixPath],
 ) -> None:
@@ -31,7 +31,7 @@ def update(
 
     def generateproject(outputdir: Path) -> None:
         project = generate(
-            template, extrabindings=extrabindings, interactive=not no_input
+            template, extrabindings=extrabindings, interactive=interactive
         )
         storeproject(project, outputdir, outputdirisproject=True)
 
