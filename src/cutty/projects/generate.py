@@ -14,6 +14,7 @@ from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
+from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
@@ -66,13 +67,15 @@ class ProjectGenerator:
 
     config: Config
     render: Renderer
+    projectpaths: Iterable[Path]
 
     @classmethod
     def create(cls, template: Template) -> ProjectGenerator:
         """Create a project generator."""
         config = loadcookiecutterconfig(template.metadata.location, template.root)
         render = createcookiecutterrenderer(template.root, config)
-        return cls(config, render)
+        projectpaths = findcookiecutterpaths(template.root, config)
+        return cls(config, render, projectpaths)
 
 
 def generate(
@@ -94,9 +97,8 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectpaths = findcookiecutterpaths(template.root, generator.config)
     projectfiles = renderfiles(
-        projectpaths,
+        generator.projectpaths,
         generator.render,
         bindings,
     )
