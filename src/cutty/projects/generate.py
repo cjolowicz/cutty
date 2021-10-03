@@ -1,8 +1,11 @@
 """Generating projects from templates."""
+from __future__ import annotations
+
 import itertools
 import pathlib
 from collections.abc import Iterable
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from lazysequence import lazysequence
 
@@ -25,6 +28,29 @@ from cutty.templates.domain.renderfiles import renderfiles
 
 class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
+
+
+@dataclass
+class Project:
+    """A generated project."""
+
+    name: str
+    files: Iterable[File]
+    hooks: Iterable[File]
+
+    @classmethod
+    def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
+        """Create a project."""
+        fileseq = lazysequence(files)
+
+        try:
+            first = fileseq[0]
+        except IndexError:
+            raise EmptyTemplateError()
+
+        files = fileseq.release()
+        name = first.path.parts[0]
+        return Project(name, files, hooks)
 
 
 def generate(
@@ -50,26 +76,20 @@ def generate(
     projectconfig = ProjectConfig(
         template.metadata.location, bindings, directory=template.metadata.directory
     )
-    projectfiles = lazysequence(
-        renderfiles(findcookiecutterpaths(template.root, config), render, bindings)
+    projectfiles = renderfiles(
+        findcookiecutterpaths(template.root, config), render, bindings
     )
-    if not projectfiles:
-        raise EmptyTemplateError()
+    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    project = Project.create(projectfiles, hookfiles)
 
-    projectname = projectfiles[0].path.parts[0]
-    projectfiles2 = projectfiles.release()
     if createconfigfile:
         projectconfigfile = createprojectconfigfile(
-            PurePath(projectname), projectconfig
+            PurePath(project.name), projectconfig
         )
-        projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
-
-    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+        project.files = itertools.chain(project.files, [projectconfigfile])
 
     return storeproject(
-        projectname,
-        projectfiles2,
-        hookfiles,
+        project,
         outputdir,
         outputdirisproject,
         fileexists,
@@ -77,19 +97,19 @@ def generate(
 
 
 def storeproject(
-    projectname: str,
-    projectfiles: Iterable[File],
-    hookfiles: Iterable[File],
+    project: Project,
     outputdir: pathlib.Path,
     outputdirisproject: bool,
     fileexists: FileExistsPolicy,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
-    projectdir = outputdir if outputdirisproject else outputdir / projectname
-    storage = createcookiecutterstorage(outputdir, projectdir, fileexists, hookfiles)
+    projectdir = outputdir if outputdirisproject else outputdir / project.name
+    storage = createcookiecutterstorage(
+        outputdir, projectdir, fileexists, project.hooks
+    )
 
     with storage:
-        for projectfile in projectfiles:
+        for projectfile in project.files:
             if outputdirisproject:
                 path = PurePath(*projectfile.path.parts[1:])
                 projectfile = projectfile.withpath(path)
