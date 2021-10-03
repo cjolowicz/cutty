@@ -52,6 +52,10 @@ class Project:
         name = first.path.parts[0]
         return Project(name, files, hooks)
 
+    def add(self, file: File) -> None:
+        """Add a project file."""
+        self.files = itertools.chain(self.files, [file])
+
 
 def generate(
     template: Template,
@@ -86,7 +90,7 @@ def generate(
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
         )
-        project.files = itertools.chain(project.files, [projectconfigfile])
+        project.add(projectconfigfile)
 
     return storeproject(
         project,
