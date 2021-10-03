@@ -25,6 +25,7 @@ from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
+from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 
 
@@ -64,6 +65,7 @@ class ProjectGenerator:
     """A project generator."""
 
     config: Config
+    render: Renderer
 
 
 def generate(
@@ -77,21 +79,26 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
+    config = loadcookiecutterconfig(template.metadata.location, template.root)
     generator = ProjectGenerator(
-        config=loadcookiecutterconfig(template.metadata.location, template.root)
+        config,
+        render=createcookiecutterrenderer(template.root, config),
     )
-    render = createcookiecutterrenderer(template.root, generator.config)
     bindings = bindcookiecuttervariables(
         generator.config.variables,
-        render,
+        generator.render,
         interactive=not no_input,
         bindings=extrabindings,
     )
 
     projectfiles = renderfiles(
-        findcookiecutterpaths(template.root, generator.config), render, bindings
+        findcookiecutterpaths(template.root, generator.config),
+        generator.render,
+        bindings,
     )
-    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    hookfiles = renderfiles(
+        findcookiecutterhooks(template.root), generator.render, bindings
+    )
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
