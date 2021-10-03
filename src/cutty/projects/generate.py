@@ -24,6 +24,8 @@ from cutty.templates.adapters.cookiecutter.projectconfig import createprojectcon
 from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
+from cutty.templates.domain.config import Config
+from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 
 
@@ -58,6 +60,21 @@ class Project:
         return dataclasses.replace(self, files=itertools.chain(self.files, [file]))
 
 
+@dataclass(frozen=True)
+class ProjectGenerator:
+    """A project generator."""
+
+    config: Config
+    render: Renderer
+
+    @classmethod
+    def create(cls, template: Template) -> ProjectGenerator:
+        """Create a project generator."""
+        config = loadcookiecutterconfig(template.metadata.location, template.root)
+        render = createcookiecutterrenderer(template.root, config)
+        return cls(config, render)
+
+
 def generate(
     template: Template,
     outputdir: pathlib.Path,
@@ -69,19 +86,22 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    config = loadcookiecutterconfig(template.metadata.location, template.root)
-    render = createcookiecutterrenderer(template.root, config)
+    generator = ProjectGenerator.create(template)
     bindings = bindcookiecuttervariables(
-        config.variables,
-        render,
+        generator.config.variables,
+        generator.render,
         interactive=not no_input,
         bindings=extrabindings,
     )
 
     projectfiles = renderfiles(
-        findcookiecutterpaths(template.root, config), render, bindings
+        findcookiecutterpaths(template.root, generator.config),
+        generator.render,
+        bindings,
     )
-    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    hookfiles = renderfiles(
+        findcookiecutterhooks(template.root), generator.render, bindings
+    )
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
