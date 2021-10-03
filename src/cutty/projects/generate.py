@@ -73,9 +73,6 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectconfig = ProjectConfig(
-        template.metadata.location, bindings, directory=template.metadata.directory
-    )
     projectfiles = renderfiles(
         findcookiecutterpaths(template.root, config), render, bindings
     )
@@ -83,6 +80,9 @@ def generate(
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
+        projectconfig = ProjectConfig(
+            template.metadata.location, bindings, directory=template.metadata.directory
+        )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
         )
