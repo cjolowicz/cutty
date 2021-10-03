@@ -63,13 +63,13 @@ def generate(
     projectfiles = renderfiles(
         findcookiecutterpaths(template.root, config), render, bindings
     )
+    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
     projectfileseq = lazysequence(projectfiles)
     if not projectfileseq:
         raise EmptyTemplateError()
 
     projectname = projectfileseq[0].path.parts[0]
     projectfiles = projectfileseq.release()
-    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
     project = Project(projectname, projectfiles, hookfiles)
 
     if createconfigfile:
