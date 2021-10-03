@@ -1,6 +1,7 @@
 """Generating projects from templates."""
 from __future__ import annotations
 
+import dataclasses
 import itertools
 import pathlib
 from collections.abc import Iterable
@@ -30,7 +31,7 @@ class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class Project:
     """A generated project."""
 
@@ -51,6 +52,10 @@ class Project:
         files = fileseq.release()
         name = first.path.parts[0]
         return Project(name, files, hooks)
+
+    def add(self, file: File) -> Project:
+        """Add a project file."""
+        return dataclasses.replace(self, files=itertools.chain(self.files, [file]))
 
 
 def generate(
@@ -73,9 +78,6 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectconfig = ProjectConfig(
-        template.metadata.location, bindings, directory=template.metadata.directory
-    )
     projectfiles = renderfiles(
         findcookiecutterpaths(template.root, config), render, bindings
     )
@@ -83,10 +85,13 @@ def generate(
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
+        projectconfig = ProjectConfig(
+            template.metadata.location, bindings, directory=template.metadata.directory
+        )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
         )
-        project.files = itertools.chain(project.files, [projectconfigfile])
+        project = project.add(projectconfigfile)
 
     return storeproject(
         project,
