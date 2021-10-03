@@ -23,7 +23,7 @@ def link(
     /,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
 ) -> None:
@@ -42,7 +42,7 @@ def link(
 
     def generateproject(outputdir: pathlib.Path) -> None:
         project = generate(
-            template, extrabindings=extrabindings, interactive=not no_input
+            template, extrabindings=extrabindings, interactive=interactive
         )
         storeproject(project, outputdir, outputdirisproject=True)
 
