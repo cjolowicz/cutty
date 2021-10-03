@@ -1,21 +1,16 @@
 """Generating projects from templates."""
 from __future__ import annotations
 
-import dataclasses
-import itertools
 import pathlib
 from collections.abc import Iterable
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from lazysequence import lazysequence
-
-from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.filestorage.domain.files import File
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.projects.project import Project
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
@@ -29,37 +24,6 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.templates.domain.variables import Variable
-
-
-class EmptyTemplateError(CuttyError):
-    """The template contains no project files."""
-
-
-@dataclass(frozen=True)
-class Project:
-    """A generated project."""
-
-    name: str
-    files: Iterable[File]
-    hooks: Iterable[File]
-
-    @classmethod
-    def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
-        """Create a project."""
-        fileseq = lazysequence(files)
-
-        try:
-            first = fileseq[0]
-        except IndexError:
-            raise EmptyTemplateError()
-
-        files = fileseq.release()
-        name = first.path.parts[0]
-        return Project(name, files, hooks)
-
-    def add(self, file: File) -> Project:
-        """Add a project file."""
-        return dataclasses.replace(self, files=itertools.chain(self.files, [file]))
 
 
 @dataclass(frozen=True)
