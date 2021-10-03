@@ -42,10 +42,13 @@ class Project:
     def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
         """Create a project."""
         fileseq = lazysequence(files)
-        if not fileseq:
+
+        try:
+            first = fileseq[0]
+        except IndexError:
             raise EmptyTemplateError()
 
-        name = fileseq[0].path.parts[0]
+        name = first.path.parts[0]
         files = fileseq.release()
         return Project(name, files, hooks)
 
