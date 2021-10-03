@@ -39,7 +39,7 @@ class Project:
     hooks: Iterable[File]
 
     @classmethod
-    def create(cls, files: Iterable[File], hookfiles: Iterable[File]) -> Project:
+    def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
         """Create a project."""
         fileseq = lazysequence(files)
         if not fileseq:
@@ -47,7 +47,7 @@ class Project:
 
         projectname = fileseq[0].path.parts[0]
         files = fileseq.release()
-        return Project(projectname, files, hookfiles)
+        return Project(projectname, files, hooks)
 
 
 def generate(
