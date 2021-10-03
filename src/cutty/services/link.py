@@ -42,12 +42,7 @@ def link(
     template = Template.load(location, checkout, directory)
 
     def generateproject(outputdir: pathlib.Path) -> None:
-        project = generate(
-            template,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            createconfigfile=True,
-        )
+        project = generate(template, extrabindings=extrabindings, no_input=no_input)
         storeproject(
             project,
             outputdir,

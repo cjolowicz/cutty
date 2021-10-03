@@ -31,12 +31,7 @@ def update(
     template = Template.load(projectconfig.template, checkout, directory)
 
     def generateproject(outputdir: Path) -> None:
-        project = generate(
-            template,
-            extrabindings=extrabindings,
-            no_input=no_input,
-            createconfigfile=True,
-        )
+        project = generate(template, extrabindings=extrabindings, no_input=no_input)
         storeproject(
             project,
             outputdir,

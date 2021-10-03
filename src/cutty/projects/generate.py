@@ -13,7 +13,7 @@ def generate(
     *,
     extrabindings: Sequence[Binding],
     no_input: bool,
-    createconfigfile: bool,
+    createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)

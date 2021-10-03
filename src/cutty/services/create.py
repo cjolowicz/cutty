@@ -25,12 +25,7 @@ def createproject(
     """Generate projects from Cookiecutter templates."""
     template = Template.load(location, checkout, directory)
 
-    project = generate(
-        template,
-        extrabindings=extrabindings,
-        no_input=no_input,
-        createconfigfile=True,
-    )
+    project = generate(template, extrabindings=extrabindings, no_input=no_input)
 
     projectdir = storeproject(
         project,
