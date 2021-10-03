@@ -3,6 +3,7 @@ import itertools
 import pathlib
 from collections.abc import Iterable
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from lazysequence import lazysequence
 
@@ -25,6 +26,15 @@ from cutty.templates.domain.renderfiles import renderfiles
 
 class EmptyTemplateError(CuttyError):
     """The template contains no project files."""
+
+
+@dataclass
+class Project:
+    """Project generated from a template."""
+
+    name: str
+    files: Iterable[File]
+    hooks: Iterable[File]
 
 
 def generate(
@@ -65,11 +75,10 @@ def generate(
         projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
 
     hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    project = Project(projectname, projectfiles2, hookfiles)
 
     return storeproject(
-        projectname,
-        projectfiles2,
-        hookfiles,
+        project,
         outputdir,
         outputdirisproject,
         fileexists,
@@ -77,19 +86,19 @@ def generate(
 
 
 def storeproject(
-    projectname: str,
-    projectfiles: Iterable[File],
-    hookfiles: Iterable[File],
+    project: Project,
     outputdir: pathlib.Path,
     outputdirisproject: bool,
     fileexists: FileExistsPolicy,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
-    projectdir = outputdir if outputdirisproject else outputdir / projectname
-    storage = createcookiecutterstorage(outputdir, projectdir, fileexists, hookfiles)
+    projectdir = outputdir if outputdirisproject else outputdir / project.name
+    storage = createcookiecutterstorage(
+        outputdir, projectdir, fileexists, project.hooks
+    )
 
     with storage:
-        for projectfile in projectfiles:
+        for projectfile in project.files:
             if outputdirisproject:
                 path = PurePath(*projectfile.path.parts[1:])
                 projectfile = projectfile.withpath(path)
