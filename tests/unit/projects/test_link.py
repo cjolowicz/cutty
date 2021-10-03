@@ -3,7 +3,7 @@ import dataclasses
 
 import pytest
 
-from cutty.projects.common import GenerateProject
+from cutty.projects.repository import GenerateProject
 from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.repository import UPDATE_BRANCH

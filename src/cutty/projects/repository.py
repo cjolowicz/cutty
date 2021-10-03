@@ -1,9 +1,9 @@
 """Project repositories."""
+from collections.abc import Callable
 from pathlib import Path
 
 import pygit2
 
-from cutty.projects.common import GenerateProject
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
@@ -12,6 +12,9 @@ from cutty.util.git import Repository
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
+
+
+GenerateProject = Callable[[Path], None]
 
 
 class ProjectRepository:
