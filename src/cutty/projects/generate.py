@@ -60,16 +60,16 @@ def generate(
     projectconfig = ProjectConfig(
         template.metadata.location, bindings, directory=template.metadata.directory
     )
-    projectfiles = lazysequence(
+    projectfileseq = lazysequence(
         renderfiles(findcookiecutterpaths(template.root, config), render, bindings)
     )
-    if not projectfiles:
+    if not projectfileseq:
         raise EmptyTemplateError()
 
-    projectname = projectfiles[0].path.parts[0]
-    projectfiles2 = projectfiles.release()
+    projectname = projectfileseq[0].path.parts[0]
+    projectfiles = projectfileseq.release()
     hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
-    project = Project(projectname, projectfiles2, hookfiles)
+    project = Project(projectname, projectfiles, hookfiles)
 
     if createconfigfile:
         projectconfigfile = createprojectconfigfile(
