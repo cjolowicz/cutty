@@ -16,12 +16,28 @@ def generate(
     createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
+    return generate2(
+        template,
+        extrabindings=extrabindings,
+        interactive=not no_input,
+        createconfigfile=createconfigfile,
+    )
+
+
+def generate2(
+    template: Template,
+    *,
+    extrabindings: Sequence[Binding],
+    interactive: bool,
+    createconfigfile: bool = True,
+) -> Project:
+    """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
 
     bindings = bindcookiecuttervariables(
         generator.variables,
         generator.renderer,
-        interactive=not no_input,
+        interactive=interactive,
         bindings=extrabindings,
     )
 
