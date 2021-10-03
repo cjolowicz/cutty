@@ -39,15 +39,15 @@ class Project:
     hooks: Iterable[File]
 
     @classmethod
-    def create(cls, projectfiles: Iterable[File], hookfiles: Iterable[File]) -> Project:
+    def create(cls, files: Iterable[File], hookfiles: Iterable[File]) -> Project:
         """Create a project."""
-        projectfileseq = lazysequence(projectfiles)
-        if not projectfileseq:
+        fileseq = lazysequence(files)
+        if not fileseq:
             raise EmptyTemplateError()
 
-        projectname = projectfileseq[0].path.parts[0]
-        projectfiles = projectfileseq.release()
-        return Project(projectname, projectfiles, hookfiles)
+        projectname = fileseq[0].path.parts[0]
+        files = fileseq.release()
+        return Project(projectname, files, hookfiles)
 
 
 def generate(
