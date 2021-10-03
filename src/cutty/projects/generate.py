@@ -88,13 +88,9 @@ class ProjectGenerator:
 
     def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
-        projectfiles = renderfiles(
-            self._paths,
-            self.renderer,
-            bindings,
-        )
+        files = renderfiles(self._paths, self.renderer, bindings)
         hookfiles = renderfiles(self._hooks, self.renderer, bindings)
-        return Project.create(projectfiles, hookfiles)
+        return Project.create(files, hookfiles)
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
