@@ -45,9 +45,9 @@ class Project:
         if not fileseq:
             raise EmptyTemplateError()
 
-        projectname = fileseq[0].path.parts[0]
+        name = fileseq[0].path.parts[0]
         files = fileseq.release()
-        return Project(projectname, files, hooks)
+        return Project(name, files, hooks)
 
 
 def generate(
