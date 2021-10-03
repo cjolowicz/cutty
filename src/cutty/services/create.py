@@ -16,7 +16,7 @@ def createproject(
     outputdir: pathlib.Path,
     *,
     extrabindings: Sequence[Binding],
-    no_input: bool,
+    interactive: bool,
     checkout: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
     fileexists: FileExistsPolicy,
@@ -25,7 +25,7 @@ def createproject(
     """Generate projects from Cookiecutter templates."""
     template = Template.load(location, checkout, directory)
 
-    project = generate(template, extrabindings=extrabindings, interactive=not no_input)
+    project = generate(template, extrabindings=extrabindings, interactive=interactive)
 
     projectdir = storeproject(
         project,
