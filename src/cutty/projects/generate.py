@@ -24,6 +24,7 @@ def generate(
 ) -> pathlib.Path:
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
+
     bindings = bindcookiecuttervariables(
         generator.variables,
         generator.renderer,
