@@ -67,6 +67,13 @@ class ProjectGenerator:
     config: Config
     render: Renderer
 
+    @classmethod
+    def create(cls, template: Template) -> ProjectGenerator:
+        """Create a project generator."""
+        config = loadcookiecutterconfig(template.metadata.location, template.root)
+        render = createcookiecutterrenderer(template.root, config)
+        return cls(config, render)
+
 
 def generate(
     template: Template,
@@ -79,9 +86,7 @@ def generate(
     createconfigfile: bool,
 ) -> pathlib.Path:
     """Generate a project from a project template."""
-    config = loadcookiecutterconfig(template.metadata.location, template.root)
-    render = createcookiecutterrenderer(template.root, config)
-    generator = ProjectGenerator(config, render)
+    generator = ProjectGenerator.create(template)
     bindings = bindcookiecuttervariables(
         generator.config.variables,
         generator.render,
