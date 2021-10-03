@@ -91,17 +91,21 @@ class ProjectGenerator:
         project = Project.create(projectfiles, hookfiles)
 
         if createconfigfile:
-            projectconfig = ProjectConfig(
-                self.template.metadata.location,
-                bindings,
-                directory=self.template.metadata.directory,
-            )
-            projectconfigfile = createprojectconfigfile(
-                PurePath(project.name), projectconfig
-            )
-            project = project.add(projectconfigfile)
+            project = self.createconfig(project, bindings)
 
         return project
+
+    def createconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
+        """Add a configuration file to the project."""
+        projectconfig = ProjectConfig(
+            self.template.metadata.location,
+            bindings,
+            directory=self.template.metadata.directory,
+        )
+        projectconfigfile = createprojectconfigfile(
+            PurePath(project.name), projectconfig
+        )
+        return project.add(projectconfigfile)
 
 
 def generate(
