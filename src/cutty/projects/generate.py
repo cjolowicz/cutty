@@ -58,6 +58,11 @@ class Project:
         return dataclasses.replace(self, files=itertools.chain(self.files, [file]))
 
 
+@dataclass(frozen=True)
+class ProjectGenerator:
+    """A project generator."""
+
+
 def generate(
     template: Template,
     outputdir: pathlib.Path,
