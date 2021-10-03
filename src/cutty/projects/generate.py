@@ -88,12 +88,7 @@ class ProjectGenerator:
             bindings,
         )
         hookfiles = renderfiles(self.hooks, self.render, bindings)
-        project = Project.create(projectfiles, hookfiles)
-
-        if createconfigfile:
-            project = self.createconfig(project, bindings)
-
-        return project
+        return Project.create(projectfiles, hookfiles)
 
     def createconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
@@ -128,6 +123,10 @@ def generate(
     )
 
     project = generator.generate(bindings, createconfigfile)
+
+    if createconfigfile:
+        project = generator.createconfig(project, bindings)
+
     return storeproject(
         project,
         outputdir,
