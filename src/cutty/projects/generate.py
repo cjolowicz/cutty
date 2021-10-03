@@ -68,14 +68,14 @@ def generate(
 
     projectname = projectfiles[0].path.parts[0]
     projectfiles2 = projectfiles.release()
+    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
+    project = Project(projectname, projectfiles2, hookfiles)
+
     if createconfigfile:
         projectconfigfile = createprojectconfigfile(
             PurePath(projectname), projectconfig
         )
-        projectfiles2 = itertools.chain(projectfiles2, [projectconfigfile])
-
-    hookfiles = renderfiles(findcookiecutterhooks(template.root), render, bindings)
-    project = Project(projectname, projectfiles2, hookfiles)
+        project.files = itertools.chain(project.files, [projectconfigfile])
 
     return storeproject(
         project,
