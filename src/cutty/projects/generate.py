@@ -70,7 +70,7 @@ class ProjectGenerator:
     _config: Config
     renderer: Renderer
     _paths: Iterable[Path]
-    hooks: Iterable[Path]
+    _hooks: Iterable[Path]
 
     @classmethod
     def create(cls, template: Template) -> ProjectGenerator:
@@ -93,7 +93,7 @@ class ProjectGenerator:
             self.renderer,
             bindings,
         )
-        hookfiles = renderfiles(self.hooks, self.renderer, bindings)
+        hookfiles = renderfiles(self._hooks, self.renderer, bindings)
         return Project.create(projectfiles, hookfiles)
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
