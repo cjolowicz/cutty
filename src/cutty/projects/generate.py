@@ -14,6 +14,7 @@ from cutty.errors import CuttyError
 from cutty.filestorage.adapters.cookiecutter import createcookiecutterstorage
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.filestorage.domain.files import File
+from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
@@ -66,13 +67,42 @@ class ProjectGenerator:
 
     config: Config
     render: Renderer
+    paths: Iterable[Path]
+    hooks: Iterable[Path]
 
     @classmethod
     def create(cls, template: Template) -> ProjectGenerator:
         """Create a project generator."""
         config = loadcookiecutterconfig(template.metadata.location, template.root)
         render = createcookiecutterrenderer(template.root, config)
-        return cls(config, render)
+        paths = findcookiecutterpaths(template.root, config)
+        hooks = findcookiecutterhooks(template.root)
+        return cls(config, render, paths, hooks)
+
+    def generate(
+        self, bindings: Sequence[Binding], template: Template, createconfigfile: bool
+    ) -> Project:
+        """Generate a project using the given bindings."""
+        projectfiles = renderfiles(
+            self.paths,
+            self.render,
+            bindings,
+        )
+        hookfiles = renderfiles(self.hooks, self.render, bindings)
+        project = Project.create(projectfiles, hookfiles)
+
+        if createconfigfile:
+            projectconfig = ProjectConfig(
+                template.metadata.location,
+                bindings,
+                directory=template.metadata.directory,
+            )
+            projectconfigfile = createprojectconfigfile(
+                PurePath(project.name), projectconfig
+            )
+            project = project.add(projectconfigfile)
+
+        return project
 
 
 def generate(
@@ -94,25 +124,7 @@ def generate(
         bindings=extrabindings,
     )
 
-    projectfiles = renderfiles(
-        findcookiecutterpaths(template.root, generator.config),
-        generator.render,
-        bindings,
-    )
-    hookfiles = renderfiles(
-        findcookiecutterhooks(template.root), generator.render, bindings
-    )
-    project = Project.create(projectfiles, hookfiles)
-
-    if createconfigfile:
-        projectconfig = ProjectConfig(
-            template.metadata.location, bindings, directory=template.metadata.directory
-        )
-        projectconfigfile = createprojectconfigfile(
-            PurePath(project.name), projectconfig
-        )
-        project = project.add(projectconfigfile)
-
+    project = generator.generate(bindings, template, createconfigfile)
     return storeproject(
         project,
         outputdir,
