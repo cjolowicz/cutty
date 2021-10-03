@@ -86,7 +86,7 @@ class ProjectGenerator:
         """Return the template variables."""
         return self.config.variables
 
-    def generate(self, bindings: Sequence[Binding], createconfigfile: bool) -> Project:
+    def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
         projectfiles = renderfiles(
             self.paths,
@@ -128,7 +128,7 @@ def generate(
         bindings=extrabindings,
     )
 
-    project = generator.generate(bindings, createconfigfile)
+    project = generator.generate(bindings)
 
     if createconfigfile:
         project = generator.createconfig(project, bindings)
