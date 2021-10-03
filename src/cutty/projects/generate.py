@@ -76,10 +76,10 @@ class ProjectGenerator:
     def create(cls, template: Template) -> ProjectGenerator:
         """Create a project generator."""
         config = loadcookiecutterconfig(template.metadata.location, template.root)
-        render = createcookiecutterrenderer(template.root, config)
+        renderer = createcookiecutterrenderer(template.root, config)
         paths = findcookiecutterpaths(template.root, config)
         hooks = findcookiecutterhooks(template.root)
-        return cls(template, config, render, paths, hooks)
+        return cls(template, config, renderer, paths, hooks)
 
     @property
     def variables(self) -> Sequence[Variable]:
