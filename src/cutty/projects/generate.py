@@ -102,9 +102,8 @@ def generate(
         generator.render,
         bindings,
     )
-    hookfiles = renderfiles(
-        findcookiecutterhooks(template.root), generator.render, bindings
-    )
+    hookpaths = findcookiecutterhooks(template.root)
+    hookfiles = renderfiles(hookpaths, generator.render, bindings)
     project = Project.create(projectfiles, hookfiles)
 
     if createconfigfile:
