@@ -66,7 +66,7 @@ class Project:
 class ProjectGenerator:
     """A project generator."""
 
-    template: Template
+    _template: Template
     config: Config
     render: Renderer
     paths: Iterable[Path]
@@ -99,9 +99,9 @@ class ProjectGenerator:
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
         projectconfig = ProjectConfig(
-            self.template.metadata.location,
+            self._template.metadata.location,
             bindings,
-            directory=self.template.metadata.directory,
+            directory=self._template.metadata.directory,
         )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
