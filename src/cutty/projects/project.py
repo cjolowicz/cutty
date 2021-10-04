@@ -6,8 +6,6 @@ import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from lazysequence import lazysequence
-
 from cutty.errors import CuttyError
 from cutty.filestorage.domain.files import File
 
@@ -27,14 +25,14 @@ class Project:
     @classmethod
     def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
         """Create a project."""
-        fileseq = lazysequence(files)
+        files = iter(files)
 
         try:
-            first = fileseq[0]
-        except IndexError:
+            first = next(files)
+        except StopIteration:
             raise EmptyTemplateError()
 
-        files = fileseq.release()
+        files = itertools.chain([first], files)
         name = first.path.parts[0]
         return Project(name, files, hooks)
 
