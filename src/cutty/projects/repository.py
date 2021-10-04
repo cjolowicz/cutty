@@ -1,5 +1,4 @@
 """Project repositories."""
-from collections.abc import Callable
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -14,9 +13,6 @@ from cutty.util.git import Repository
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
-
-
-GenerateProject = Callable[[Path], None]
 
 
 class ProjectRepository:
