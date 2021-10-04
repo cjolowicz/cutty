@@ -38,7 +38,7 @@ class ProjectRepository:
         project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def link2(
+    def link(
         self,
         template: Template.Metadata,
     ) -> Iterator[Path]:

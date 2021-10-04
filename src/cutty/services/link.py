@@ -41,7 +41,7 @@ def link(
     template = Template.load(location, checkout, directory)
     repository = ProjectRepository(projectdir)
 
-    with repository.link2(template.metadata) as outputdir:
+    with repository.link(template.metadata) as outputdir:
         project = generate(
             template, extrabindings=extrabindings, interactive=interactive
         )

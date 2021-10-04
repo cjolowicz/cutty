@@ -22,7 +22,7 @@ def linkproject(
 ) -> None:
     """Link a project to a project template."""
     repository = ProjectRepository(project.path)
-    with repository.link2(template) as projectdir:
+    with repository.link(template) as projectdir:
         generateproject(projectdir)
 
 
