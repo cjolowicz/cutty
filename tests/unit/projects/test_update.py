@@ -24,7 +24,8 @@ def updateproject(
 ) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
-    project.update(generateproject, template)
+    with project.update2(template) as outputdir:
+        generateproject(outputdir)
 
 
 def continueupdate(projectdir: Path) -> None:

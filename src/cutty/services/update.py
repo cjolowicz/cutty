@@ -28,12 +28,10 @@ def update(
         directory = projectconfig.directory
 
     template = Template.load(projectconfig.template, checkout, directory)
+    repository = ProjectRepository(projectdir)
 
-    def generateproject(outputdir: Path) -> None:
+    with repository.update2(template.metadata) as outputdir:
         project = generate(
             template, extrabindings=extrabindings, interactive=interactive
         )
         storeproject(project, outputdir, outputdirisproject=True)
-
-    project = ProjectRepository(projectdir)
-    project.update(generateproject, template.metadata)

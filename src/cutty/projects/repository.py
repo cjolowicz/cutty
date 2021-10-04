@@ -75,13 +75,6 @@ class ProjectRepository:
 
         self.project.heads[LATEST_BRANCH] = update.commit
 
-    def update(
-        self, generateproject: GenerateProject, template: Template.Metadata
-    ) -> None:
-        """Update a project by applying changes between the generated trees."""
-        with self.update2(template) as projectdir:
-            generateproject(projectdir)
-
     @contextmanager
     def update2(self, template: Template.Metadata) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
