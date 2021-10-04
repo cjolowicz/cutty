@@ -43,6 +43,15 @@ class ProjectRepository:
         template: Template.Metadata,
     ) -> None:
         """Link a project to a project template."""
+        with self.link2(template) as projectdir:
+            generateproject(projectdir)
+
+    @contextmanager
+    def link2(
+        self,
+        template: Template.Metadata,
+    ) -> Iterator[Path]:
+        """Link a project to a project template."""
         if latest := self.project.heads.get(LATEST_BRANCH):
             update = self.project.heads.create(UPDATE_BRANCH, latest, force=True)
         else:
@@ -51,7 +60,7 @@ class ProjectRepository:
             update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
-            generateproject(worktree.path)
+            yield worktree.path
             message = (
                 _createcommitmessage(template)
                 if latest is None
