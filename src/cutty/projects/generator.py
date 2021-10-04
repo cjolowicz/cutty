@@ -26,7 +26,7 @@ from cutty.templates.domain.variables import Variable
 class ProjectGenerator:
     """A project generator."""
 
-    _template: Template
+    _template: Template.Metadata
     _config: Config
     renderer: Renderer
     _paths: Iterable[Path]
@@ -39,7 +39,7 @@ class ProjectGenerator:
         renderer = createcookiecutterrenderer(template.root, config)
         paths = findcookiecutterpaths(template.root, config)
         hooks = findcookiecutterhooks(template.root)
-        return cls(template, config, renderer, paths, hooks)
+        return cls(template.metadata, config, renderer, paths, hooks)
 
     @property
     def variables(self) -> Sequence[Variable]:
@@ -55,9 +55,7 @@ class ProjectGenerator:
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
         projectconfig = ProjectConfig(
-            self._template.metadata.location,
-            bindings,
-            directory=self._template.metadata.directory,
+            self._template.location, bindings, directory=self._template.directory
         )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
