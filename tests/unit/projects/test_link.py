@@ -22,7 +22,8 @@ def linkproject(
 ) -> None:
     """Link a project to a project template."""
     repository = ProjectRepository(project.path)
-    repository.link(generateproject, template)
+    with repository.link2(template) as projectdir:
+        generateproject(projectdir)
 
 
 @pytest.fixture

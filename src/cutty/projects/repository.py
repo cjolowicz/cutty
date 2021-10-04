@@ -37,15 +37,6 @@ class ProjectRepository:
         project.commit(message=_createcommitmessage(template))
         project.heads[LATEST_BRANCH] = project.head.commit
 
-    def link(
-        self,
-        generateproject: GenerateProject,
-        template: Template.Metadata,
-    ) -> None:
-        """Link a project to a project template."""
-        with self.link2(template) as projectdir:
-            generateproject(projectdir)
-
     @contextmanager
     def link2(
         self,
