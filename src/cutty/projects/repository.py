@@ -1,9 +1,11 @@
 """Project repositories."""
 from collections.abc import Callable
+from collections.abc import Iterator
 from pathlib import Path
 
 import pygit2
 
+from cutty.compat.contextlib import contextmanager
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
@@ -77,13 +79,19 @@ class ProjectRepository:
         self, generateproject: GenerateProject, template: Template.Metadata
     ) -> None:
         """Update a project by applying changes between the generated trees."""
+        with self.update2(template) as projectdir:
+            generateproject(projectdir)
+
+    @contextmanager
+    def update2(self, template: Template.Metadata) -> Iterator[Path]:
+        """Update a project by applying changes between the generated trees."""
         latestbranch = self.project.branch(LATEST_BRANCH)
         updatebranch = self.project.heads.create(
             UPDATE_BRANCH, latestbranch.commit, force=True
         )
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
-            generateproject(worktree.path)
+            yield worktree.path
             worktree.commit(message=_updatecommitmessage(template))
 
         self.project.cherrypick(updatebranch.commit)
