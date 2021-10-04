@@ -1,9 +1,10 @@
 """Project repositories."""
-from collections.abc import Callable
+from collections.abc import Iterator
 from pathlib import Path
 
 import pygit2
 
+from cutty.compat.contextlib import contextmanager
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
@@ -12,9 +13,6 @@ from cutty.util.git import Repository
 
 LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
-
-
-GenerateProject = Callable[[Path], None]
 
 
 class ProjectRepository:
@@ -35,11 +33,11 @@ class ProjectRepository:
         project.commit(message=_createcommitmessage(template))
         project.heads[LATEST_BRANCH] = project.head.commit
 
+    @contextmanager
     def link(
         self,
-        generateproject: GenerateProject,
         template: Template.Metadata,
-    ) -> None:
+    ) -> Iterator[Path]:
         """Link a project to a project template."""
         if latest := self.project.heads.get(LATEST_BRANCH):
             update = self.project.heads.create(UPDATE_BRANCH, latest, force=True)
@@ -49,7 +47,7 @@ class ProjectRepository:
             update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
-            generateproject(worktree.path)
+            yield worktree.path
             message = (
                 _createcommitmessage(template)
                 if latest is None
@@ -73,9 +71,8 @@ class ProjectRepository:
 
         self.project.heads[LATEST_BRANCH] = update.commit
 
-    def update(
-        self, generateproject: GenerateProject, template: Template.Metadata
-    ) -> None:
+    @contextmanager
+    def update(self, template: Template.Metadata) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         latestbranch = self.project.branch(LATEST_BRANCH)
         updatebranch = self.project.heads.create(
@@ -83,7 +80,7 @@ class ProjectRepository:
         )
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
-            generateproject(worktree.path)
+            yield worktree.path
             worktree.commit(message=_updatecommitmessage(template))
 
         self.project.cherrypick(updatebranch.commit)
