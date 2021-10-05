@@ -13,7 +13,7 @@ from cutty.templates.domain.bindings import Binding
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
-    "--no-input",
+    "--non-interactive",
     is_flag=True,
     default=False,
     help="Do not prompt for template variables.",
@@ -63,7 +63,7 @@ from cutty.templates.domain.bindings import Binding
 def create(
     template: str,
     extra_context: dict[str, str],
-    no_input: bool,
+    non_interactive: bool,
     revision: Optional[str],
     output_dir: Optional[pathlib.Path],
     directory: Optional[pathlib.Path],
@@ -84,7 +84,7 @@ def create(
         template,
         output_dir,
         extrabindings=extrabindings,
-        interactive=not no_input,
+        interactive=not non_interactive,
         revision=revision,
         directory=directory2,
         fileexists=fileexists,

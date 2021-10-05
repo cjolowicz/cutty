@@ -28,7 +28,7 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     """Fixture for a generated project."""
     project = Path("awesome")
 
-    runcutty("create", "--no-input", str(template), f"project={project.name}")
+    runcutty("create", "--non-interactive", str(template), f"project={project.name}")
 
     return project
 
@@ -146,12 +146,12 @@ def test_extra_context_new_variable(
     assert "stable" == projectvariable(project, "status")
 
 
-def test_no_input(runcutty: RunCutty, template: Path, project: Path) -> None:
+def test_non_interactive(runcutty: RunCutty, template: Path, project: Path) -> None:
     """It does not prompt for variables added after the last project generation."""
     updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
-        runcutty("update", "--no-input", input="3\n")
+        runcutty("update", "--non-interactive", input="3\n")
 
     assert "alpha" == projectvariable(project, "status")
 

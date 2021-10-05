@@ -12,7 +12,7 @@ from cutty.templates.domain.bindings import Binding
 
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
-    "--no-input",
+    "--non-interactive",
     is_flag=True,
     default=False,
     help="Do not prompt for template variables.",
@@ -61,7 +61,7 @@ from cutty.templates.domain.bindings import Binding
 )
 def update(
     extra_context: dict[str, str],
-    no_input: bool,
+    non_interactive: bool,
     cwd: Optional[pathlib.Path],
     revision: Optional[str],
     directory: Optional[pathlib.Path],
@@ -92,7 +92,7 @@ def update(
     service_update(
         cwd,
         extrabindings=extrabindings,
-        interactive=not no_input,
+        interactive=not non_interactive,
         revision=revision,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )

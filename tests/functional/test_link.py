@@ -53,9 +53,15 @@ def test_extra_context(runcutty: RunCutty, project: Path, template: Path) -> Non
     assert "excellent" == projectvariable(project, "project")
 
 
-def test_no_input(runcutty: RunCutty, project: Path, template: Path) -> None:
+def test_non_interactive(runcutty: RunCutty, project: Path, template: Path) -> None:
     """It does not prompt for variables."""
-    runcutty("link", f"--cwd={project}", "--no-input", str(template), input="ignored\n")
+    runcutty(
+        "link",
+        f"--cwd={project}",
+        "--non-interactive",
+        str(template),
+        input="ignored\n",
+    )
 
     assert "example" == projectvariable(project, "project")
 
