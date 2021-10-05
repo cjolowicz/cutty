@@ -19,8 +19,7 @@ from cutty.templates.domain.bindings import Binding
     help="Do not prompt for template variables.",
 )
 @click.option(
-    "-c",
-    "--checkout",
+    "--revision",
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
@@ -65,7 +64,7 @@ def create(
     template: str,
     extra_context: dict[str, str],
     no_input: bool,
-    checkout: Optional[str],
+    revision: Optional[str],
     output_dir: Optional[pathlib.Path],
     directory: Optional[pathlib.Path],
     overwrite_if_exists: bool,
@@ -86,7 +85,7 @@ def create(
         output_dir,
         extrabindings=extrabindings,
         interactive=not no_input,
-        checkout=checkout,
+        revision=revision,
         directory=directory2,
         fileexists=fileexists,
         in_place=in_place,

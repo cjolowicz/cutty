@@ -284,7 +284,7 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
     assert directory == str(config.directory)
 
 
-def test_checkout(
+def test_revision(
     runcutty: RunCutty, template: Path, templateproject: Path, project: Path
 ) -> None:
     """It uses the specified revision of the template."""
@@ -294,7 +294,7 @@ def test_checkout(
 
     updatefile(templateproject / "LICENSE", "b")
 
-    runcutty("update", f"--cwd={project}", f"--checkout={revision}")
+    runcutty("update", f"--cwd={project}", f"--revision={revision}")
 
     assert (project / "LICENSE").read_text() == "a"
 

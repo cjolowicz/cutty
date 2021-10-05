@@ -17,13 +17,13 @@ def createproject(
     *,
     extrabindings: Sequence[Binding],
     interactive: bool,
-    checkout: Optional[str],
+    revision: Optional[str],
     directory: Optional[pathlib.PurePosixPath],
     fileexists: FileExistsPolicy,
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load(location, checkout, directory)
+    template = Template.load(location, revision, directory)
 
     project = generate(template, extrabindings=extrabindings, interactive=interactive)
 

@@ -97,7 +97,7 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
 
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
-    runcutty("create", f"--checkout={revision}", str(template))
+    runcutty("create", f"--revision={revision}", str(template))
 
     repository = Repository.open(Path("example"))
 
