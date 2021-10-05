@@ -28,7 +28,7 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     """Fixture for a generated project."""
     project = Path("awesome")
 
-    runcutty("create", "--no-input", str(template), f"project={project.name}")
+    runcutty("create", "--non-interactive", str(template), f"project={project.name}")
 
     return project
 
