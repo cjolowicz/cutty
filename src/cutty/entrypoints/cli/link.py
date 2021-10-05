@@ -59,6 +59,6 @@ def link(
         cwd,
         extrabindings=extrabindings,
         interactive=not no_input,
-        checkout=revision,
+        revision=revision,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
