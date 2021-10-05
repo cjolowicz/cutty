@@ -27,8 +27,7 @@ from cutty.templates.domain.bindings import Binding
     help="Directory of the generated project.",
 )
 @click.option(
-    "-c",
-    "--checkout",
+    "--revision",
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
@@ -46,7 +45,7 @@ def link(
     extra_context: dict[str, str],
     no_input: bool,
     cwd: Optional[pathlib.Path],
-    checkout: Optional[str],
+    revision: Optional[str],
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
@@ -60,6 +59,6 @@ def link(
         cwd,
         extrabindings=extrabindings,
         interactive=not no_input,
-        checkout=checkout,
+        checkout=revision,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
     )
