@@ -71,13 +71,13 @@ def test_directory(runcutty: RunCutty, project: Path, template: Path) -> None:
     assert directory == str(config.directory)
 
 
-def test_checkout(runcutty: RunCutty, project: Path, template: Path) -> None:
+def test_revision(runcutty: RunCutty, project: Path, template: Path) -> None:
     """It uses the specified revision of the template."""
     initial = Repository.open(template).head.commit.id
 
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
-    runcutty("link", f"--cwd={project}", f"--checkout={initial}", str(template))
+    runcutty("link", f"--cwd={project}", f"--revision={initial}", str(template))
 
     latest = Repository.open(project).branch(LATEST_BRANCH)
     assert "LICENSE" not in latest.commit.tree
