@@ -34,7 +34,7 @@ class Template:
     def load(
         cls,
         template: str,
-        checkout: Optional[str],
+        revision: Optional[str],
         directory: Optional[pathlib.PurePosixPath],
     ) -> Template:
         """Load a project template."""
@@ -42,11 +42,11 @@ class Template:
         repositoryprovider = getdefaultrepositoryprovider(cachedir)
         repository = repositoryprovider(
             template,
-            revision=checkout,
+            revision=revision,
             directory=(PurePath(*directory.parts) if directory is not None else None),
         )
 
         metadata = cls.Metadata(
-            template, checkout, directory, repository.name, repository.revision
+            template, revision, directory, repository.name, repository.revision
         )
         return cls(metadata, repository.path)
