@@ -85,7 +85,7 @@ def create(
         output_dir,
         extrabindings=extrabindings,
         interactive=not no_input,
-        checkout=revision,
+        revision=revision,
         directory=directory2,
         fileexists=fileexists,
         in_place=in_place,
