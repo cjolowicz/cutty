@@ -69,7 +69,7 @@ def test_output_dir(runcutty: RunCutty, template: Path) -> None:
 
 def test_inplace(runcutty: RunCutty, template: Path) -> None:
     """It generates the project files in the current directory."""
-    runcutty("create", "--no-input", "--in-place", str(template))
+    runcutty("create", "--non-interactive", "--in-place", str(template))
 
     assert template_files(template) == project_files(".") - EXTRA
 
