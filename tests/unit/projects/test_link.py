@@ -90,14 +90,14 @@ def test_linkproject_latest_branch_commit_message(
 def test_linkproject_latest_branch_commit_message_update(
     project: Repository, template: Template.Metadata
 ) -> None:
-    """It uses a commit message indicating an update if the branch exists."""
+    """It uses a commit message indicating an initial import."""
     project.heads.create(LATEST_BRANCH)
 
     updatefile(project.path / "initial")
 
     linkproject(project, template)
 
-    assert "update" in project.heads[LATEST_BRANCH].message.lower()
+    assert "initial" in project.heads[LATEST_BRANCH].message.lower()
 
 
 def test_linkproject_update_branch(
