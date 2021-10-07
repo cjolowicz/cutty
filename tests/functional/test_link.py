@@ -100,7 +100,7 @@ def test_orphan_branch(runcutty: RunCutty, project: Path, template: Path) -> Non
 def test_update_branch_exists(
     runcutty: RunCutty, project: Path, template: Path
 ) -> None:
-    """It updates an existing update branch."""
+    """It does not crash if latest and update branches already exist."""
     repository = Repository.open(project)
     for branch in UPDATE_BRANCH, LATEST_BRANCH:
         repository.heads.create(branch)
