@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pygit2
 import pytest
 
 from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
@@ -361,3 +362,33 @@ def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
 
     with pytest.raises(RunCuttyError):
         runcutty("update", "--cwd=project")
+
+
+def undo(repository: Repository) -> None:
+    """Hard-reset to the parent of HEAD."""
+    [parent] = repository.head.commit.parents
+    repository._repository.reset(parent.id, pygit2.GIT_RESET_HARD)
+
+
+def test_reverted_update(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It does not skip changes when a previous update was reverted."""
+    # Update #1: Add file 'a'
+    updatefile(templateproject / "a")
+    runcutty("update", f"--cwd={project}")
+
+    # Update #2: Add file 'b'
+    updatefile(templateproject / "b")
+    runcutty("update", f"--cwd={project}")
+
+    # "Revert" project updates (hard reset).
+    repository = Repository.open(project)
+    undo(repository)
+    undo(repository)
+
+    # Update #3: Add files 'a' and 'b'
+    runcutty("update", f"--cwd={project}")
+
+    assert "a" in repository.head.commit.tree
+    assert "b" in repository.head.commit.tree
