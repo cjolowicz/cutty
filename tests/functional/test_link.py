@@ -116,19 +116,17 @@ def test_update_branch_exists(
 def test_latest_branch_exists(
     runcutty: RunCutty, project: Path, template: Path
 ) -> None:
-    """It fast-forwards an existing latest branch."""
+    """It resets an existing latest branch."""
     repository = Repository.open(project)
     _, latest = [
         repository.heads.create(branch) for branch in (UPDATE_BRANCH, LATEST_BRANCH)
     ]
-    expected = latest.commit
 
     updatefile(project / "marker")
 
     runcutty("link", f"--cwd={project}", str(template))
 
-    [actual] = latest.commit.parents
-    assert expected == actual
+    assert not latest.commit.parents
 
 
 def test_commit_message_template(
