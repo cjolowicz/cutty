@@ -1,4 +1,4 @@
-"""Unit tests for cutty.services.link."""
+"""Unit tests for cutty.projects.repository."""
 import dataclasses
 
 import pytest
