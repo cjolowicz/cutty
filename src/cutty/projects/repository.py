@@ -39,10 +39,10 @@ class ProjectRepository:
         template: Template.Metadata,
     ) -> Iterator[Path]:
         """Link a project to a project template."""
-        if latest := self.project.heads.get(LATEST_BRANCH):
-            for name in (LATEST_BRANCH, UPDATE_BRANCH):
-                self.project.heads.pop(name, None)
-            latest = None
+        for name in (LATEST_BRANCH, UPDATE_BRANCH):
+            self.project.heads.pop(name, None)
+
+        latest = None
 
         if not latest:
             # Unborn branches cannot have worktrees. Create an orphan branch with an
