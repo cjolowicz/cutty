@@ -40,8 +40,11 @@ class ProjectRepository:
     ) -> Iterator[Path]:
         """Link a project to a project template."""
         if latest := self.project.heads.get(LATEST_BRANCH):
-            update = self.project.heads.create(UPDATE_BRANCH, latest, force=True)
-        else:
+            for name in (LATEST_BRANCH, UPDATE_BRANCH):
+                self.project.heads.pop(name, None)
+            latest = None
+
+        if not latest:
             # Unborn branches cannot have worktrees. Create an orphan branch with an
             # empty placeholder commit instead. We'll squash it after project creation.
             update = _create_orphan_branch(self.project, UPDATE_BRANCH)
