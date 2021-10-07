@@ -39,25 +39,20 @@ class ProjectRepository:
         template: Template.Metadata,
     ) -> Iterator[Path]:
         """Link a project to a project template."""
-        if latest := self.project.heads.get(LATEST_BRANCH):
-            update = self.project.heads.create(UPDATE_BRANCH, latest, force=True)
-        else:
-            # Unborn branches cannot have worktrees. Create an orphan branch with an
-            # empty placeholder commit instead. We'll squash it after project creation.
-            update = _create_orphan_branch(self.project, UPDATE_BRANCH)
+        for name in (LATEST_BRANCH, UPDATE_BRANCH):
+            self.project.heads.pop(name, None)
+
+        # Unborn branches cannot have worktrees. Create an orphan branch with an
+        # empty placeholder commit instead. We'll squash it after project creation.
+        update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
             yield worktree.path
-            message = (
-                _createcommitmessage(template)
-                if latest is None
-                else _updatecommitmessage(template)
-            )
+            message = _createcommitmessage(template)
             worktree.commit(message=message)
 
-        if latest is None:
-            # Squash the empty initial commit.
-            _squash_branch(self.project, update)
+        # Squash the empty initial commit.
+        _squash_branch(self.project, update)
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (update.commit.tree / PROJECT_CONFIG_FILE).data
