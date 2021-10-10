@@ -22,7 +22,6 @@ class Template:
         """Metadata for a project template."""
 
         location: str
-        directory: Optional[pathlib.PurePosixPath]
         name: str
         revision: Optional[Revision]
         directory2: Optional[pathlib.Path]
@@ -47,10 +46,6 @@ class Template:
         )
 
         metadata = cls.Metadata(
-            template,
-            pathlib.PurePosixPath(directory) if directory is not None else None,
-            repository.name,
-            repository.revision,
-            directory,
+            template, repository.name, repository.revision, directory
         )
         return cls(metadata, repository.path)
