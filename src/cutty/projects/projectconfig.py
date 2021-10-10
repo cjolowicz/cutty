@@ -22,6 +22,7 @@ class ProjectConfig:
     bindings: Sequence[Binding]
     directory: Optional[pathlib.PurePosixPath] = None
     revision: Optional[str] = None
+    directory2: Optional[pathlib.Path] = None
 
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
