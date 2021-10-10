@@ -21,6 +21,7 @@ class ProjectConfig:
     template: str
     bindings: Sequence[Binding]
     directory: Optional[pathlib.PurePosixPath] = None
+    revision: Optional[str] = None
 
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
@@ -28,7 +29,11 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
     directory = str(config.directory) if config.directory is not None else None
     path = project / PROJECT_CONFIG_FILE
     data = {
-        "template": {"location": config.template, "directory": directory},
+        "template": {
+            "location": config.template,
+            "revision": config.revision,
+            "directory": directory,
+        },
         "bindings": {binding.name: binding.value for binding in config.bindings},
     }
     text = json.dumps(data, indent=2) + "\n"
@@ -54,7 +59,14 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
 
     if not (directory is None or isinstance(directory, str)):
         raise TypeError(
-            f"{path}: template directory must be 'str' or 'None', got {template!r}"
+            f"{path}: template directory must be 'str' or 'None', got {directory!r}"
+        )
+
+    revision = data["template"]["revision"]
+
+    if not (revision is None or isinstance(revision, str)):
+        raise TypeError(
+            f"{path}: template revision must be 'str' or 'None', got {revision!r}"
         )
 
     bindings = [Binding(key, value) for key, value in data["bindings"].items()]
@@ -63,6 +75,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
         template,
         bindings,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        revision=revision,
     )
 
 

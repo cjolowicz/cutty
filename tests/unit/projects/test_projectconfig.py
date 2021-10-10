@@ -2,6 +2,7 @@
 import dataclasses
 import json
 import pathlib
+from typing import Any
 
 import pytest
 
@@ -20,9 +21,11 @@ from cutty.templates.domain.bindings import Binding
 def projectconfig() -> ProjectConfig:
     """Fixture for a project configuration."""
     template = "https://example.com/repository.git"
+    revision = "cac8df79d0680240f6d7d11c027548d5582ea308"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
+    directory = pathlib.PurePosixPath("a")
 
-    return ProjectConfig(template, bindings, directory=pathlib.PurePosixPath("a"))
+    return ProjectConfig(template, bindings, directory=directory, revision=revision)
 
 
 @pytest.fixture
@@ -44,7 +47,7 @@ def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> No
 def test_readprojectconfigfile_typeerror(
     storage: DiskFileStorage, projectconfig: ProjectConfig
 ) -> None:
-    """It checks that the template location is a string."""
+    """It checks that the payload is a JSON object."""
     file = createprojectconfigfile(PurePath(), projectconfig)
     file = dataclasses.replace(file, blob=json.dumps("teapot").encode())
 
@@ -55,33 +58,23 @@ def test_readprojectconfigfile_typeerror(
         readprojectconfigfile(storage.root)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("location", None),
+        ("directory", 42),
+        ("revision", 42),
+    ],
+)
 def test_readprojectconfigfile_template_typeerror(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
+    storage: DiskFileStorage, projectconfig: ProjectConfig, field: str, value: Any
 ) -> None:
     """It checks that the template location is a string."""
     file = createprojectconfigfile(PurePath(), projectconfig)
 
     # Replace the template location with `None` in the JSON record.
     data = json.loads(file.blob.decode())
-    data["template"]["location"] = None
-    file = dataclasses.replace(file, blob=json.dumps(data).encode())
-
-    with storage:
-        storage.add(file)
-
-    with pytest.raises(TypeError):
-        readprojectconfigfile(storage.root)
-
-
-def test_readprojectconfigfile_directory_typeerror(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
-) -> None:
-    """It checks that the template directory is a string or None."""
-    file = createprojectconfigfile(PurePath(), projectconfig)
-
-    # Replace the template location with 42 in the JSON record.
-    data = json.loads(file.blob.decode())
-    data["template"]["directory"] = 42
+    data["template"][field] = value
     file = dataclasses.replace(file, blob=json.dumps(data).encode())
 
     with storage:
@@ -128,7 +121,7 @@ def test_readcookiecutterjson(
 ) -> None:
     """It loads a project configuration from a .cookiecutter.json file."""
     # The .cookiecutter.json format does not include the template directory.
-    projectconfig = dataclasses.replace(projectconfig, directory=None)
+    projectconfig = dataclasses.replace(projectconfig, directory=None, revision=None)
 
     file = createlegacyprojectconfigfile(PurePath(), projectconfig)
 
