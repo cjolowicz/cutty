@@ -29,7 +29,11 @@ def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> Regular
     directory = str(config.directory) if config.directory is not None else None
     path = project / PROJECT_CONFIG_FILE
     data = {
-        "template": {"location": config.template, "directory": directory},
+        "template": {
+            "location": config.template,
+            "revision": config.revision,
+            "directory": directory,
+        },
         "bindings": {binding.name: binding.value for binding in config.bindings},
     }
     text = json.dumps(data, indent=2) + "\n"
