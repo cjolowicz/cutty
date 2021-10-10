@@ -93,6 +93,24 @@ def test_readprojectconfigfile_directory_typeerror(
         readprojectconfigfile(storage.root)
 
 
+def test_readprojectconfigfile_revision_typeerror(
+    storage: DiskFileStorage, projectconfig: ProjectConfig
+) -> None:
+    """It checks that the template revision is a string or None."""
+    file = createprojectconfigfile(PurePath(), projectconfig)
+
+    # Replace the template location with 42 in the JSON record.
+    data = json.loads(file.blob.decode())
+    data["template"]["revision"] = 42
+    file = dataclasses.replace(file, blob=json.dumps(data).encode())
+
+    with storage:
+        storage.add(file)
+
+    with pytest.raises(TypeError):
+        readprojectconfigfile(storage.root)
+
+
 def test_createprojectconfigfile_format(
     storage: DiskFileStorage, projectconfig: ProjectConfig
 ) -> None:
