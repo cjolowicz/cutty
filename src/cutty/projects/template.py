@@ -22,7 +22,7 @@ class Template:
         """Metadata for a project template."""
 
         location: str
-        directory2: Optional[pathlib.Path]
+        directory: Optional[pathlib.Path]
         name: str
         revision: Optional[Revision]
 
