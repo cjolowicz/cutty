@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import PurePosixPath
 
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
@@ -54,8 +55,13 @@ class ProjectGenerator:
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
+        directory = (
+            PurePosixPath(self._template.directory2)
+            if self._template.directory2 is not None
+            else None
+        )
         projectconfig = ProjectConfig(
-            self._template.location, bindings, directory=self._template.directory
+            self._template.location, bindings, directory=directory
         )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
