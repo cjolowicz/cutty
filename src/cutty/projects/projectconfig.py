@@ -55,7 +55,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
 
     if not (directory is None or isinstance(directory, str)):
         raise TypeError(
-            f"{path}: template directory must be 'str' or 'None', got {template!r}"
+            f"{path}: template directory must be 'str' or 'None', got {directory!r}"
         )
 
     revision = data["template"]["revision"]
