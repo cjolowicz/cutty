@@ -16,6 +16,9 @@ import pygit2.repository
 from cutty.compat.contextlib import contextmanager
 
 
+DIGEST_SIZE = 32
+
+
 class Heads(MutableMapping[str, pygit2.Commit]):
     """Heads in a git repository."""
 
@@ -220,7 +223,7 @@ class Repository:
         """Create a worktree for the branch in the repository."""
 
         def _hash(name: str) -> str:
-            return hashlib.blake2b(name.encode(), digest_size=32).hexdigest()
+            return hashlib.blake2b(name.encode(), digest_size=DIGEST_SIZE).hexdigest()
 
         worktree = None
 
