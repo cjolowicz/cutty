@@ -17,7 +17,7 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
-def link2(
+def link(
     location: Optional[str],
     projectdir: pathlib.Path,
     /,
