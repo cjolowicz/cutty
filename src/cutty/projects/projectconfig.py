@@ -77,6 +77,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
         bindings,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         revision=revision,
+        directory2=pathlib.Path(directory) if directory is not None else None,
     )
 
 
