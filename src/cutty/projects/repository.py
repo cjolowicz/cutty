@@ -5,8 +5,8 @@ from pathlib import Path
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
+from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Branch
 from cutty.util.git import Repository
 

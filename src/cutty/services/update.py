@@ -5,10 +5,10 @@ from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.projects.generate import generate
+from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
 

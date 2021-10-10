@@ -6,7 +6,7 @@ from typing import Any
 import pygit2
 import pytest
 
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
+from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError

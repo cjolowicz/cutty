@@ -8,12 +8,12 @@ from dataclasses import dataclass
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.project import Project
+from cutty.projects.projectconfig import createprojectconfigfile
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.template import Template
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
-from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
-from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
