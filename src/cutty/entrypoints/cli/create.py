@@ -6,7 +6,7 @@ import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
-from cutty.services.create import createproject2
+from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 
 
@@ -78,7 +78,7 @@ def create(
         output_dir = pathlib.Path.cwd()
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    createproject2(
+    createproject(
         template,
         output_dir,
         extrabindings=extrabindings,
