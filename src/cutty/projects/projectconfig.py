@@ -20,7 +20,7 @@ class ProjectConfig:
 
     template: str
     bindings: Sequence[Binding]
-    revision: Optional[str] = None
+    revision: Optional[str]
     directory: Optional[pathlib.Path] = None
 
 
@@ -88,4 +88,4 @@ def readcookiecutterjson(project: pathlib.Path) -> ProjectConfig:
     template = data.pop("_template")
     bindings = [Binding(name, value) for name, value in data.items()]
 
-    return ProjectConfig(template, bindings)
+    return ProjectConfig(template, bindings, revision=None)
