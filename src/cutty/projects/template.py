@@ -37,6 +37,20 @@ class Template:
         directory: Optional[pathlib.PurePosixPath],
     ) -> Template:
         """Load a project template."""
+        return cls.load2(
+            template,
+            revision,
+            pathlib.Path(directory) if directory is not None else None,
+        )
+
+    @classmethod
+    def load2(
+        cls,
+        template: str,
+        revision: Optional[str],
+        directory: Optional[pathlib.Path],
+    ) -> Template:
+        """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         repositoryprovider = getdefaultrepositoryprovider(cachedir)
         repository = repositoryprovider(
@@ -46,6 +60,9 @@ class Template:
         )
 
         metadata = cls.Metadata(
-            template, directory, repository.name, repository.revision
+            template,
+            pathlib.PurePosixPath(directory) if directory is not None else None,
+            repository.name,
+            repository.revision,
         )
         return cls(metadata, repository.path)
