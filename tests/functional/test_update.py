@@ -282,7 +282,7 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
     runcutty("update", f"--cwd={project}", f"--directory={directory}")
 
     config = readprojectconfigfile(project)
-    assert directory == str(config.directory2)
+    assert directory == str(config.directory)
 
 
 def test_revision(

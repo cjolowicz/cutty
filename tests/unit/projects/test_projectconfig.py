@@ -23,13 +23,13 @@ def projectconfig() -> ProjectConfig:
     template = "https://example.com/repository.git"
     revision = "cac8df79d0680240f6d7d11c027548d5582ea308"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
-    directory2 = pathlib.Path("a")
+    directory = pathlib.Path("a")
 
     return ProjectConfig(
         template,
         bindings,
         revision=revision,
-        directory2=directory2,
+        directory=directory,
     )
 
 
@@ -126,7 +126,7 @@ def test_readcookiecutterjson(
 ) -> None:
     """It loads a project configuration from a .cookiecutter.json file."""
     # The .cookiecutter.json format does not include the template directory.
-    projectconfig = dataclasses.replace(projectconfig, revision=None, directory2=None)
+    projectconfig = dataclasses.replace(projectconfig, revision=None, directory=None)
 
     file = createlegacyprojectconfigfile(PurePath(), projectconfig)
 

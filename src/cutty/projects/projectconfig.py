@@ -21,12 +21,12 @@ class ProjectConfig:
     template: str
     bindings: Sequence[Binding]
     revision: Optional[str] = None
-    directory2: Optional[pathlib.Path] = None
+    directory: Optional[pathlib.Path] = None
 
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
-    directory = str(config.directory2) if config.directory2 is not None else None
+    directory = str(config.directory) if config.directory is not None else None
     path = project / PROJECT_CONFIG_FILE
     data = {
         "template": {
@@ -75,7 +75,7 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
         template,
         bindings,
         revision=revision,
-        directory2=pathlib.Path(directory) if directory is not None else None,
+        directory=pathlib.Path(directory) if directory is not None else None,
     )
 
 
