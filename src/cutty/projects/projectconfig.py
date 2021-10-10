@@ -27,7 +27,7 @@ class ProjectConfig:
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
     """Create a JSON file with the settings and bindings for a project."""
-    directory = str(config.directory) if config.directory is not None else None
+    directory = str(config.directory2) if config.directory2 is not None else None
     path = project / PROJECT_CONFIG_FILE
     data = {
         "template": {
