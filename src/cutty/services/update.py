@@ -24,11 +24,7 @@ def update(
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
     if directory is None:
-        directory = (
-            Path(projectconfig.directory)
-            if projectconfig.directory is not None
-            else None
-        )
+        directory = projectconfig.directory2
 
     template = Template.load(projectconfig.template, revision, directory)
     repository = ProjectRepository(projectdir)

@@ -74,7 +74,7 @@ def test_directory(runcutty: RunCutty, project: Path, template: Path) -> None:
     runcutty("link", f"--cwd={project}", f"--directory={directory}", str(template))
 
     config = readprojectconfigfile(project)
-    assert directory == str(config.directory)
+    assert directory == str(config.directory2)
 
 
 def test_revision(runcutty: RunCutty, project: Path, template: Path) -> None:
