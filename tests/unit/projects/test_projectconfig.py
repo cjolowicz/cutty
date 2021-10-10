@@ -21,8 +21,9 @@ def projectconfig() -> ProjectConfig:
     """Fixture for a project configuration."""
     template = "https://example.com/repository.git"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
+    directory = pathlib.PurePosixPath("a")
 
-    return ProjectConfig(template, bindings, directory=pathlib.PurePosixPath("a"))
+    return ProjectConfig(template, bindings, directory=directory)
 
 
 @pytest.fixture
