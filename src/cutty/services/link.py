@@ -17,27 +17,6 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
-def link(
-    location: Optional[str],
-    projectdir: pathlib.Path,
-    /,
-    *,
-    extrabindings: Sequence[Binding],
-    interactive: bool,
-    revision: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
-) -> None:
-    """Link project to a Cookiecutter template."""
-    link2(
-        location,
-        projectdir,
-        extrabindings=extrabindings,
-        interactive=interactive,
-        revision=revision,
-        directory=pathlib.Path(directory) if directory is not None else None,
-    )
-
-
 def link2(
     location: Optional[str],
     projectdir: pathlib.Path,

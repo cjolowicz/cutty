@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
-from cutty.services.link import link as service_link
+from cutty.services.link import link2 as service_link
 from cutty.templates.domain.bindings import Binding
 
 
@@ -60,5 +60,5 @@ def link(
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        directory=directory,
     )
