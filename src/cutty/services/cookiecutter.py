@@ -21,7 +21,33 @@ def createproject(
     fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load(location, checkout, directory)
+    createproject2(
+        location,
+        outputdir,
+        extrabindings=extrabindings,
+        interactive=interactive,
+        checkout=checkout,
+        directory=pathlib.Path(directory) if directory is not None else None,
+        fileexists=fileexists,
+    )
+
+
+def createproject2(
+    location: str,
+    outputdir: pathlib.Path,
+    *,
+    extrabindings: Sequence[Binding],
+    interactive: bool,
+    checkout: Optional[str],
+    directory: Optional[pathlib.Path],
+    fileexists: FileExistsPolicy,
+) -> None:
+    """Generate projects from Cookiecutter templates."""
+    template = Template.load(
+        location,
+        checkout,
+        pathlib.PurePosixPath(directory) if directory is not None else None,
+    )
 
     project = generate(
         template,
