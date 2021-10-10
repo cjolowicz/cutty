@@ -44,7 +44,7 @@ def test_roundtrip(storage: DiskFileStorage, projectconfig: ProjectConfig) -> No
 def test_readprojectconfigfile_typeerror(
     storage: DiskFileStorage, projectconfig: ProjectConfig
 ) -> None:
-    """It checks that the template location is a string."""
+    """It checks that the payload is a JSON object."""
     file = createprojectconfigfile(PurePath(), projectconfig)
     file = dataclasses.replace(file, blob=json.dumps("teapot").encode())
 
