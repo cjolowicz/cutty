@@ -130,7 +130,7 @@ def test_readcookiecutterjson(
 ) -> None:
     """It loads a project configuration from a .cookiecutter.json file."""
     # The .cookiecutter.json format does not include the template directory.
-    projectconfig = dataclasses.replace(projectconfig, directory=None)
+    projectconfig = dataclasses.replace(projectconfig, directory=None, revision=None)
 
     file = createlegacyprojectconfigfile(PurePath(), projectconfig)
 
