@@ -38,11 +38,8 @@ def link(
     if location is None:
         raise TemplateNotSpecifiedError()
 
-    template = Template.load(
-        location,
-        revision,
-        pathlib.PurePosixPath(directory) if directory is not None else None,
-    )
+    template = Template.load2(location, revision, directory)
+
     repository = ProjectRepository(projectdir)
 
     with repository.link(template.metadata) as outputdir:

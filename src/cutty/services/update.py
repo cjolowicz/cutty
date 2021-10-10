@@ -1,7 +1,6 @@
 """Update a project with changes from its Cookiecutter template."""
 from collections.abc import Sequence
 from pathlib import Path
-from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.projects.generate import generate
@@ -24,11 +23,14 @@ def update(
     projectconfig = readprojectconfigfile(projectdir)
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
-    directory2 = PurePosixPath(directory) if directory is not None else None
     if directory is None:
-        directory2 = projectconfig.directory
+        directory = (
+            Path(projectconfig.directory)
+            if projectconfig.directory is not None
+            else None
+        )
 
-    template = Template.load(projectconfig.template, revision, directory2)
+    template = Template.load2(projectconfig.template, revision, directory)
     repository = ProjectRepository(projectdir)
 
     with repository.update(template.metadata) as outputdir:

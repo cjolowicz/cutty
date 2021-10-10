@@ -23,11 +23,7 @@ def createproject(
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load(
-        location,
-        revision,
-        pathlib.PurePosixPath(directory) if directory is not None else None,
-    )
+    template = Template.load2(location, revision, directory)
 
     project = generate(template, extrabindings=extrabindings, interactive=interactive)
 

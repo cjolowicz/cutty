@@ -30,20 +30,6 @@ class Template:
     root: Path
 
     @classmethod
-    def load(
-        cls,
-        template: str,
-        revision: Optional[str],
-        directory: Optional[pathlib.PurePosixPath],
-    ) -> Template:
-        """Load a project template."""
-        return cls.load2(
-            template,
-            revision,
-            pathlib.Path(directory) if directory is not None else None,
-        )
-
-    @classmethod
     def load2(
         cls,
         template: str,
