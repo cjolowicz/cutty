@@ -21,13 +21,32 @@ def update(
     directory: Optional[PurePosixPath],
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
+    update2(
+        projectdir,
+        extrabindings=extrabindings,
+        interactive=interactive,
+        revision=revision,
+        directory=Path(directory) if directory is not None else None,
+    )
+
+
+def update2(
+    projectdir: Path,
+    *,
+    extrabindings: Sequence[Binding],
+    interactive: bool,
+    revision: Optional[str],
+    directory: Optional[Path],
+) -> None:
+    """Update a project with changes from its Cookiecutter template."""
     projectconfig = readprojectconfigfile(projectdir)
     extrabindings = list(projectconfig.bindings) + list(extrabindings)
 
+    directory2 = PurePosixPath(directory) if directory is not None else None
     if directory is None:
-        directory = projectconfig.directory
+        directory2 = projectconfig.directory
 
-    template = Template.load(projectconfig.template, revision, directory)
+    template = Template.load(projectconfig.template, revision, directory2)
     repository = ProjectRepository(projectdir)
 
     with repository.update(template.metadata) as outputdir:
