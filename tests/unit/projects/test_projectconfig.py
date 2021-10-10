@@ -25,12 +25,7 @@ def projectconfig() -> ProjectConfig:
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
     directory = pathlib.Path("a")
 
-    return ProjectConfig(
-        template,
-        bindings,
-        revision=revision,
-        directory=directory,
-    )
+    return ProjectConfig(template, bindings, revision=revision, directory=directory)
 
 
 @pytest.fixture
