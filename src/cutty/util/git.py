@@ -244,9 +244,7 @@ class Repository:
                 yield repository
         finally:
             if worktree is not None:
-                # Prune with `force=True` to work around libgit2 issue.
-                # https://github.com/libgit2/libgit2/issues/5280
-                worktree.prune(True)
+                worktree.prune()
 
     def _checkoutemptytree(self) -> None:
         """Check out an empty tree from the repository."""
