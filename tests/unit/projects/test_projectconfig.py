@@ -1,4 +1,4 @@
-"""Unit tests for cutty.templates.adapters.cookiecutter.projectconfig."""
+"""Unit tests for cutty.projects.projectconfig."""
 import dataclasses
 import json
 import pathlib
@@ -8,11 +8,11 @@ import pytest
 from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.templates.adapters.cookiecutter.projectconfig import COOKIECUTTER_JSON_FILE
-from cutty.templates.adapters.cookiecutter.projectconfig import createprojectconfigfile
-from cutty.templates.adapters.cookiecutter.projectconfig import ProjectConfig
-from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
-from cutty.templates.adapters.cookiecutter.projectconfig import readprojectconfigfile
+from cutty.projects.projectconfig import COOKIECUTTER_JSON_FILE
+from cutty.projects.projectconfig import createprojectconfigfile
+from cutty.projects.projectconfig import ProjectConfig
+from cutty.projects.projectconfig import readcookiecutterjson
+from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.templates.domain.bindings import Binding
 
 

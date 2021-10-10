@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cutty.templates.adapters.cookiecutter.projectconfig import PROJECT_CONFIG_FILE
+from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError

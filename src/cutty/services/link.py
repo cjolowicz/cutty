@@ -6,10 +6,10 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
+from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.projectconfig import readcookiecutterjson
 from cutty.templates.domain.bindings import Binding
 
 

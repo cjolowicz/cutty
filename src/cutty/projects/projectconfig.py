@@ -1,4 +1,4 @@
-"""Configuration for projects generated from Cookiecutter templates."""
+"""Configuration for projects generated from templates."""
 import json
 import pathlib
 from dataclasses import dataclass
