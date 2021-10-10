@@ -6,7 +6,7 @@ import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.projects.repository import ProjectRepository
-from cutty.services.update import update as service_update
+from cutty.services.update import update2 as service_update
 from cutty.templates.domain.bindings import Binding
 
 
@@ -94,5 +94,5 @@ def update(
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        directory=directory,
     )

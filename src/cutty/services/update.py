@@ -12,24 +12,6 @@ from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
-def update(
-    projectdir: Path,
-    *,
-    extrabindings: Sequence[Binding],
-    interactive: bool,
-    revision: Optional[str],
-    directory: Optional[PurePosixPath],
-) -> None:
-    """Update a project with changes from its Cookiecutter template."""
-    update2(
-        projectdir,
-        extrabindings=extrabindings,
-        interactive=interactive,
-        revision=revision,
-        directory=Path(directory) if directory is not None else None,
-    )
-
-
 def update2(
     projectdir: Path,
     *,
