@@ -18,7 +18,7 @@ def createproject(
     extrabindings: Sequence[Binding],
     interactive: bool,
     revision: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
+    directory: Optional[pathlib.Path],
     fileexists: FileExistsPolicy,
     in_place: bool,
 ) -> None:

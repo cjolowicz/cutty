@@ -17,7 +17,7 @@ def createproject(
     extrabindings: Sequence[Binding],
     interactive: bool,
     checkout: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
+    directory: Optional[pathlib.Path],
     fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""

@@ -25,7 +25,7 @@ def link(
     extrabindings: Sequence[Binding],
     interactive: bool,
     revision: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
+    directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
     with contextlib.suppress(FileNotFoundError):
@@ -39,6 +39,7 @@ def link(
         raise TemplateNotSpecifiedError()
 
     template = Template.load(location, revision, directory)
+
     repository = ProjectRepository(projectdir)
 
     with repository.link(template.metadata) as outputdir:

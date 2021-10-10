@@ -22,7 +22,7 @@ class Template:
         """Metadata for a project template."""
 
         location: str
-        directory: Optional[pathlib.PurePosixPath]
+        directory: Optional[pathlib.Path]
         name: str
         revision: Optional[Revision]
 
@@ -34,7 +34,7 @@ class Template:
         cls,
         template: str,
         revision: Optional[str],
-        directory: Optional[pathlib.PurePosixPath],
+        directory: Optional[pathlib.Path],
     ) -> Template:
         """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))

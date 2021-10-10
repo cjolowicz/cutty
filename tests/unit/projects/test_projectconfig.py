@@ -23,9 +23,9 @@ def projectconfig() -> ProjectConfig:
     template = "https://example.com/repository.git"
     revision = "cac8df79d0680240f6d7d11c027548d5582ea308"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
-    directory = pathlib.PurePosixPath("a")
+    directory = pathlib.Path("a")
 
-    return ProjectConfig(template, bindings, directory=directory, revision=revision)
+    return ProjectConfig(template, bindings, revision=revision, directory=directory)
 
 
 @pytest.fixture
@@ -121,7 +121,7 @@ def test_readcookiecutterjson(
 ) -> None:
     """It loads a project configuration from a .cookiecutter.json file."""
     # The .cookiecutter.json format does not include the template directory.
-    projectconfig = dataclasses.replace(projectconfig, directory=None, revision=None)
+    projectconfig = dataclasses.replace(projectconfig, revision=None, directory=None)
 
     file = createlegacyprojectconfigfile(PurePath(), projectconfig)
 

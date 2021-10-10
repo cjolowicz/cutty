@@ -20,8 +20,8 @@ class ProjectConfig:
 
     template: str
     bindings: Sequence[Binding]
-    directory: Optional[pathlib.PurePosixPath] = None
     revision: Optional[str] = None
+    directory: Optional[pathlib.Path] = None
 
 
 def createprojectconfigfile(project: PurePath, config: ProjectConfig) -> RegularFile:
@@ -74,8 +74,8 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
     return ProjectConfig(
         template,
         bindings,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
         revision=revision,
+        directory=pathlib.Path(directory) if directory is not None else None,
     )
 
 

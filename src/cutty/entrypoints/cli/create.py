@@ -77,8 +77,6 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()
 
-    directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
-
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     createproject(
         template,
@@ -86,7 +84,7 @@ def create(
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=directory2,
+        directory=directory,
         fileexists=fileexists,
         in_place=in_place,
     )

@@ -1,7 +1,6 @@
 """Update a project with changes from its Cookiecutter template."""
 from collections.abc import Sequence
 from pathlib import Path
-from pathlib import PurePosixPath
 from typing import Optional
 
 from cutty.projects.generate import generate
@@ -18,7 +17,7 @@ def update(
     extrabindings: Sequence[Binding],
     interactive: bool,
     revision: Optional[str],
-    directory: Optional[PurePosixPath],
+    directory: Optional[Path],
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectconfig = readprojectconfigfile(projectdir)

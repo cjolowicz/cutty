@@ -94,5 +94,5 @@ def update(
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        directory=directory,
     )
