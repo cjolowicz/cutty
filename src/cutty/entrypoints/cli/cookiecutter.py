@@ -1,13 +1,12 @@
 """Command-line interface for creating projects from Cookiecutter templates."""
 from collections.abc import Iterator
 from pathlib import Path
-from pathlib import PurePosixPath
 from typing import Optional
 
 import click
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.services.cookiecutter import createproject
+from cutty.services.cookiecutter import createproject2
 from cutty.templates.domain.bindings import Binding
 
 
@@ -103,15 +102,14 @@ def cookiecutter(
     if output_dir is None:
         output_dir = Path.cwd()
 
-    directory2 = PurePosixPath(directory) if directory is not None else None
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
-    createproject(
+    createproject2(
         location,
         output_dir,
         extrabindings=extrabindings,
         interactive=not no_input,
         checkout=checkout,
-        directory=directory2,
+        directory=directory,
         fileexists=fileexists,
     )

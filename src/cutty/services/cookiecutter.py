@@ -10,28 +10,6 @@ from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
-def createproject(
-    location: str,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    interactive: bool,
-    checkout: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
-    fileexists: FileExistsPolicy,
-) -> None:
-    """Generate projects from Cookiecutter templates."""
-    createproject2(
-        location,
-        outputdir,
-        extrabindings=extrabindings,
-        interactive=interactive,
-        checkout=checkout,
-        directory=pathlib.Path(directory) if directory is not None else None,
-        fileexists=fileexists,
-    )
-
-
 def createproject2(
     location: str,
     outputdir: pathlib.Path,
