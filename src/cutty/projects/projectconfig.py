@@ -58,12 +58,20 @@ def readprojectconfigfile(project: pathlib.Path) -> ProjectConfig:
             f"{path}: template directory must be 'str' or 'None', got {template!r}"
         )
 
+    revision = data["template"]["revision"]
+
+    if not (revision is None or isinstance(revision, str)):
+        raise TypeError(
+            f"{path}: template revision must be 'str' or 'None', got {revision!r}"
+        )
+
     bindings = [Binding(key, value) for key, value in data["bindings"].items()]
 
     return ProjectConfig(
         template,
         bindings,
         directory=pathlib.PurePosixPath(directory) if directory is not None else None,
+        revision=revision,
     )
 
 
