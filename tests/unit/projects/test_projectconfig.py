@@ -2,6 +2,7 @@
 import dataclasses
 import json
 import pathlib
+from typing import Any
 
 import pytest
 
@@ -57,51 +58,23 @@ def test_readprojectconfigfile_typeerror(
         readprojectconfigfile(storage.root)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("location", None),
+        ("directory", 42),
+        ("revision", 42),
+    ],
+)
 def test_readprojectconfigfile_template_typeerror(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
+    storage: DiskFileStorage, projectconfig: ProjectConfig, field: str, value: Any
 ) -> None:
     """It checks that the template location is a string."""
     file = createprojectconfigfile(PurePath(), projectconfig)
 
     # Replace the template location with `None` in the JSON record.
     data = json.loads(file.blob.decode())
-    data["template"]["location"] = None
-    file = dataclasses.replace(file, blob=json.dumps(data).encode())
-
-    with storage:
-        storage.add(file)
-
-    with pytest.raises(TypeError):
-        readprojectconfigfile(storage.root)
-
-
-def test_readprojectconfigfile_directory_typeerror(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
-) -> None:
-    """It checks that the template directory is a string or None."""
-    file = createprojectconfigfile(PurePath(), projectconfig)
-
-    # Replace the template location with 42 in the JSON record.
-    data = json.loads(file.blob.decode())
-    data["template"]["directory"] = 42
-    file = dataclasses.replace(file, blob=json.dumps(data).encode())
-
-    with storage:
-        storage.add(file)
-
-    with pytest.raises(TypeError):
-        readprojectconfigfile(storage.root)
-
-
-def test_readprojectconfigfile_revision_typeerror(
-    storage: DiskFileStorage, projectconfig: ProjectConfig
-) -> None:
-    """It checks that the template revision is a string or None."""
-    file = createprojectconfigfile(PurePath(), projectconfig)
-
-    # Replace the template location with 42 in the JSON record.
-    data = json.loads(file.blob.decode())
-    data["template"]["revision"] = 42
+    data["template"][field] = value
     file = dataclasses.replace(file, blob=json.dumps(data).encode())
 
     with storage:
