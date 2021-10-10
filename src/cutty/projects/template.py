@@ -22,9 +22,9 @@ class Template:
         """Metadata for a project template."""
 
         location: str
+        directory2: Optional[pathlib.Path]
         name: str
         revision: Optional[Revision]
-        directory2: Optional[pathlib.Path]
 
     metadata: Metadata
     root: Path
@@ -46,6 +46,6 @@ class Template:
         )
 
         metadata = cls.Metadata(
-            template, repository.name, repository.revision, directory
+            template, directory, repository.name, repository.revision
         )
         return cls(metadata, repository.path)
