@@ -6,7 +6,7 @@ import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
-from cutty.services.create import createproject
+from cutty.services.create import createproject2
 from cutty.templates.domain.bindings import Binding
 
 
@@ -77,16 +77,14 @@ def create(
     if output_dir is None:
         output_dir = pathlib.Path.cwd()
 
-    directory2 = pathlib.PurePosixPath(directory) if directory is not None else None
-
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    createproject(
+    createproject2(
         template,
         output_dir,
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=directory2,
+        directory=directory,
         fileexists=fileexists,
         in_place=in_place,
     )

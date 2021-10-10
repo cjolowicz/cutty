@@ -39,27 +39,3 @@ def createproject2(
     )
 
     ProjectRepository.create(projectdir, template.metadata)
-
-
-def createproject(
-    location: str,
-    outputdir: pathlib.Path,
-    *,
-    extrabindings: Sequence[Binding],
-    interactive: bool,
-    revision: Optional[str],
-    directory: Optional[pathlib.PurePosixPath],
-    fileexists: FileExistsPolicy,
-    in_place: bool,
-) -> None:
-    """Generate projects from Cookiecutter templates."""
-    createproject2(
-        location,
-        outputdir,
-        extrabindings=extrabindings,
-        interactive=interactive,
-        revision=revision,
-        directory=pathlib.Path(directory) if directory is not None else None,
-        fileexists=fileexists,
-        in_place=in_place,
-    )
