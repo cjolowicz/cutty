@@ -23,7 +23,7 @@ def createproject(
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load2(location, revision, directory)
+    template = Template.load(location, revision, directory)
 
     project = generate(template, extrabindings=extrabindings, interactive=interactive)
 

@@ -21,7 +21,7 @@ def createproject(
     fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load2(location, checkout, directory)
+    template = Template.load(location, checkout, directory)
 
     project = generate(
         template,

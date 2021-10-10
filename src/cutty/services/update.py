@@ -30,7 +30,7 @@ def update(
             else None
         )
 
-    template = Template.load2(projectconfig.template, revision, directory)
+    template = Template.load(projectconfig.template, revision, directory)
     repository = ProjectRepository(projectdir)
 
     with repository.update(template.metadata) as outputdir:

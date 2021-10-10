@@ -30,7 +30,7 @@ class Template:
     root: Path
 
     @classmethod
-    def load2(
+    def load(
         cls,
         template: str,
         revision: Optional[str],
