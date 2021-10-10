@@ -24,6 +24,7 @@ def set_user_cache_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) 
 def set_storage_digest_size(monkeypatch: pytest.MonkeyPatch) -> None:
     """Avoid errors due to excessively long paths on Windows."""
     monkeypatch.setattr("cutty.repositories.adapters.storage.DIGEST_SIZE", 3)
+    monkeypatch.setattr("cutty.util.git.DIGEST_SIZE", 3)
 
 
 @pytest.fixture(scope="session")
