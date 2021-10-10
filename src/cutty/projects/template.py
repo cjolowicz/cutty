@@ -25,6 +25,7 @@ class Template:
         directory: Optional[pathlib.PurePosixPath]
         name: str
         revision: Optional[Revision]
+        directory2: Optional[pathlib.Path]
 
     metadata: Metadata
     root: Path
@@ -50,5 +51,6 @@ class Template:
             pathlib.PurePosixPath(directory) if directory is not None else None,
             repository.name,
             repository.revision,
+            directory,
         )
         return cls(metadata, repository.path)
