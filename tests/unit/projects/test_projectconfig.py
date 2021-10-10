@@ -20,10 +20,11 @@ from cutty.templates.domain.bindings import Binding
 def projectconfig() -> ProjectConfig:
     """Fixture for a project configuration."""
     template = "https://example.com/repository.git"
+    revision = "cac8df79d0680240f6d7d11c027548d5582ea308"
     bindings = [Binding("project", "example"), Binding("license", "MIT")]
     directory = pathlib.PurePosixPath("a")
 
-    return ProjectConfig(template, bindings, directory=directory)
+    return ProjectConfig(template, bindings, directory=directory, revision=revision)
 
 
 @pytest.fixture
