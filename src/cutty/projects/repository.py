@@ -53,6 +53,8 @@ class ProjectRepository:
 
         self.project.heads[LATEST_BRANCH] = update.commit
 
+        update = self.project.branch(UPDATE_BRANCH)
+
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (update.commit.tree / PROJECT_CONFIG_FILE).data
         )
