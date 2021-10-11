@@ -59,6 +59,7 @@ class ProjectRepository:
         with self.reset(template) as path:
             yield path
 
+        message = _linkcommitmessage(template)
         update = self.project.branch(UPDATE_BRANCH)
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
@@ -66,7 +67,7 @@ class ProjectRepository:
         )
 
         self.project.commit(
-            message=_linkcommitmessage(template),
+            message=message,
             author=update.commit.author,
             committer=self.project.default_signature,
         )
