@@ -59,7 +59,10 @@ class ProjectRepository:
         with self.reset(template) as path:
             yield path
 
-        message = _linkcommitmessage(template)
+        self.updateconfig(message=_linkcommitmessage(template))
+
+    def updateconfig(self, message: str) -> None:
+        """Update the project configuration."""
         update = self.project.branch(UPDATE_BRANCH)
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
