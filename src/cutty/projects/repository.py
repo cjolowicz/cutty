@@ -51,6 +51,8 @@ class ProjectRepository:
         # Squash the empty initial commit.
         _squash_branch(self.project, update)
 
+        self.project.heads[LATEST_BRANCH] = update.commit
+
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (update.commit.tree / PROJECT_CONFIG_FILE).data
         )
@@ -60,8 +62,6 @@ class ProjectRepository:
             author=update.commit.author,
             committer=self.project.default_signature,
         )
-
-        self.project.heads[LATEST_BRANCH] = update.commit
 
     @contextmanager
     def update(self, template: Template.Metadata) -> Iterator[Path]:
