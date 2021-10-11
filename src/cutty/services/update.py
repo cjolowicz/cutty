@@ -26,8 +26,18 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    template = Template.load(projectconfig.template, revision, directory)
     repository = ProjectRepository(projectdir)
+    template = Template.load(
+        projectconfig.template, projectconfig.revision, projectconfig.directory
+    )
+
+    with repository.reset(template.metadata) as outputdir:
+        project = generate(
+            template, extrabindings=projectconfig.bindings, interactive=interactive
+        )
+        storeproject(project, outputdir, outputdirisproject=True)
+
+    template = Template.load(projectconfig.template, revision, directory)
 
     with repository.update(template.metadata) as outputdir:
         project = generate(

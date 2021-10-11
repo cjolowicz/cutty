@@ -34,11 +34,8 @@ class ProjectRepository:
         project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def link(
-        self,
-        template: Template.Metadata,
-    ) -> Iterator[Path]:
-        """Link a project to a project template."""
+    def reset(self, template: Template.Metadata) -> Iterator[Path]:
+        """Create an orphan branch for project generation."""
         for name in (LATEST_BRANCH, UPDATE_BRANCH):
             self.project.heads.pop(name, None)
 
@@ -54,17 +51,29 @@ class ProjectRepository:
         # Squash the empty initial commit.
         _squash_branch(self.project, update)
 
+        self.project.heads[LATEST_BRANCH] = update.commit
+
+    @contextmanager
+    def link(self, template: Template.Metadata) -> Iterator[Path]:
+        """Link a project to a project template."""
+        with self.reset(template) as path:
+            yield path
+
+        self.updateconfig(message=_linkcommitmessage(template))
+
+    def updateconfig(self, message: str) -> None:
+        """Update the project configuration."""
+        update = self.project.branch(UPDATE_BRANCH)
+
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (update.commit.tree / PROJECT_CONFIG_FILE).data
         )
 
         self.project.commit(
-            message=_linkcommitmessage(template),
+            message=message,
             author=update.commit.author,
             committer=self.project.default_signature,
         )
-
-        self.project.heads[LATEST_BRANCH] = update.commit
 
     @contextmanager
     def update(self, template: Template.Metadata) -> Iterator[Path]:
@@ -97,6 +106,7 @@ class ProjectRepository:
         """Skip an update with conflicts."""
         self.project.resetcherrypick()
         self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
+        self.updateconfig("Skip update")
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""

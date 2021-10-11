@@ -116,6 +116,7 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
 
 def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
     """It fast-forwards the latest branch to the tip of the update branch."""
+    updatefile(repository.path / "cutty.json")
     createconflict(repository, path, ours="a", theirs="b")
 
     updatehead = repository.heads[UPDATE_BRANCH]
