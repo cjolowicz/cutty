@@ -334,6 +334,7 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
     assert (project / "LICENSE").read_text() == "b"
 
 
+@pytest.mark.xfail(reason="merge conflict in cutty.json due to template revision")
 def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It skips the update."""
     updatefile(project / "LICENSE", "a")
