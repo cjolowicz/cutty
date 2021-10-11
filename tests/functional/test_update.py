@@ -371,7 +371,6 @@ def undo(repository: Repository) -> None:
     repository._repository.reset(parent.id, pygit2.GIT_RESET_HARD)
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_reverted_update(
     runcutty: RunCutty, templateproject: Path, project: Path
 ) -> None:
