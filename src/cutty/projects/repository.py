@@ -34,10 +34,7 @@ class ProjectRepository:
         project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def link(
-        self,
-        template: Template.Metadata,
-    ) -> Iterator[Path]:
+    def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
         for name in (LATEST_BRANCH, UPDATE_BRANCH):
             self.project.heads.pop(name, None)
