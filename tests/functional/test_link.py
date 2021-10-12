@@ -5,7 +5,6 @@ import pytest
 
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import LATEST_BRANCH
-from cutty.projects.repository import UPDATE_BRANCH
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError
@@ -89,46 +88,6 @@ def test_revision(runcutty: RunCutty, project: Path, template: Path) -> None:
     assert "LICENSE" not in latest.commit.tree
 
 
-def test_orphan_branch(runcutty: RunCutty, project: Path, template: Path) -> None:
-    """It creates an orphan branch."""
-    runcutty("link", f"--cwd={project}", str(template))
-
-    repository = Repository.open(project)
-    assert not repository.heads[LATEST_BRANCH].parents
-
-
-def test_update_branch_exists(
-    runcutty: RunCutty, project: Path, template: Path
-) -> None:
-    """It does not crash if latest and update branches already exist."""
-    repository = Repository.open(project)
-    for branch in UPDATE_BRANCH, LATEST_BRANCH:
-        repository.heads.create(branch)
-
-    updatefile(project / "marker")
-
-    runcutty("link", f"--cwd={project}", str(template))
-
-    assert (project / "marker").is_file()
-    assert (project / "cutty.json").is_file()
-
-
-def test_latest_branch_exists(
-    runcutty: RunCutty, project: Path, template: Path
-) -> None:
-    """It resets an existing latest branch."""
-    repository = Repository.open(project)
-    _, latest = [
-        repository.heads.create(branch) for branch in (UPDATE_BRANCH, LATEST_BRANCH)
-    ]
-
-    updatefile(project / "marker")
-
-    runcutty("link", f"--cwd={project}", str(template))
-
-    assert not latest.commit.parents
-
-
 def test_commit_message_template(
     runcutty: RunCutty, project: Path, template: Path
 ) -> None:
@@ -141,22 +100,6 @@ def test_commit_message_template(
 
 def test_commit_message_verb(runcutty: RunCutty, project: Path, template: Path) -> None:
     """It uses the verb 'Link' in the commit message."""
-    runcutty("link", f"--cwd={project}", str(template))
-
-    repository = Repository.open(project)
-    assert "Link" in repository.head.commit.message
-
-
-def test_commit_message_verb_branch_exists(
-    runcutty: RunCutty, project: Path, template: Path
-) -> None:
-    """It uses the verb 'Link' when the update branch already exists."""
-    repository = Repository.open(project)
-    for branch in UPDATE_BRANCH, LATEST_BRANCH:
-        repository.heads.create(branch)
-
-    updatefile(project / "marker")
-
     runcutty("link", f"--cwd={project}", str(template))
 
     repository = Repository.open(project)
