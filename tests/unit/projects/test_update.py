@@ -126,17 +126,14 @@ def test_skipupdate(repository: Repository, path: Path) -> None:
     assert blob.data.decode() == "a"
 
 
-def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
-    """It resets the update branch to the tip of the latest branch."""
+def test_abortupdate(repository: Repository, path: Path) -> None:
+    """It uses our version."""
     createconflict(repository, path, ours="a", theirs="b")
-
-    latesthead = repository.heads[LATEST_BRANCH]
 
     abortupdate(repository.path)
 
-    assert (
-        repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]
-    )
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "a"
 
 
 @pytest.fixture
