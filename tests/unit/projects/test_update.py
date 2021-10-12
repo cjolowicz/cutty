@@ -115,16 +115,15 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     assert repository.cherrypickhead is None
 
 
-def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
-    """It fast-forwards the latest branch to the tip of the update branch."""
+def test_skipupdate(repository: Repository, path: Path) -> None:
+    """It uses our version."""
     updatefile(repository.path / "cutty.json")
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.heads[UPDATE_BRANCH]
-
     skipupdate(repository.path)
 
-    assert repository.heads[LATEST_BRANCH] == updatehead
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "a"
 
 
 def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
