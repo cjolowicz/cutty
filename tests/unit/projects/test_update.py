@@ -57,8 +57,10 @@ def createconflict(
     repository.checkout(main)
     updatefile(path, ours)
 
+    cherry = repository.heads.pop(branch.name)
+
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(branch.commit)
+        repository.cherrypick(cherry)
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
