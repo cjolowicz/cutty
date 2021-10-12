@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 
 from cutty.projects.projectconfig import readprojectconfigfile
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError
@@ -83,9 +82,9 @@ def test_revision(runcutty: RunCutty, project: Path, template: Path) -> None:
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
     runcutty("link", f"--cwd={project}", f"--revision={initial}", str(template))
+    runcutty("update", f"--cwd={project}")
 
-    latest = Repository.open(project).branch(LATEST_BRANCH)
-    assert "LICENSE" not in latest.commit.tree
+    assert "LICENSE" in Repository.open(project).head.commit.tree
 
 
 def test_commit_message_template(
