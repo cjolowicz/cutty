@@ -181,28 +181,6 @@ def test_updateproject_commit_message_revision(
     assert template.revision in project.head.commit.message
 
 
-def test_updateproject_latest_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It updates the latest branch."""
-    updatefile(project.path / "initial")
-
-    tip = project.heads[LATEST_BRANCH]
-
-    updateproject(project.path, template)
-
-    assert [tip] == project.heads[LATEST_BRANCH].parents
-
-
-def test_updateproject_update_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It creates the update branch."""
-    updateproject(project.path, template)
-
-    assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
-
-
 def test_updateproject_no_changes(
     project: Repository, template: Template.Metadata
 ) -> None:
