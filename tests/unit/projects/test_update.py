@@ -92,7 +92,7 @@ def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) 
 
 
 def test_continueupdate_works_after_commit(repository: Repository, path: Path) -> None:
-    """It updates the latest branch even if the cherry-pick is no longer in progress."""
+    """It continues the update even if the cherry-pick is no longer in progress."""
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
@@ -101,7 +101,8 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
 
     continueupdate(repository.path)
 
-    assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "b"
 
 
 def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
