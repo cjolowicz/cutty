@@ -156,7 +156,7 @@ def test_updateproject_commit_message_template(
 def test_updateproject_commit_message_revision(
     project: Repository, template: Template.Metadata
 ) -> None:
-    """It includes the template name in the commit message."""
+    """It includes the template revision in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
 
     updateproject(project.path, template)
