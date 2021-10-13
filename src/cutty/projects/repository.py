@@ -54,10 +54,10 @@ class ProjectRepository:
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as (path, _):
+        with self.reset(template) as (path, getlatest):
             yield path
 
-        commit = self.project.heads[UPDATE_BRANCH]
+        commit = getlatest()
 
         self.updateconfig(message=_linkcommitmessage(template), commit=commit)
 
