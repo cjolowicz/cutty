@@ -76,13 +76,13 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        updatebranch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
+        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
-        with self.project.worktree(updatebranch, checkout=False) as worktree:
+        with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path
             worktree.commit(message=_updatecommitmessage(template))
 
-        self.project.cherrypick(updatebranch.commit)
+        self.project.cherrypick(branch.commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
