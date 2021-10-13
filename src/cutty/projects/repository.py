@@ -67,8 +67,7 @@ class ProjectRepository:
     ) -> None:
         """Update the project configuration."""
         if commit is None:
-            update = self.project.branch(UPDATE_BRANCH)
-            commit = update.commit
+            commit = self.project.heads[UPDATE_BRANCH]
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (commit.tree / PROJECT_CONFIG_FILE).data
