@@ -1,6 +1,7 @@
 """Project repositories."""
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -76,12 +77,16 @@ class ProjectRepository:
         )
 
     @contextmanager
-    def update(self, template: Template.Metadata) -> Iterator[Path]:
+    def update(
+        self, template: Template.Metadata, *, parent: Optional[pygit2.Commit] = None
+    ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         latestbranch = self.project.branch(LATEST_BRANCH)
-        updatebranch = self.project.heads.create(
-            UPDATE_BRANCH, latestbranch.commit, force=True
-        )
+
+        if parent is None:
+            parent = latestbranch.commit
+
+        updatebranch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
             yield worktree.path
