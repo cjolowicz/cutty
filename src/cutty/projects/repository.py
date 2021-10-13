@@ -83,7 +83,6 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        latestbranch = self.project.branch(LATEST_BRANCH)
         updatebranch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(updatebranch, checkout=False) as worktree:
@@ -91,8 +90,6 @@ class ProjectRepository:
             worktree.commit(message=_updatecommitmessage(template))
 
         self.project.cherrypick(updatebranch.commit)
-
-        latestbranch.commit = updatebranch.commit
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
