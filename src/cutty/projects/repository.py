@@ -1,4 +1,5 @@
 """Project repositories."""
+from collections.abc import Callable
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -34,7 +35,9 @@ class ProjectRepository:
         project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def reset2(self, template: Template.Metadata) -> Iterator[Path]:
+    def reset2(
+        self, template: Template.Metadata
+    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan branch for project generation."""
         for name in (LATEST_BRANCH, UPDATE_BRANCH):
             self.project.heads.pop(name, None)
@@ -44,7 +47,7 @@ class ProjectRepository:
         update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
-            yield worktree.path
+            yield worktree.path, lambda: self.project.heads[LATEST_BRANCH]
             message = _createcommitmessage(template)
             worktree.commit(message=message)
 
@@ -56,7 +59,7 @@ class ProjectRepository:
     @contextmanager
     def reset(self, template: Template.Metadata) -> Iterator[Path]:
         """Create an orphan branch for project generation."""
-        with self.reset2(template) as path:
+        with self.reset2(template) as (path, _):
             yield path
 
     @contextmanager
