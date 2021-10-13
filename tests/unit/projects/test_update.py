@@ -50,16 +50,16 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    [update] = createbranches(repository, "branch")
+    [branch] = createbranches(repository, "branch")
 
-    repository.checkout(update)
+    repository.checkout(branch)
     updatefile(path, theirs)
 
     repository.checkout(main)
     updatefile(path, ours)
 
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.commit)
+        repository.cherrypick(branch.commit)
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
