@@ -111,7 +111,6 @@ class ProjectRepository:
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
         self.project.resetcherrypick()
-        self.project.heads[UPDATE_BRANCH] = self.project.heads[LATEST_BRANCH]
 
 
 def _create_orphan_branch(repository: Repository, name: str) -> Branch:
