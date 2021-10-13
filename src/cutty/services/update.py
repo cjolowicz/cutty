@@ -5,7 +5,6 @@ from typing import Optional
 
 from cutty.projects.generate import generate
 from cutty.projects.projectconfig import readprojectconfigfile
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -32,7 +31,7 @@ def update(
         projectconfig.template, projectconfig.revision, projectconfig.directory
     )
 
-    with repository.reset(template.metadata) as (outputdir, _):
+    with repository.reset(template.metadata) as (outputdir, getlatest):
         project = generate(
             template, extrabindings=projectconfig.bindings, interactive=interactive
         )
@@ -40,7 +39,7 @@ def update(
 
     template = Template.load(projectconfig.template, revision, directory)
 
-    parent = repository.project.heads[LATEST_BRANCH]
+    parent = getlatest()
     with repository.update(template.metadata, parent=parent) as outputdir:
         project = generate(
             template, extrabindings=extrabindings, interactive=interactive
