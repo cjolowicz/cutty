@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.repository import UPDATE_BRANCH
 from cutty.projects.template import Template
@@ -16,6 +15,9 @@ from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
+
+
+LATEST_BRANCH = "cutty/latest"
 
 
 def updateproject(projectdir: Path, template: Template.Metadata) -> None:

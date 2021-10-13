@@ -12,7 +12,6 @@ from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
-LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
 
 
