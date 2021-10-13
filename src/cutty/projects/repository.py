@@ -60,7 +60,9 @@ class ProjectRepository:
         with self.reset(template) as (path, _):
             yield path
 
-        self.updateconfig(message=_linkcommitmessage(template))
+        commit = self.project.heads[UPDATE_BRANCH]
+
+        self.updateconfig(message=_linkcommitmessage(template), commit=commit)
 
     def updateconfig(
         self, message: str, *, commit: Optional[pygit2.Commit] = None
