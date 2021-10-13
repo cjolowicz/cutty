@@ -82,7 +82,9 @@ class ProjectRepository:
             yield worktree.path
             worktree.commit(message=_updatecommitmessage(template))
 
-        self.project.cherrypick(branch.commit)
+        commit = self.project.heads.pop(branch.name)
+
+        self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
