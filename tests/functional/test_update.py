@@ -352,6 +352,12 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     assert (project / "INSTALL").is_file()
 
 
+def test_skip_without_update(runcutty: RunCutty, project: Path) -> None:
+    """It exits with a non-zero status code."""
+    with pytest.raises(RunCuttyError):
+        runcutty("update", f"--cwd={project}", "--skip")
+
+
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It exits with a non-zero status code."""
     (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
