@@ -103,8 +103,6 @@ class ProjectRepository:
                 committer=self.project.default_signature,
             )
 
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
-
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
         self.project.resetcherrypick()
