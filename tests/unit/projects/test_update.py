@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.repository import UPDATE_BRANCH
 from cutty.projects.template import Template
 from cutty.util.git import Repository
 from tests.util.git import createbranches
@@ -51,7 +50,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    [update] = createbranches(repository, UPDATE_BRANCH)
+    [update] = createbranches(repository, "branch")
 
     repository.checkout(update)
     updatefile(path, theirs)
