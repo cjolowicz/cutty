@@ -64,14 +64,15 @@ class ProjectRepository:
     def updateconfig(self, message: str) -> None:
         """Update the project configuration."""
         update = self.project.branch(UPDATE_BRANCH)
+        commit = update.commit
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
-            (update.commit.tree / PROJECT_CONFIG_FILE).data
+            (commit.tree / PROJECT_CONFIG_FILE).data
         )
 
         self.project.commit(
             message=message,
-            author=update.commit.author,
+            author=commit.author,
             committer=self.project.default_signature,
         )
 
