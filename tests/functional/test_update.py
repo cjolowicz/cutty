@@ -392,3 +392,15 @@ def test_reverted_update(
 
     assert "a" in repository.head.commit.tree
     assert "b" in repository.head.commit.tree
+
+
+@pytest.mark.xfail(reason="TODO")
+def test_no_branches(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It does not create additional branches."""
+    repository = Repository.open(project)
+    branches = list(repository.heads)
+
+    updatefile(templateproject / "LICENSE")
+    runcutty("update", f"--cwd={project}")
+
+    assert branches == list(repository.heads)
