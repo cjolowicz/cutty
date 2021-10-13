@@ -34,7 +34,7 @@ class ProjectRepository:
         project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def reset(self, template: Template.Metadata) -> Iterator[Path]:
+    def reset2(self, template: Template.Metadata) -> Iterator[Path]:
         """Create an orphan branch for project generation."""
         for name in (LATEST_BRANCH, UPDATE_BRANCH):
             self.project.heads.pop(name, None)
@@ -52,6 +52,12 @@ class ProjectRepository:
         _squash_branch(self.project, update)
 
         self.project.heads[LATEST_BRANCH] = update.commit
+
+    @contextmanager
+    def reset(self, template: Template.Metadata) -> Iterator[Path]:
+        """Create an orphan branch for project generation."""
+        with self.reset2(template) as path:
+            yield path
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
