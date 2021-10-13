@@ -32,7 +32,7 @@ def update(
         projectconfig.template, projectconfig.revision, projectconfig.directory
     )
 
-    with repository.reset2(template.metadata) as (outputdir, _):
+    with repository.reset(template.metadata) as (outputdir, _):
         project = generate(
             template, extrabindings=projectconfig.bindings, interactive=interactive
         )
