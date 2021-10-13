@@ -38,7 +38,7 @@ class ProjectRepository:
         self, template: Template.Metadata
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan branch for project generation."""
-        for name in (LATEST_BRANCH, UPDATE_BRANCH):
+        for name in (UPDATE_BRANCH,):
             self.project.heads.pop(name, None)
 
         # Unborn branches cannot have worktrees. Create an orphan branch with an
