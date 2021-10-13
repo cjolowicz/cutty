@@ -57,15 +57,9 @@ class ProjectRepository:
         self.project.heads[LATEST_BRANCH] = update.commit
 
     @contextmanager
-    def reset(self, template: Template.Metadata) -> Iterator[Path]:
-        """Create an orphan branch for project generation."""
-        with self.reset2(template) as (path, _):
-            yield path
-
-    @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as path:
+        with self.reset2(template) as (path, _):
             yield path
 
         self.updateconfig(message=_linkcommitmessage(template))
