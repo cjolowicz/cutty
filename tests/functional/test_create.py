@@ -116,7 +116,6 @@ def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
         runcutty("create", str(emptytemplate))
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_no_branches(runcutty: RunCutty, template: Path) -> None:
     """It does not create additional branches."""
     project = Repository.init(Path("example"))
