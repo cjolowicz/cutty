@@ -21,7 +21,8 @@ pytest_plugins = ["tests.fixtures.git"]
 def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
-    with project.update(template) as outputdir:
+    parent = project.project.heads[LATEST_BRANCH]
+    with project.update(template, parent=parent) as outputdir:
         (outputdir / "cutty.json").touch()
 
 
@@ -168,7 +169,8 @@ def test_updateproject_no_changes(
     tip = project.head.commit
 
     repository = ProjectRepository(project.path)
-    with repository.update(template):
+    parent = repository.project.heads[LATEST_BRANCH]
+    with repository.update(template, parent=parent):
         pass
 
     assert tip == project.head.commit
