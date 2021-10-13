@@ -17,9 +17,6 @@ from tests.util.git import updatefile
 pytest_plugins = ["tests.fixtures.git"]
 
 
-LATEST_BRANCH = "cutty/latest"
-
-
 def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
@@ -54,7 +51,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    [update] = createbranches(repository, UPDATE_BRANCH)
 
     repository.checkout(update)
     updatefile(path, theirs)
@@ -125,7 +122,6 @@ def test_abortupdate(repository: Repository, path: Path) -> None:
 @pytest.fixture
 def project(repository: Repository) -> Repository:
     """Fixture for a project repository."""
-    repository.heads.create(LATEST_BRANCH)
     return repository
 
 
