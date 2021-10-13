@@ -39,8 +39,7 @@ def update(
 
     template = Template.load(projectconfig.template, revision, directory)
 
-    parent = getlatest()
-    with repository.update(template.metadata, parent=parent) as outputdir:
+    with repository.update(template.metadata, parent=getlatest()) as outputdir:
         project = generate(
             template, extrabindings=extrabindings, interactive=interactive
         )
