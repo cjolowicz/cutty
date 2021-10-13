@@ -32,7 +32,6 @@ class ProjectRepository:
             project = Repository.init(projectdir)
 
         project.commit(message=_createcommitmessage(template))
-        project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
     def reset(
