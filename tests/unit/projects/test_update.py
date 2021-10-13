@@ -23,8 +23,11 @@ LATEST_BRANCH = "cutty/latest"
 def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
-    parent = project.project.heads[LATEST_BRANCH]
-    with project.update(template, parent=parent) as outputdir:
+
+    with project.reset(template) as (outputdir, getlatest):
+        pass
+
+    with project.update(template, parent=getlatest()) as outputdir:
         (outputdir / "cutty.json").touch()
 
 
@@ -171,8 +174,11 @@ def test_updateproject_no_changes(
     tip = project.head.commit
 
     repository = ProjectRepository(project.path)
-    parent = repository.project.heads[LATEST_BRANCH]
-    with repository.update(template, parent=parent):
+
+    with repository.reset(template) as (outputdir, getlatest):
+        pass
+
+    with repository.update(template, parent=getlatest()):
         pass
 
     assert tip == project.head.commit
