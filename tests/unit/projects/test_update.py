@@ -7,7 +7,6 @@ import pytest
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository
-from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -50,7 +49,7 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    [branch] = createbranches(repository, "branch")
+    branch = repository.heads.create("branch")
 
     repository.checkout(branch)
     updatefile(path, theirs)
