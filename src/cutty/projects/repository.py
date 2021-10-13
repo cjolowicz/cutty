@@ -2,6 +2,7 @@
 from collections.abc import Callable
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -61,10 +62,13 @@ class ProjectRepository:
 
         self.updateconfig(message=_linkcommitmessage(template))
 
-    def updateconfig(self, message: str) -> None:
+    def updateconfig(
+        self, message: str, *, commit: Optional[pygit2.Commit] = None
+    ) -> None:
         """Update the project configuration."""
-        update = self.project.branch(UPDATE_BRANCH)
-        commit = update.commit
+        if commit is None:
+            update = self.project.branch(UPDATE_BRANCH)
+            commit = update.commit
 
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
             (commit.tree / PROJECT_CONFIG_FILE).data
