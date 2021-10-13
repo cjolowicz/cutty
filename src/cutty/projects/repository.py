@@ -47,14 +47,14 @@ class ProjectRepository:
         update = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(update, checkout=False) as worktree:
-            yield worktree.path, lambda: self.project.heads[LATEST_BRANCH]
+            yield worktree.path, lambda: latest
             message = _createcommitmessage(template)
             worktree.commit(message=message)
 
         # Squash the empty initial commit.
         _squash_branch(self.project, update)
 
-        self.project.heads[LATEST_BRANCH] = update.commit
+        latest = self.project.heads[LATEST_BRANCH] = update.commit
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
