@@ -106,7 +106,6 @@ class ProjectRepository:
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
         self.project.resetcherrypick()
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
         self.updateconfig("Skip update")
 
     def abortupdate(self) -> None:
