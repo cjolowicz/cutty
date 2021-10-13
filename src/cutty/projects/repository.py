@@ -39,17 +39,17 @@ class ProjectRepository:
         """Create an orphan branch for project generation."""
         # Unborn branches cannot have worktrees. Create an orphan branch with an
         # empty placeholder commit instead. We'll squash it after project creation.
-        update = _create_orphan_branch(self.project, UPDATE_BRANCH)
+        branch = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
-        with self.project.worktree(update, checkout=False) as worktree:
+        with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path, lambda: latest
             message = _createcommitmessage(template)
             worktree.commit(message=message)
 
         # Squash the empty initial commit.
-        _squash_branch(self.project, update)
+        _squash_branch(self.project, branch)
 
-        latest = update.commit
+        latest = branch.commit
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
