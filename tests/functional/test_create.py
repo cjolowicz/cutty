@@ -114,3 +114,16 @@ def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
         runcutty("create", str(emptytemplate))
+
+
+@pytest.mark.xfail(reason="TODO")
+def test_no_branches(runcutty: RunCutty, template: Path) -> None:
+    """It does not create additional branches."""
+    project = Repository.init(Path("example"))
+    project.commit()
+
+    branches = list(project.heads)
+
+    runcutty("create", f"--output-dir={project.path}", "--in-place", str(template))
+
+    assert branches == list(project.heads)
