@@ -3,6 +3,7 @@ import pathlib
 from typing import NoReturn
 
 from cutty.projects.project import EmptyTemplateError
+from cutty.projects.repository import NoUpdateInProgressError
 from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
@@ -85,6 +86,11 @@ def _emptytemplate(error: EmptyTemplateError) -> NoReturn:
     _die("template does not contain project files")
 
 
+@exceptionhandler
+def _noupdateinprogress(error: NoUpdateInProgressError) -> NoReturn:
+    _die("no update in progress")
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -96,4 +102,5 @@ fatal = (
     >> _revisionnotfound
     >> _templatenotspecified
     >> _emptytemplate
+    >> _noupdateinprogress
 )
