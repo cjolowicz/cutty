@@ -49,7 +49,7 @@ class ProjectRepository:
         # Squash the empty initial commit.
         _squash_branch(self.project, branch)
 
-        latest = branch.commit
+        latest = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
