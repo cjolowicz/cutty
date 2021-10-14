@@ -37,17 +37,13 @@ class ProjectRepository:
         self, template: Template.Metadata
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan commit with a generated project."""
-        # Unborn branches cannot have worktrees. Create an orphan branch with an
-        # empty placeholder commit instead. We'll squash it after project creation.
+        # Unborn branches cannot have worktrees.
         branch = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
         with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path, lambda: latest
             message = _createcommitmessage(template)
             worktree.commit(message=message)
-
-        # Squash the empty initial commit.
-        _squash_branch(self.project, branch)
 
         latest = self.project.heads.pop(branch.name)
 
@@ -119,20 +115,6 @@ def _create_orphan_branch(repository: Repository, name: str) -> Branch:
         [],
     )
     return repository.branch(name)
-
-
-def _squash_branch(repository: Repository, branch: Branch) -> None:
-    """Squash the branch."""
-    name, commit = branch.name, branch.commit
-    del repository.heads[name]
-    repository._repository.create_commit(
-        f"refs/heads/{name}",
-        commit.author,
-        commit.committer,
-        commit.message,
-        commit.tree.id,
-        [],
-    )
 
 
 def _createcommitmessage(template: Template.Metadata) -> str:
