@@ -39,7 +39,7 @@ def link(
         raise TemplateNotSpecifiedError()
 
     template = Template.load(location, revision, directory)
-    project = generate(template, extrabindings=extrabindings, interactive=interactive)
+    project = generate(template, extrabindings, interactive=interactive)
 
     repository = ProjectRepository(projectdir)
 

@@ -30,15 +30,13 @@ def update(
     template = Template.load(
         projectconfig.template, projectconfig.revision, projectconfig.directory
     )
-    project = generate(
-        template, extrabindings=projectconfig.bindings, interactive=interactive
-    )
+    project = generate(template, projectconfig.bindings, interactive=interactive)
 
     with repository.reset(template.metadata) as (outputdir, getlatest):
         storeproject(project, outputdir, outputdirisproject=True)
 
     template = Template.load(projectconfig.template, revision, directory)
-    project = generate(template, extrabindings=extrabindings, interactive=interactive)
+    project = generate(template, extrabindings, interactive=interactive)
 
     with repository.update(template.metadata, parent=getlatest()) as outputdir:
         storeproject(project, outputdir, outputdirisproject=True)

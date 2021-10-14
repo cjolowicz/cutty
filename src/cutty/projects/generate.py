@@ -10,8 +10,9 @@ from cutty.templates.domain.bindings import Binding
 
 def generate(
     template: Template,
+    bindings: Sequence[Binding] = (),
+    /,
     *,
-    extrabindings: Sequence[Binding],
     interactive: bool,
     createconfigfile: bool = True,
 ) -> Project:
@@ -22,7 +23,7 @@ def generate(
         generator.variables,
         generator.renderer,
         interactive=interactive,
-        bindings=extrabindings,
+        bindings=bindings,
     )
 
     project = generator.generate(bindings)
