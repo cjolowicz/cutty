@@ -10,19 +10,24 @@ from cutty.templates.domain.bindings import Binding
 
 def generate(
     template: Template,
+    bindings: Sequence[Binding] = (),
+    /,
     *,
     interactive: bool,
     extrabindings: Sequence[Binding] = (),
     createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
+    if extrabindings:
+        bindings = extrabindings
+
     generator = ProjectGenerator.create(template)
 
     bindings = bindcookiecuttervariables(
         generator.variables,
         generator.renderer,
         interactive=interactive,
-        bindings=extrabindings,
+        bindings=bindings,
     )
 
     project = generator.generate(bindings)
