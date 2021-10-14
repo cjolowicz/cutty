@@ -11,8 +11,8 @@ from cutty.templates.domain.bindings import Binding
 def generate(
     template: Template,
     *,
-    extrabindings: Sequence[Binding],
     interactive: bool,
+    extrabindings: Sequence[Binding] = (),
     createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
