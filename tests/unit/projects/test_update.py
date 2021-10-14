@@ -74,20 +74,6 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     assert blob.data == b"b"
 
 
-def test_continueupdate_works_after_commit(repository: Repository, path: Path) -> None:
-    """It continues the update even if the cherry-pick is no longer in progress."""
-    createconflict(repository, path, ours="a", theirs="b")
-    resolveconflicts(repository.path, path, Side.THEIRS)
-
-    # The user invokes `git cherry-pick --continue` before `cutty update --continue`.
-    repository.commit()
-
-    continueupdate(repository.path)
-
-    blob = repository.head.commit.tree / path.name
-    assert blob.data.decode() == "b"
-
-
 def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
     """It removes CHERRY_PICK_HEAD."""
     createconflict(repository, path, ours="a", theirs="b")
