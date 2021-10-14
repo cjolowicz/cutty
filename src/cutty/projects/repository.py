@@ -85,14 +85,11 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
+        message = _updatecommitmessage(template)
+        with self.store(template, parent, message) as (path, getlatest):
+            yield path
 
-        with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path
-            worktree.commit(message=_updatecommitmessage(template))
-
-        commit = self.project.heads.pop(branch.name)
-
+        commit = getlatest()
         if commit != parent:
             self.project.cherrypick(commit)
 
