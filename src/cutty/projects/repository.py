@@ -1,4 +1,5 @@
 """Project repositories."""
+from collections.abc import Callable
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -11,7 +12,6 @@ from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
-LATEST_BRANCH = "cutty/latest"
 UPDATE_BRANCH = "cutty/update"
 
 
@@ -31,65 +31,60 @@ class ProjectRepository:
             project = Repository.init(projectdir)
 
         project.commit(message=_createcommitmessage(template))
-        project.heads[LATEST_BRANCH] = project.head.commit
 
     @contextmanager
-    def reset(self, template: Template.Metadata) -> Iterator[Path]:
-        """Create an orphan branch for project generation."""
-        for name in (LATEST_BRANCH, UPDATE_BRANCH):
-            self.project.heads.pop(name, None)
-
+    def reset(
+        self, template: Template.Metadata
+    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
+        """Create an orphan commit with a generated project."""
         # Unborn branches cannot have worktrees. Create an orphan branch with an
         # empty placeholder commit instead. We'll squash it after project creation.
-        update = _create_orphan_branch(self.project, UPDATE_BRANCH)
+        branch = _create_orphan_branch(self.project, UPDATE_BRANCH)
 
-        with self.project.worktree(update, checkout=False) as worktree:
-            yield worktree.path
+        with self.project.worktree(branch, checkout=False) as worktree:
+            yield worktree.path, lambda: latest
             message = _createcommitmessage(template)
             worktree.commit(message=message)
 
         # Squash the empty initial commit.
-        _squash_branch(self.project, update)
+        _squash_branch(self.project, branch)
 
-        self.project.heads[LATEST_BRANCH] = update.commit
+        latest = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as path:
+        with self.reset(template) as (path, getlatest):
             yield path
 
-        self.updateconfig(message=_linkcommitmessage(template))
+        self.updateconfig(message=_linkcommitmessage(template), commit=getlatest())
 
-    def updateconfig(self, message: str) -> None:
+    def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
-        update = self.project.branch(UPDATE_BRANCH)
-
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
-            (update.commit.tree / PROJECT_CONFIG_FILE).data
+            (commit.tree / PROJECT_CONFIG_FILE).data
         )
 
         self.project.commit(
             message=message,
-            author=update.commit.author,
+            author=commit.author,
             committer=self.project.default_signature,
         )
 
     @contextmanager
-    def update(self, template: Template.Metadata) -> Iterator[Path]:
+    def update(
+        self, template: Template.Metadata, *, parent: pygit2.Commit
+    ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        latestbranch = self.project.branch(LATEST_BRANCH)
-        updatebranch = self.project.heads.create(
-            UPDATE_BRANCH, latestbranch.commit, force=True
-        )
+        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
-        with self.project.worktree(updatebranch, checkout=False) as worktree:
+        with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path
             worktree.commit(message=_updatecommitmessage(template))
 
-        self.project.cherrypick(updatebranch.commit)
+        commit = self.project.heads.pop(branch.name)
 
-        latestbranch.commit = updatebranch.commit
+        self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
@@ -100,23 +95,21 @@ class ProjectRepository:
                 committer=self.project.default_signature,
             )
 
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
-
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
-        self.project.resetcherrypick()
-        self.project.heads[LATEST_BRANCH] = self.project.heads[UPDATE_BRANCH]
-        self.updateconfig("Skip update")
+        if commit := self.project.cherrypickhead:  # pragma: no branch
+            self.project.resetcherrypick()
+            self.updateconfig("Skip update", commit=commit)
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
         self.project.resetcherrypick()
-        self.project.heads[UPDATE_BRANCH] = self.project.heads[LATEST_BRANCH]
 
 
 def _create_orphan_branch(repository: Repository, name: str) -> Branch:
     """Create an orphan branch with an empty commit."""
     author = committer = repository.default_signature
+    repository.heads.pop(name, None)
     repository._repository.create_commit(
         f"refs/heads/{name}",
         author,

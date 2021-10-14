@@ -4,12 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.repository import UPDATE_BRANCH
 from cutty.projects.template import Template
 from cutty.util.git import Repository
-from tests.util.git import createbranches
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
@@ -21,7 +18,11 @@ pytest_plugins = ["tests.fixtures.git"]
 def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
-    with project.update(template) as outputdir:
+
+    with project.reset(template) as (outputdir, getlatest):
+        pass
+
+    with project.update(template, parent=getlatest()) as outputdir:
         (outputdir / "cutty.json").touch()
 
 
@@ -48,16 +49,18 @@ def createconflict(
 ) -> None:
     """Create an update conflict."""
     main = repository.head
-    update, _ = createbranches(repository, UPDATE_BRANCH, LATEST_BRANCH)
+    branch = repository.heads.create("branch")
 
-    repository.checkout(update)
+    repository.checkout(branch)
     updatefile(path, theirs)
 
     repository.checkout(main)
     updatefile(path, ours)
 
+    cherry = repository.heads.pop(branch.name)
+
     with pytest.raises(Exception, match=path.name):
-        repository.cherrypick(update.commit)
+        repository.cherrypick(cherry)
 
 
 def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
@@ -71,28 +74,8 @@ def test_continueupdate_commits_changes(repository: Repository, path: Path) -> N
     assert blob.data == b"b"
 
 
-def test_continueupdate_preserves_metainfo(repository: Repository, path: Path) -> None:
-    """It preserves the original commit message."""
-    createconflict(repository, path, ours="a", theirs="b")
-    resolveconflicts(repository.path, path, Side.THEIRS)
-
-    continueupdate(repository.path)
-
-    assert repository.heads[UPDATE_BRANCH].message == repository.head.commit.message
-
-
-def test_continueupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
-    """It updates the latest branch to the tip of the update branch."""
-    createconflict(repository, path, ours="a", theirs="b")
-    resolveconflicts(repository.path, path, Side.THEIRS)
-
-    continueupdate(repository.path)
-
-    assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
-
-
 def test_continueupdate_works_after_commit(repository: Repository, path: Path) -> None:
-    """It updates the latest branch even if the cherry-pick is no longer in progress."""
+    """It continues the update even if the cherry-pick is no longer in progress."""
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
@@ -101,7 +84,8 @@ def test_continueupdate_works_after_commit(repository: Repository, path: Path) -
 
     continueupdate(repository.path)
 
-    assert repository.heads[LATEST_BRANCH] == repository.heads[UPDATE_BRANCH]
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "b"
 
 
 def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
@@ -114,35 +98,30 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     assert repository.cherrypickhead is None
 
 
-def test_skipupdate_fastforwards_latest(repository: Repository, path: Path) -> None:
-    """It fast-forwards the latest branch to the tip of the update branch."""
+def test_skipupdate(repository: Repository, path: Path) -> None:
+    """It uses our version."""
     updatefile(repository.path / "cutty.json")
     createconflict(repository, path, ours="a", theirs="b")
 
-    updatehead = repository.heads[UPDATE_BRANCH]
-
     skipupdate(repository.path)
 
-    assert repository.heads[LATEST_BRANCH] == updatehead
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "a"
 
 
-def test_abortupdate_rewinds_update_branch(repository: Repository, path: Path) -> None:
-    """It resets the update branch to the tip of the latest branch."""
+def test_abortupdate(repository: Repository, path: Path) -> None:
+    """It uses our version."""
     createconflict(repository, path, ours="a", theirs="b")
-
-    latesthead = repository.heads[LATEST_BRANCH]
 
     abortupdate(repository.path)
 
-    assert (
-        repository.heads[LATEST_BRANCH] == latesthead == repository.heads[UPDATE_BRANCH]
-    )
+    blob = repository.head.commit.tree / path.name
+    assert blob.data.decode() == "a"
 
 
 @pytest.fixture
 def project(repository: Repository) -> Repository:
     """Fixture for a project repository."""
-    repository.heads.create(LATEST_BRANCH)
     return repository
 
 
@@ -176,34 +155,12 @@ def test_updateproject_commit_message_template(
 def test_updateproject_commit_message_revision(
     project: Repository, template: Template.Metadata
 ) -> None:
-    """It includes the template name in the commit message."""
+    """It includes the template revision in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
 
     updateproject(project.path, template)
 
     assert template.revision in project.head.commit.message
-
-
-def test_updateproject_latest_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It updates the latest branch."""
-    updatefile(project.path / "initial")
-
-    tip = project.heads[LATEST_BRANCH]
-
-    updateproject(project.path, template)
-
-    assert [tip] == project.heads[LATEST_BRANCH].parents
-
-
-def test_updateproject_update_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It creates the update branch."""
-    updateproject(project.path, template)
-
-    assert project.heads[LATEST_BRANCH] == project.heads[UPDATE_BRANCH]
 
 
 def test_updateproject_no_changes(
@@ -213,7 +170,11 @@ def test_updateproject_no_changes(
     tip = project.head.commit
 
     repository = ProjectRepository(project.path)
-    with repository.update(template):
+
+    with repository.reset(template) as (outputdir, getlatest):
+        pass
+
+    with repository.update(template, parent=getlatest()):
         pass
 
     assert tip == project.head.commit

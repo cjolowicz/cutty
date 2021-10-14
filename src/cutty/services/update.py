@@ -31,7 +31,7 @@ def update(
         projectconfig.template, projectconfig.revision, projectconfig.directory
     )
 
-    with repository.reset(template.metadata) as outputdir:
+    with repository.reset(template.metadata) as (outputdir, getlatest):
         project = generate(
             template, extrabindings=projectconfig.bindings, interactive=interactive
         )
@@ -39,7 +39,7 @@ def update(
 
     template = Template.load(projectconfig.template, revision, directory)
 
-    with repository.update(template.metadata) as outputdir:
+    with repository.update(template.metadata, parent=getlatest()) as outputdir:
         project = generate(
             template, extrabindings=extrabindings, interactive=interactive
         )

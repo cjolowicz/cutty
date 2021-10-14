@@ -3,12 +3,9 @@ import dataclasses
 
 import pytest
 
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.repository import UPDATE_BRANCH
 from cutty.projects.template import Template
 from cutty.util.git import Repository
-from tests.util.git import updatefile
 
 
 pytest_plugins = ["tests.fixtures.git"]
@@ -63,49 +60,3 @@ def test_linkproject_commit_message_revision(
     linkproject(project, template)
 
     assert template.revision in project.head.commit.message
-
-
-def test_linkproject_latest_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It creates the latest branch."""
-    updatefile(project.path / "initial")
-
-    linkproject(project, template)
-
-    assert LATEST_BRANCH in project.heads
-
-
-def test_linkproject_latest_branch_commit_message(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It uses a commit message indicating an initial import."""
-    updatefile(project.path / "initial")
-
-    linkproject(project, template)
-
-    assert "initial" in project.heads[LATEST_BRANCH].message.lower()
-
-
-def test_linkproject_latest_branch_commit_message_update(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It uses a commit message indicating an initial import."""
-    project.heads.create(LATEST_BRANCH)
-
-    updatefile(project.path / "initial")
-
-    linkproject(project, template)
-
-    assert "initial" in project.heads[LATEST_BRANCH].message.lower()
-
-
-def test_linkproject_update_branch(
-    project: Repository, template: Template.Metadata
-) -> None:
-    """It creates the update branch."""
-    updatefile(project.path / "initial")
-
-    linkproject(project, template)
-
-    assert UPDATE_BRANCH in project.heads

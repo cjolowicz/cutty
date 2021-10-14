@@ -8,7 +8,6 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.projects.repository import LATEST_BRANCH
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository
@@ -101,21 +100,3 @@ def test_existing_repository(
     creategitrepository(projectpath, template)
 
     assert file.path.name in repository.head.commit.tree
-
-
-def test_branch(project: pathlib.Path, template: Template.Metadata) -> None:
-    """It creates a branch pointing to the initial commit."""
-    creategitrepository(project, template)
-
-    repository = Repository.open(project)
-    assert repository.head.commit == repository.heads[LATEST_BRANCH]
-
-
-def test_branch_not_checked_out(
-    project: pathlib.Path, template: Template.Metadata
-) -> None:
-    """It does not check out the `latest` branch."""
-    creategitrepository(project, template)
-
-    repository = Repository.open(project)
-    assert repository.head.name != LATEST_BRANCH
