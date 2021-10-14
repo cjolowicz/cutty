@@ -54,11 +54,11 @@ class ProjectRepository:
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path, lambda: latest
+            yield worktree.path, lambda: commit
             message = _createcommitmessage(template)
             worktree.commit(message=message)
 
-        latest = self.project.heads.pop(branch.name)
+        commit = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
