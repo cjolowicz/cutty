@@ -24,10 +24,7 @@ def createproject(
     template = Template.load(location, checkout, directory)
 
     project = generate(
-        template,
-        extrabindings=extrabindings,
-        interactive=interactive,
-        createconfigfile=False,
+        template, extrabindings, interactive=interactive, createconfigfile=False
     )
 
     storeproject(
