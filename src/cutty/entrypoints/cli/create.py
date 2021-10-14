@@ -24,8 +24,8 @@ from cutty.templates.domain.bindings import Binding
     help="Branch, tag, or commit hash of the template repository.",
 )
 @click.option(
-    "-o",
-    "--output-dir",
+    "-C",
+    "--cwd",
     metavar="DIR",
     type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
     help="Parent directory of the generated project.",
@@ -65,7 +65,7 @@ def create(
     extra_context: dict[str, str],
     non_interactive: bool,
     revision: Optional[str],
-    output_dir: Optional[pathlib.Path],
+    cwd: Optional[pathlib.Path],
     directory: Optional[pathlib.Path],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
@@ -74,13 +74,13 @@ def create(
     """Generate projects from Cookiecutter templates."""
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
-    if output_dir is None:
-        output_dir = pathlib.Path.cwd()
+    if cwd is None:
+        cwd = pathlib.Path.cwd()
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
     createproject(
         template,
-        output_dir,
+        cwd,
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
