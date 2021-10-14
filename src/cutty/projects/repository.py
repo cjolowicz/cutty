@@ -9,7 +9,6 @@ from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.template import Template
-from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
@@ -43,7 +42,8 @@ class ProjectRepository:
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan commit with a generated project."""
         # Unborn branches cannot have worktrees.
-        branch = _create_orphan_branch(self.project, UPDATE_BRANCH)
+        commit = _create_orphan_commit(self.project)
+        branch = self.project.heads.create(UPDATE_BRANCH, commit, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path, lambda: latest
@@ -128,12 +128,6 @@ def _create_orphan_commit(repository: Repository) -> pygit2.Commit:
     )
     commit: pygit2.Commit = repository._repository[oid]
     return commit
-
-
-def _create_orphan_branch(repository: Repository, name: str) -> Branch:
-    """Create an orphan branch with an empty commit."""
-    commit = _create_orphan_commit(repository)
-    return repository.heads.create(name, commit, force=True)
 
 
 def _createcommitmessage(template: Template.Metadata) -> str:
