@@ -44,12 +44,12 @@ class ProjectRepository:
         # Unborn branches cannot have worktrees.
         commit = _create_orphan_commit(self.project)
         message = _createcommitmessage(template)
-        with self.store(template, commit, message) as values:
+        with self.store(commit, message) as values:
             yield values
 
     @contextmanager
     def store(
-        self, template: Template.Metadata, parent: pygit2.Commit, message: str
+        self, parent: pygit2.Commit, message: str
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create a commit with a generated project."""
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
@@ -86,7 +86,7 @@ class ProjectRepository:
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         message = _updatecommitmessage(template)
-        with self.store(template, parent, message) as (path, getcommit):
+        with self.store(parent, message) as (path, getcommit):
             yield path
 
         commit = getcommit()
