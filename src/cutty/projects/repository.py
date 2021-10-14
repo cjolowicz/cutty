@@ -63,10 +63,10 @@ class ProjectRepository:
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as (path, getlatest):
+        with self.reset(template) as (path, getcommit):
             yield path
 
-        self.updateconfig(message=_linkcommitmessage(template), commit=getlatest())
+        self.updateconfig(message=_linkcommitmessage(template), commit=getcommit())
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -86,10 +86,10 @@ class ProjectRepository:
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         message = _updatecommitmessage(template)
-        with self.store(template, parent, message) as (path, getlatest):
+        with self.store(template, parent, message) as (path, getcommit):
             yield path
 
-        commit = getlatest()
+        commit = getcommit()
         if commit != parent:
             self.project.cherrypick(commit)
 
