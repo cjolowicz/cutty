@@ -85,7 +85,8 @@ class ProjectRepository:
 
         commit = self.project.heads.pop(branch.name)
 
-        self.project.cherrypick(commit)
+        if commit != parent:
+            self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""

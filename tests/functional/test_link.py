@@ -87,6 +87,16 @@ def test_revision(runcutty: RunCutty, project: Path, template: Path) -> None:
     assert "LICENSE" in Repository.open(project).head.commit.tree
 
 
+def test_skip(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It skips an update if the revision is already linked."""
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("link", f"--cwd={project}", str(template))
+    runcutty("update", f"--cwd={project}")
+
+    assert "LICENSE" not in Repository.open(project).head.commit.tree
+
+
 def test_commit_message_template(
     runcutty: RunCutty, project: Path, template: Path
 ) -> None:
