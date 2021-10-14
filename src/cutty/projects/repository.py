@@ -108,6 +108,9 @@ class ProjectRepository:
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
+        if not self.project.cherrypickhead:
+            raise NoUpdateInProgressError()
+
         self.project.resetcherrypick()
 
 
