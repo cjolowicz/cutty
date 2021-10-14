@@ -14,13 +14,9 @@ def generate(
     /,
     *,
     interactive: bool,
-    extrabindings: Sequence[Binding] = (),
     createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
-    if extrabindings:
-        bindings = extrabindings
-
     generator = ProjectGenerator.create(template)
 
     bindings = bindcookiecuttervariables(
