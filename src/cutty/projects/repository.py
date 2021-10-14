@@ -115,8 +115,8 @@ class ProjectRepository:
         self.project.resetcherrypick()
 
 
-def _create_orphan_branch(repository: Repository, name: str) -> Branch:
-    """Create an orphan branch with an empty commit."""
+def _create_orphan_commit(repository: Repository) -> pygit2.Commit:
+    """Create an orphan empty commit."""
     author = committer = repository.default_signature
     oid = repository._repository.create_commit(
         None,
@@ -126,7 +126,13 @@ def _create_orphan_branch(repository: Repository, name: str) -> Branch:
         repository._repository.TreeBuilder().write(),
         [],
     )
-    commit = repository._repository[oid]
+    commit: pygit2.Commit = repository._repository[oid]
+    return commit
+
+
+def _create_orphan_branch(repository: Repository, name: str) -> Branch:
+    """Create an orphan branch with an empty commit."""
+    commit = _create_orphan_commit(repository)
     return repository.heads.create(name, commit, force=True)
 
 
