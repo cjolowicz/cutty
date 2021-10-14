@@ -118,16 +118,16 @@ class ProjectRepository:
 def _create_orphan_branch(repository: Repository, name: str) -> Branch:
     """Create an orphan branch with an empty commit."""
     author = committer = repository.default_signature
-    repository.heads.pop(name, None)
-    repository._repository.create_commit(
-        f"refs/heads/{name}",
+    oid = repository._repository.create_commit(
+        None,
         author,
         committer,
         "initial",
         repository._repository.TreeBuilder().write(),
         [],
     )
-    return repository.branch(name)
+    commit = repository._repository[oid]
+    return repository.heads.create(name, commit, force=True)
 
 
 def _createcommitmessage(template: Template.Metadata) -> str:
