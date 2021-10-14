@@ -31,7 +31,7 @@ from cutty.templates.domain.bindings import Binding
     help="Parent directory of the generated project.",
 )
 @click.option(
-    "--directory",
+    "--template-directory",
     metavar="DIR",
     type=click.Path(path_type=pathlib.Path),
     help=(
@@ -66,7 +66,7 @@ def create(
     non_interactive: bool,
     revision: Optional[str],
     cwd: Optional[pathlib.Path],
-    directory: Optional[pathlib.Path],
+    template_directory: Optional[pathlib.Path],
     overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     in_place: bool,
@@ -84,7 +84,7 @@ def create(
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
-        directory=directory,
+        directory=template_directory,
         fileexists=fileexists,
         in_place=in_place,
     )

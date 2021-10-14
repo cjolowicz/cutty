@@ -69,7 +69,9 @@ def test_directory(runcutty: RunCutty, project: Path, template: Path) -> None:
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("link", f"--cwd={project}", f"--directory={directory}", str(template))
+    runcutty(
+        "link", f"--cwd={project}", f"--template-directory={directory}", str(template)
+    )
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)
