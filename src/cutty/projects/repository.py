@@ -89,12 +89,14 @@ class ProjectRepository:
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
-        if commit := self.project.cherrypickhead:
-            self.project.commit(
-                message=commit.message,
-                author=commit.author,
-                committer=self.project.default_signature,
-            )
+        if not (commit := self.project.cherrypickhead):
+            raise NoUpdateInProgressError()
+
+        self.project.commit(
+            message=commit.message,
+            author=commit.author,
+            committer=self.project.default_signature,
+        )
 
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
