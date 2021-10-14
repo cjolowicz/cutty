@@ -352,10 +352,19 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     assert (project / "INSTALL").is_file()
 
 
-def test_skip_without_update(runcutty: RunCutty, project: Path) -> None:
+@pytest.mark.parametrize("option", ["skip", "continue", "abort"])
+def test_sequencer_without_update(
+    runcutty: RunCutty, project: Path, option: str
+) -> None:
     """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
-        runcutty("update", f"--cwd={project}", "--skip")
+        runcutty("update", f"--cwd={project}", f"--{option}")
+
+
+def test_continue_without_update(runcutty: RunCutty, project: Path) -> None:
+    """It exits with a non-zero status code."""
+    with pytest.raises(RunCuttyError):
+        runcutty("update", f"--cwd={project}", "--continue")
 
 
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
