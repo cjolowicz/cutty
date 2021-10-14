@@ -7,6 +7,7 @@ from yarl import URL
 
 from cutty.entrypoints.cli.errors import fatal
 from cutty.errors import CuttyError
+from cutty.projects.repository import NoUpdateInProgressError
 from cutty.repositories.adapters.fetchers.file import FileFetcherError
 from cutty.repositories.adapters.fetchers.git import GitFetcherError
 from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
@@ -55,6 +56,7 @@ from cutty.services.link import TemplateNotSpecifiedError
         UnknownLocationError(URL("invalid://location")),
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
         TemplateNotSpecifiedError(),
+        NoUpdateInProgressError(),
     ],
 )
 def test_errors(error: CuttyError) -> None:

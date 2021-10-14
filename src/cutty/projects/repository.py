@@ -6,6 +6,7 @@ from pathlib import Path
 import pygit2
 
 from cutty.compat.contextlib import contextmanager
+from cutty.errors import CuttyError
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.template import Template
 from cutty.util.git import Branch
@@ -13,6 +14,10 @@ from cutty.util.git import Repository
 
 
 UPDATE_BRANCH = "cutty/update"
+
+
+class NoUpdateInProgressError(CuttyError):
+    """A sequencer action was invoked without an update in progress."""
 
 
 class ProjectRepository:
@@ -84,21 +89,28 @@ class ProjectRepository:
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
-        if commit := self.project.cherrypickhead:
-            self.project.commit(
-                message=commit.message,
-                author=commit.author,
-                committer=self.project.default_signature,
-            )
+        if not (commit := self.project.cherrypickhead):
+            raise NoUpdateInProgressError()
+
+        self.project.commit(
+            message=commit.message,
+            author=commit.author,
+            committer=self.project.default_signature,
+        )
 
     def skipupdate(self) -> None:
         """Skip an update with conflicts."""
-        if commit := self.project.cherrypickhead:  # pragma: no branch
-            self.project.resetcherrypick()
-            self.updateconfig("Skip update", commit=commit)
+        if not (commit := self.project.cherrypickhead):
+            raise NoUpdateInProgressError()
+
+        self.project.resetcherrypick()
+        self.updateconfig("Skip update", commit=commit)
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
+        if not self.project.cherrypickhead:
+            raise NoUpdateInProgressError()
+
         self.project.resetcherrypick()
 
 
