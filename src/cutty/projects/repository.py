@@ -104,7 +104,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.updateconfig("Skip update", commit=commit)
+        self.updateconfig(f"Skip: {commit.message}", commit=commit)
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
