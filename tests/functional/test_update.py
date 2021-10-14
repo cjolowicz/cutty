@@ -267,7 +267,7 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--directory={directory}", str(template))
+    runcutty("create", f"--template-directory={directory}", str(template))
     updatefile(template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
     runcutty("update", f"--cwd={project}")
 
@@ -279,7 +279,7 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("update", f"--cwd={project}", f"--directory={directory}")
+    runcutty("update", f"--cwd={project}", f"--template-directory={directory}")
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)

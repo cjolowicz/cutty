@@ -79,7 +79,7 @@ def test_directory(runcutty: RunCutty, template: Path) -> None:
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--directory={directory}", str(template))
+    runcutty("create", f"--template-directory={directory}", str(template))
 
     assert template_files(template / "a") == project_files("example") - EXTRA
 
