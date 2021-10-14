@@ -48,10 +48,10 @@ class ProjectRepository:
 
     @contextmanager
     def store(
-        self, template: Template.Metadata, commit: pygit2.Commit
+        self, template: Template.Metadata, parent: pygit2.Commit
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create a commit with a generated project."""
-        branch = self.project.heads.create(UPDATE_BRANCH, commit, force=True)
+        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
             yield worktree.path, lambda: latest
