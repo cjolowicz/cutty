@@ -3,6 +3,7 @@ from collections.abc import Callable
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -27,6 +28,7 @@ class ProjectBuilder:
     path: Path
     _getcommit: Callable[[], pygit2.Commit]
     message: str = ""
+    _commit: Optional[pygit2.Commit] = None
 
     @property
     def commit(self) -> pygit2.Commit:
