@@ -9,7 +9,6 @@ from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.template import Template
-from cutty.util.git import Branch
 from cutty.util.git import Repository
 
 
@@ -43,22 +42,40 @@ class ProjectRepository:
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan commit with a generated project."""
         # Unborn branches cannot have worktrees.
-        branch = _create_orphan_branch(self.project, UPDATE_BRANCH)
+        message = _createcommitmessage(template)
+        with self.store(self.root, message) as values:
+            yield values
+
+    @property
+    def root(self) -> pygit2.Commit:
+        """Create an orphan empty commit."""
+        author = committer = self.project.default_signature
+        repository = self.project._repository
+        tree = repository.TreeBuilder().write()
+        oid = repository.create_commit(None, author, committer, "", tree, [])
+        commit: pygit2.Commit = repository[oid]
+        return commit
+
+    @contextmanager
+    def store(
+        self, parent: pygit2.Commit, message: str
+    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
+        """Create a commit with a generated project."""
+        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path, lambda: latest
-            message = _createcommitmessage(template)
+            yield worktree.path, lambda: commit
             worktree.commit(message=message)
 
-        latest = self.project.heads.pop(branch.name)
+        commit = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as (path, getlatest):
+        with self.reset(template) as (path, getcommit):
             yield path
 
-        self.updateconfig(message=_linkcommitmessage(template), commit=getlatest())
+        self.updateconfig(message=_linkcommitmessage(template), commit=getcommit())
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -77,14 +94,11 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
+        message = _updatecommitmessage(template)
+        with self.store(parent, message) as (path, getcommit):
+            yield path
 
-        with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path
-            worktree.commit(message=_updatecommitmessage(template))
-
-        commit = self.project.heads.pop(branch.name)
-
+        commit = getcommit()
         if commit != parent:
             self.project.cherrypick(commit)
 
@@ -113,21 +127,6 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-
-
-def _create_orphan_branch(repository: Repository, name: str) -> Branch:
-    """Create an orphan branch with an empty commit."""
-    author = committer = repository.default_signature
-    repository.heads.pop(name, None)
-    repository._repository.create_commit(
-        f"refs/heads/{name}",
-        author,
-        committer,
-        "initial",
-        repository._repository.TreeBuilder().write(),
-        [],
-    )
-    return repository.branch(name)
 
 
 def _createcommitmessage(template: Template.Metadata) -> str:
