@@ -1,5 +1,4 @@
 """Project repositories."""
-from collections.abc import Callable
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,7 +25,6 @@ class ProjectBuilder:
     """Adding a project to the repository."""
 
     path: Path
-    _getcommit: Callable[[], pygit2.Commit]
     message: str = ""
     _commit: Optional[pygit2.Commit] = None
 
@@ -77,12 +75,12 @@ class ProjectRepository:
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            builder = ProjectBuilder(worktree.path, lambda: commit)
+            builder = ProjectBuilder(worktree.path)
             yield builder
 
             worktree.commit(message=builder.message)
 
-        builder._commit = commit = self.project.heads.pop(branch.name)
+        builder._commit = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
