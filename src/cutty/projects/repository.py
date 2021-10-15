@@ -74,8 +74,10 @@ class ProjectRepository:
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            yield ProjectBuilder(worktree.path, lambda: commit)
-            worktree.commit(message=message)
+            builder = ProjectBuilder(worktree.path, lambda: commit)
+            yield builder
+
+            worktree.commit(message=builder.message or message)
 
         commit = self.project.heads.pop(branch.name)
 
