@@ -33,7 +33,8 @@ class ProjectBuilder:
     @property
     def commit(self) -> pygit2.Commit:
         """Return the newly created commit."""
-        return self._getcommit()
+        assert self._commit is not None  # noqa: S101
+        return self._commit
 
 
 class ProjectRepository:
