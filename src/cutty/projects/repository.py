@@ -69,9 +69,7 @@ class ProjectRepository:
         return commit
 
     @contextmanager
-    def store(
-        self, parent: pygit2.Commit, message: str = ""
-    ) -> Iterator[ProjectBuilder]:
+    def store(self, parent: pygit2.Commit) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
@@ -79,7 +77,7 @@ class ProjectRepository:
             builder = ProjectBuilder(worktree.path, lambda: commit)
             yield builder
 
-            worktree.commit(message=builder.message or message)
+            worktree.commit(message=builder.message)
 
         commit = self.project.heads.pop(branch.name)
 
