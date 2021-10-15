@@ -51,7 +51,7 @@ class ProjectRepository:
         project.commit(message=_createcommitmessage(template))
 
     @contextmanager
-    def reset2(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
+    def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
         """Create an orphan commit with a generated project."""
         message = _createcommitmessage(template)
         with self.store(self.root, message) as (path, getcommit):
@@ -83,7 +83,7 @@ class ProjectRepository:
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset2(template) as builder:
+        with self.reset(template) as builder:
             yield builder.path
 
         self.updateconfig(message=_linkcommitmessage(template), commit=builder.commit)
