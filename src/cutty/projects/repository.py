@@ -54,8 +54,8 @@ class ProjectRepository:
     def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
         """Create an orphan commit with a generated project."""
         message = _createcommitmessage(template)
-        with self.store(self.root, message) as (path, getcommit):
-            yield ProjectBuilder(path, getcommit)
+        with self.store(self.root, message) as builder:
+            yield builder
 
     @property
     def root(self) -> pygit2.Commit:
@@ -68,14 +68,12 @@ class ProjectRepository:
         return commit
 
     @contextmanager
-    def store(
-        self, parent: pygit2.Commit, message: str
-    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
+    def store(self, parent: pygit2.Commit, message: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path, lambda: commit
+            yield ProjectBuilder(worktree.path, lambda: commit)
             worktree.commit(message=message)
 
         commit = self.project.heads.pop(branch.name)
@@ -106,10 +104,10 @@ class ProjectRepository:
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         message = _updatecommitmessage(template)
-        with self.store(parent, message) as (path, getcommit):
-            yield path
+        with self.store(parent, message) as builder:
+            yield builder.path
 
-        commit = getcommit()
+        commit = builder.commit
         if commit != parent:
             self.project.cherrypick(commit)
 
