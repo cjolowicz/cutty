@@ -1,7 +1,8 @@
 """Project repositories."""
-from collections.abc import Callable
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -17,6 +18,26 @@ UPDATE_BRANCH = "cutty/update"
 
 class NoUpdateInProgressError(CuttyError):
     """A sequencer action was invoked without an update in progress."""
+
+
+@dataclass
+class ProjectBuilder:
+    """Adding a project to the repository."""
+
+    path: Path
+    message: str = ""
+    _commit: Optional[pygit2.Commit] = None
+
+    @property
+    def commit(self) -> pygit2.Commit:
+        """Return the newly created commit."""
+        assert self._commit is not None  # noqa: S101
+        return self._commit
+
+    @commit.setter
+    def commit(self, commit: pygit2.Commit) -> None:
+        """Set the newly created commit."""
+        self._commit = commit
 
 
 class ProjectRepository:
@@ -37,14 +58,11 @@ class ProjectRepository:
         project.commit(message=_createcommitmessage(template))
 
     @contextmanager
-    def reset(
-        self, template: Template.Metadata
-    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
+    def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
         """Create an orphan commit with a generated project."""
-        # Unborn branches cannot have worktrees.
-        message = _createcommitmessage(template)
-        with self.store(self.root, message) as values:
-            yield values
+        with self.build(self.root) as builder:
+            builder.message = _createcommitmessage(template)
+            yield builder
 
     @property
     def root(self) -> pygit2.Commit:
@@ -57,25 +75,25 @@ class ProjectRepository:
         return commit
 
     @contextmanager
-    def store(
-        self, parent: pygit2.Commit, message: str
-    ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
+    def build(self, parent: pygit2.Commit) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            yield worktree.path, lambda: commit
-            worktree.commit(message=message)
+            builder = ProjectBuilder(worktree.path)
+            yield builder
 
-        commit = self.project.heads.pop(branch.name)
+            worktree.commit(message=builder.message)
+
+        builder.commit = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as (path, getcommit):
-            yield path
+        with self.reset(template) as builder:
+            yield builder.path
 
-        self.updateconfig(message=_linkcommitmessage(template), commit=getcommit())
+        self.updateconfig(message=_linkcommitmessage(template), commit=builder.commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -94,13 +112,12 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        message = _updatecommitmessage(template)
-        with self.store(parent, message) as (path, getcommit):
-            yield path
+        with self.build(parent) as builder:
+            builder.message = _updatecommitmessage(template)
+            yield builder.path
 
-        commit = getcommit()
-        if commit != parent:
-            self.project.cherrypick(commit)
+        if builder.commit != parent:
+            self.project.cherrypick(builder.commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
