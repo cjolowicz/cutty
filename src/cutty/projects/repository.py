@@ -42,10 +42,24 @@ class ProjectRepository:
     ) -> Iterator[tuple[Path, Callable[[], pygit2.Commit]]]:
         """Create an orphan commit with a generated project."""
         # Unborn branches cannot have worktrees.
-        commit = _create_orphan_commit(self.project)
+        commit = self._create_orphan_commit()
         message = _createcommitmessage(template)
         with self.store(commit, message) as values:
             yield values
+
+    def _create_orphan_commit(self) -> pygit2.Commit:
+        """Create an orphan empty commit."""
+        author = committer = self.project.default_signature
+        oid = self.project._repository.create_commit(
+            None,
+            author,
+            committer,
+            "initial",
+            self.project._repository.TreeBuilder().write(),
+            [],
+        )
+        commit: pygit2.Commit = self.project._repository[oid]
+        return commit
 
     @contextmanager
     def store(
@@ -118,21 +132,6 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-
-
-def _create_orphan_commit(repository: Repository) -> pygit2.Commit:
-    """Create an orphan empty commit."""
-    author = committer = repository.default_signature
-    oid = repository._repository.create_commit(
-        None,
-        author,
-        committer,
-        "initial",
-        repository._repository.TreeBuilder().write(),
-        [],
-    )
-    commit: pygit2.Commit = repository._repository[oid]
-    return commit
 
 
 def _createcommitmessage(template: Template.Metadata) -> str:
