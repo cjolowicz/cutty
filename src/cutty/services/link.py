@@ -30,7 +30,7 @@ def link(
     """Link project to a Cookiecutter template."""
     with contextlib.suppress(FileNotFoundError):
         projectconfig = readcookiecutterjson(projectdir)
-        extrabindings = list(projectconfig.bindings) + list(extrabindings)
+        extrabindings = [*projectconfig.bindings, *extrabindings]
 
         if location is None:
             location = projectconfig.template
