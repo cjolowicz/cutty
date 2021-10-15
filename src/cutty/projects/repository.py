@@ -50,15 +50,16 @@ class ProjectRepository:
     def _create_orphan_commit(self) -> pygit2.Commit:
         """Create an orphan empty commit."""
         author = committer = self.project.default_signature
-        oid = self.project._repository.create_commit(
+        repository = self.project._repository
+        oid = repository.create_commit(
             None,
             author,
             committer,
             "initial",
-            self.project._repository.TreeBuilder().write(),
+            repository.TreeBuilder().write(),
             [],
         )
-        commit: pygit2.Commit = self.project._repository[oid]
+        commit: pygit2.Commit = repository[oid]
         return commit
 
     @contextmanager
