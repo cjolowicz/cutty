@@ -55,7 +55,7 @@ class ProjectRepository:
             None,
             author,
             committer,
-            "initial",
+            "",
             repository.TreeBuilder().write(),
             [],
         )
