@@ -21,7 +21,7 @@ def update(
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
     projectconfig = readprojectconfigfile(projectdir)
-    extrabindings = list(projectconfig.bindings) + list(extrabindings)
+    extrabindings = [*projectconfig.bindings, *extrabindings]
 
     if directory is None:
         directory = projectconfig.directory
