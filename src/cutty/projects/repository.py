@@ -34,6 +34,11 @@ class ProjectBuilder:
         assert self._commit is not None  # noqa: S101
         return self._commit
 
+    @commit.setter
+    def commit(self, commit: pygit2.Commit) -> None:
+        """Set the newly created commit."""
+        self._commit = commit
+
 
 class ProjectRepository:
     """Project repository."""
@@ -80,7 +85,7 @@ class ProjectRepository:
 
             worktree.commit(message=builder.message)
 
-        builder._commit = self.project.heads.pop(branch.name)
+        builder.commit = self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
