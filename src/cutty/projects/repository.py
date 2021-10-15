@@ -1,6 +1,7 @@
 """Project repositories."""
 from collections.abc import Callable
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 
 import pygit2
@@ -17,6 +18,19 @@ UPDATE_BRANCH = "cutty/update"
 
 class NoUpdateInProgressError(CuttyError):
     """A sequencer action was invoked without an update in progress."""
+
+
+@dataclass
+class ProjectBuilder:
+    """Adding a project to the repository."""
+
+    path: Path
+    _getcommit: Callable[[], pygit2.Commit]
+
+    @property
+    def commit(self) -> pygit2.Commit:
+        """Return the newly created commit."""
+        return self._getcommit()
 
 
 class ProjectRepository:
