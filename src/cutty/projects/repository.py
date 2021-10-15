@@ -108,8 +108,8 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        message = _updatecommitmessage(template)
-        with self.store(parent, message) as builder:
+        with self.store(parent) as builder:
+            builder.message = _updatecommitmessage(template)
             yield builder.path
 
         if builder.commit != parent:
