@@ -26,6 +26,7 @@ class ProjectBuilder:
 
     path: Path
     _getcommit: Callable[[], pygit2.Commit]
+    message: str = ""
 
     @property
     def commit(self) -> pygit2.Commit:
