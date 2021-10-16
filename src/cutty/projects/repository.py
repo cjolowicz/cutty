@@ -24,6 +24,7 @@ class NoUpdateInProgressError(CuttyError):
 class ProjectBuilder:
     """Adding a project to the repository."""
 
+    _worktree: Repository
     path: Path
     message: str = ""
     _commit: Optional[str] = None
@@ -81,7 +82,7 @@ class ProjectRepository:
         )
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            builder = ProjectBuilder(worktree.path)
+            builder = ProjectBuilder(worktree, worktree.path)
             yield builder
 
             worktree.commit(message=builder.message)
