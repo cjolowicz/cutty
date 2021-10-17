@@ -32,8 +32,8 @@ class ProjectBuilder:
     @property
     def commit2(self) -> str:
         """Return the ID of the newly created commit."""
-        assert self._commit is not None  # noqa: S101
-        return str(self._commit.id)
+        assert self._commit2 is not None  # noqa: S101
+        return self._commit2
 
     @commit2.setter
     def commit2(self, commit: str) -> None:
