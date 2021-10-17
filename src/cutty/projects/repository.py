@@ -83,11 +83,7 @@ class ProjectRepository:
             commit2 = builder.commit(createcommitmessage(template))
 
         commit = self.project._repository[commit2]
-        self.updateconfig(message=linkcommitmessage(template), commit=commit)
-
-    def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
-        """Update the project configuration."""
-        self.updateconfig2(str(commit.id))
+        self.updateconfig2(message=linkcommitmessage(template), commit=str(commit.id))
 
     def updateconfig2(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
@@ -124,7 +120,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.updateconfig(f"Skip: {commit.message}", commit=commit)
+        self.updateconfig2(f"Skip: {commit.message}", commit=str(commit.id))
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
