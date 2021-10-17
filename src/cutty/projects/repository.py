@@ -40,12 +40,6 @@ class ProjectBuilder:
         """Set the ID of the newly created commit."""
         self._commit2 = commit
 
-    @property
-    def commit(self) -> pygit2.Commit:
-        """Return the newly created commit."""
-        assert self._commit is not None  # noqa: S101
-        return self._commit
-
 
 class ProjectRepository:
     """Project repository."""
