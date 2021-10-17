@@ -22,9 +22,9 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
 
     with project.build(project.root) as builder:
         builder.message = createcommitmessage(template)
-        builder.commit = builder.commit3()
+        commit = builder.commit3()
 
-    with project.update(template, parent=builder.commit) as outputdir:
+    with project.update(template, parent=commit) as outputdir:
         (outputdir / "cutty.json").touch()
 
 
@@ -161,9 +161,9 @@ def test_updateproject_no_changes(
 
     with repository.build(repository.root) as builder:
         builder.message = createcommitmessage(template)
-        builder.commit = builder.commit3()
+        commit = builder.commit3()
 
-    with repository.update(template, parent=builder.commit):
+    with repository.update(template, parent=commit):
         pass
 
     assert tip == project.head.commit

@@ -2,7 +2,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import pygit2
 
@@ -27,18 +26,6 @@ class ProjectBuilder:
     _worktree: Repository
     path: Path
     message: str = ""
-    _commit: Optional[str] = None
-
-    @property
-    def commit(self) -> str:
-        """Return the ID of the newly created commit."""
-        assert self._commit is not None  # noqa: S101
-        return self._commit
-
-    @commit.setter
-    def commit(self, commit: str) -> None:
-        """Set the ID of the newly created commit."""
-        self._commit = commit
 
     def commit3(self) -> str:
         """Commit the project."""
@@ -91,9 +78,9 @@ class ProjectRepository:
         with self.build(self.root) as builder:
             yield builder.path
             builder.message = createcommitmessage(template)
-            builder.commit = builder.commit3()
+            commit2 = builder.commit3()
 
-        commit = self.project._repository[builder.commit]
+        commit = self.project._repository[commit2]
         self.updateconfig(message=linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
@@ -114,10 +101,10 @@ class ProjectRepository:
         with self.build(parent) as builder:
             yield builder.path
             builder.message = updatecommitmessage(template)
-            builder.commit = builder.commit3()
+            commit2 = builder.commit3()
 
-        if builder.commit != parent:
-            commit = self.project._repository[builder.commit]
+        if commit2 != parent:
+            commit = self.project._repository[commit2]
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:

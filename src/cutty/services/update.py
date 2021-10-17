@@ -36,10 +36,10 @@ def update(
     with repository.build(repository.root) as builder:
         storeproject(project, builder.path, outputdirisproject=True)
         builder.message = createcommitmessage(template.metadata)
-        builder.commit = builder.commit3()
+        commit = builder.commit3()
 
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
 
-    with repository.update(template.metadata, parent=builder.commit) as outputdir:
+    with repository.update(template.metadata, parent=commit) as outputdir:
         storeproject(project, outputdir, outputdirisproject=True)
