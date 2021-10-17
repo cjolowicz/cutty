@@ -35,6 +35,11 @@ class ProjectBuilder:
         assert self._commit is not None  # noqa: S101
         return str(self._commit.id)
 
+    @commit2.setter
+    def commit2(self, commit: str) -> None:
+        """Set the ID of the newly created commit."""
+        self._commit2 = commit
+
     @property
     def commit(self) -> pygit2.Commit:
         """Return the newly created commit."""
@@ -45,7 +50,7 @@ class ProjectBuilder:
     def commit(self, commit: pygit2.Commit) -> None:
         """Set the newly created commit."""
         self._commit = commit
-        self._commit2 = str(commit.id)
+        self.commit2 = str(commit.id)
 
 
 class ProjectRepository:
