@@ -26,17 +26,17 @@ class ProjectBuilder:
 
     path: Path
     message: str = ""
-    _commit: Optional[pygit2.Commit] = None
+    _commit: Optional[str] = None
 
     @property
-    def commit(self) -> pygit2.Commit:
-        """Return the newly created commit."""
+    def commit(self) -> str:
+        """Return the ID of the newly created commit."""
         assert self._commit is not None  # noqa: S101
         return self._commit
 
     @commit.setter
-    def commit(self, commit: pygit2.Commit) -> None:
-        """Set the newly created commit."""
+    def commit(self, commit: str) -> None:
+        """Set the ID of the newly created commit."""
         self._commit = commit
 
 
@@ -65,19 +65,20 @@ class ProjectRepository:
             yield builder
 
     @property
-    def root(self) -> pygit2.Commit:
+    def root(self) -> str:
         """Create an orphan empty commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
         oid = repository.create_commit(None, author, committer, "", tree, [])
-        commit: pygit2.Commit = repository[oid]
-        return commit
+        return str(oid)
 
     @contextmanager
-    def build(self, parent: pygit2.Commit) -> Iterator[ProjectBuilder]:
+    def build(self, parent: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
-        branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
+        branch = self.project.heads.create(
+            UPDATE_BRANCH, self.project._repository[parent], force=True
+        )
 
         with self.project.worktree(branch, checkout=False) as worktree:
             builder = ProjectBuilder(worktree.path)
@@ -85,7 +86,8 @@ class ProjectRepository:
 
             worktree.commit(message=builder.message)
 
-        builder.commit = self.project.heads.pop(branch.name)
+        commit = self.project.heads.pop(branch.name)
+        builder.commit = str(commit.id)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
@@ -93,7 +95,8 @@ class ProjectRepository:
         with self.reset(template) as builder:
             yield builder.path
 
-        self.updateconfig(message=_linkcommitmessage(template), commit=builder.commit)
+        commit = self.project._repository[builder.commit]
+        self.updateconfig(message=_linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -108,16 +111,15 @@ class ProjectRepository:
         )
 
     @contextmanager
-    def update(
-        self, template: Template.Metadata, *, parent: pygit2.Commit
-    ) -> Iterator[Path]:
+    def update(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
         if builder.commit != parent:
-            self.project.cherrypick(builder.commit)
+            commit = self.project._repository[builder.commit]
+            self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
