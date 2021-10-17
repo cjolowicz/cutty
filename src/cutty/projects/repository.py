@@ -85,6 +85,8 @@ class ProjectRepository:
         with self.build2(parent) as builder:
             yield builder
 
+            builder.commit2()
+
     @contextmanager
     def build2(self, parent: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
@@ -95,8 +97,6 @@ class ProjectRepository:
         with self.project.worktree(branch, checkout=False) as worktree:
             builder = ProjectBuilder(worktree, worktree.path)
             yield builder
-
-            builder.commit2()
 
         self.project.heads.pop(branch.name)
 
