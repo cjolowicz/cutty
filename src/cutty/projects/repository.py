@@ -86,8 +86,8 @@ class ProjectRepository:
             yield builder
 
             worktree.commit(message=builder.message)
+            builder.commit = str(branch.commit.id)
 
-        builder.commit = str(branch.commit.id)
         self.project.heads.pop(branch.name)
 
     @contextmanager
