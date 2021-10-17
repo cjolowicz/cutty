@@ -105,8 +105,12 @@ class ProjectRepository:
             commit2 = builder.commit(updatecommitmessage(template))
 
         if commit2 != parent:
-            commit = self.project._repository[commit2]
-            self.project.cherrypick(commit)
+            self.import_(commit2)
+
+    def import_(self, commit2: str) -> None:
+        """Import changes to the project made by the given commit."""
+        commit = self.project._repository[commit2]
+        self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
