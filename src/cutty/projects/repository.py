@@ -132,8 +132,8 @@ class ProjectRepository:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
-        commit = self.project._repository[builder.commit2]
         if builder.commit2 != parent:
+            commit = self.project._repository[builder.commit2]
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
