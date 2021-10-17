@@ -25,12 +25,10 @@ class ProjectBuilder:
 
     _worktree: Repository
     path: Path
-    message: str = ""
 
     def commit2(self, message: str) -> str:
         """Commit the project."""
-        self.message = message
-        self._worktree.commit(message=self.message)
+        self._worktree.commit(message=message)
         return str(self._worktree.head.commit.id)
 
 
