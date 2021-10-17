@@ -24,7 +24,6 @@ class ProjectBuilder:
     """Adding a project to the repository."""
 
     _worktree: Repository
-    _path: Path
 
     @property
     def path(self) -> Path:
@@ -71,7 +70,7 @@ class ProjectRepository:
         )
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            builder = ProjectBuilder(worktree, worktree.path)
+            builder = ProjectBuilder(worktree)
             yield builder
 
         self.project.heads.pop(branch.name)
