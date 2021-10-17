@@ -26,18 +26,18 @@ class ProjectBuilder:
 
     path: Path
     message: str = ""
-    _commit2: Optional[str] = None
+    _commit: Optional[str] = None
 
     @property
-    def commit2(self) -> str:
+    def commit(self) -> str:
         """Return the ID of the newly created commit."""
-        assert self._commit2 is not None  # noqa: S101
-        return self._commit2
+        assert self._commit is not None  # noqa: S101
+        return self._commit
 
-    @commit2.setter
-    def commit2(self, commit: str) -> None:
+    @commit.setter
+    def commit(self, commit: str) -> None:
         """Set the ID of the newly created commit."""
-        self._commit2 = commit
+        self._commit = commit
 
 
 class ProjectRepository:
@@ -87,7 +87,7 @@ class ProjectRepository:
             worktree.commit(message=builder.message)
 
         commit = self.project.heads.pop(branch.name)
-        builder.commit2 = str(commit.id)
+        builder.commit = str(commit.id)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
@@ -95,7 +95,7 @@ class ProjectRepository:
         with self.reset(template) as builder:
             yield builder.path
 
-        commit = self.project._repository[builder.commit2]
+        commit = self.project._repository[builder.commit]
         self.updateconfig(message=_linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
@@ -117,8 +117,8 @@ class ProjectRepository:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
-        if builder.commit2 != parent:
-            commit = self.project._repository[builder.commit2]
+        if builder.commit != parent:
+            commit = self.project._repository[builder.commit]
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
