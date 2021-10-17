@@ -32,8 +32,9 @@ def update(
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.reset(template.metadata) as builder:
+    with repository.reset2(template.metadata) as builder:
         storeproject(project, builder.path, outputdirisproject=True)
+        builder.commit2()
 
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)

@@ -19,8 +19,8 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
 
-    with project.reset(template) as builder:
-        pass
+    with project.reset2(template) as builder:
+        builder.commit2()
 
     with project.update(template, parent=builder.commit) as outputdir:
         (outputdir / "cutty.json").touch()
@@ -157,8 +157,8 @@ def test_updateproject_no_changes(
 
     repository = ProjectRepository(project.path)
 
-    with repository.reset(template) as builder:
-        pass
+    with repository.reset2(template) as builder:
+        builder.commit2()
 
     with repository.update(template, parent=builder.commit):
         pass
