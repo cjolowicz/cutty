@@ -40,6 +40,11 @@ class ProjectBuilder:
         """Set the ID of the newly created commit."""
         self._commit = commit
 
+    def commit2(self) -> None:
+        """Commit the project."""
+        self._worktree.commit(message=self.message)
+        self.commit = str(self._worktree.head.commit.id)
+
 
 class ProjectRepository:
     """Project repository."""
@@ -85,8 +90,7 @@ class ProjectRepository:
             builder = ProjectBuilder(worktree, worktree.path)
             yield builder
 
-            worktree.commit(message=builder.message)
-            builder.commit = str(worktree.head.commit.id)
+            builder.commit2()
 
         self.project.heads.pop(branch.name)
 
