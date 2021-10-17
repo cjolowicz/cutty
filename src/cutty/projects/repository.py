@@ -128,13 +128,12 @@ class ProjectRepository:
     @contextmanager
     def update2(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        parent2 = self.project._repository[parent]
-        with self.build(str(parent2.id)) as builder:
+        with self.build(parent) as builder:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
         commit = self.project._repository[builder.commit2]
-        if commit != parent2:
+        if str(commit.id) != parent:
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
