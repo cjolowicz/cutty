@@ -123,8 +123,9 @@ class ProjectRepository:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
-        if builder.commit != parent:
-            self.project.cherrypick(builder.commit)
+        commit = self.project._repository[builder.commit2]
+        if commit != parent:
+            self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
