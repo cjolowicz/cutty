@@ -29,6 +29,12 @@ class ProjectBuilder:
     _commit: Optional[pygit2.Commit] = None
 
     @property
+    def commit2(self) -> str:
+        """Return the ID of the newly created commit."""
+        assert self._commit is not None  # noqa: S101
+        return str(self._commit.id)
+
+    @property
     def commit(self) -> pygit2.Commit:
         """Return the newly created commit."""
         assert self._commit is not None  # noqa: S101
