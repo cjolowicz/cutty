@@ -32,7 +32,7 @@ def update(
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.reset2(template.metadata) as builder:
+    with repository.reset(template.metadata) as builder:
         storeproject(project, builder.path, outputdirisproject=True)
         builder.commit2()
 
