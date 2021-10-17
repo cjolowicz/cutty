@@ -26,7 +26,6 @@ class ProjectBuilder:
 
     path: Path
     message: str = ""
-    _commit: Optional[pygit2.Commit] = None
     _commit2: Optional[str] = None
 
     @property
@@ -87,7 +86,7 @@ class ProjectRepository:
 
             worktree.commit(message=builder.message)
 
-        builder._commit = commit = self.project.heads.pop(branch.name)
+        commit = self.project.heads.pop(branch.name)
         builder.commit2 = str(commit.id)
 
     @contextmanager
