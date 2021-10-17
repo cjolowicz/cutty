@@ -61,13 +61,13 @@ class ProjectRepository:
         except pygit2.GitError:
             project = Repository.init(projectdir)
 
-        project.commit(message=_createcommitmessage(template))
+        project.commit(message=createcommitmessage(template))
 
     @contextmanager
     def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
         """Create an orphan commit with a generated project."""
         with self.build(self.root) as builder:
-            builder.message = _createcommitmessage(template)
+            builder.message = createcommitmessage(template)
             yield builder
 
     @property
@@ -153,7 +153,7 @@ class ProjectRepository:
         self.project.resetcherrypick()
 
 
-def _createcommitmessage(template: Template.Metadata) -> str:
+def createcommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for importing the template."""
     if template.revision:
         return f"Initial import from {template.name} {template.revision}"
