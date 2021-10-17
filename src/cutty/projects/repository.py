@@ -122,20 +122,19 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        with self.update2(template, parent=parent) as path:
+        with self.update2(template, parent=str(parent.id)) as path:
             yield path
 
     @contextmanager
-    def update2(
-        self, template: Template.Metadata, *, parent: pygit2.Commit
-    ) -> Iterator[Path]:
+    def update2(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        with self.build(str(parent.id)) as builder:
+        parent2 = self.project._repository[parent]
+        with self.build(str(parent2.id)) as builder:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
         commit = self.project._repository[builder.commit2]
-        if commit != parent:
+        if commit != parent2:
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
