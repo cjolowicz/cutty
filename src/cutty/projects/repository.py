@@ -118,14 +118,6 @@ class ProjectRepository:
         )
 
     @contextmanager
-    def update(
-        self, template: Template.Metadata, *, parent: pygit2.Commit
-    ) -> Iterator[Path]:
-        """Update a project by applying changes between the generated trees."""
-        with self.update2(template, parent=str(parent.id)) as path:
-            yield path
-
-    @contextmanager
     def update2(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:

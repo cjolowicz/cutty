@@ -38,5 +38,7 @@ def update(
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
 
-    with repository.update(template.metadata, parent=builder.commit) as outputdir:
+    with repository.update2(
+        template.metadata, parent=str(builder.commit.id)
+    ) as outputdir:
         storeproject(project, outputdir, outputdirisproject=True)
