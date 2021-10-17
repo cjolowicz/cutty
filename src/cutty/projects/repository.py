@@ -89,8 +89,8 @@ class ProjectRepository:
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
         with self.build(self.root) as builder:
-            builder.message = createcommitmessage(template)
             yield builder.path
+            builder.message = createcommitmessage(template)
             builder.commit2()
 
         commit = self.project._repository[builder.commit]
