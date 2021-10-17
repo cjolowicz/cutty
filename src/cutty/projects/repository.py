@@ -27,6 +27,11 @@ class ProjectBuilder:
     path: Path
     message: str = ""
 
+    def commit2(self, message: str) -> str:
+        """Commit the project."""
+        self.message = message
+        return self.commit()
+
     def commit(self) -> str:
         """Commit the project."""
         self._worktree.commit(message=self.message)
@@ -77,8 +82,7 @@ class ProjectRepository:
         """Link a project to a project template."""
         with self.build(self.root) as builder:
             yield builder.path
-            builder.message = createcommitmessage(template)
-            commit2 = builder.commit()
+            commit2 = builder.commit2(createcommitmessage(template))
 
         commit = self.project._repository[commit2]
         self.updateconfig(message=linkcommitmessage(template), commit=commit)
@@ -100,8 +104,7 @@ class ProjectRepository:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
             yield builder.path
-            builder.message = updatecommitmessage(template)
-            commit2 = builder.commit()
+            commit2 = builder.commit2(updatecommitmessage(template))
 
         if commit2 != parent:
             commit = self.project._repository[commit2]
