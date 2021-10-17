@@ -2,7 +2,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import pygit2
 
@@ -24,20 +23,17 @@ class NoUpdateInProgressError(CuttyError):
 class ProjectBuilder:
     """Adding a project to the repository."""
 
-    path: Path
-    message: str = ""
-    _commit: Optional[str] = None
+    _worktree: Repository
 
     @property
-    def commit(self) -> str:
-        """Return the ID of the newly created commit."""
-        assert self._commit is not None  # noqa: S101
-        return self._commit
+    def path(self) -> Path:
+        """Return the project directory."""
+        return self._worktree.path
 
-    @commit.setter
-    def commit(self, commit: str) -> None:
-        """Set the ID of the newly created commit."""
-        self._commit = commit
+    def commit(self, message: str) -> str:
+        """Commit the project."""
+        self._worktree.commit(message=message)
+        return str(self._worktree.head.commit.id)
 
 
 class ProjectRepository:
@@ -55,14 +51,7 @@ class ProjectRepository:
         except pygit2.GitError:
             project = Repository.init(projectdir)
 
-        project.commit(message=_createcommitmessage(template))
-
-    @contextmanager
-    def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
-        """Create an orphan commit with a generated project."""
-        with self.build(self.root) as builder:
-            builder.message = _createcommitmessage(template)
-            yield builder
+        project.commit(message=createcommitmessage(template))
 
     @property
     def root(self) -> str:
@@ -81,22 +70,20 @@ class ProjectRepository:
         )
 
         with self.project.worktree(branch, checkout=False) as worktree:
-            builder = ProjectBuilder(worktree.path)
+            builder = ProjectBuilder(worktree)
             yield builder
 
-            worktree.commit(message=builder.message)
-
-        commit = self.project.heads.pop(branch.name)
-        builder.commit = str(commit.id)
+        self.project.heads.pop(branch.name)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as builder:
+        with self.build(self.root) as builder:
             yield builder.path
+            commit2 = builder.commit(createcommitmessage(template))
 
-        commit = self.project._repository[builder.commit]
-        self.updateconfig(message=_linkcommitmessage(template), commit=commit)
+        commit = self.project._repository[commit2]
+        self.updateconfig(message=linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -114,11 +101,11 @@ class ProjectRepository:
     def update(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
-            builder.message = _updatecommitmessage(template)
             yield builder.path
+            commit2 = builder.commit(updatecommitmessage(template))
 
-        if builder.commit != parent:
-            commit = self.project._repository[builder.commit]
+        if commit2 != parent:
+            commit = self.project._repository[commit2]
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
@@ -148,7 +135,7 @@ class ProjectRepository:
         self.project.resetcherrypick()
 
 
-def _createcommitmessage(template: Template.Metadata) -> str:
+def createcommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for importing the template."""
     if template.revision:
         return f"Initial import from {template.name} {template.revision}"
@@ -156,7 +143,7 @@ def _createcommitmessage(template: Template.Metadata) -> str:
         return f"Initial import from {template.name}"
 
 
-def _updatecommitmessage(template: Template.Metadata) -> str:
+def updatecommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for updating the template."""
     if template.revision:
         return f"Update {template.name} to {template.revision}"
@@ -164,7 +151,7 @@ def _updatecommitmessage(template: Template.Metadata) -> str:
         return f"Update {template.name}"
 
 
-def _linkcommitmessage(template: Template.Metadata) -> str:
+def linkcommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for linking the template."""
     if template.revision:
         return f"Link to {template.name} {template.revision}"
