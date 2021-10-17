@@ -83,9 +83,9 @@ class ProjectRepository:
             commit2 = builder.commit(createcommitmessage(template))
 
         commit = self.project._repository[commit2]
-        self.updateconfig2(message=linkcommitmessage(template), commit=str(commit.id))
+        self.updateconfig(message=linkcommitmessage(template), commit=str(commit.id))
 
-    def updateconfig2(self, message: str, *, commit: str) -> None:
+    def updateconfig(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
         commit2 = self.project._repository[commit]
 
@@ -120,7 +120,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.updateconfig2(f"Skip: {commit.message}", commit=str(commit.id))
+        self.updateconfig(f"Skip: {commit.message}", commit=str(commit.id))
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
