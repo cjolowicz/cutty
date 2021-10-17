@@ -87,9 +87,8 @@ class ProjectRepository:
 
             worktree.commit(message=builder.message)
 
-        commit = branch.commit
+        builder.commit = str(branch.commit.id)
         self.project.heads.pop(branch.name)
-        builder.commit = str(commit.id)
 
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
