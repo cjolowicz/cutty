@@ -7,6 +7,7 @@ from cutty.projects.generate import generate
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
+from cutty.projects.repository import updatecommitmessage
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
@@ -40,5 +41,9 @@ def update(
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
 
-    with repository.update(template.metadata, parent=commit) as outputdir:
-        storeproject(project, outputdir, outputdirisproject=True)
+    with repository.build(parent=commit) as builder:
+        storeproject(project, builder.path, outputdirisproject=True)
+        commit2 = builder.commit(updatecommitmessage(template.metadata))
+
+    if commit2 != commit:
+        repository.import_(commit2)

@@ -97,16 +97,6 @@ class ProjectRepository:
             committer=self.project.default_signature,
         )
 
-    @contextmanager
-    def update(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
-        """Update a project by applying changes between the generated trees."""
-        with self.build(parent=parent) as builder:
-            yield builder.path
-            commit2 = builder.commit(updatecommitmessage(template))
-
-        if commit2 != parent:
-            self.import_(commit2)
-
     def import_(self, commit: str) -> None:
         """Import changes to the project made by the given commit."""
         self.project.cherrypick(self.project._repository[commit])
