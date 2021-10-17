@@ -87,13 +87,19 @@ class ProjectRepository:
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
+        self.updateconfig2(str(commit.id))
+
+    def updateconfig2(self, message: str, *, commit: str) -> None:
+        """Update the project configuration."""
+        commit2 = self.project._repository[commit]
+
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
-            (commit.tree / PROJECT_CONFIG_FILE).data
+            (commit2.tree / PROJECT_CONFIG_FILE).data
         )
 
         self.project.commit(
             message=message,
-            author=commit.author,
+            author=commit2.author,
             committer=self.project.default_signature,
         )
 
