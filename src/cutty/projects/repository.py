@@ -123,7 +123,7 @@ class ProjectRepository:
         self, template: Template.Metadata, *, parent: pygit2.Commit
     ) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
-        with self.build(parent) as builder:
+        with self.build(parent, str(parent.id)) as builder:
             builder.message = _updatecommitmessage(template)
             yield builder.path
 
