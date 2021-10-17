@@ -27,7 +27,7 @@ class ProjectBuilder:
     path: Path
     message: str = ""
 
-    def commit3(self) -> str:
+    def commit(self) -> str:
         """Commit the project."""
         self._worktree.commit(message=self.message)
         return str(self._worktree.head.commit.id)
@@ -78,7 +78,7 @@ class ProjectRepository:
         with self.build(self.root) as builder:
             yield builder.path
             builder.message = createcommitmessage(template)
-            commit2 = builder.commit3()
+            commit2 = builder.commit()
 
         commit = self.project._repository[commit2]
         self.updateconfig(message=linkcommitmessage(template), commit=commit)
@@ -101,7 +101,7 @@ class ProjectRepository:
         with self.build(parent) as builder:
             yield builder.path
             builder.message = updatecommitmessage(template)
-            commit2 = builder.commit3()
+            commit2 = builder.commit()
 
         if commit2 != parent:
             commit = self.project._repository[commit2]
