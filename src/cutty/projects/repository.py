@@ -27,6 +27,7 @@ class ProjectBuilder:
     path: Path
     message: str = ""
     _commit: Optional[pygit2.Commit] = None
+    _commit2: Optional[str] = None
 
     @property
     def commit2(self) -> str:
@@ -44,6 +45,7 @@ class ProjectBuilder:
     def commit(self, commit: pygit2.Commit) -> None:
         """Set the newly created commit."""
         self._commit = commit
+        self._commit2 = str(commit.id)
 
 
 class ProjectRepository:
