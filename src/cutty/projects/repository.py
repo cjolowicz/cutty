@@ -119,7 +119,7 @@ class ProjectRepository:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
             yield builder.path
-            builder.message = _updatecommitmessage(template)
+            builder.message = updatecommitmessage(template)
             builder.commit2()
 
         if builder.commit != parent:
@@ -161,7 +161,7 @@ def createcommitmessage(template: Template.Metadata) -> str:
         return f"Initial import from {template.name}"
 
 
-def _updatecommitmessage(template: Template.Metadata) -> str:
+def updatecommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for updating the template."""
     if template.revision:
         return f"Update {template.name} to {template.revision}"
