@@ -100,7 +100,7 @@ class ProjectRepository:
             builder.commit2()
 
         commit = self.project._repository[builder.commit]
-        self.updateconfig(message=_linkcommitmessage(template), commit=commit)
+        self.updateconfig(message=linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
@@ -169,7 +169,7 @@ def updatecommitmessage(template: Template.Metadata) -> str:
         return f"Update {template.name}"
 
 
-def _linkcommitmessage(template: Template.Metadata) -> str:
+def linkcommitmessage(template: Template.Metadata) -> str:
     """Return the commit message for linking the template."""
     if template.revision:
         return f"Link to {template.name} {template.revision}"
