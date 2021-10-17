@@ -133,7 +133,7 @@ class ProjectRepository:
             yield builder.path
 
         commit = self.project._repository[builder.commit2]
-        if str(commit.id) != parent:
+        if builder.commit2 != parent:
             self.project.cherrypick(commit)
 
     def continueupdate(self) -> None:
