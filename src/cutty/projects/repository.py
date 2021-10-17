@@ -118,7 +118,7 @@ class ProjectRepository:
         )
 
     @contextmanager
-    def update2(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
+    def update(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
             builder.message = _updatecommitmessage(template)
