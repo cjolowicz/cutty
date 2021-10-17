@@ -67,12 +67,19 @@ class ProjectRepository:
     @property
     def root(self) -> pygit2.Commit:
         """Create an orphan empty commit."""
+        repository = self.project._repository
+        oid = self.root2
+        commit: pygit2.Commit = repository[oid]
+        return commit
+
+    @property
+    def root2(self) -> str:
+        """Create an orphan empty commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
         oid = repository.create_commit(None, author, committer, "", tree, [])
-        commit: pygit2.Commit = repository[oid]
-        return commit
+        return str(oid)
 
     @contextmanager
     def build(self, parent: str) -> Iterator[ProjectBuilder]:
