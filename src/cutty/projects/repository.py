@@ -29,7 +29,7 @@ class ProjectBuilder:
     @property
     def path(self) -> Path:
         """Return the project directory."""
-        return self._path
+        return self._worktree.path
 
     def commit2(self, message: str) -> str:
         """Commit the project."""
