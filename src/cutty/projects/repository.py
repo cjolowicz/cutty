@@ -63,13 +63,6 @@ class ProjectRepository:
 
         project.commit(message=createcommitmessage(template))
 
-    @contextmanager
-    def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
-        """Create an orphan commit with a generated project."""
-        with self.build(self.root) as builder:
-            builder.message = createcommitmessage(template)
-            yield builder
-
     @property
     def root(self) -> str:
         """Create an orphan empty commit."""
@@ -95,7 +88,8 @@ class ProjectRepository:
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.reset(template) as builder:
+        with self.build(self.root) as builder:
+            builder.message = createcommitmessage(template)
             yield builder.path
             builder.commit2()
 

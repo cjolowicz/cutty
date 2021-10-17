@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository
@@ -19,7 +20,8 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
 
-    with project.reset(template) as builder:
+    with project.build(project.root) as builder:
+        builder.message = createcommitmessage(template)
         builder.commit2()
 
     with project.update(template, parent=builder.commit) as outputdir:
@@ -157,7 +159,8 @@ def test_updateproject_no_changes(
 
     repository = ProjectRepository(project.path)
 
-    with repository.reset(template) as builder:
+    with repository.build(repository.root) as builder:
+        builder.message = createcommitmessage(template)
         builder.commit2()
 
     with repository.update(template, parent=builder.commit):

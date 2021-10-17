@@ -5,6 +5,7 @@ from typing import Optional
 
 from cutty.projects.generate import generate
 from cutty.projects.projectconfig import readprojectconfigfile
+from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -32,7 +33,8 @@ def update(
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.reset(template.metadata) as builder:
+    with repository.build(repository.root) as builder:
+        builder.message = createcommitmessage(template.metadata)
         storeproject(project, builder.path, outputdirisproject=True)
         builder.commit2()
 
