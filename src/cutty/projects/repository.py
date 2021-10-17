@@ -82,6 +82,12 @@ class ProjectRepository:
     @contextmanager
     def build(self, parent: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
+        with self.build2(parent) as builder:
+            yield builder
+
+    @contextmanager
+    def build2(self, parent: str) -> Iterator[ProjectBuilder]:
+        """Create a commit with a generated project."""
         branch = self.project.heads.create(
             UPDATE_BRANCH, self.project._repository[parent], force=True
         )
