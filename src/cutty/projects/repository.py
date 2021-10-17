@@ -99,7 +99,8 @@ class ProjectRepository:
         with self.reset(template) as builder:
             yield builder.path
 
-        self.updateconfig(message=_linkcommitmessage(template), commit=builder.commit)
+        commit = self.project._repository[builder.commit2]
+        self.updateconfig(message=_linkcommitmessage(template), commit=commit)
 
     def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
         """Update the project configuration."""
