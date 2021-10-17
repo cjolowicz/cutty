@@ -42,6 +42,10 @@ class ProjectBuilder:
 
     def commit2(self) -> None:
         """Commit the project."""
+        self.commit3()
+
+    def commit3(self) -> None:
+        """Commit the project."""
         self._worktree.commit(message=self.message)
         self.commit = str(self._worktree.head.commit.id)
 
