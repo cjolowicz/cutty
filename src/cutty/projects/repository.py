@@ -83,13 +83,9 @@ class ProjectRepository:
         return commit
 
     @contextmanager
-    def build(
-        self, parent2: str, parent: Optional[pygit2.Commit] = None
-    ) -> Iterator[ProjectBuilder]:
+    def build(self, parent2: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
-        if parent is None:
-            parent = self.project._repository[parent2]
-
+        parent = self.project._repository[parent2]
         branch = self.project.heads.create(UPDATE_BRANCH, parent, force=True)
 
         with self.project.worktree(branch, checkout=False) as worktree:
