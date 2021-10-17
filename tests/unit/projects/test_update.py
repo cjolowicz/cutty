@@ -21,7 +21,7 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     project = ProjectRepository(projectdir)
 
     with project.build(project.root) as builder:
-        commit = builder.commit2(createcommitmessage(template))
+        commit = builder.commit(createcommitmessage(template))
 
     with project.update(template, parent=commit) as outputdir:
         (outputdir / "cutty.json").touch()
@@ -159,7 +159,7 @@ def test_updateproject_no_changes(
     repository = ProjectRepository(project.path)
 
     with repository.build(repository.root) as builder:
-        commit = builder.commit2(createcommitmessage(template))
+        commit = builder.commit(createcommitmessage(template))
 
     with repository.update(template, parent=commit):
         pass

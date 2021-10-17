@@ -30,7 +30,7 @@ class ProjectBuilder:
         """Return the project directory."""
         return self._worktree.path
 
-    def commit2(self, message: str) -> str:
+    def commit(self, message: str) -> str:
         """Commit the project."""
         self._worktree.commit(message=message)
         return str(self._worktree.head.commit.id)
@@ -80,7 +80,7 @@ class ProjectRepository:
         """Link a project to a project template."""
         with self.build(self.root) as builder:
             yield builder.path
-            commit2 = builder.commit2(createcommitmessage(template))
+            commit2 = builder.commit(createcommitmessage(template))
 
         commit = self.project._repository[commit2]
         self.updateconfig(message=linkcommitmessage(template), commit=commit)
@@ -102,7 +102,7 @@ class ProjectRepository:
         """Update a project by applying changes between the generated trees."""
         with self.build(parent) as builder:
             yield builder.path
-            commit2 = builder.commit2(updatecommitmessage(template))
+            commit2 = builder.commit(updatecommitmessage(template))
 
         if commit2 != parent:
             commit = self.project._repository[commit2]
