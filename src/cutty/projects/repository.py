@@ -60,7 +60,7 @@ class ProjectRepository:
     @contextmanager
     def reset(self, template: Template.Metadata) -> Iterator[ProjectBuilder]:
         """Create an orphan commit with a generated project."""
-        with self.build(str(self.root.id)) as builder:
+        with self.build(self.root2) as builder:
             builder.message = _createcommitmessage(template)
             yield builder
 
