@@ -87,7 +87,8 @@ class ProjectRepository:
 
             worktree.commit(message=builder.message)
 
-        commit = self.project.heads.pop(branch.name)
+        commit = branch.commit
+        self.project.heads.pop(branch.name)
         builder.commit = str(commit.id)
 
     @contextmanager
