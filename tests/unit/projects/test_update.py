@@ -6,6 +6,7 @@ import pytest
 
 from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
+from cutty.projects.repository import updatecommitmessage
 from cutty.projects.template import Template
 from cutty.util.git import Repository
 from tests.util.git import resolveconflicts
@@ -20,11 +21,15 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
 
-    with project.build(project.root) as builder:
+    with project.build(parent=project.root) as builder:
         commit = builder.commit(createcommitmessage(template))
 
-    with project.update(template, parent=commit) as outputdir:
-        (outputdir / "cutty.json").touch()
+    with project.build(parent=commit) as builder:
+        (builder.path / "cutty.json").touch()
+        commit2 = builder.commit(updatecommitmessage(template))
+
+    if commit2 != commit:
+        project.import_(commit2)
 
 
 def continueupdate(projectdir: Path) -> None:
@@ -158,10 +163,13 @@ def test_updateproject_no_changes(
 
     repository = ProjectRepository(project.path)
 
-    with repository.build(repository.root) as builder:
+    with repository.build(parent=repository.root) as builder:
         commit = builder.commit(createcommitmessage(template))
 
-    with repository.update(template, parent=commit):
-        pass
+    with repository.build(parent=commit) as builder:
+        commit2 = builder.commit(updatecommitmessage(template))
+
+    if commit2 != commit:
+        repository.import_(commit2)
 
     assert tip == project.head.commit

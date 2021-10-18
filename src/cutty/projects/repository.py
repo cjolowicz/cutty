@@ -63,7 +63,7 @@ class ProjectRepository:
         return str(oid)
 
     @contextmanager
-    def build(self, parent: str) -> Iterator[ProjectBuilder]:
+    def build(self, *, parent: str) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         branch = self.project.heads.create(
             UPDATE_BRANCH, self.project._repository[parent], force=True
@@ -78,7 +78,7 @@ class ProjectRepository:
     @contextmanager
     def link(self, template: Template.Metadata) -> Iterator[Path]:
         """Link a project to a project template."""
-        with self.build(self.root) as builder:
+        with self.build(parent=self.root) as builder:
             yield builder.path
             commit2 = builder.commit(createcommitmessage(template))
 
@@ -97,16 +97,9 @@ class ProjectRepository:
             committer=self.project.default_signature,
         )
 
-    @contextmanager
-    def update(self, template: Template.Metadata, *, parent: str) -> Iterator[Path]:
-        """Update a project by applying changes between the generated trees."""
-        with self.build(parent) as builder:
-            yield builder.path
-            commit2 = builder.commit(updatecommitmessage(template))
-
-        if commit2 != parent:
-            commit = self.project._repository[commit2]
-            self.project.cherrypick(commit)
+    def import_(self, commit: str) -> None:
+        """Import changes to the project made by the given commit."""
+        self.project.cherrypick(self.project._repository[commit])
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
