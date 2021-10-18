@@ -75,25 +75,17 @@ class ProjectRepository:
 
         self.project.heads.pop(branch.name)
 
-    @contextmanager
-    def link(self, template: Template.Metadata) -> Iterator[Path]:
-        """Link a project to a project template."""
-        with self.build(parent=self.root) as builder:
-            yield builder.path
-            commit2 = builder.commit(createcommitmessage(template))
-
-        commit = self.project._repository[commit2]
-        self.updateconfig(message=linkcommitmessage(template), commit=commit)
-
-    def updateconfig(self, message: str, *, commit: pygit2.Commit) -> None:
+    def link(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
+        commit2 = self.project._repository[commit]
+
         (self.project.path / PROJECT_CONFIG_FILE).write_bytes(
-            (commit.tree / PROJECT_CONFIG_FILE).data
+            (commit2.tree / PROJECT_CONFIG_FILE).data
         )
 
         self.project.commit(
             message=message,
-            author=commit.author,
+            author=commit2.author,
             committer=self.project.default_signature,
         )
 
@@ -118,7 +110,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.updateconfig(f"Skip: {commit.message}", commit=commit)
+        self.link(f"Skip: {commit.message}", commit=str(commit.id))
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""

@@ -7,6 +7,8 @@ from typing import Optional
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
 from cutty.projects.projectconfig import readcookiecutterjson
+from cutty.projects.repository import createcommitmessage
+from cutty.projects.repository import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -43,5 +45,8 @@ def link(
 
     repository = ProjectRepository(projectdir)
 
-    with repository.link(template.metadata) as outputdir:
-        storeproject(project, outputdir, outputdirisproject=True)
+    with repository.build(parent=repository.root) as builder:
+        storeproject(project, builder.path, outputdirisproject=True)
+        commit2 = builder.commit(createcommitmessage(template.metadata))
+
+    repository.link(message=linkcommitmessage(template.metadata), commit=commit2)
