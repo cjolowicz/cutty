@@ -20,7 +20,7 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     """Update a project by applying changes between the generated trees."""
     project = ProjectRepository(projectdir)
 
-    with project.build(project.root) as builder:
+    with project.build(parent=project.root) as builder:
         commit = builder.commit(createcommitmessage(template))
 
     with project.update(template, parent=commit) as outputdir:
@@ -158,7 +158,7 @@ def test_updateproject_no_changes(
 
     repository = ProjectRepository(project.path)
 
-    with repository.build(repository.root) as builder:
+    with repository.build(parent=repository.root) as builder:
         commit = builder.commit(createcommitmessage(template))
 
     with repository.update(template, parent=commit):

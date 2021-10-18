@@ -33,7 +33,7 @@ def update(
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.build(repository.root) as builder:
+    with repository.build(parent=repository.root) as builder:
         storeproject(project, builder.path, outputdirisproject=True)
         commit = builder.commit(createcommitmessage(template.metadata))
 
