@@ -1,8 +1,6 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
 
-import pytest
-
 from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
@@ -24,45 +22,41 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
     repository.updateconfig(message=linkcommitmessage(template), commit=commit2)
 
 
-@pytest.fixture
-def project(repository: Repository) -> Repository:
-    """Fixture for a project repository."""
-    return repository
-
-
-def test_linkproject_commit(project: Repository, template: Template.Metadata) -> None:
+def test_linkproject_commit(
+    repository: Repository, template: Template.Metadata
+) -> None:
     """It creates a commit on the current branch."""
-    tip = project.head.commit
+    tip = repository.head.commit
 
-    linkproject(project, template)
+    linkproject(repository, template)
 
-    assert [tip] == project.head.commit.parents
+    assert [tip] == repository.head.commit.parents
 
 
 def test_linkproject_commit_message(
-    project: Repository, template: Template.Metadata
+    repository: Repository, template: Template.Metadata
 ) -> None:
     """It uses a commit message indicating the linkage."""
-    linkproject(project, template)
+    linkproject(repository, template)
 
-    assert "link" in project.head.commit.message.lower()
+    assert "link" in repository.head.commit.message.lower()
 
 
 def test_linkproject_commit_message_template(
-    project: Repository, template: Template.Metadata
+    repository: Repository, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
-    linkproject(project, template)
+    linkproject(repository, template)
 
-    assert template.name in project.head.commit.message
+    assert template.name in repository.head.commit.message
 
 
 def test_linkproject_commit_message_revision(
-    project: Repository, template: Template.Metadata
+    repository: Repository, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
     template = dataclasses.replace(template, revision="1.0.0")
 
-    linkproject(project, template)
+    linkproject(repository, template)
 
-    assert template.revision in project.head.commit.message
+    assert template.revision in repository.head.commit.message
