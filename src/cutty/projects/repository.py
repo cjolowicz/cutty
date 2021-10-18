@@ -75,7 +75,7 @@ class ProjectRepository:
 
         self.project.heads.pop(branch.name)
 
-    def updateconfig(self, message: str, *, commit: str) -> None:
+    def link(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
         commit2 = self.project._repository[commit]
 
@@ -110,7 +110,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.updateconfig(f"Skip: {commit.message}", commit=str(commit.id))
+        self.link(f"Skip: {commit.message}", commit=str(commit.id))
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
