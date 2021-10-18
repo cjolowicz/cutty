@@ -82,8 +82,7 @@ class ProjectRepository:
             yield builder.path
             commit2 = builder.commit(createcommitmessage(template))
 
-        commit = self.project._repository[commit2]
-        self.updateconfig(message=linkcommitmessage(template), commit=str(commit.id))
+        self.updateconfig(message=linkcommitmessage(template), commit=commit2)
 
     def updateconfig(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
