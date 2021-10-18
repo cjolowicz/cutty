@@ -75,15 +75,6 @@ class ProjectRepository:
 
         self.project.heads.pop(branch.name)
 
-    @contextmanager
-    def link(self, template: Template.Metadata) -> Iterator[Path]:
-        """Link a project to a project template."""
-        with self.build(parent=self.root) as builder:
-            yield builder.path
-            commit2 = builder.commit(createcommitmessage(template))
-
-        self.updateconfig(message=linkcommitmessage(template), commit=commit2)
-
     def updateconfig(self, message: str, *, commit: str) -> None:
         """Update the project configuration."""
         commit2 = self.project._repository[commit]

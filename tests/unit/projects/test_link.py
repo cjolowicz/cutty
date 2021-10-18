@@ -3,6 +3,8 @@ import dataclasses
 
 import pytest
 
+from cutty.projects.repository import createcommitmessage
+from cutty.projects.repository import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository
@@ -14,8 +16,12 @@ pytest_plugins = ["tests.fixtures.git"]
 def linkproject(project: Repository, template: Template.Metadata) -> None:
     """Link a project to a project template."""
     repository = ProjectRepository(project.path)
-    with repository.link(template) as projectdir:
-        (projectdir / "cutty.json").touch()
+
+    with repository.build(parent=repository.root) as builder:
+        (builder.path / "cutty.json").touch()
+        commit2 = builder.commit(createcommitmessage(template))
+
+    repository.updateconfig(message=linkcommitmessage(template), commit=commit2)
 
 
 @pytest.fixture
