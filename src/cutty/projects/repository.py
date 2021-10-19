@@ -62,6 +62,10 @@ class ProjectRepository:
     @property
     def root(self) -> str:
         """Create an orphan empty commit."""
+        return self.createroot()
+
+    def createroot(self) -> str:
+        """Create an orphan empty commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
