@@ -469,6 +469,23 @@ def test_cherrypick_conflict_deletion(repository: Repository, path: Path) -> Non
         repository.cherrypick(branch.commit)
 
 
+def test_cherrypick_with_untracked_files(repository: Repository, path: Path) -> None:
+    """It does not commit untracked files."""
+    main = repository.head
+    branch = repository.heads.create("branch")
+
+    repository.checkout(branch)
+    updatefile(path)
+
+    untracked = repository.path / "untracked-file"
+    untracked.touch()
+
+    repository.checkout(main)
+    repository.cherrypick(branch.commit)
+
+    assert untracked.name not in repository.head.commit.tree
+
+
 def test_cherrypickhead_none(repository: Repository) -> None:
     """It returns None if no cherry pick is in progress."""
     assert repository.cherrypickhead is None
