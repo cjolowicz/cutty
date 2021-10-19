@@ -50,7 +50,8 @@ class ProjectRepository:
         try:
             project = cls(projectdir).project
         except pygit2.GitError:
-            project = Repository.init(projectdir)
+            Repository.init(projectdir)
+            project = cls(projectdir).project
 
         if project._repository.head_is_unborn:
             author = committer = project.default_signature
