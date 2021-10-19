@@ -51,6 +51,7 @@ class ProjectRepository:
         except pygit2.GitError:
             project = Repository.init(projectdir)
 
+        if project._repository.head_is_unborn:
             author = committer = project.default_signature
             repository = project._repository
             tree = repository.TreeBuilder().write()
