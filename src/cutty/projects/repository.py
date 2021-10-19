@@ -49,11 +49,11 @@ class ProjectRepository:
         """Initialize the git repository for a project."""
         try:
             repository = cls(projectdir)
-            project = repository.project
         except pygit2.GitError:
             Repository.init(projectdir)
             repository = cls(projectdir)
-            project = repository.project
+
+        project = repository.project
 
         if project._repository.head_is_unborn:
             author = committer = project.default_signature
