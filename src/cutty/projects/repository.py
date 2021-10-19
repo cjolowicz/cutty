@@ -48,10 +48,12 @@ class ProjectRepository:
     def create(cls, projectdir: Path, template: Template.Metadata) -> None:
         """Initialize the git repository for a project."""
         try:
-            project = cls(projectdir).project
+            repository = cls(projectdir)
+            project = repository.project
         except pygit2.GitError:
             Repository.init(projectdir)
-            project = cls(projectdir).project
+            repository = cls(projectdir)
+            project = repository.project
 
         if project._repository.head_is_unborn:
             author = committer = project.default_signature
