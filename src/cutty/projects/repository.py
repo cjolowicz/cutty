@@ -53,12 +53,10 @@ class ProjectRepository:
             Repository.init(projectdir)
             repository = cls(projectdir)
 
-        project = repository.project
-
-        if project._repository.head_is_unborn:
+        if repository.project._repository.head_is_unborn:
             repository.createroot(updateref="HEAD")
 
-        project.commit(message=createcommitmessage(template))
+        repository.project.commit(message=createcommitmessage(template))
 
     @property
     def root(self) -> str:
