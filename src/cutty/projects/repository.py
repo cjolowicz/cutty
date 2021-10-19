@@ -60,7 +60,7 @@ class ProjectRepository:
 
     @property
     def root(self) -> str:
-        """Create an orphan empty commit."""
+        """Create an empty root commit."""
         return self.createroot(updateref=None)
 
     def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
