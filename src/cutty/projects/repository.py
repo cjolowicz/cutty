@@ -51,6 +51,11 @@ class ProjectRepository:
         except pygit2.GitError:
             project = Repository.init(projectdir)
 
+            author = committer = project.default_signature
+            repository = project._repository
+            tree = repository.TreeBuilder().write()
+            repository.create_commit("HEAD", author, committer, "", tree, [])
+
         project.commit(message=createcommitmessage(template))
 
     @property
