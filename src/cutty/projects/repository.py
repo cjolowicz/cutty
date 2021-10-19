@@ -56,9 +56,7 @@ class ProjectRepository:
         project = repository.project
 
         if project._repository.head_is_unborn:
-            author = committer = project.default_signature
-            tree = project._repository.TreeBuilder().write()
-            project._repository.create_commit("HEAD", author, committer, "", tree, [])
+            repository.createroot(updateref="HEAD")
 
         project.commit(message=createcommitmessage(template))
 
