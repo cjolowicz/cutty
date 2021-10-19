@@ -54,7 +54,7 @@ class ProjectRepository:
             repository = cls(projectdir)
 
         if repository.project._repository.head_is_unborn:
-            repository.createroot(updateref="HEAD")
+            repository.createroot()
 
         repository.project.commit(message=createcommitmessage(template))
 
@@ -63,7 +63,7 @@ class ProjectRepository:
         """Create an orphan empty commit."""
         return self.createroot(updateref=None)
 
-    def createroot(self, *, updateref: Optional[str]) -> str:
+    def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
         """Create an orphan empty commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
