@@ -64,7 +64,7 @@ class ProjectRepository:
         return self.createroot(updateref=None)
 
     def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
-        """Create an orphan empty commit."""
+        """Create an empty root commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
