@@ -271,6 +271,7 @@ class Repository:
             message=commit.message,
             author=commit.author,
             committer=self.default_signature,
+            stageallfiles=False,
         )
 
         self._repository.state_cleanup()
