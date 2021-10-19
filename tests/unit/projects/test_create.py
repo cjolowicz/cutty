@@ -63,6 +63,16 @@ def test_commit(project: pathlib.Path, template: Template.Metadata) -> None:
     repository.head.commit  # does not raise
 
 
+def test_initial_commit(project: pathlib.Path, template: Template.Metadata) -> None:
+    """It creates an empty initial commit."""
+    creategitrepository(project, template)
+
+    repository = Repository.open(project)
+    [root] = repository.head.commit.parents
+    assert not root.parents
+    assert not root.tree
+
+
 def test_commit_message_template(
     project: pathlib.Path, template: Template.Metadata
 ) -> None:
