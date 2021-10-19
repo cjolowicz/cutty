@@ -190,6 +190,7 @@ class Repository:
         message: str = "",
         author: Optional[pygit2.Signature] = None,
         committer: Optional[pygit2.Signature] = None,
+        stageallfiles: bool = True,
     ) -> None:
         """Commit all changes in the repository.
 
@@ -198,7 +199,8 @@ class Repository:
         repository = self._repository
         index = repository.index
 
-        index.add_all()
+        if stageallfiles:
+            index.add_all()
 
         tree = index.write_tree()
         if not repository.head_is_unborn and tree == repository.head.peel().tree.id:
