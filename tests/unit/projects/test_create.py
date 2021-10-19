@@ -110,3 +110,22 @@ def test_existing_repository(
     creategitrepository(projectpath, template)
 
     assert file.path.name in repository.head.commit.tree
+
+
+def test_existing_repository_initial_commit(
+    storage: FileStorage,
+    file: RegularFile,
+    projectpath: pathlib.Path,
+    template: Template.Metadata,
+) -> None:
+    """It creates an empty root commit in an existing repository."""
+    repository = Repository.init(projectpath)
+
+    with storage:
+        storage.add(file)
+
+    creategitrepository(projectpath, template)
+
+    [root] = repository.head.commit.parents
+    assert not root.parents
+    assert not root.tree
