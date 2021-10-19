@@ -2,6 +2,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -62,14 +63,14 @@ class ProjectRepository:
     @property
     def root(self) -> str:
         """Create an orphan empty commit."""
-        return self.createroot()
+        return self.createroot(updateref=None)
 
-    def createroot(self) -> str:
+    def createroot(self, *, updateref: Optional[str]) -> str:
         """Create an orphan empty commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
-        oid = repository.create_commit(None, author, committer, "", tree, [])
+        oid = repository.create_commit(updateref, author, committer, "", tree, [])
         return str(oid)
 
     @contextmanager
