@@ -8,7 +8,7 @@ from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.repository import updatecommitmessage
-from cutty.projects.store import storeproject2
+from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
@@ -35,14 +35,14 @@ def update(
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
     with repository.build(parent=repository.root) as builder:
-        storeproject2(project, builder.path)
+        storeproject(project, builder.path)
         commit = builder.commit(createcommitmessage(template.metadata))
 
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
 
     with repository.build(parent=commit) as builder:
-        storeproject2(project, builder.path)
+        storeproject(project, builder.path)
         commit2 = builder.commit(updatecommitmessage(template.metadata))
 
     if commit2 != commit:

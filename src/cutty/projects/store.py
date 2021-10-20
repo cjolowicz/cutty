@@ -7,7 +7,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.project import Project
 
 
-def storeproject2(
+def storeproject(
     project: Project,
     projectdir: pathlib.Path,
     *,
