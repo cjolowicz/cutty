@@ -6,9 +6,9 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
+from cutty.projects.messages import createcommitmessage
+from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import readcookiecutterjson
-from cutty.projects.repository import createcommitmessage
-from cutty.projects.repository import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template

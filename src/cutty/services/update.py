@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Optional
 
 from cutty.projects.generate import generate
+from cutty.projects.messages import createcommitmessage
+from cutty.projects.messages import updatecommitmessage
 from cutty.projects.projectconfig import readprojectconfigfile
-from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.repository import updatecommitmessage
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
