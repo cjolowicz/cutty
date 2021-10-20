@@ -5,7 +5,7 @@ from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
-from cutty.projects.store import storeproject
+from cutty.projects.store import storeproject2
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
@@ -27,9 +27,11 @@ def createproject(
         template, extrabindings, interactive=interactive, createconfigfile=False
     )
 
-    storeproject(
+    outputdirisproject = False
+    projectdir = outputdir if outputdirisproject else outputdir / project.name
+    storeproject2(
         project,
-        outputdir,
-        outputdirisproject=False,
+        projectdir,
+        outputdirisproject=outputdirisproject,
         fileexists=fileexists,
     )
