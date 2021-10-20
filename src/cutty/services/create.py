@@ -27,11 +27,11 @@ def createproject(
     template = Template.load(location, revision, directory)
 
     project = generate(template, extrabindings, interactive=interactive)
-
     projectdir = outputdir if in_place else outputdir / project.name
+    repository = ProjectRepository.create(projectdir)
+
     storeproject(
         project, projectdir, outputdirisproject=in_place, fileexists=fileexists
     )
 
-    repository = ProjectRepository.create(projectdir)
     repository.project.commit(message=createcommitmessage(template.metadata))
