@@ -47,9 +47,8 @@ def link(
 
     with repository.build(parent=repository.root) as builder:
         outputdir = builder.path
-        outputdirisproject = True
-        projectdir = outputdir if outputdirisproject else outputdir / project.name
-        storeproject2(project, projectdir, outputdirisproject=outputdirisproject)
+        projectdir = outputdir
+        storeproject2(project, projectdir)
         commit2 = builder.commit(createcommitmessage(template.metadata))
 
     repository.link(message=linkcommitmessage(template.metadata), commit=commit2)
