@@ -1,4 +1,6 @@
 """Project repositories."""
+from __future__ import annotations
+
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -47,10 +49,11 @@ class ProjectRepository:
     @classmethod
     def create(cls, projectdir: Path, template: Template.Metadata) -> None:
         """Initialize the git repository for a project."""
-        cls.create(projectdir, template)
+        repository = cls.create(projectdir)
+        repository.project.commit(message=createcommitmessage(template))
 
     @classmethod
-    def create2(cls, projectdir: Path, template: Template.Metadata) -> None:
+    def create2(cls, projectdir: Path) -> ProjectRepository:
         """Initialize the git repository for a project."""
         try:
             repository = cls(projectdir)
@@ -61,7 +64,7 @@ class ProjectRepository:
         if repository.project._repository.head_is_unborn:
             repository.createroot()
 
-        repository.project.commit(message=createcommitmessage(template))
+        return repository
 
     @property
     def root(self) -> str:
