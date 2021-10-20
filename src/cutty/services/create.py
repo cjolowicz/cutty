@@ -30,8 +30,8 @@ def createproject(
     projectdir = outputdir if in_place else outputdir / project.name
     repository = ProjectRepository.create(projectdir)
 
-    storeproject(
-        project, projectdir, outputdirisproject=in_place, fileexists=fileexists
-    )
+    with repository.build(parent=repository.root) as builder:
+        storeproject(project, builder.path, fileexists=fileexists)
+        commit = builder.commit(message=createcommitmessage(template.metadata))
 
-    repository.project.commit(message=createcommitmessage(template.metadata))
+    repository.import_(commit)
