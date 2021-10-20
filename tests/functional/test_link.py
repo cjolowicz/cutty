@@ -171,3 +171,14 @@ def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
 
     with pytest.raises(RunCuttyError):
         runcutty("link", "--cwd=project", str(emptytemplate))
+
+
+def test_untracked_files(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It does not commit untracked files."""
+    existing = project / "untracked-file"
+    existing.touch()
+
+    runcutty("link", f"--cwd={project}", str(template))
+
+    repository = Repository.open(project)
+    assert existing.name not in repository.head.commit.tree
