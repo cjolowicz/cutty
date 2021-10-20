@@ -7,23 +7,6 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.project import Project
 
 
-def storeproject(
-    project: Project,
-    outputdir: pathlib.Path,
-    outputdirisproject: bool,
-    fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-) -> pathlib.Path:
-    """Store a project in the output directory."""
-    projectdir = outputdir if outputdirisproject else outputdir / project.name
-    storeproject2(
-        project,
-        projectdir,
-        outputdirisproject=outputdirisproject,
-        fileexists=fileexists,
-    )
-    return projectdir
-
-
 def storeproject2(
     project: Project,
     projectdir: pathlib.Path,
