@@ -28,7 +28,7 @@ def storeproject2(
     project: Project,
     projectdir: pathlib.Path,
     *,
-    outputdirisproject: bool,
+    outputdirisproject: bool = True,
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> None:
     """Store a project in the output directory."""
