@@ -9,12 +9,13 @@ from cutty.projects.project import Project
 
 def storeproject(
     project: Project,
-    outputdir: pathlib.Path,
-    outputdirisproject: bool,
+    projectdir: pathlib.Path,
+    *,
+    outputdirisproject: bool = True,
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
-) -> pathlib.Path:
+) -> None:
     """Store a project in the output directory."""
-    projectdir = outputdir if outputdirisproject else outputdir / project.name
+    outputdir = projectdir if outputdirisproject else projectdir.parent
     storage = createcookiecutterstorage(
         outputdir, projectdir, fileexists, project.hooks
     )
@@ -26,5 +27,3 @@ def storeproject(
                 projectfile = projectfile.withpath(path)
 
             storage.add(projectfile)
-
-    return projectdir

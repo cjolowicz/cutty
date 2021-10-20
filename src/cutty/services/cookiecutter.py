@@ -29,7 +29,7 @@ def createproject(
 
     storeproject(
         project,
-        outputdir,
+        outputdir / project.name,
         outputdirisproject=False,
         fileexists=fileexists,
     )

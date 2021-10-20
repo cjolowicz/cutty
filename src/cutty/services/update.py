@@ -35,14 +35,14 @@ def update(
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
     with repository.build(parent=repository.root) as builder:
-        storeproject(project, builder.path, outputdirisproject=True)
+        storeproject(project, builder.path)
         commit = builder.commit(createcommitmessage(template.metadata))
 
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
 
     with repository.build(parent=commit) as builder:
-        storeproject(project, builder.path, outputdirisproject=True)
+        storeproject(project, builder.path)
         commit2 = builder.commit(updatecommitmessage(template.metadata))
 
     if commit2 != commit:

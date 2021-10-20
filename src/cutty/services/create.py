@@ -27,11 +27,9 @@ def createproject(
 
     project = generate(template, extrabindings, interactive=interactive)
 
-    projectdir = storeproject(
-        project,
-        outputdir,
-        outputdirisproject=in_place,
-        fileexists=fileexists,
+    projectdir = outputdir if in_place else outputdir / project.name
+    storeproject(
+        project, projectdir, outputdirisproject=in_place, fileexists=fileexists
     )
 
     ProjectRepository.create(projectdir, template.metadata)
