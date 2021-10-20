@@ -14,17 +14,18 @@ def storeproject(
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
-    return storeproject2(project, outputdir, outputdirisproject, fileexists)
+    projectdir = outputdir if outputdirisproject else outputdir / project.name
+    return storeproject2(project, projectdir, outputdir, outputdirisproject, fileexists)
 
 
 def storeproject2(
     project: Project,
+    projectdir: pathlib.Path,
     outputdir: pathlib.Path,
     outputdirisproject: bool,
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> pathlib.Path:
     """Store a project in the output directory."""
-    projectdir = outputdir if outputdirisproject else outputdir / project.name
     storage = createcookiecutterstorage(
         outputdir, projectdir, fileexists, project.hooks
     )
