@@ -47,6 +47,11 @@ class ProjectRepository:
     @classmethod
     def create(cls, projectdir: Path, template: Template.Metadata) -> None:
         """Initialize the git repository for a project."""
+        cls.create(projectdir, template)
+
+    @classmethod
+    def create2(cls, projectdir: Path, template: Template.Metadata) -> None:
+        """Initialize the git repository for a project."""
         try:
             repository = cls(projectdir)
         except pygit2.GitError:
