@@ -2,6 +2,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import pygit2
 
@@ -47,19 +48,27 @@ class ProjectRepository:
     def create(cls, projectdir: Path, template: Template.Metadata) -> None:
         """Initialize the git repository for a project."""
         try:
-            project = Repository.open(projectdir)
+            repository = cls(projectdir)
         except pygit2.GitError:
-            project = Repository.init(projectdir)
+            Repository.init(projectdir)
+            repository = cls(projectdir)
 
-        project.commit(message=createcommitmessage(template))
+        if repository.project._repository.head_is_unborn:
+            repository.createroot()
+
+        repository.project.commit(message=createcommitmessage(template))
 
     @property
     def root(self) -> str:
-        """Create an orphan empty commit."""
+        """Create an empty root commit."""
+        return self.createroot(updateref=None)
+
+    def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
+        """Create an empty root commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
-        oid = repository.create_commit(None, author, committer, "", tree, [])
+        oid = repository.create_commit(updateref, author, committer, "", tree, [])
         return str(oid)
 
     @contextmanager

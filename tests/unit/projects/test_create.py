@@ -63,6 +63,16 @@ def test_commit(project: pathlib.Path, template: Template.Metadata) -> None:
     repository.head.commit  # does not raise
 
 
+def test_initial_commit(project: pathlib.Path, template: Template.Metadata) -> None:
+    """It creates an empty initial commit."""
+    creategitrepository(project, template)
+
+    repository = Repository.open(project)
+    [root] = repository.head.commit.parents
+    assert not root.parents
+    assert not root.tree
+
+
 def test_commit_message_template(
     project: pathlib.Path, template: Template.Metadata
 ) -> None:
@@ -100,3 +110,22 @@ def test_existing_repository(
     creategitrepository(projectpath, template)
 
     assert file.path.name in repository.head.commit.tree
+
+
+def test_existing_repository_initial_commit(
+    storage: FileStorage,
+    file: RegularFile,
+    projectpath: pathlib.Path,
+    template: Template.Metadata,
+) -> None:
+    """It creates an empty root commit in an existing repository."""
+    repository = Repository.init(projectpath)
+
+    with storage:
+        storage.add(file)
+
+    creategitrepository(projectpath, template)
+
+    [root] = repository.head.commit.parents
+    assert not root.parents
+    assert not root.tree
