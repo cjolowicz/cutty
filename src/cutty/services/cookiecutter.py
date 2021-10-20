@@ -27,5 +27,9 @@ def createproject(
         template, extrabindings, interactive=interactive, createconfigfile=False
     )
 
-    projectdir = outputdir / project.name
-    storeproject2(project, projectdir, outputdirisproject=False, fileexists=fileexists)
+    storeproject2(
+        project,
+        outputdir / project.name,
+        outputdirisproject=False,
+        fileexists=fileexists,
+    )
