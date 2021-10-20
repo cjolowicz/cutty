@@ -10,7 +10,7 @@ from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
+from cutty.projects.store import storeproject2
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
@@ -46,7 +46,10 @@ def link(
     repository = ProjectRepository(projectdir)
 
     with repository.build(parent=repository.root) as builder:
-        storeproject(project, builder.path, outputdirisproject=True)
+        outputdir = builder.path
+        outputdirisproject = True
+        projectdir = outputdir if outputdirisproject else outputdir / project.name
+        storeproject2(project, projectdir, outputdirisproject=outputdirisproject)
         commit2 = builder.commit(createcommitmessage(template.metadata))
 
     repository.link(message=linkcommitmessage(template.metadata), commit=commit2)
