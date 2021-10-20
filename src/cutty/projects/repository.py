@@ -60,11 +60,6 @@ class ProjectRepository:
 
         return repository
 
-    @property
-    def root(self) -> str:
-        """Create an empty root commit."""
-        return self.createroot(updateref=None)
-
     def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
         """Create an empty root commit."""
         author = committer = self.project.default_signature
@@ -77,7 +72,7 @@ class ProjectRepository:
     def build(self, *, parent: Optional[str] = None) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         if parent is None:
-            parent = self.root
+            parent = self.createroot(updateref=None)
 
         branch = self.project.heads.create(
             UPDATE_BRANCH, self.project._repository[parent], force=True
