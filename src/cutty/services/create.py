@@ -5,6 +5,7 @@ from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
+from cutty.projects.repository import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -26,10 +27,11 @@ def createproject(
     template = Template.load(location, revision, directory)
 
     project = generate(template, extrabindings, interactive=interactive)
-
     projectdir = outputdir if in_place else outputdir / project.name
-    storeproject(
-        project, projectdir, outputdirisproject=in_place, fileexists=fileexists
-    )
+    repository = ProjectRepository.create(projectdir)
 
-    ProjectRepository.create(projectdir, template.metadata)
+    with repository.build(parent=repository.root) as builder:
+        storeproject(project, builder.path, fileexists=fileexists)
+        commit = builder.commit(message=createcommitmessage(template.metadata))
+
+    repository.import_(commit)
