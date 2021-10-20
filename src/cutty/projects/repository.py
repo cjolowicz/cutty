@@ -74,8 +74,11 @@ class ProjectRepository:
         return str(oid)
 
     @contextmanager
-    def build(self, *, parent: str) -> Iterator[ProjectBuilder]:
+    def build(self, *, parent: Optional[str] = None) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
+        if parent is None:
+            parent = self.root
+
         branch = self.project.heads.create(
             UPDATE_BRANCH, self.project._repository[parent], force=True
         )

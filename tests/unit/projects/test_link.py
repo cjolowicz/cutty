@@ -15,7 +15,7 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
     """Link a project to a project template."""
     repository = ProjectRepository(project.path)
 
-    with repository.build(parent=repository.root) as builder:
+    with repository.build() as builder:
         (builder.path / "cutty.json").touch()
         commit2 = builder.commit(createcommitmessage(template))
 
