@@ -128,7 +128,6 @@ def test_no_branches(runcutty: RunCutty, template: Path) -> None:
     assert branches == list(project.heads)
 
 
-@pytest.mark.xfail(reason="TODO")
 def test_existing_files(runcutty: RunCutty, template: Path) -> None:
     """It does not commit existing files."""
     existing = Path("example", "do-not-commit-this-file")
