@@ -15,7 +15,13 @@ def storeproject(
 ) -> pathlib.Path:
     """Store a project in the output directory."""
     projectdir = outputdir if outputdirisproject else outputdir / project.name
-    storeproject2(project, projectdir, outputdir, outputdirisproject, fileexists)
+    storeproject2(
+        project,
+        projectdir,
+        outputdir,
+        outputdirisproject=outputdirisproject,
+        fileexists=fileexists,
+    )
     return projectdir
 
 
@@ -23,6 +29,7 @@ def storeproject2(
     project: Project,
     projectdir: pathlib.Path,
     outputdir: pathlib.Path,
+    *,
     outputdirisproject: bool,
     fileexists: FileExistsPolicy = FileExistsPolicy.RAISE,
 ) -> None:
