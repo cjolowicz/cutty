@@ -33,5 +33,5 @@ def createproject(
         project, projectdir, outputdirisproject=in_place, fileexists=fileexists
     )
 
-    repository = ProjectRepository.create2(projectdir)
+    repository = ProjectRepository.create(projectdir)
     repository.project.commit(message=createcommitmessage(template.metadata))

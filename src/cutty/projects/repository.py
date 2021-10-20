@@ -47,7 +47,7 @@ class ProjectRepository:
         self.project = Repository.open(path)
 
     @classmethod
-    def create2(cls, projectdir: Path) -> ProjectRepository:
+    def create(cls, projectdir: Path) -> ProjectRepository:
         """Initialize the git repository for a project."""
         try:
             repository = cls(projectdir)

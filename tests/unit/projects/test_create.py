@@ -16,7 +16,7 @@ from cutty.util.git import Repository
 
 def creategitrepository(projectdir: pathlib.Path, template: Template.Metadata) -> None:
     """Initialize the git repository for a project."""
-    repository = ProjectRepository.create2(projectdir)
+    repository = ProjectRepository.create(projectdir)
     repository.project.commit(message=createcommitmessage(template))
 
 
