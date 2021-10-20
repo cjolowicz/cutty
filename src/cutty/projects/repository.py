@@ -56,11 +56,11 @@ class ProjectRepository:
             repository = cls(projectdir)
 
         if repository.project._repository.head_is_unborn:
-            repository.createroot()
+            repository._createroot()
 
         return repository
 
-    def createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
+    def _createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
         """Create an empty root commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
@@ -72,7 +72,7 @@ class ProjectRepository:
     def build(self, *, parent: Optional[str] = None) -> Iterator[ProjectBuilder]:
         """Create a commit with a generated project."""
         if parent is None:
-            parent = self.createroot(updateref=None)
+            parent = self._createroot(updateref=None)
 
         branch = self.project.heads.create(
             UPDATE_BRANCH, self.project._repository[parent], force=True
