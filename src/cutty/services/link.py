@@ -49,4 +49,4 @@ def link(
         storeproject(project, builder.path)
         commit = builder.commit(createcommitmessage(template.metadata))
 
-    repository.link2(commit, message=linkcommitmessage(template.metadata))
+    repository.link(commit, message=linkcommitmessage(template.metadata))
