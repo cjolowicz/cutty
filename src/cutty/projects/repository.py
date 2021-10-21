@@ -86,7 +86,7 @@ class ProjectRepository:
 
     def link(self, commit: str, *, message: str) -> None:
         """Update the project configuration."""
-        filename = PROJECT_CONFIG_FILE
+        filename = Path(PROJECT_CONFIG_FILE)
         commit2 = self.project._repository[commit]
 
         (self.project.path / filename).write_bytes((commit2.tree / filename).data)
