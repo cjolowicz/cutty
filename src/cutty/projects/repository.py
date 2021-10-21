@@ -83,7 +83,7 @@ class ProjectRepository:
 
         self.project.heads.pop(branch.name)
 
-    def link(self, message: str, *, commit: str) -> None:
+    def link(self, commit: str, *, message: str) -> None:
         """Update the project configuration."""
         commit2 = self.project._repository[commit]
 
@@ -91,10 +91,12 @@ class ProjectRepository:
             (commit2.tree / PROJECT_CONFIG_FILE).data
         )
 
+        self.project._repository.index.add(PROJECT_CONFIG_FILE)
         self.project.commit(
             message=message,
             author=commit2.author,
             committer=self.project.default_signature,
+            stageallfiles=False,
         )
 
     def import_(self, commit: str) -> None:
@@ -118,7 +120,7 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
-        self.link(f"Skip: {commit.message}", commit=str(commit.id))
+        self.link(str(commit.id), message=f"Skip: {commit.message}")
 
     def abortupdate(self) -> None:
         """Abort an update with conflicts."""
