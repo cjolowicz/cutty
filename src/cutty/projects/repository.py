@@ -91,10 +91,12 @@ class ProjectRepository:
             (commit2.tree / PROJECT_CONFIG_FILE).data
         )
 
+        self.project._repository.index.add(PROJECT_CONFIG_FILE)
         self.project.commit(
             message=message,
             author=commit2.author,
             committer=self.project.default_signature,
+            stageallfiles=False,
         )
 
     def import_(self, commit: str) -> None:
