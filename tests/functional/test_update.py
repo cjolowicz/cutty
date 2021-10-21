@@ -420,7 +420,9 @@ def test_no_branches(runcutty: RunCutty, templateproject: Path, project: Path) -
     assert branches == list(repository.heads)
 
 
-def test_dirty(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+def test_untracked_files(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
     """It does not commit untracked files."""
     untracked = project / "untracked-file"
     untracked.touch()
