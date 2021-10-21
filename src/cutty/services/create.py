@@ -30,7 +30,7 @@ def createproject(
     projectdir = outputdir if in_place else outputdir / project.name
     repository = ProjectRepository.create(projectdir)
 
-    with repository.build(parent=repository.root) as builder:
+    with repository.build() as builder:
         storeproject(project, builder.path, fileexists=fileexists)
         commit = builder.commit(message=createcommitmessage(template.metadata))
 
