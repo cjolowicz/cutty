@@ -138,3 +138,15 @@ def test_existing_files(runcutty: RunCutty, template: Path) -> None:
 
     project = Repository.open(existing.parent)
     assert existing.name not in project.head.commit.tree
+
+
+def test_untracked_files(runcutty: RunCutty, template: Path) -> None:
+    """It does not commit untracked files."""
+    project = Repository.init(Path("example"))
+
+    untracked = project.path / "untracked-file"
+    untracked.touch()
+
+    runcutty("create", str(template))
+
+    assert untracked.name not in project.head.commit.tree
