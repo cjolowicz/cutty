@@ -1,8 +1,8 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
 
-from cutty.projects.repository import createcommitmessage
-from cutty.projects.repository import linkcommitmessage
+from cutty.projects.messages import createcommitmessage
+from cutty.projects.messages import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository

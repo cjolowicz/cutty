@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from cutty.projects.repository import createcommitmessage
+from cutty.projects.messages import createcommitmessage
+from cutty.projects.messages import updatecommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.repository import updatecommitmessage
 from cutty.projects.template import Template
 from cutty.util.git import Repository
 from tests.util.git import resolveconflicts

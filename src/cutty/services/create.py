@@ -5,7 +5,7 @@ from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
-from cutty.projects.repository import createcommitmessage
+from cutty.projects.messages import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
