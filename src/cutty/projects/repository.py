@@ -77,11 +77,12 @@ class ProjectRepository:
             UPDATE_BRANCH, self.project._repository[parent], force=True
         )
 
-        with self.project.worktree(branch, checkout=False) as worktree:
-            builder = ProjectBuilder(worktree)
-            yield builder
-
-        self.project.heads.pop(branch.name)
+        try:
+            with self.project.worktree(branch, checkout=False) as worktree:
+                builder = ProjectBuilder(worktree)
+                yield builder
+        finally:
+            self.project.heads.pop(branch.name)
 
     def link(self, commit: str, *, message: str) -> None:
         """Update the project configuration."""
