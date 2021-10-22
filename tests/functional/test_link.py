@@ -134,13 +134,13 @@ def test_project_config_directory(
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--template-directory={directory}", str(template))
+    option = f"--template-directory={directory}"
+    options = [option] if specify_template_directory else []
+
+    runcutty("create", option, str(template))
 
     updatefile(template / directory / "{{ cookiecutter.project }}" / "LICENSE")
 
-    options = (
-        [f"--template-directory={directory}"] if specify_template_directory else []
-    )
     runcutty("link", "--cwd=example", *options)
 
 
