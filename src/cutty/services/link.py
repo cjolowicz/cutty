@@ -1,5 +1,4 @@
 """Link a project to a Cookiecutter template."""
-import contextlib
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -31,12 +30,14 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    with contextlib.suppress(FileNotFoundError):
+    try:
         projectconfig = readcookiecutterjson(projectdir)
         extrabindings = [*projectconfig.bindings, *extrabindings]
 
         if location is None:
             location = projectconfig.template
+    except FileNotFoundError:
+        pass
 
     if location is None:
         raise TemplateNotSpecifiedError()
