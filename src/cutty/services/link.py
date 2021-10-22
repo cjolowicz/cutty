@@ -8,6 +8,7 @@ from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -30,14 +31,17 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
+    projectconfig: Optional[ProjectConfig] = None
     try:
         projectconfig = readcookiecutterjson(projectdir)
+    except FileNotFoundError:
+        pass
+
+    if projectconfig is not None:
         extrabindings = [*projectconfig.bindings, *extrabindings]
 
         if location is None:
             location = projectconfig.template
-    except FileNotFoundError:
-        pass
 
     if location is None:
         raise TemplateNotSpecifiedError()
