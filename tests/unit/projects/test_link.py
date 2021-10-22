@@ -2,7 +2,6 @@
 import dataclasses
 from pathlib import Path
 
-from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.repository import ProjectRepository
@@ -19,7 +18,7 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
 
     with repository.build() as builder:
         (builder.path / "cutty.json").touch()
-        commit = builder.commit(createcommitmessage(template))
+        commit = builder.commit(linkcommitmessage(template))
 
     repository.import2(
         commit, paths=[Path(PROJECT_CONFIG_FILE)], message=linkcommitmessage(template)
