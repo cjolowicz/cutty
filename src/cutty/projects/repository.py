@@ -86,19 +86,19 @@ class ProjectRepository:
 
     def import2(self, commit: str, *, paths: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
-        commit2 = self.project._repository[commit]
+        cherry = self.project._repository[commit]
 
         if not paths:
-            self.project.cherrypick(commit2)
+            self.project.cherrypick(cherry)
             return
 
         for path in paths:
-            (self.project.path / path).write_bytes((commit2.tree / path).data)
+            (self.project.path / path).write_bytes((cherry.tree / path).data)
             self.project._repository.index.add(path)
 
         self.project.commit(
-            message=commit2.message,
-            author=commit2.author,
+            message=cherry.message,
+            author=cherry.author,
             committer=self.project.default_signature,
             stageallfiles=False,
         )
