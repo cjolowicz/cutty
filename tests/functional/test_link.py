@@ -126,7 +126,10 @@ def test_project_config_template(runcutty: RunCutty, template: Path) -> None:
     runcutty("link", "--cwd=example")
 
 
-def test_project_config_directory(runcutty: RunCutty, template: Path) -> None:
+@pytest.mark.parametrize("specify_template_directory", [False, True])
+def test_project_config_directory(
+    runcutty: RunCutty, template: Path, specify_template_directory: bool
+) -> None:
     """It reads the template directory from cutty.json if it exists."""
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
@@ -135,7 +138,10 @@ def test_project_config_directory(runcutty: RunCutty, template: Path) -> None:
 
     updatefile(template / directory / "{{ cookiecutter.project }}" / "LICENSE")
 
-    runcutty("link", "--cwd=example")
+    options = (
+        [f"--template-directory={directory}"] if specify_template_directory else []
+    )
+    runcutty("link", "--cwd=example", *options)
 
 
 def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:
