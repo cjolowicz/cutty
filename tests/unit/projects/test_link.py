@@ -22,7 +22,7 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
         commit = builder.commit(createcommitmessage(template))
 
     repository.import2(
-        commit, files=[Path(PROJECT_CONFIG_FILE)], message=linkcommitmessage(template)
+        commit, paths=[Path(PROJECT_CONFIG_FILE)], message=linkcommitmessage(template)
     )
 
 

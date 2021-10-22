@@ -84,13 +84,13 @@ class ProjectRepository:
         finally:
             self.project.heads.pop(branch.name)
 
-    def import2(self, commit: str, *, message: str, files: Iterable[Path]) -> None:
+    def import2(self, commit: str, *, message: str, paths: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
         commit2 = self.project._repository[commit]
 
-        for filename in files:
-            (self.project.path / filename).write_bytes((commit2.tree / filename).data)
-            self.project._repository.index.add(filename)
+        for path in paths:
+            (self.project.path / path).write_bytes((commit2.tree / path).data)
+            self.project._repository.index.add(path)
 
         self.project.commit(
             message=message,

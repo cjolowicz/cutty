@@ -86,6 +86,6 @@ def link(
 
     repository.import2(
         commit,
-        files=[pathlib.Path(PROJECT_CONFIG_FILE)],
+        paths=[pathlib.Path(PROJECT_CONFIG_FILE)],
         message=linkcommitmessage(template.metadata),
     )
