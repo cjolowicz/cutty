@@ -83,4 +83,4 @@ def link(
         storeproject(project, builder.path)
         commit = builder.commit(linkcommitmessage(template.metadata))
 
-    repository.import2(commit, paths=[pathlib.Path(PROJECT_CONFIG_FILE)])
+    repository.import_(commit, paths=[pathlib.Path(PROJECT_CONFIG_FILE)])
