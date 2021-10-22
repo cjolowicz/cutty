@@ -59,12 +59,14 @@ class ProjectRepository:
 
         return repository
 
-    def _createroot(self, *, updateref: Optional[str] = "HEAD") -> str:
+    def _createroot(
+        self, *, updateref: Optional[str] = "HEAD", message: str = ""
+    ) -> str:
         """Create an empty root commit."""
         author = committer = self.project.default_signature
         repository = self.project._repository
         tree = repository.TreeBuilder().write()
-        oid = repository.create_commit(updateref, author, committer, "", tree, [])
+        oid = repository.create_commit(updateref, author, committer, message, tree, [])
         return str(oid)
 
     @contextmanager
