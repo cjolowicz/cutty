@@ -58,8 +58,12 @@ def link(
     if location is None:
         raise TemplateNotSpecifiedError()
 
-    template = Template.load(location, revision, directory)
-    project = generate(template, extrabindings, interactive=interactive)
+    projectconfig = ProjectConfig(location, extrabindings, revision, directory)
+
+    template = Template.load(
+        projectconfig.template, projectconfig.revision, projectconfig.directory
+    )
+    project = generate(template, projectconfig.bindings, interactive=interactive)
 
     repository = ProjectRepository(projectdir)
 
