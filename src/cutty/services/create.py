@@ -28,7 +28,7 @@ def createproject(
 
     project = generate(template, extrabindings, interactive=interactive)
     projectdir = outputdir if in_place else outputdir / project.name
-    repository = ProjectRepository.create(projectdir)
+    repository = ProjectRepository.create(projectdir, message="Initial commit")
 
     with repository.build() as builder:
         storeproject(project, builder.path, fileexists=fileexists)
