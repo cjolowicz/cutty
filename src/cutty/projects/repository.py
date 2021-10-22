@@ -46,7 +46,7 @@ class ProjectRepository:
         self.project = Repository.open(path)
 
     @classmethod
-    def create(cls, projectdir: Path) -> ProjectRepository:
+    def create(cls, projectdir: Path, message: str = "") -> ProjectRepository:
         """Initialize the git repository for a project."""
         try:
             repository = cls(projectdir)
@@ -55,7 +55,7 @@ class ProjectRepository:
             repository = cls(projectdir)
 
         if repository.project._repository.head_is_unborn:
-            repository._createroot()
+            repository._createroot(message=message)
 
         return repository
 
