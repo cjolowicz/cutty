@@ -117,6 +117,15 @@ def test_commit_message_verb(runcutty: RunCutty, project: Path, template: Path) 
     assert "Link" in repository.head.commit.message
 
 
+def test_project_config_template(runcutty: RunCutty, template: Path) -> None:
+    """It reads the template from cutty.json if it exists."""
+    runcutty("create", str(template))
+
+    updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("link", "--cwd=example")
+
+
 def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:
     """It reads bindings from .cookiecutter.json if it exists."""
     updatefile(
