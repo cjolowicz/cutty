@@ -38,12 +38,6 @@ def continueupdate(projectdir: Path) -> None:
     project.continueupdate()
 
 
-def skipupdate(projectdir: Path) -> None:
-    """Skip an update with conflicts."""
-    project = ProjectRepository(projectdir)
-    project.skipupdate()
-
-
 def abortupdate(projectdir: Path) -> None:
     """Abort an update with conflicts."""
     project = ProjectRepository(projectdir)
