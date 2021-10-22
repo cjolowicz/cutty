@@ -52,6 +52,9 @@ def link(
         if location is None:
             location = projectconfig.template
 
+        if directory is None:
+            directory = projectconfig.directory
+
     if location is None:
         raise TemplateNotSpecifiedError()
 
