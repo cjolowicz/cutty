@@ -126,6 +126,18 @@ def test_project_config_template(runcutty: RunCutty, template: Path) -> None:
     runcutty("link", "--cwd=example")
 
 
+def test_project_config_directory(runcutty: RunCutty, template: Path) -> None:
+    """It reads the template directory from cutty.json if it exists."""
+    directory = "a"
+    move_repository_files_to_subdirectory(template, directory)
+
+    runcutty("create", f"--template-directory={directory}", str(template))
+
+    updatefile(template / directory / "{{ cookiecutter.project }}" / "LICENSE")
+
+    runcutty("link", "--cwd=example")
+
+
 def test_legacy_project_config_bindings(runcutty: RunCutty, template: Path) -> None:
     """It reads bindings from .cookiecutter.json if it exists."""
     updatefile(
