@@ -20,6 +20,16 @@ class TemplateNotSpecifiedError(CuttyError):
     """The template was not specified."""
 
 
+def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
+    """Attempt to load the project configuration."""
+    projectconfig: Optional[ProjectConfig] = None
+    try:
+        projectconfig = readcookiecutterjson(projectdir)
+    except FileNotFoundError:
+        pass
+    return projectconfig
+
+
 def link(
     location: Optional[str],
     projectdir: pathlib.Path,
@@ -31,11 +41,7 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    projectconfig: Optional[ProjectConfig] = None
-    try:
-        projectconfig = readcookiecutterjson(projectdir)
-    except FileNotFoundError:
-        pass
+    projectconfig = loadprojectconfig(projectdir)
 
     if projectconfig is not None:
         extrabindings = [*projectconfig.bindings, *extrabindings]
