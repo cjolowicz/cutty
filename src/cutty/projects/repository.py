@@ -10,7 +10,6 @@ import pygit2
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
-from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.util.git import Repository
 
 
@@ -112,16 +111,6 @@ class ProjectRepository:
             message=commit.message,
             author=commit.author,
             committer=self.project.default_signature,
-        )
-
-    def skipupdate(self) -> None:
-        """Skip an update with conflicts."""
-        if not (commit := self.project.cherrypickhead):
-            raise NoUpdateInProgressError()
-
-        self.project.resetcherrypick()
-        self.link(
-            str(commit.id), Path(PROJECT_CONFIG_FILE), message=f"Skip: {commit.message}"
         )
 
     def abortupdate(self) -> None:
