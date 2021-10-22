@@ -84,7 +84,7 @@ class ProjectRepository:
         finally:
             self.project.heads.pop(branch.name)
 
-    def import2(self, commit: str, *, paths: Iterable[Path]) -> None:
+    def import2(self, commit: str, *, paths: Iterable[Path] = ()) -> None:
         """Import changes to the project made by the given commit."""
         cherry = self.project._repository[commit]
 
@@ -105,7 +105,7 @@ class ProjectRepository:
 
     def import_(self, commit: str) -> None:
         """Import changes to the project made by the given commit."""
-        self.import2(commit, paths=[])
+        self.import2(commit)
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
