@@ -22,12 +22,11 @@ class TemplateNotSpecifiedError(CuttyError):
 
 def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
     """Attempt to load the project configuration."""
-    projectconfig: Optional[ProjectConfig] = None
     try:
-        projectconfig = readcookiecutterjson(projectdir)
+        return readcookiecutterjson(projectdir)
     except FileNotFoundError:
         pass
-    return projectconfig
+    return None
 
 
 def link(
