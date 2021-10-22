@@ -90,17 +90,6 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     assert repository.cherrypickhead is None
 
 
-def test_skipupdate(repository: Repository, path: Path) -> None:
-    """It uses our version."""
-    updatefile(repository.path / "cutty.json")
-    createconflict(repository, path, ours="a", theirs="b")
-
-    skipupdate(repository.path)
-
-    blob = repository.head.commit.tree / path.name
-    assert blob.data.decode() == "a"
-
-
 def test_abortupdate(repository: Repository, path: Path) -> None:
     """It uses our version."""
     createconflict(repository, path, ours="a", theirs="b")
