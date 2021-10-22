@@ -1,4 +1,5 @@
 """Link a project to a Cookiecutter template."""
+import contextlib
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -22,10 +23,9 @@ class TemplateNotSpecifiedError(CuttyError):
 
 def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
     """Attempt to load the project configuration."""
-    try:
+    with contextlib.suppress(FileNotFoundError):
         return readcookiecutterjson(projectdir)
-    except FileNotFoundError:
-        pass
+
     return None
 
 
