@@ -8,6 +8,7 @@ from cutty.errors import CuttyError
 from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import linkcommitmessage
+from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -49,4 +50,8 @@ def link(
         storeproject(project, builder.path)
         commit = builder.commit(createcommitmessage(template.metadata))
 
-    repository.link(commit, message=linkcommitmessage(template.metadata))
+    repository.link(
+        commit,
+        pathlib.Path(PROJECT_CONFIG_FILE),
+        message=linkcommitmessage(template.metadata),
+    )

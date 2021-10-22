@@ -1,8 +1,10 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
+from pathlib import Path
 
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import linkcommitmessage
+from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository
@@ -19,7 +21,9 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
         (builder.path / "cutty.json").touch()
         commit = builder.commit(createcommitmessage(template))
 
-    repository.link(commit, message=linkcommitmessage(template))
+    repository.link(
+        commit, Path(PROJECT_CONFIG_FILE), message=linkcommitmessage(template)
+    )
 
 
 def test_linkproject_commit(
