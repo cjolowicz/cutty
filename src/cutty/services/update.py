@@ -47,8 +47,14 @@ def update(
 
     commit = _create(repository, projectconfig, interactive)
 
-    template = Template.load(projectconfig.template, revision, directory)
-    project = generate(template, extrabindings, interactive=interactive)
+    projectconfig2 = ProjectConfig(
+        projectconfig.template, extrabindings, revision, directory
+    )
+
+    template = Template.load(
+        projectconfig2.template, projectconfig2.revision, projectconfig2.directory
+    )
+    project = generate(template, projectconfig2.bindings, interactive=interactive)
 
     with repository.build(parent=commit) as builder:
         storeproject(project, builder.path)
