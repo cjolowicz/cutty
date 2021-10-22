@@ -38,12 +38,6 @@ def continueupdate(projectdir: Path) -> None:
     project.continueupdate()
 
 
-def skipupdate(projectdir: Path) -> None:
-    """Skip an update with conflicts."""
-    project = ProjectRepository(projectdir)
-    project.skipupdate()
-
-
 def abortupdate(projectdir: Path) -> None:
     """Abort an update with conflicts."""
     project = ProjectRepository(projectdir)
@@ -88,17 +82,6 @@ def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> Non
     continueupdate(repository.path)
 
     assert repository.cherrypickhead is None
-
-
-def test_skipupdate(repository: Repository, path: Path) -> None:
-    """It uses our version."""
-    updatefile(repository.path / "cutty.json")
-    createconflict(repository, path, ours="a", theirs="b")
-
-    skipupdate(repository.path)
-
-    blob = repository.head.commit.tree / path.name
-    assert blob.data.decode() == "a"
 
 
 def test_abortupdate(repository: Repository, path: Path) -> None:

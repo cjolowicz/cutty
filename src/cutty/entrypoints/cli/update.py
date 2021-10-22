@@ -48,12 +48,6 @@ from cutty.templates.domain.bindings import Binding
     help="Resume updating after conflict resolution.",
 )
 @click.option(
-    "--skip",
-    is_flag=True,
-    default=False,
-    help="Skip the current update.",
-)
-@click.option(
     "--abort",
     is_flag=True,
     default=False,
@@ -66,7 +60,6 @@ def update(
     revision: Optional[str],
     template_directory: Optional[pathlib.Path],
     continue_: bool,
-    skip: bool,
     abort: bool,
 ) -> None:
     """Update a project with changes from its template."""
@@ -77,10 +70,6 @@ def update(
 
     if continue_:
         project.continueupdate()
-        return
-
-    if skip:
-        project.skipupdate()
         return
 
     if abort:
