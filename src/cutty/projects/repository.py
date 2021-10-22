@@ -86,6 +86,10 @@ class ProjectRepository:
 
     def import2(self, commit: str, *, paths: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
+        if not paths:
+            self.project.cherrypick(self.project._repository[commit])
+            return
+
         commit2 = self.project._repository[commit]
 
         for path in paths:
@@ -101,7 +105,7 @@ class ProjectRepository:
 
     def import_(self, commit: str) -> None:
         """Import changes to the project made by the given commit."""
-        self.project.cherrypick(self.project._repository[commit])
+        self.import2(commit, paths=[])
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""
