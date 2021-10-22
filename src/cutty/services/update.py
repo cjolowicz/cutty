@@ -6,11 +6,26 @@ from typing import Optional
 from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
+
+
+def _create(
+    repository: ProjectRepository, projectconfig: ProjectConfig, interactive: bool
+) -> str:
+    """Create the project and return the commit ID."""
+    template = Template.load(
+        projectconfig.template, projectconfig.revision, projectconfig.directory
+    )
+    project = generate(template, projectconfig.bindings, interactive=interactive)
+
+    with repository.build() as builder:
+        storeproject(project, builder.path)
+        return builder.commit(createcommitmessage(template.metadata))
 
 
 def update(
@@ -29,14 +44,8 @@ def update(
         directory = projectconfig.directory
 
     repository = ProjectRepository(projectdir)
-    template = Template.load(
-        projectconfig.template, projectconfig.revision, projectconfig.directory
-    )
-    project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(createcommitmessage(template.metadata))
+    commit = _create(repository, projectconfig, interactive)
 
     template = Template.load(projectconfig.template, revision, directory)
     project = generate(template, extrabindings, interactive=interactive)
