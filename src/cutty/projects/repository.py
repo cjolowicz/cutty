@@ -86,11 +86,11 @@ class ProjectRepository:
 
     def import2(self, commit: str, *, paths: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
-        if not paths:
-            self.project.cherrypick(self.project._repository[commit])
-            return
-
         commit2 = self.project._repository[commit]
+
+        if not paths:
+            self.project.cherrypick(commit2)
+            return
 
         for path in paths:
             (self.project.path / path).write_bytes((commit2.tree / path).data)
