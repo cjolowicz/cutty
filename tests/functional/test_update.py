@@ -335,14 +335,15 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
 
 
 def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
-    """It skips the update."""
+    """It skips the update with `cutty update --abort && cutty link`."""
     updatefile(project / "LICENSE", "a")
     updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("update", f"--cwd={project}")
 
-    runcutty("update", f"--cwd={project}", "--skip")
+    runcutty("update", f"--cwd={project}", "--abort")
+    runcutty("link", f"--cwd={project}")
 
     updatefile(templateproject / "INSTALL")
 
