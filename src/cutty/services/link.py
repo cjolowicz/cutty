@@ -11,6 +11,7 @@ from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readcookiecutterjson
+from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
@@ -23,6 +24,9 @@ class TemplateNotSpecifiedError(CuttyError):
 
 def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
     """Attempt to load the project configuration."""
+    with contextlib.suppress(FileNotFoundError):
+        return readprojectconfigfile(projectdir)
+
     with contextlib.suppress(FileNotFoundError):
         return readcookiecutterjson(projectdir)
 
