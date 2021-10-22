@@ -33,6 +33,31 @@ def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
     return None
 
 
+def createprojectconfig(
+    projectdir: pathlib.Path,
+    location: Optional[str],
+    bindings: Sequence[Binding],
+    revision: Optional[str],
+    directory: Optional[pathlib.Path],
+) -> ProjectConfig:
+    """Assemble project configuration from parameters and the existing project."""
+    projectconfig = loadprojectconfig(projectdir)
+
+    if projectconfig is not None:
+        bindings = [*projectconfig.bindings, *bindings]
+
+        if location is None:
+            location = projectconfig.template
+
+        if directory is None:
+            directory = projectconfig.directory
+
+    if location is None:
+        raise TemplateNotSpecifiedError()
+
+    return ProjectConfig(location, bindings, revision, directory)
+
+
 def link(
     location: Optional[str],
     projectdir: pathlib.Path,
@@ -44,21 +69,9 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    projectconfig = loadprojectconfig(projectdir)
-
-    if projectconfig is not None:
-        extrabindings = [*projectconfig.bindings, *extrabindings]
-
-        if location is None:
-            location = projectconfig.template
-
-        if directory is None:
-            directory = projectconfig.directory
-
-    if location is None:
-        raise TemplateNotSpecifiedError()
-
-    projectconfig = ProjectConfig(location, extrabindings, revision, directory)
+    projectconfig = createprojectconfig(
+        projectdir, location, extrabindings, revision, directory
+    )
 
     template = Template.load(
         projectconfig.template, projectconfig.revision, projectconfig.directory
