@@ -1,6 +1,7 @@
 """Project repositories."""
 from __future__ import annotations
 
+from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -83,24 +84,24 @@ class ProjectRepository:
         finally:
             self.project.heads.pop(branch.name)
 
-    def link(self, commit: str, *files: Path, message: str) -> None:
-        """Update the project configuration."""
-        commit2 = self.project._repository[commit]
+    def import_(self, commit: str, *, paths: Iterable[Path] = ()) -> None:
+        """Import changes to the project made by the given commit."""
+        cherry = self.project._repository[commit]
 
-        for filename in files:
-            (self.project.path / filename).write_bytes((commit2.tree / filename).data)
-            self.project._repository.index.add(filename)
+        if not paths:
+            self.project.cherrypick(cherry)
+            return
+
+        for path in paths:
+            (self.project.path / path).write_bytes((cherry.tree / path).data)
+            self.project._repository.index.add(path)
 
         self.project.commit(
-            message=message,
-            author=commit2.author,
+            message=cherry.message,
+            author=cherry.author,
             committer=self.project.default_signature,
             stageallfiles=False,
         )
-
-    def import_(self, commit: str) -> None:
-        """Import changes to the project made by the given commit."""
-        self.project.cherrypick(self.project._repository[commit])
 
     def continueupdate(self) -> None:
         """Continue an update after conflict resolution."""

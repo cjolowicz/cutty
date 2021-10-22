@@ -6,7 +6,6 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.generate import generate
-from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.projectconfig import ProjectConfig
@@ -82,10 +81,6 @@ def link(
 
     with repository.build() as builder:
         storeproject(project, builder.path)
-        commit = builder.commit(createcommitmessage(template.metadata))
+        commit = builder.commit(linkcommitmessage(template.metadata))
 
-    repository.link(
-        commit,
-        pathlib.Path(PROJECT_CONFIG_FILE),
-        message=linkcommitmessage(template.metadata),
-    )
+    repository.import_(commit, paths=[pathlib.Path(PROJECT_CONFIG_FILE)])
