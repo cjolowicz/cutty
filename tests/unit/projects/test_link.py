@@ -21,8 +21,8 @@ def linkproject(project: Repository, template: Template.Metadata) -> None:
         (builder.path / "cutty.json").touch()
         commit = builder.commit(createcommitmessage(template))
 
-    repository.link(
-        commit, Path(PROJECT_CONFIG_FILE), message=linkcommitmessage(template)
+    repository.import2(
+        commit, files=[Path(PROJECT_CONFIG_FILE)], message=linkcommitmessage(template)
     )
 
 

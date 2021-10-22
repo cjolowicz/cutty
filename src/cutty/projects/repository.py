@@ -84,10 +84,6 @@ class ProjectRepository:
         finally:
             self.project.heads.pop(branch.name)
 
-    def link(self, commit: str, *files: Path, message: str) -> None:
-        """Update the project configuration."""
-        self.import2(commit, message=message, files=files)
-
     def import2(self, commit: str, *, message: str, files: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
         commit2 = self.project._repository[commit]
