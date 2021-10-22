@@ -3,15 +3,15 @@ from cutty.projects.template import Template
 
 
 def createcommitmessage(template: Template.Metadata) -> str:
-    """Return the commit message for importing the template."""
+    """Build the commit message for importing the project."""
     if template.revision:
-        return f"Initial import from {template.name} {template.revision}"
+        return f"Import {template.name} {template.revision}"
     else:
-        return f"Initial import from {template.name}"
+        return f"Import {template.name}"
 
 
 def updatecommitmessage(template: Template.Metadata) -> str:
-    """Return the commit message for updating the template."""
+    """Build the commit message for updating the project."""
     if template.revision:
         return f"Update {template.name} to {template.revision}"
     else:
@@ -19,7 +19,7 @@ def updatecommitmessage(template: Template.Metadata) -> str:
 
 
 def linkcommitmessage(template: Template.Metadata) -> str:
-    """Return the commit message for linking the template."""
+    """Build the commit message for linking the project."""
     if template.revision:
         return f"Link to {template.name} {template.revision}"
     else:

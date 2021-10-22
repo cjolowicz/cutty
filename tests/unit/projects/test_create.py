@@ -14,9 +14,17 @@ from cutty.projects.template import Template
 from cutty.util.git import Repository
 
 
+def test_create_message(tmp_path: pathlib.Path) -> None:
+    """It uses the specified commit message."""
+    path = tmp_path / "project"
+    ProjectRepository.create(path, message="teapot")
+    repository = Repository.open(path)
+    assert "teapot" == repository.head.commit.message
+
+
 def creategitrepository(projectdir: pathlib.Path, template: Template.Metadata) -> None:
     """Initialize the git repository for a project."""
-    repository = ProjectRepository.create(projectdir)
+    repository = ProjectRepository.create(projectdir, message="Initial commit")
     repository.project.commit(message=createcommitmessage(template))
 
 
