@@ -37,19 +37,19 @@ def update(
     directory: Optional[Path],
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
-    projectconfig = readprojectconfigfile(projectdir)
+    config = readprojectconfigfile(projectdir)
 
-    projectconfig2 = ProjectConfig(
-        projectconfig.template,
-        [*projectconfig.bindings, *extrabindings],
+    config2 = ProjectConfig(
+        config.template,
+        [*config.bindings, *extrabindings],
         revision,
-        projectconfig.directory if directory is None else directory,
+        config.directory if directory is None else directory,
     )
 
     repository = ProjectRepository(projectdir)
 
-    parent = _create(repository, projectconfig, interactive)
-    commit = _create(repository, projectconfig2, interactive, parent=parent)
+    parent = _create(repository, config, interactive)
+    commit = _create(repository, config2, interactive, parent=parent)
 
     if commit != parent:
         repository.import_(commit)
