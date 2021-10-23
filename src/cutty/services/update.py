@@ -14,7 +14,10 @@ from cutty.templates.domain.bindings import Binding
 
 
 def _create(
-    repository: ProjectRepository, projectconfig: ProjectConfig, interactive: bool
+    repository: ProjectRepository,
+    projectconfig: ProjectConfig,
+    interactive: bool,
+    parent: Optional[str] = None,
 ) -> str:
     """Create the project and return the commit ID."""
     template = Template.load(
@@ -22,7 +25,7 @@ def _create(
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.build() as builder:
+    with repository.build(parent=parent) as builder:
         storeproject(project, builder.path)
         return builder.commit(updatecommitmessage(template.metadata))
 
