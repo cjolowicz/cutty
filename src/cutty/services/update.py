@@ -4,13 +4,28 @@ from pathlib import Path
 from typing import Optional
 
 from cutty.projects.generate import generate
-from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
+
+
+def _create(
+    repository: ProjectRepository,
+    config: ProjectConfig,
+    interactive: bool,
+    parent: Optional[str] = None,
+) -> str:
+    """Create the project and return the commit ID."""
+    template = Template.load(config.template, config.revision, config.directory)
+    project = generate(template, config.bindings, interactive=interactive)
+
+    with repository.build(parent=parent) as builder:
+        storeproject(project, builder.path)
+        return builder.commit(updatecommitmessage(template.metadata))
 
 
 def update(
@@ -22,28 +37,19 @@ def update(
     directory: Optional[Path],
 ) -> None:
     """Update a project with changes from its Cookiecutter template."""
-    projectconfig = readprojectconfigfile(projectdir)
-    extrabindings = [*projectconfig.bindings, *extrabindings]
+    config1 = readprojectconfigfile(projectdir)
 
-    if directory is None:
-        directory = projectconfig.directory
+    config2 = ProjectConfig(
+        config1.template,
+        [*config1.bindings, *extrabindings],
+        revision,
+        config1.directory if directory is None else directory,
+    )
 
     repository = ProjectRepository(projectdir)
-    template = Template.load(
-        projectconfig.template, projectconfig.revision, projectconfig.directory
-    )
-    project = generate(template, projectconfig.bindings, interactive=interactive)
 
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(createcommitmessage(template.metadata))
+    parent = _create(repository, config1, interactive)
+    commit = _create(repository, config2, interactive, parent=parent)
 
-    template = Template.load(projectconfig.template, revision, directory)
-    project = generate(template, extrabindings, interactive=interactive)
-
-    with repository.build(parent=commit) as builder:
-        storeproject(project, builder.path)
-        commit2 = builder.commit(updatecommitmessage(template.metadata))
-
-    if commit2 != commit:
-        repository.import_(commit2)
+    if commit != parent:
+        repository.import_(commit)
