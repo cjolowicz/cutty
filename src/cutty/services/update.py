@@ -53,14 +53,7 @@ def update(
         projectconfig.template, extrabindings, revision, directory
     )
 
-    template = Template.load(
-        projectconfig2.template, projectconfig2.revision, projectconfig2.directory
-    )
-    project = generate(template, projectconfig2.bindings, interactive=interactive)
-
-    with repository.build(parent=commit) as builder:
-        storeproject(project, builder.path)
-        commit2 = builder.commit(updatecommitmessage(template.metadata))
+    commit2 = _create(repository, projectconfig2, interactive, parent=commit)
 
     if commit2 != commit:
         repository.import_(commit2)
