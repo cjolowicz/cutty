@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional
 
 from cutty.projects.generate import generate
-from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readprojectconfigfile
@@ -25,7 +24,7 @@ def _create(
 
     with repository.build() as builder:
         storeproject(project, builder.path)
-        return builder.commit(createcommitmessage(template.metadata))
+        return builder.commit(updatecommitmessage(template.metadata))
 
 
 def update(
