@@ -45,14 +45,13 @@ def update(
     if directory is None:
         directory = projectconfig.directory
 
-    repository = ProjectRepository(projectdir)
-
-    commit = _create(repository, projectconfig, interactive)
-
     projectconfig2 = ProjectConfig(
         projectconfig.template, extrabindings, revision, directory
     )
 
+    repository = ProjectRepository(projectdir)
+
+    commit = _create(repository, projectconfig, interactive)
     commit2 = _create(repository, projectconfig2, interactive, parent=commit)
 
     if commit2 != commit:
