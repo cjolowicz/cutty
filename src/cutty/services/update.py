@@ -51,8 +51,8 @@ def update(
 
     repository = ProjectRepository(projectdir)
 
-    commit = _create(repository, projectconfig, interactive)
-    commit2 = _create(repository, projectconfig2, interactive, parent=commit)
+    parent = _create(repository, projectconfig, interactive)
+    commit2 = _create(repository, projectconfig2, interactive, parent=parent)
 
-    if commit2 != commit:
+    if commit2 != parent:
         repository.import_(commit2)
