@@ -40,11 +40,11 @@ def update(
     projectconfig = readprojectconfigfile(projectdir)
     extrabindings = [*projectconfig.bindings, *extrabindings]
 
-    if directory is None:
-        directory = projectconfig.directory
-
     projectconfig2 = ProjectConfig(
-        projectconfig.template, extrabindings, revision, directory
+        projectconfig.template,
+        extrabindings,
+        revision,
+        projectconfig.directory if directory is None else directory,
     )
 
     repository = ProjectRepository(projectdir)
