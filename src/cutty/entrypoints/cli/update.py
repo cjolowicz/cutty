@@ -69,11 +69,11 @@ def update(
     project = ProjectRepository(cwd)
 
     if continue_:
-        project.continueupdate()
+        project.continue_()
         return
 
     if abort:
-        project.abortupdate()
+        project.abort()
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
