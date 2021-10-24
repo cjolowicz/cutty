@@ -40,13 +40,6 @@ from cutty.templates.domain.bindings import Binding
     ),
 )
 @click.option(
-    "-s",
-    "--skip-if-file-exists",
-    is_flag=True,
-    default=False,
-    help="Skip the files in the corresponding directories if they already exist.",
-)
-@click.option(
     "-i",
     "--in-place",
     is_flag=True,
@@ -60,7 +53,6 @@ def create(
     revision: Optional[str],
     cwd: Optional[pathlib.Path],
     template_directory: Optional[pathlib.Path],
-    skip_if_file_exists: bool,
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
@@ -69,7 +61,7 @@ def create(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
-    fileexists = fileexistspolicy(False, skip_if_file_exists)
+    fileexists = fileexistspolicy(False, False)
     createproject(
         template,
         cwd,
