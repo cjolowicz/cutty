@@ -72,12 +72,12 @@ def link(
         projectdir, location, extrabindings, revision, directory
     )
 
+    repository = ProjectRepository(projectdir)
+
     template = Template.load(
         projectconfig.template, projectconfig.revision, projectconfig.directory
     )
     project = generate(template, projectconfig.bindings, interactive=interactive)
-
-    repository = ProjectRepository(projectdir)
 
     with repository.build() as builder:
         storeproject(project, builder.path)
