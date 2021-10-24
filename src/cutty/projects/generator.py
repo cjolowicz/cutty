@@ -50,7 +50,7 @@ class ProjectGenerator:
         """Generate a project using the given bindings."""
         files = renderfiles(self._paths, self.renderer, bindings)
         hooks = renderfiles(self._hooks, self.renderer, bindings)
-        return Project.create(files, hooks)
+        return Project.create(self._template, files, hooks)
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
