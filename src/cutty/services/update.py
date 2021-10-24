@@ -3,14 +3,12 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
 
-from cutty.projects.generate import generate
+from cutty.projects.build import buildproject
 from cutty.projects.messages import MessageBuilder
 from cutty.projects.messages import updatecommitmessage
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
-from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
@@ -23,12 +21,13 @@ def _create(
     commitmessage: MessageBuilder,
 ) -> str:
     """Create the project and return the commit ID."""
-    template = Template.load(config.template, config.revision, config.directory)
-    project = generate(template, config.bindings, interactive=interactive)
-
-    with repository.build(parent=parent) as builder:
-        storeproject(project, builder.path)
-        return builder.commit(commitmessage(template.metadata))
+    return buildproject(
+        repository,
+        config,
+        interactive=interactive,
+        parent=parent,
+        commitmessage=commitmessage,
+    )
 
 
 def update(
