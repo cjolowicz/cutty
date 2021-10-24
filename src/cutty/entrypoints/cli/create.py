@@ -40,13 +40,6 @@ from cutty.templates.domain.bindings import Binding
     ),
 )
 @click.option(
-    "-f",
-    "--overwrite-if-exists",
-    is_flag=True,
-    default=False,
-    help="Overwrite the contents of the output directory if it already exists.",
-)
-@click.option(
     "-s",
     "--skip-if-file-exists",
     is_flag=True,
@@ -67,7 +60,6 @@ def create(
     revision: Optional[str],
     cwd: Optional[pathlib.Path],
     template_directory: Optional[pathlib.Path],
-    overwrite_if_exists: bool,
     skip_if_file_exists: bool,
     in_place: bool,
 ) -> None:
@@ -77,7 +69,7 @@ def create(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
+    fileexists = fileexistspolicy(False, skip_if_file_exists)
     createproject(
         template,
         cwd,
