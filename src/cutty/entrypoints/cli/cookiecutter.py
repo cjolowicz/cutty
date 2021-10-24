@@ -6,7 +6,7 @@ from typing import Optional
 import click
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
-from cutty.services.cookiecutter import createproject
+from cutty.services.cookiecutter import create
 from cutty.templates.domain.bindings import Binding
 
 
@@ -104,7 +104,7 @@ def cookiecutter(
 
     fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
 
-    createproject(
+    create(
         location,
         output_dir,
         extrabindings=extrabindings,

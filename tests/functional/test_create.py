@@ -150,3 +150,43 @@ def test_untracked_files(runcutty: RunCutty, template: Path) -> None:
     runcutty("create", str(template))
 
     assert untracked.name not in project.head.commit.tree
+
+
+def test_untracked_project_files(runcutty: RunCutty, template: Path) -> None:
+    """It bails out to avoid overwriting uncommitted changes."""
+    project = Repository.init(Path("example"))
+
+    untracked = project.path / "cutty.json"
+    untracked.touch()
+
+    with pytest.raises(Exception, match="uncommitted change"):
+        runcutty("create", str(template))
+
+    assert {untracked.relative_to(project.path)} == project_files(project.path)
+
+
+def test_existing_project_files(runcutty: RunCutty, template: Path) -> None:
+    """It does not overwrite existing files."""
+    project = Path("example")
+    project.mkdir()
+
+    existing = project / "cutty.json"
+    existing.touch()
+
+    with pytest.raises(Exception, match="uncommitted change"):
+        runcutty("create", str(template))
+
+    assert {existing.relative_to(project)} == project_files(project)
+
+
+def test_conflict(runcutty: RunCutty, template: Path) -> None:
+    """It produces conflict markers if files have conflicting changes."""
+    project = Repository.init(Path("example"))
+    conflicting = project.path / "cutty.json"
+
+    updatefile(conflicting, "null")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("create", str(template))
+
+    assert ">>>>" in conflicting.read_text()

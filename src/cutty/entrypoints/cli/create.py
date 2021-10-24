@@ -5,8 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
-from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
-from cutty.services.create import createproject
+from cutty.services.create import create as service_create
 from cutty.templates.domain.bindings import Binding
 
 
@@ -40,20 +39,6 @@ from cutty.templates.domain.bindings import Binding
     ),
 )
 @click.option(
-    "-f",
-    "--overwrite-if-exists",
-    is_flag=True,
-    default=False,
-    help="Overwrite the contents of the output directory if it already exists.",
-)
-@click.option(
-    "-s",
-    "--skip-if-file-exists",
-    is_flag=True,
-    default=False,
-    help="Skip the files in the corresponding directories if they already exist.",
-)
-@click.option(
     "-i",
     "--in-place",
     is_flag=True,
@@ -67,8 +52,6 @@ def create(
     revision: Optional[str],
     cwd: Optional[pathlib.Path],
     template_directory: Optional[pathlib.Path],
-    overwrite_if_exists: bool,
-    skip_if_file_exists: bool,
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
@@ -77,14 +60,12 @@ def create(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
-    fileexists = fileexistspolicy(overwrite_if_exists, skip_if_file_exists)
-    createproject(
+    service_create(
         template,
         cwd,
         extrabindings=extrabindings,
         interactive=not non_interactive,
         revision=revision,
         directory=template_directory,
-        fileexists=fileexists,
         in_place=in_place,
     )
