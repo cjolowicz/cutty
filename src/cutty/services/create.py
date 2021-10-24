@@ -3,11 +3,11 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-from cutty.projects.generate import generate
+from cutty.projects.build import commitproject
+from cutty.projects.build import createproject
 from cutty.projects.messages import createcommitmessage
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
-from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
@@ -22,14 +22,12 @@ def create(
     in_place: bool,
 ) -> None:
     """Generate projects from templates."""
-    template = Template.load(location, revision, directory)
+    config = ProjectConfig(location, extrabindings, revision, directory)
 
-    project = generate(template, extrabindings, interactive=interactive)
+    project = createproject(config, interactive=interactive)
     projectdir = outputdir if in_place else outputdir / project.name
     repository = ProjectRepository.create(projectdir, message="Initial commit")
 
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(message=createcommitmessage(template.metadata))
+    commit = commitproject(repository, project, commitmessage=createcommitmessage)
 
     repository.import_(commit)
