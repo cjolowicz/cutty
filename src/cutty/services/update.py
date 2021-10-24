@@ -20,7 +20,7 @@ def _create(
     *,
     interactive: bool,
     parent: Optional[str] = None,
-    commitmessage: MessageBuilder = updatecommitmessage,
+    commitmessage: MessageBuilder,
 ) -> str:
     """Create the project and return the commit ID."""
     template = Template.load(config.template, config.revision, config.directory)
@@ -51,8 +51,20 @@ def update(
 
     repository = ProjectRepository(projectdir)
 
-    parent = _create(repository, config1, interactive=interactive)
-    commit = _create(repository, config2, interactive=interactive, parent=parent)
+    parent = _create(
+        repository,
+        config1,
+        interactive=interactive,
+        commitmessage=updatecommitmessage,
+    )
+
+    commit = _create(
+        repository,
+        config2,
+        interactive=interactive,
+        commitmessage=updatecommitmessage,
+        parent=parent,
+    )
 
     if commit != parent:
         repository.import_(commit)
