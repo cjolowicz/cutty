@@ -16,6 +16,7 @@ from cutty.templates.domain.bindings import Binding
 def _create(
     repository: ProjectRepository,
     config: ProjectConfig,
+    *,
     interactive: bool,
     parent: Optional[str] = None,
 ) -> str:
@@ -48,8 +49,8 @@ def update(
 
     repository = ProjectRepository(projectdir)
 
-    parent = _create(repository, config1, interactive)
-    commit = _create(repository, config2, interactive, parent=parent)
+    parent = _create(repository, config1, interactive=interactive)
+    commit = _create(repository, config2, interactive=interactive, parent=parent)
 
     if commit != parent:
         repository.import_(commit)
