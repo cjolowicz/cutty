@@ -6,6 +6,7 @@ from typing import Optional
 from cutty.projects.build import commitproject
 from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
@@ -22,9 +23,10 @@ def create(
     in_place: bool,
 ) -> None:
     """Generate projects from templates."""
-    template = Template.load(location, revision, directory)
+    config = ProjectConfig(location, extrabindings, revision, directory)
 
-    project = generate(template, extrabindings, interactive=interactive)
+    template = Template.load(config.template, config.revision, config.directory)
+    project = generate(template, config.bindings, interactive=interactive)
     projectdir = outputdir if in_place else outputdir / project.name
     repository = ProjectRepository.create(projectdir, message="Initial commit")
 
