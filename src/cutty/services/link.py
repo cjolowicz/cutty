@@ -5,15 +5,13 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.projects.generate import generate
+from cutty.projects.build import buildproject
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
-from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
@@ -40,16 +38,16 @@ def createprojectconfig(
     directory: Optional[pathlib.Path],
 ) -> ProjectConfig:
     """Assemble project configuration from parameters and the existing project."""
-    projectconfig = loadprojectconfig(projectdir)
+    config = loadprojectconfig(projectdir)
 
-    if projectconfig is not None:
-        bindings = [*projectconfig.bindings, *bindings]
+    if config is not None:
+        bindings = [*config.bindings, *bindings]
 
         if location is None:
-            location = projectconfig.template
+            location = config.template
 
         if directory is None:
-            directory = projectconfig.directory
+            directory = config.directory
 
     if location is None:
         raise TemplateNotSpecifiedError()
@@ -68,19 +66,17 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    projectconfig = createprojectconfig(
+    config = createprojectconfig(
         projectdir, location, extrabindings, revision, directory
     )
 
-    template = Template.load(
-        projectconfig.template, projectconfig.revision, projectconfig.directory
-    )
-    project = generate(template, projectconfig.bindings, interactive=interactive)
-
     repository = ProjectRepository(projectdir)
 
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(linkcommitmessage(template.metadata))
+    commit = buildproject(
+        repository,
+        config,
+        interactive=interactive,
+        commitmessage=linkcommitmessage,
+    )
 
     repository.import_(commit, paths=[pathlib.Path(PROJECT_CONFIG_FILE)])

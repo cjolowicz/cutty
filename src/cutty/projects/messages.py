@@ -1,5 +1,10 @@
 """Commit messages."""
+from collections.abc import Callable
+
 from cutty.projects.template import Template
+
+
+MessageBuilder = Callable[[Template.Metadata], str]
 
 
 def createcommitmessage(template: Template.Metadata) -> str:
