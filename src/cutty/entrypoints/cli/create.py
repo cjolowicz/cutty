@@ -5,7 +5,6 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
-from cutty.entrypoints.cli.cookiecutter import fileexistspolicy
 from cutty.services.create import createproject
 from cutty.templates.domain.bindings import Binding
 
@@ -61,7 +60,6 @@ def create(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
-    fileexists = fileexistspolicy(False, False)
     createproject(
         template,
         cwd,
@@ -69,6 +67,5 @@ def create(
         interactive=not non_interactive,
         revision=revision,
         directory=template_directory,
-        fileexists=fileexists,
         in_place=in_place,
     )

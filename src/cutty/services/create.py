@@ -3,7 +3,6 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
-from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.repository import ProjectRepository
@@ -20,7 +19,6 @@ def createproject(
     interactive: bool,
     revision: Optional[str],
     directory: Optional[pathlib.Path],
-    fileexists: FileExistsPolicy,
     in_place: bool,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
@@ -31,7 +29,7 @@ def createproject(
     repository = ProjectRepository.create(projectdir, message="Initial commit")
 
     with repository.build() as builder:
-        storeproject(project, builder.path, fileexists=fileexists)
+        storeproject(project, builder.path)
         commit = builder.commit(message=createcommitmessage(template.metadata))
 
     repository.import_(commit)
