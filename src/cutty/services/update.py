@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from cutty.projects.generate import generate
+from cutty.projects.messages import MessageBuilder
 from cutty.projects.messages import updatecommitmessage
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readprojectconfigfile
@@ -19,6 +20,7 @@ def _create(
     *,
     interactive: bool,
     parent: Optional[str] = None,
+    commitmessage: MessageBuilder = updatecommitmessage,
 ) -> str:
     """Create the project and return the commit ID."""
     template = Template.load(config.template, config.revision, config.directory)
@@ -26,7 +28,7 @@ def _create(
 
     with repository.build(parent=parent) as builder:
         storeproject(project, builder.path)
-        return builder.commit(updatecommitmessage(template.metadata))
+        return builder.commit(commitmessage(template.metadata))
 
 
 def update(
