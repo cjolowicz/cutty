@@ -5,15 +5,13 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.errors import CuttyError
-from cutty.projects.generate import generate
+from cutty.projects.build import buildproject
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.projectconfig import readcookiecutterjson
 from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
-from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
 
@@ -74,11 +72,11 @@ def link(
 
     repository = ProjectRepository(projectdir)
 
-    template = Template.load(config.template, config.revision, config.directory)
-    project = generate(template, config.bindings, interactive=interactive)
-
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(linkcommitmessage(template.metadata))
+    commit = buildproject(
+        repository,
+        config,
+        interactive=interactive,
+        commitmessage=linkcommitmessage,
+    )
 
     repository.import_(commit, paths=[pathlib.Path(PROJECT_CONFIG_FILE)])
