@@ -32,10 +32,10 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
         project.import_(commit2)
 
 
-def continueupdate(projectdir: Path) -> None:
+def continue_(projectdir: Path) -> None:
     """Continue an update after conflict resolution."""
     project = ProjectRepository(projectdir)
-    project.continueupdate()
+    project.continue_()
 
 
 def abortupdate(projectdir: Path) -> None:
@@ -63,23 +63,23 @@ def createconflict(
         repository.cherrypick(cherry)
 
 
-def test_continueupdate_commits_changes(repository: Repository, path: Path) -> None:
+def test_continue_commits_changes(repository: Repository, path: Path) -> None:
     """It commits the changes."""
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate(repository.path)
+    continue_(repository.path)
 
     blob = repository.head.commit.tree / path.name
     assert blob.data == b"b"
 
 
-def test_continueupdate_state_cleanup(repository: Repository, path: Path) -> None:
+def test_continue_state_cleanup(repository: Repository, path: Path) -> None:
     """It removes CHERRY_PICK_HEAD."""
     createconflict(repository, path, ours="a", theirs="b")
     resolveconflicts(repository.path, path, Side.THEIRS)
 
-    continueupdate(repository.path)
+    continue_(repository.path)
 
     assert repository.cherrypickhead is None
 

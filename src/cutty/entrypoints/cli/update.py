@@ -69,7 +69,7 @@ def update(
     project = ProjectRepository(cwd)
 
     if continue_:
-        project.continueupdate()
+        project.continue_()
         return
 
     if abort:

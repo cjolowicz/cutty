@@ -105,7 +105,7 @@ class ProjectRepository:
             stageallfiles=False,
         )
 
-    def continueupdate(self) -> None:
+    def continue_(self) -> None:
         """Continue an update after conflict resolution."""
         if not (commit := self.project.cherrypickhead):
             raise NoUpdateInProgressError()
