@@ -3,10 +3,10 @@ import pathlib
 from collections.abc import Sequence
 from typing import Optional
 
+from cutty.projects.build import commitproject
 from cutty.projects.generate import generate
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
 
@@ -28,8 +28,6 @@ def create(
     projectdir = outputdir if in_place else outputdir / project.name
     repository = ProjectRepository.create(projectdir, message="Initial commit")
 
-    with repository.build() as builder:
-        storeproject(project, builder.path)
-        commit = builder.commit(message=createcommitmessage(template.metadata))
+    commit = commitproject(repository, project, commitmessage=createcommitmessage)
 
     repository.import_(commit)
