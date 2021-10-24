@@ -40,16 +40,16 @@ def createprojectconfig(
     directory: Optional[pathlib.Path],
 ) -> ProjectConfig:
     """Assemble project configuration from parameters and the existing project."""
-    projectconfig = loadprojectconfig(projectdir)
+    config = loadprojectconfig(projectdir)
 
-    if projectconfig is not None:
-        bindings = [*projectconfig.bindings, *bindings]
+    if config is not None:
+        bindings = [*config.bindings, *bindings]
 
         if location is None:
-            location = projectconfig.template
+            location = config.template
 
         if directory is None:
-            directory = projectconfig.directory
+            directory = config.directory
 
     if location is None:
         raise TemplateNotSpecifiedError()
@@ -68,16 +68,14 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a Cookiecutter template."""
-    projectconfig = createprojectconfig(
+    config = createprojectconfig(
         projectdir, location, extrabindings, revision, directory
     )
 
     repository = ProjectRepository(projectdir)
 
-    template = Template.load(
-        projectconfig.template, projectconfig.revision, projectconfig.directory
-    )
-    project = generate(template, projectconfig.bindings, interactive=interactive)
+    template = Template.load(config.template, config.revision, config.directory)
+    project = generate(template, config.bindings, interactive=interactive)
 
     with repository.build() as builder:
         storeproject(project, builder.path)
