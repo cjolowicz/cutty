@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
-from cutty.services.create import createproject
+from cutty.services.create import create as service_create
 from cutty.templates.domain.bindings import Binding
 
 
@@ -60,7 +60,7 @@ def create(
     if cwd is None:
         cwd = pathlib.Path.cwd()
 
-    createproject(
+    service_create(
         template,
         cwd,
         extrabindings=extrabindings,
