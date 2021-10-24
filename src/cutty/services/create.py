@@ -1,4 +1,4 @@
-"""Create a project from a Cookiecutter template."""
+"""Create a project from a template."""
 import pathlib
 from collections.abc import Sequence
 from typing import Optional
@@ -21,7 +21,7 @@ def create(
     directory: Optional[pathlib.Path],
     in_place: bool,
 ) -> None:
-    """Generate projects from Cookiecutter templates."""
+    """Generate projects from templates."""
     template = Template.load(location, revision, directory)
 
     project = generate(template, extrabindings, interactive=interactive)

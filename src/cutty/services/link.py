@@ -1,4 +1,4 @@
-"""Link a project to a Cookiecutter template."""
+"""Link a project to a template."""
 import contextlib
 import pathlib
 from collections.abc import Sequence
@@ -65,7 +65,7 @@ def link(
     revision: Optional[str],
     directory: Optional[pathlib.Path],
 ) -> None:
-    """Link project to a Cookiecutter template."""
+    """Link project to a template."""
     config = createprojectconfig(
         projectdir, location, extrabindings, revision, directory
     )

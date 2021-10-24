@@ -1,4 +1,4 @@
-"""Update a project with changes from its Cookiecutter template."""
+"""Update a project with changes from its template."""
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
@@ -19,7 +19,7 @@ def update(
     revision: Optional[str],
     directory: Optional[Path],
 ) -> None:
-    """Update a project with changes from its Cookiecutter template."""
+    """Update a project with changes from its template."""
     config1 = readprojectconfigfile(projectdir)
 
     config2 = ProjectConfig(
