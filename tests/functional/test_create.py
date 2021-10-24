@@ -163,3 +163,17 @@ def test_untracked_project_files(runcutty: RunCutty, template: Path) -> None:
         runcutty("create", str(template))
 
     assert {untracked.relative_to(project.path)} == project_files(project.path)
+
+
+def test_existing_project_files(runcutty: RunCutty, template: Path) -> None:
+    """It does not overwrite existing files."""
+    project = Path("example")
+    project.mkdir()
+
+    existing = project / "cutty.json"
+    existing.touch()
+
+    with pytest.raises(Exception, match="uncommitted change"):
+        runcutty("create", str(template))
+
+    assert {existing.relative_to(project)} == project_files(project)
