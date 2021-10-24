@@ -116,7 +116,7 @@ class ProjectRepository:
             committer=self.project.default_signature,
         )
 
-    def abortupdate(self) -> None:
+    def abort(self) -> None:
         """Abort an update with conflicts."""
         if not self.project.cherrypickhead:
             raise NoUpdateInProgressError()

@@ -38,10 +38,10 @@ def continue_(projectdir: Path) -> None:
     project.continue_()
 
 
-def abortupdate(projectdir: Path) -> None:
+def abort(projectdir: Path) -> None:
     """Abort an update with conflicts."""
     project = ProjectRepository(projectdir)
-    project.abortupdate()
+    project.abort()
 
 
 def createconflict(
@@ -84,11 +84,11 @@ def test_continue_state_cleanup(repository: Repository, path: Path) -> None:
     assert repository.cherrypickhead is None
 
 
-def test_abortupdate(repository: Repository, path: Path) -> None:
+def test_abort(repository: Repository, path: Path) -> None:
     """It uses our version."""
     createconflict(repository, path, ours="a", theirs="b")
 
-    abortupdate(repository.path)
+    abort(repository.path)
 
     blob = repository.head.commit.tree / path.name
     assert blob.data.decode() == "a"
