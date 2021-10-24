@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from cutty.errors import CuttyError
 from cutty.filestorage.domain.files import File
+from cutty.projects.template import Template
 
 
 class EmptyTemplateError(CuttyError):
@@ -18,12 +19,18 @@ class EmptyTemplateError(CuttyError):
 class Project:
     """A generated project."""
 
+    template: Template.Metadata
     name: str
     files: Iterable[File]
     hooks: Iterable[File]
 
     @classmethod
-    def create(cls, files: Iterable[File], hooks: Iterable[File]) -> Project:
+    def create(
+        cls,
+        template: Template.Metadata,
+        files: Iterable[File],
+        hooks: Iterable[File],
+    ) -> Project:
         """Create a project."""
         files = iter(files)
 
@@ -34,7 +41,7 @@ class Project:
 
         files = itertools.chain([first], files)
         name = first.path.parts[0]
-        return Project(name, files, hooks)
+        return Project(template, name, files, hooks)
 
     def add(self, file: File) -> Project:
         """Add a project file."""
