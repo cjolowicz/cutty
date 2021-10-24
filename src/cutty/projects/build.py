@@ -17,6 +17,20 @@ def createproject(config: ProjectConfig, *, interactive: bool) -> Project:
     return generate(template, config.bindings, interactive=interactive)
 
 
+def commitproject(
+    repository: ProjectRepository,
+    project: Project,
+    *,
+    parent: Optional[str] = None,
+    commitmessage: MessageBuilder,
+) -> str:
+    """Build the project, returning the commit ID."""
+    with repository.build(parent=parent) as builder:
+        storeproject(project, builder.path)
+
+        return builder.commit(commitmessage(project.template))
+
+
 def buildproject(
     repository: ProjectRepository,
     config: ProjectConfig,
@@ -28,6 +42,6 @@ def buildproject(
     """Build the project, returning the commit ID."""
     project = createproject(config, interactive=interactive)
 
-    with repository.build(parent=parent) as builder:
-        storeproject(project, builder.path)
-        return builder.commit(commitmessage(project.template))
+    return commitproject(
+        repository, project, parent=parent, commitmessage=commitmessage
+    )
