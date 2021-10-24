@@ -23,4 +23,4 @@ def buildproject(
 
     with repository.build(parent=parent) as builder:
         storeproject(project, builder.path)
-        return builder.commit(commitmessage(template.metadata))
+        return builder.commit(commitmessage(project.template))
