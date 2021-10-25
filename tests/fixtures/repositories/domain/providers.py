@@ -6,8 +6,8 @@ from typing import Optional
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
+from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import Provider
-from cutty.packages.domain.repository import Package
 from cutty.packages.domain.revisions import Revision
 
 

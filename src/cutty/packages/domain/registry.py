@@ -11,11 +11,11 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
+from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
 from cutty.packages.domain.providers import ProviderStore
-from cutty.packages.domain.repository import Package
 from cutty.packages.domain.revisions import Revision
 
 

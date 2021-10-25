@@ -8,6 +8,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.mounters import Mounter
+from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import Provider
@@ -15,7 +16,6 @@ from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.registry import provide
 from cutty.packages.domain.registry import ProviderRegistry
-from cutty.packages.domain.repository import Package
 from tests.fixtures.repositories.domain.providers import constprovider
 from tests.fixtures.repositories.domain.providers import dictprovider
 from tests.fixtures.repositories.domain.providers import nullprovider

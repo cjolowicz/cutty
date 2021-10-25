@@ -18,7 +18,7 @@ from cutty.packages.domain.locations import Location
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
-from cutty.packages.domain.repository import Package
+from cutty.packages.domain.package import Package
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
