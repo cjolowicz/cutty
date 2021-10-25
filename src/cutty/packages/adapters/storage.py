@@ -149,7 +149,7 @@ def getdefaultproviderstore(
     return providerstore
 
 
-def getdefaultrepositoryprovider(
+def getdefaultpackageprovider(
     path: pathlib.Path, *, timer: Timer = defaulttimer
 ) -> ProviderRegistry:
     """Return a repository provider."""
