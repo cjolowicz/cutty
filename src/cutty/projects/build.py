@@ -1,6 +1,8 @@
 """Building projects in a repository."""
+from collections.abc import Iterator
 from typing import Optional
 
+from cutty.compat.contextlib import contextmanager
 from cutty.projects.generate import generate
 from cutty.projects.messages import MessageBuilder
 from cutty.projects.project import Project
@@ -14,15 +16,24 @@ def createproject(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
 ) -> Project:
     """Create the project."""
-    with Template.load(config.template, config.revision, config.directory) as template:
-        pass
+    with createproject2(
+        config, interactive=interactive, createconfigfile=createconfigfile
+    ) as project:
+        return project
 
-    return generate(
-        template,
-        config.bindings,
-        interactive=interactive,
-        createconfigfile=createconfigfile,
-    )
+
+@contextmanager
+def createproject2(
+    config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
+) -> Iterator[Project]:
+    """Create the project."""
+    with Template.load(config.template, config.revision, config.directory) as template:
+        yield generate(
+            template,
+            config.bindings,
+            interactive=interactive,
+            createconfigfile=createconfigfile,
+        )
 
 
 def commitproject(
