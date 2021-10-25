@@ -26,7 +26,7 @@ class UnknownLocationError(CuttyError):
     location: Location
 
 
-def provide(
+def _provide(
     providers: Iterable[Provider],
     location: Location,
     revision: Optional[Revision] = None,
@@ -64,7 +64,7 @@ class ProviderRegistry:
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-        package = provide(providers, location, revision)
+        package = _provide(providers, location, revision)
 
         return PackageRepository(package)
 
