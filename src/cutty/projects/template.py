@@ -42,7 +42,7 @@ class Template:
         """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository2(template, revision=revision)
+        repository = packageprovider.getrepository(template, revision=revision)
 
         with repository.get(revision) as package:
             if directory is not None:

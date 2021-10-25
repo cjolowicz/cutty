@@ -62,7 +62,7 @@ def test_none(providerstore: ProviderStore, url: URL) -> None:
     """It raises an exception if the registry is empty."""
     registry = ProviderRegistry(providerstore, factories=[])
     with pytest.raises(Exception):
-        registry.getrepository2(str(url))
+        registry.getrepository(str(url))
 
 
 def test_with_url(
@@ -71,7 +71,7 @@ def test_with_url(
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry.getrepository2(str(url))
+    repository = registry.getrepository(str(url))
 
     with repository.get() as package:
         assert not list(package.path.iterdir())
@@ -92,7 +92,7 @@ def test_with_path(
     )
 
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry.getrepository2(str(directory))
+    repository = registry.getrepository(str(directory))
 
     with repository.get(str(directory)) as package:
         [entry] = package.path.iterdir()
@@ -111,7 +111,7 @@ def test_with_provider_specific_url(
     ]
     registry = ProviderRegistry(providerstore, factories)
     with pytest.raises(Exception):
-        registry.getrepository2(str(url))
+        registry.getrepository(str(url))
 
 
 def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) -> None:
@@ -122,7 +122,7 @@ def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) 
     factories = [ConstProviderFactory(constprovider("default", package))]
     registry = ProviderRegistry(providerstore, factories)
     url = url.with_scheme(f"invalid+{url.scheme}")
-    repository = registry.getrepository2(str(url))
+    repository = registry.getrepository(str(url))
 
     with repository.get() as package2:
         assert package == package2
@@ -132,14 +132,14 @@ def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
     """It does not crash when rewriting provider-specific file:// URLs."""
     # https://github.com/aio-libs/yarl/issues/280
     registry = ProviderRegistry(providerstore, [ConstProviderFactory(dictprovider())])
-    registry.getrepository2("dict+file:///path/to/repository.zip")  # does not raise
+    registry.getrepository("dict+file:///path/to/repository.zip")  # does not raise
 
 
 def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry.getrepository2(
+    repository = registry.getrepository(
         "https://example.com/path/to/example?query#fragment"
     )
 

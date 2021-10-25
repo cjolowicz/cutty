@@ -53,7 +53,7 @@ class ProviderRegistry:
             providerfactory.name: providerfactory for providerfactory in factories
         }
 
-    def getrepository2(
+    def getrepository(
         self,
         rawlocation: str,
         revision: Optional[Revision] = None,
