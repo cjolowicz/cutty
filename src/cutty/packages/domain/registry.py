@@ -33,8 +33,8 @@ def provide(
 ) -> Package:
     """Provide the package located at the given URL."""
     for provider in providers:
-        if repository := provider(location, revision):
-            return repository
+        if package := provider(location, revision):
+            return package
 
     raise UnknownLocationError(location)
 
@@ -65,9 +65,9 @@ class ProviderRegistry:
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-        repository = provide(providers, location, revision)
+        package = provide(providers, location, revision)
 
-        return repository if directory is None else repository.descend(directory)
+        return package if directory is None else package.descend(directory)
 
     def _extractprovidername(
         self, location: Location
