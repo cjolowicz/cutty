@@ -8,9 +8,9 @@ import pytest
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
-from cutty.repositories.domain.mounters import Mounter
-from cutty.repositories.domain.mounters import unversioned_mounter
-from cutty.repositories.domain.revisions import Revision
+from cutty.packages.domain.mounters import Mounter
+from cutty.packages.domain.mounters import unversioned_mounter
+from cutty.packages.domain.revisions import Revision
 
 
 @pytest.fixture

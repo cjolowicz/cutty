@@ -2,7 +2,7 @@
 import pytest
 from yarl import URL
 
-from cutty.repositories.domain.matchers import Matcher
+from cutty.packages.domain.matchers import Matcher
 
 
 @pytest.fixture

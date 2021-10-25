@@ -4,9 +4,9 @@ import pathlib
 import pytest
 from yarl import URL
 
-from cutty.repositories.domain.providers import ProviderName
-from cutty.repositories.domain.providers import ProviderStore
-from cutty.repositories.domain.stores import Store
+from cutty.packages.domain.providers import ProviderName
+from cutty.packages.domain.providers import ProviderStore
+from cutty.packages.domain.stores import Store
 
 
 @pytest.fixture

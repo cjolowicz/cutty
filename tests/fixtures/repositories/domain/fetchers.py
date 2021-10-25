@@ -5,12 +5,12 @@ from typing import Optional
 import pytest
 from yarl import URL
 
-from cutty.repositories.domain.fetchers import Fetcher
-from cutty.repositories.domain.fetchers import fetcher
-from cutty.repositories.domain.fetchers import FetchMode
-from cutty.repositories.domain.matchers import scheme
-from cutty.repositories.domain.revisions import Revision
-from cutty.repositories.domain.stores import Store
+from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import FetchMode
+from cutty.packages.domain.matchers import scheme
+from cutty.packages.domain.revisions import Revision
+from cutty.packages.domain.stores import Store
 from tests.fixtures.repositories.domain.types import FetcherCalls
 
 

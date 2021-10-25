@@ -5,10 +5,10 @@ from typing import Optional
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.repositories.domain.locations import Location
-from cutty.repositories.domain.providers import Provider
-from cutty.repositories.domain.repository import Repository
-from cutty.repositories.domain.revisions import Revision
+from cutty.packages.domain.locations import Location
+from cutty.packages.domain.providers import Provider
+from cutty.packages.domain.repository import Repository
+from cutty.packages.domain.revisions import Revision
 
 
 pytest_plugins = ["tests.fixtures.repositories.domain.stores"]

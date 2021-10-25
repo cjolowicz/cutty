@@ -9,8 +9,8 @@ import platformdirs
 
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
-from cutty.repositories.domain.revisions import Revision
+from cutty.packages.adapters.storage import getdefaultrepositoryprovider
+from cutty.packages.domain.revisions import Revision
 
 
 @dataclass

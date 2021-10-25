@@ -1,9 +1,9 @@
 """Fixtures for cutty.repositories.adapters.providers.mercurial."""
 import pytest
 
-from cutty.repositories.adapters.fetchers.mercurial import findhg
-from cutty.repositories.adapters.fetchers.mercurial import Hg
-from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
+from cutty.packages.adapters.fetchers.mercurial import findhg
+from cutty.packages.adapters.fetchers.mercurial import Hg
+from cutty.packages.adapters.fetchers.mercurial import HgNotFoundError
 
 
 @pytest.fixture(scope="session")
