@@ -39,11 +39,13 @@ class Template:
         """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         packageprovider = getdefaultpackageprovider(cachedir)
-        package = packageprovider(
+        repository = packageprovider.getrepository(
             template,
             revision=revision,
             directory=(PurePath(*directory.parts) if directory is not None else None),
         )
+        with repository.get(revision) as package:
+            pass
 
         metadata = cls.Metadata(template, directory, package.name, package.revision)
         return cls(metadata, package.path)

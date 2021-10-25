@@ -72,20 +72,6 @@ class ProviderRegistry:
             package if directory is None else package.descend(directory)
         )
 
-    def __call__(
-        self,
-        rawlocation: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
-    ) -> Package:
-        """Return the package located at the given URL."""
-        repository = self.getrepository(
-            rawlocation, revision=revision, fetchmode=fetchmode, directory=directory
-        )
-        with repository.get(revision) as package:
-            return package
-
     def _extractprovidername(
         self, location: Location
     ) -> tuple[Optional[ProviderName], Location]:
