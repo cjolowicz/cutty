@@ -33,7 +33,7 @@ class Template:
 
     @classmethod
     @contextmanager
-    def load2(
+    def load(
         cls,
         template: str,
         revision: Optional[str],
