@@ -14,7 +14,6 @@ from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.providers import RemoteProviderFactory
-from cutty.packages.domain.registry import provide
 from cutty.packages.domain.registry import ProviderRegistry
 from tests.fixtures.packages.domain.providers import constprovider
 from tests.fixtures.packages.domain.providers import dictprovider
@@ -36,10 +35,15 @@ pytest_plugins = [
         [nullprovider, Provider("null2")],
     ],
 )
-def test_provide_fail(providers: list[Provider]) -> None:
+def test_provide_fail(providerstore: ProviderStore, providers: list[Provider]) -> None:
     """It raises an exception."""
+    registry = ProviderRegistry(
+        providerstore,
+        factories=[ConstProviderFactory(provider) for provider in providers],
+    )
+
     with pytest.raises(Exception):
-        provide(providers, URL())
+        registry.getrepository("")
 
 
 @pytest.mark.parametrize(
@@ -51,11 +55,17 @@ def test_provide_fail(providers: list[Provider]) -> None:
         [dictprovider({}), dictprovider({"marker": ""}, name="dict2")],
     ],
 )
-def test_provide_pass(providers: list[Provider]) -> None:
+def test_provide_pass(providerstore: ProviderStore, providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
-    package = provide(providers, URL())
-    assert package.path.is_dir()
-    assert not (package.path / "marker").is_file()
+    registry = ProviderRegistry(
+        providerstore,
+        factories=[ConstProviderFactory(provider) for provider in providers],
+    )
+
+    repository = registry.getrepository("")
+    with repository.get() as package:
+        assert package.path.is_dir()
+        assert not (package.path / "marker").is_file()
 
 
 def test_none(providerstore: ProviderStore, url: URL) -> None:
