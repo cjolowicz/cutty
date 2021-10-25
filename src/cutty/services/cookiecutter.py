@@ -5,6 +5,7 @@ from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.generate import generate
+from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 from cutty.templates.domain.bindings import Binding
@@ -21,10 +22,11 @@ def create(
     fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    template = Template.load(location, checkout, directory)
+    config = ProjectConfig(location, extrabindings, checkout, directory)
+    template = Template.load(config.template, config.revision, config.directory)
 
     project = generate(
-        template, extrabindings, interactive=interactive, createconfigfile=False
+        template, config.bindings, interactive=interactive, createconfigfile=False
     )
 
     storeproject(
