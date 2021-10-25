@@ -9,8 +9,8 @@ import platformdirs
 
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.repositories.adapters.storage import getdefaultrepositoryprovider
-from cutty.repositories.domain.revisions import Revision
+from cutty.packages.adapters.storage import getdefaultpackageprovider
+from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -38,14 +38,12 @@ class Template:
     ) -> Template:
         """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        repositoryprovider = getdefaultrepositoryprovider(cachedir)
-        repository = repositoryprovider(
+        packageprovider = getdefaultpackageprovider(cachedir)
+        package = packageprovider(
             template,
             revision=revision,
             directory=(PurePath(*directory.parts) if directory is not None else None),
         )
 
-        metadata = cls.Metadata(
-            template, directory, repository.name, repository.revision
-        )
-        return cls(metadata, repository.path)
+        metadata = cls.Metadata(template, directory, package.name, package.revision)
+        return cls(metadata, package.path)

@@ -7,15 +7,15 @@ from yarl import URL
 
 from cutty.entrypoints.cli.errors import fatal
 from cutty.errors import CuttyError
+from cutty.packages.adapters.fetchers.file import FileFetcherError
+from cutty.packages.adapters.fetchers.git import GitFetcherError
+from cutty.packages.adapters.fetchers.http import HTTPFetcherError
+from cutty.packages.adapters.fetchers.mercurial import HgError
+from cutty.packages.adapters.fetchers.mercurial import HgNotFoundError
+from cutty.packages.adapters.providers.git import RevisionNotFoundError
+from cutty.packages.domain.mounters import UnsupportedRevisionError
+from cutty.packages.domain.registry import UnknownLocationError
 from cutty.projects.repository import NoUpdateInProgressError
-from cutty.repositories.adapters.fetchers.file import FileFetcherError
-from cutty.repositories.adapters.fetchers.git import GitFetcherError
-from cutty.repositories.adapters.fetchers.http import HTTPFetcherError
-from cutty.repositories.adapters.fetchers.mercurial import HgError
-from cutty.repositories.adapters.fetchers.mercurial import HgNotFoundError
-from cutty.repositories.adapters.providers.git import RevisionNotFoundError
-from cutty.repositories.domain.mounters import UnsupportedRevisionError
-from cutty.repositories.domain.registry import UnknownLocationError
 from cutty.services.link import TemplateNotSpecifiedError
 
 
