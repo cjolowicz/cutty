@@ -56,7 +56,7 @@ class BaseProvider(Provider):
         self.mount = mount
         self.getrevision = getrevision
 
-    def _loadrepository(
+    def _loadpackage(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
     ) -> Package:
         filesystem = self.mount(path, revision)
@@ -93,7 +93,7 @@ class LocalProvider(BaseProvider):
             return None
 
         if path.exists() and self.match(path):
-            return self._loadrepository(location, revision, path)
+            return self._loadpackage(location, revision, path)
 
         return None
 
@@ -142,7 +142,7 @@ class RemoteProvider(BaseProvider):
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
                 if path := fetcher(url, self.store, revision, self.fetchmode):
-                    return self._loadrepository(location, revision, path)
+                    return self._loadpackage(location, revision, path)
 
         return None
 
