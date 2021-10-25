@@ -49,10 +49,12 @@ def constprovider(name: str, package: Package) -> Provider:
     return _
 
 
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
+def dictprovider(
+    mapping: Optional[dict[str, Any]] = None, name: str = "dict"
+) -> Provider:
     """Provider that matches every URL with a package."""
 
-    @provider("dict")
+    @provider(name)
     def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
         filesystem = DictFilesystem(mapping or {})
         path = Path(filesystem=filesystem)
