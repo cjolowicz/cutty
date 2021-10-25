@@ -12,6 +12,7 @@ from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
@@ -53,21 +54,23 @@ class ProviderRegistry:
             providerfactory.name: providerfactory for providerfactory in factories
         }
 
-    def __call__(
+    def getrepository(
         self,
         rawlocation: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
         directory: Optional[PurePath] = None,
-    ) -> Package:
-        """Return the package located at the given URL."""
+    ) -> PackageRepository:
+        """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
         package = provide(providers, location, revision)
 
-        return package if directory is None else package.descend(directory)
+        return PackageRepository(
+            package if directory is None else package.descend(directory)
+        )
 
     def _extractprovidername(
         self, location: Location
