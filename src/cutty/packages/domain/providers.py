@@ -19,6 +19,7 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -29,6 +30,14 @@ class Provider:
     def __init__(self, name: str = "") -> None:
         """Initialize."""
         self.name = name
+
+    def provide(
+        self, location: Location, revision: Optional[Revision] = None
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
+        if package := self(location, revision):
+            return PackageRepository(package)
+        return None
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
