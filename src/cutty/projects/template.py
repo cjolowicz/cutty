@@ -37,6 +37,16 @@ class Template:
         directory: Optional[pathlib.Path],
     ) -> Template:
         """Load a project template."""
+        return cls.load2(template, revision, directory)
+
+    @classmethod
+    def load2(
+        cls,
+        template: str,
+        revision: Optional[str],
+        directory: Optional[pathlib.Path],
+    ) -> Template:
+        """Load a project template."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         packageprovider = getdefaultpackageprovider(cachedir)
         repository = packageprovider.getrepository(
