@@ -17,9 +17,9 @@ from cutty.packages.domain.stores import Store
 
 
 pytest_plugins = [
-    "tests.fixtures.repositories.domain.fetchers",
-    "tests.fixtures.repositories.domain.matchers",
-    "tests.fixtures.repositories.domain.mounters",
+    "tests.fixtures.packages.domain.fetchers",
+    "tests.fixtures.packages.domain.matchers",
+    "tests.fixtures.packages.domain.mounters",
 ]
 
 

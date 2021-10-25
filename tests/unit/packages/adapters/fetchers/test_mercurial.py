@@ -16,7 +16,7 @@ from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.stores import Store
 
 
-pytest_plugins = ["tests.fixtures.repositories.adapters.mercurial"]
+pytest_plugins = ["tests.fixtures.packages.adapters.mercurial"]
 
 
 @pytest.fixture(scope="session")

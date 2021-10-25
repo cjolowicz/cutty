@@ -11,7 +11,7 @@ from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.revisions import Revision
 
 
-pytest_plugins = ["tests.fixtures.repositories.domain.stores"]
+pytest_plugins = ["tests.fixtures.packages.domain.stores"]
 
 
 ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Package]]

@@ -4,12 +4,12 @@ from yarl import URL
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.stores import Store
-from tests.fixtures.repositories.domain.types import FetcherCalls
+from tests.fixtures.packages.domain.types import FetcherCalls
 
 
 pytest_plugins = [
-    "tests.fixtures.repositories.domain.fetchers",
-    "tests.fixtures.repositories.domain.stores",
+    "tests.fixtures.packages.domain.fetchers",
+    "tests.fixtures.packages.domain.stores",
 ]
 
 

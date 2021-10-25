@@ -11,7 +11,7 @@ from cutty.packages.adapters.providers.mercurial import hgproviderfactory
 from cutty.packages.domain.stores import Store
 
 
-pytest_plugins = ["tests.fixtures.repositories.adapters.mercurial"]
+pytest_plugins = ["tests.fixtures.packages.adapters.mercurial"]
 
 
 @pytest.fixture(scope="session")

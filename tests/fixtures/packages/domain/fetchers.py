@@ -11,7 +11,7 @@ from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
-from tests.fixtures.repositories.domain.types import FetcherCalls
+from tests.fixtures.packages.domain.types import FetcherCalls
 
 
 @pytest.fixture

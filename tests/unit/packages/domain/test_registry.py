@@ -16,15 +16,15 @@ from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.registry import provide
 from cutty.packages.domain.registry import ProviderRegistry
-from tests.fixtures.repositories.domain.providers import constprovider
-from tests.fixtures.repositories.domain.providers import dictprovider
-from tests.fixtures.repositories.domain.providers import nullprovider
+from tests.fixtures.packages.domain.providers import constprovider
+from tests.fixtures.packages.domain.providers import dictprovider
+from tests.fixtures.packages.domain.providers import nullprovider
 
 
 pytest_plugins = [
-    "tests.fixtures.repositories.domain.fetchers",
-    "tests.fixtures.repositories.domain.mounters",
-    "tests.fixtures.repositories.domain.stores",
+    "tests.fixtures.packages.domain.fetchers",
+    "tests.fixtures.packages.domain.mounters",
+    "tests.fixtures.packages.domain.stores",
 ]
 
 
