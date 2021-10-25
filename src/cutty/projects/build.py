@@ -13,7 +13,7 @@ from cutty.projects.template import Template
 
 
 @contextmanager
-def createproject2(
+def createproject(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
 ) -> Iterator[Project]:
     """Create the project."""
@@ -49,7 +49,7 @@ def buildproject(
     commitmessage: MessageBuilder,
 ) -> str:
     """Build the project, returning the commit ID."""
-    with createproject2(config, interactive=interactive) as project:
+    with createproject(config, interactive=interactive) as project:
         return commitproject(
             repository, project, parent=parent, commitmessage=commitmessage
         )
