@@ -39,18 +39,18 @@ nullprovider = Provider("null")
 """Provider that matches no location."""
 
 
-def constprovider(name: str, repository: Package) -> Provider:
-    """Provider that returns the same repository always."""
+def constprovider(name: str, package: Package) -> Provider:
+    """Provider that returns the same package always."""
 
     @provider(name)
     def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
-        return repository
+        return package
 
     return _
 
 
 def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
-    """Provider that matches every URL with a repository."""
+    """Provider that matches every URL with a package."""
 
     @provider("dict")
     def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:

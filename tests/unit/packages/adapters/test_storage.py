@@ -78,8 +78,8 @@ def timer() -> FakeTimer:
 
 @pytest.fixture
 def storage(tmp_path: Path, timer: FakeTimer) -> PackageStorage:
-    """Fixture for a repository storage."""
-    path = tmp_path / "repository-storage"
+    """Fixture for a package storage."""
+    path = tmp_path / "package-storage"
     return PackageStorage(path, timer=timer)
 
 
@@ -183,7 +183,7 @@ def test_storage_clean_something(
 
 @pytest.fixture
 def defaultproviderstore(tmp_path: Path, timer: FakeTimer) -> ProviderStore:
-    """Fixture for a repository storage."""
+    """Fixture for a provider store."""
     return getdefaultproviderstore(tmp_path, timer=timer)
 
 

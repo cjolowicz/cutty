@@ -19,10 +19,10 @@ def repository(tmp_path: Path) -> Path:
 def test_happy(repository: Path) -> None:
     """It provides a repository from a local directory."""
     url = asurl(repository)
-    repository2 = diskprovider(url)
-    assert repository2 is not None
+    package = diskprovider(url)
+    assert package is not None
 
-    text = (repository2.path / "marker").read_text()
+    text = (package.path / "marker").read_text()
     assert text == "Lorem"
 
 

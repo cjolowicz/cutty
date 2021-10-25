@@ -53,9 +53,9 @@ def test_provide_fail(providers: list[Provider]) -> None:
 )
 def test_provide_pass(providers: list[Provider]) -> None:
     """It returns a path to the filesystem."""
-    repository = provide(providers, URL())
-    assert repository.path.is_dir()
-    assert not (repository.path / "marker").is_file()
+    package = provide(providers, URL())
+    assert package.path.is_dir()
+    assert not (package.path / "marker").is_file()
 
 
 def test_none(providerstore: ProviderStore, url: URL) -> None:
@@ -71,8 +71,8 @@ def test_with_url(
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry(str(url))
-    assert not list(repository.path.iterdir())
+    package = registry(str(url))
+    assert not list(package.path.iterdir())
 
 
 def test_with_path(
@@ -90,8 +90,8 @@ def test_with_path(
     )
 
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry(str(directory))
-    [entry] = repository.path.iterdir()
+    package = registry(str(directory))
+    [entry] = package.path.iterdir()
 
     assert entry.name == "marker"
 
@@ -112,14 +112,14 @@ def test_with_provider_specific_url(
 
 def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) -> None:
     """It invokes providers with the original scheme."""
-    repositorypath = Path(filesystem=DictFilesystem({}))
-    repository = Package("example", repositorypath, None)
+    packagepath = Path(filesystem=DictFilesystem({}))
+    package = Package("example", packagepath, None)
 
-    factories = [ConstProviderFactory(constprovider("default", repository))]
+    factories = [ConstProviderFactory(constprovider("default", package))]
     registry = ProviderRegistry(providerstore, factories)
     url = url.with_scheme(f"invalid+{url.scheme}")
 
-    assert repository == registry(str(url))
+    assert package == registry(str(url))
 
 
 def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
@@ -133,5 +133,5 @@ def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> N
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
-    repository = registry("https://example.com/path/to/example?query#fragment")
-    assert "example" == repository.name
+    package = registry("https://example.com/path/to/example?query#fragment")
+    assert "example" == package.name
