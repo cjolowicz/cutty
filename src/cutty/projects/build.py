@@ -10,11 +10,18 @@ from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 
 
-def createproject(config: ProjectConfig, *, interactive: bool) -> Project:
+def createproject(
+    config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
+) -> Project:
     """Create the project."""
     template = Template.load(config.template, config.revision, config.directory)
 
-    return generate(template, config.bindings, interactive=interactive)
+    return generate(
+        template,
+        config.bindings,
+        interactive=interactive,
+        createconfigfile=createconfigfile,
+    )
 
 
 def commitproject(
