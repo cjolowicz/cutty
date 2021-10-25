@@ -1222,7 +1222,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "853e18eb9a441677134812489cffb37f656059665abf94712028fbf542ee698c"
+content-hash = "3e3a3990a09bb0213932102d043faee4519bf55da278227711031d597c8e5907"
 
 [metadata.files]
 alabaster = [
