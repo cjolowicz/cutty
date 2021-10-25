@@ -15,7 +15,7 @@ from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.registry import provide
 from cutty.packages.domain.registry import ProviderRegistry
-from cutty.packages.domain.repository import Repository
+from cutty.packages.domain.repository import Package
 from tests.fixtures.repositories.domain.providers import constprovider
 from tests.fixtures.repositories.domain.providers import dictprovider
 from tests.fixtures.repositories.domain.providers import nullprovider
@@ -113,7 +113,7 @@ def test_with_provider_specific_url(
 def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) -> None:
     """It invokes providers with the original scheme."""
     repositorypath = Path(filesystem=DictFilesystem({}))
-    repository = Repository("example", repositorypath, None)
+    repository = Package("example", repositorypath, None)
 
     factories = [ConstProviderFactory(constprovider("default", repository))]
     registry = ProviderRegistry(providerstore, factories)

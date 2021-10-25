@@ -1,4 +1,4 @@
-"""Repository."""
+"""Package."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -11,17 +11,17 @@ from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
-class Repository:
+class Package:
     """A repository."""
 
     name: str
     path: Path
     revision: Optional[Revision]
 
-    def descend(self, directory: PurePath) -> Repository:
+    def descend(self, directory: PurePath) -> Package:
         """Return the subrepository located in the given directory."""
         path = self.path.joinpath(*directory.parts)
-        return Repository(
+        return Package(
             directory.name,
             Path(filesystem=PathFilesystem(path)),
             self.revision,

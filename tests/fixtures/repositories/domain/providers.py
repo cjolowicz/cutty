@@ -7,14 +7,14 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.providers import Provider
-from cutty.packages.domain.repository import Repository
+from cutty.packages.domain.repository import Package
 from cutty.packages.domain.revisions import Revision
 
 
 pytest_plugins = ["tests.fixtures.repositories.domain.stores"]
 
 
-ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Repository]]
+ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Package]]
 
 
 def provider(name: str) -> Callable[[ProviderFunction], Provider]:
@@ -27,7 +27,7 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
 
             def __call__(
                 self, location: Location, revision: Optional[Revision] = None
-            ) -> Optional[Repository]:
+            ) -> Optional[Package]:
                 return function(location, revision)
 
         return _Provider()
@@ -39,11 +39,11 @@ nullprovider = Provider("null")
 """Provider that matches no location."""
 
 
-def constprovider(name: str, repository: Repository) -> Provider:
+def constprovider(name: str, repository: Package) -> Provider:
     """Provider that returns the same repository always."""
 
     @provider(name)
-    def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
+    def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
         return repository
 
     return _
@@ -53,9 +53,9 @@ def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
     """Provider that matches every URL with a repository."""
 
     @provider("dict")
-    def _(location: Location, revision: Optional[Revision]) -> Optional[Repository]:
+    def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
         filesystem = DictFilesystem(mapping or {})
         path = Path(filesystem=filesystem)
-        return Repository(location.name, path, revision)
+        return Package(location.name, path, revision)
 
     return _

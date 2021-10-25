@@ -8,7 +8,7 @@ from yarl import URL
 from cutty.packages.adapters.storage import defaulttimer
 from cutty.packages.adapters.storage import getdefaultproviderstore
 from cutty.packages.adapters.storage import hashurl
-from cutty.packages.adapters.storage import RepositoryStorage
+from cutty.packages.adapters.storage import PackageStorage
 from cutty.packages.adapters.storage import StorageRecord
 from cutty.packages.domain.providers import ProviderStore
 
@@ -77,32 +77,32 @@ def timer() -> FakeTimer:
 
 
 @pytest.fixture
-def storage(tmp_path: Path, timer: FakeTimer) -> RepositoryStorage:
+def storage(tmp_path: Path, timer: FakeTimer) -> PackageStorage:
     """Fixture for a repository storage."""
     path = tmp_path / "repository-storage"
-    return RepositoryStorage(path, timer=timer)
+    return PackageStorage(path, timer=timer)
 
 
-def test_storage_get_not_found(storage: RepositoryStorage, url: URL) -> None:
+def test_storage_get_not_found(storage: PackageStorage, url: URL) -> None:
     """It returns None if the storage record was not found."""
     assert storage.get(url, provider="git") is None
 
 
-def test_storage_allocate_get(storage: RepositoryStorage, url: URL) -> None:
+def test_storage_allocate_get(storage: PackageStorage, url: URL) -> None:
     """It allocates and retrieves a storage record."""
     record = storage.allocate(url, provider="git")
     assert record == storage.get(url, provider="git")
 
 
 def test_storage_allocate_timer(
-    storage: RepositoryStorage, url: URL, timer: FakeTimer
+    storage: PackageStorage, url: URL, timer: FakeTimer
 ) -> None:
     """It stores the current time."""
     record = storage.allocate(url, provider="git")
     assert record.updated == timer.now
 
 
-def test_storage_allocate_twice(storage: RepositoryStorage, url: URL) -> None:
+def test_storage_allocate_twice(storage: PackageStorage, url: URL) -> None:
     """It raises an exception."""
     storage.allocate(url, provider="git")
     with pytest.raises(FileExistsError):
@@ -110,7 +110,7 @@ def test_storage_allocate_twice(storage: RepositoryStorage, url: URL) -> None:
 
 
 def test_storage_allocate_same_url_different_provider(
-    storage: RepositoryStorage, url: URL
+    storage: PackageStorage, url: URL
 ) -> None:
     """It allocates separate records."""
     storage.allocate(url, provider="git")
@@ -119,9 +119,7 @@ def test_storage_allocate_same_url_different_provider(
     assert {record.provider for record in storage.list()} == {"git", "hg"}
 
 
-def test_storage_get_timer(
-    storage: RepositoryStorage, url: URL, timer: FakeTimer
-) -> None:
+def test_storage_get_timer(storage: PackageStorage, url: URL, timer: FakeTimer) -> None:
     """It updates the timestamp."""
     record_0 = storage.allocate(url, provider="git")
     timer.tick()
@@ -132,14 +130,14 @@ def test_storage_get_timer(
     assert record.updated != record_0.updated
 
 
-def test_storage_list_empty(storage: RepositoryStorage) -> None:
+def test_storage_list_empty(storage: PackageStorage) -> None:
     """It does not yield anything."""
     records = storage.list()
     assert not list(records)
 
 
 def test_storage_list_something(
-    storage: RepositoryStorage, url: URL, timer: FakeTimer
+    storage: PackageStorage, url: URL, timer: FakeTimer
 ) -> None:
     """It yields the allocated records."""
     first = storage.allocate(url.with_host("host1"), provider="git")
@@ -153,7 +151,7 @@ def test_storage_list_something(
     assert not list(records)
 
 
-def test_storage_clean_empty(storage: RepositoryStorage, timer: FakeTimer) -> None:
+def test_storage_clean_empty(storage: PackageStorage, timer: FakeTimer) -> None:
     """It does nothing."""
     cutoff = timer.now - datetime.timedelta(seconds=1)
     records = storage.clean(cutoff)
@@ -162,7 +160,7 @@ def test_storage_clean_empty(storage: RepositoryStorage, timer: FakeTimer) -> No
 
 
 def test_storage_clean_something(
-    storage: RepositoryStorage, url: URL, timer: FakeTimer
+    storage: PackageStorage, url: URL, timer: FakeTimer
 ) -> None:
     """It removes records older than the cutoff."""
     first = storage.allocate(url.with_host("host1"), provider="git")

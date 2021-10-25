@@ -15,7 +15,7 @@ from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
 from cutty.packages.domain.providers import ProviderStore
-from cutty.packages.domain.repository import Repository
+from cutty.packages.domain.repository import Package
 from cutty.packages.domain.revisions import Revision
 
 
@@ -30,7 +30,7 @@ def provide(
     providers: Iterable[Provider],
     location: Location,
     revision: Optional[Revision] = None,
-) -> Repository:
+) -> Package:
     """Provide the repository located at the given URL."""
     for provider in providers:
         if repository := provider(location, revision):
@@ -59,7 +59,7 @@ class ProviderRegistry:
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
         directory: Optional[PurePath] = None,
-    ) -> Repository:
+    ) -> Package:
         """Return the repository located at the given URL."""
         location = parselocation(rawlocation)
 

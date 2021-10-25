@@ -1,4 +1,4 @@
-"""Repository providers."""
+"""Package providers."""
 import abc
 import pathlib
 from collections.abc import Callable
@@ -18,7 +18,7 @@ from cutty.packages.domain.locations import Location
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
-from cutty.packages.domain.repository import Repository
+from cutty.packages.domain.repository import Package
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -32,7 +32,7 @@ class Provider:
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Repository]:
+    ) -> Optional[Package]:
         """Return the repository at the given location."""
 
 
@@ -58,13 +58,13 @@ class BaseProvider(Provider):
 
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> Repository:
+    ) -> Package:
         filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
             revision = self.getrevision(path, revision)
 
-        return Repository(location.name, Path(filesystem=filesystem), revision)
+        return Package(location.name, Path(filesystem=filesystem), revision)
 
 
 class LocalProvider(BaseProvider):
@@ -85,7 +85,7 @@ class LocalProvider(BaseProvider):
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Repository]:
+    ) -> Optional[Package]:
         """Return the repository at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
@@ -130,7 +130,7 @@ class RemoteProvider(BaseProvider):
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Repository]:
+    ) -> Optional[Package]:
         """Return the repository at the given location."""
         if isinstance(location, URL):
             url = location

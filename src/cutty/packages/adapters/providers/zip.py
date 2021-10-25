@@ -1,4 +1,4 @@
-"""Repository providers for ZIP archives."""
+"""Package providers for ZIP archives."""
 from pathlib import Path
 
 from cutty.filesystems.adapters.zip import ZipFilesystem

@@ -1,4 +1,4 @@
-"""Repository storage."""
+"""Package storage."""
 from __future__ import annotations
 
 import datetime
@@ -75,7 +75,7 @@ def defaulttimer() -> datetime.datetime:
     return datetime.datetime.now(tz=datetime.timezone.utc)
 
 
-class RepositoryStorage:
+class PackageStorage:
     """Storage backend for repositories."""
 
     def __init__(self, path: pathlib.Path, *, timer: Timer = defaulttimer) -> None:
@@ -132,7 +132,7 @@ def getdefaultproviderstore(
     path: pathlib.Path, *, timer: Timer = defaulttimer
 ) -> ProviderStore:
     """Return a provider store."""
-    storage = RepositoryStorage(path, timer=timer)
+    storage = PackageStorage(path, timer=timer)
 
     def providerstore(provider: str) -> Store:
         """Return a store function for the provider."""
