@@ -33,7 +33,7 @@ pytest_plugins = [
     [
         [],
         [nullprovider],
-        [nullprovider, nullprovider],
+        [nullprovider, Provider("null2")],
     ],
 )
 def test_provide_fail(providers: list[Provider]) -> None:
@@ -48,7 +48,7 @@ def test_provide_fail(providers: list[Provider]) -> None:
         [dictprovider({})],
         [dictprovider({}), nullprovider],
         [nullprovider, dictprovider({})],
-        [dictprovider({}), dictprovider({"marker": ""})],
+        [dictprovider({}), dictprovider({"marker": ""}, name="dict2")],
     ],
 )
 def test_provide_pass(providers: list[Provider]) -> None:
