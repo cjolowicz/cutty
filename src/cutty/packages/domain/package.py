@@ -12,14 +12,14 @@ from cutty.packages.domain.revisions import Revision
 
 @dataclass
 class Package:
-    """A repository."""
+    """A package."""
 
     name: str
     path: Path
     revision: Optional[Revision]
 
     def descend(self, directory: PurePath) -> Package:
-        """Return the subrepository located in the given directory."""
+        """Return the subpackage located in the given directory."""
         path = self.path.joinpath(*directory.parts)
         return Package(
             directory.name,

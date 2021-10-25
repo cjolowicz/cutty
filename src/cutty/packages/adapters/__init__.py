@@ -1,1 +1,1 @@
-"""Adapters for the cutty.repositories package."""
+"""Adapters for the cutty.packages package."""

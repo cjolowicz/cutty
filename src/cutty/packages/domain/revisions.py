@@ -1,2 +1,2 @@
-"""Revisions identify a repository version."""
+"""Revisions identify a package version."""
 Revision = str

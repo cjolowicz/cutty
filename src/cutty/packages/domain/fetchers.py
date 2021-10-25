@@ -1,4 +1,4 @@
-"""Fetching repositories from URLs."""
+"""Fetching packages from URLs."""
 import enum
 import pathlib
 from collections.abc import Callable
@@ -31,7 +31,7 @@ class Fetcher(Protocol):
         revision: Optional[Revision] = None,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
-        """Retrieve the repository at the URL into local storage."""
+        """Retrieve the package at the URL into local storage."""
 
 
 FetchFunction = Callable[[URL, pathlib.Path, Optional[Revision]], None]
@@ -39,7 +39,7 @@ FetchDecorator = Callable[[FetchFunction], Fetcher]
 
 
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
-    """A fetcher retrieves a repository from a URL into storage."""
+    """A fetcher retrieves a package from a URL into storage."""
     relativestore = store
 
     def _decorator(fetch: FetchFunction) -> Fetcher:

@@ -1,4 +1,4 @@
-"""Fetch a repository via FTP."""
+"""Fetch a package via FTP."""
 import pathlib
 import shutil
 import urllib.request

@@ -23,7 +23,7 @@ from cutty.packages.domain.stores import Store
 
 @dataclass
 class StorageRecord:
-    """Record describing the storage for a repository."""
+    """Record describing the storage for a package repository."""
 
     path: pathlib.Path
     url: URL
@@ -76,7 +76,7 @@ def defaulttimer() -> datetime.datetime:
 
 
 class PackageStorage:
-    """Storage backend for repositories."""
+    """Storage backend for packages."""
 
     def __init__(self, path: pathlib.Path, *, timer: Timer = defaulttimer) -> None:
         """Initialize."""
@@ -85,12 +85,12 @@ class PackageStorage:
         self.timer = timer
 
     def _getrepositorypath(self, url: URL, *, provider: ProviderName) -> pathlib.Path:
-        """Return the path to the repository."""
+        """Return the path to the package repository."""
         h = hashurl(url)
         return self.path / "repositories" / provider / h[:2] / h[2:]
 
     def get(self, url: URL, *, provider: ProviderName) -> Optional[StorageRecord]:
-        """Retrieve storage for a repository."""
+        """Retrieve storage for a package repository."""
         path = self._getrepositorypath(url, provider=provider)
         if not path.exists():
             return None
@@ -102,7 +102,7 @@ class PackageStorage:
         return record
 
     def allocate(self, url: URL, *, provider: ProviderName) -> StorageRecord:
-        """Allocate storage for a repository."""
+        """Allocate storage for a package repository."""
         path = self._getrepositorypath(url, provider=provider)
         path.mkdir(parents=True)
 
@@ -152,7 +152,7 @@ def getdefaultproviderstore(
 def getdefaultpackageprovider(
     path: pathlib.Path, *, timer: Timer = defaulttimer
 ) -> ProviderRegistry:
-    """Return a repository provider."""
+    """Return a package provider."""
     return ProviderRegistry(
         getdefaultproviderstore(path, timer=timer),
         defaultproviderfactories,

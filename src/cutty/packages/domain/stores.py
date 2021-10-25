@@ -9,7 +9,7 @@ Store = Callable[[URL], pathlib.Path]
 
 
 def defaultstore(url: URL) -> pathlib.Path:
-    """Return the relative path to the repository within the storage location."""
+    """Return the relative path to the package repository within storage."""
     path = pathlib.PurePosixPath(url.path)
     path = path.relative_to(path.parent)
     return pathlib.Path(path)

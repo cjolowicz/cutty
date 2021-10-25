@@ -9,7 +9,7 @@ from cutty.packages.domain.revisions import Revision
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the repository revision."""
+    """Return the package revision."""
     hg = findhg()
 
     if revision is None:

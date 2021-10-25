@@ -1,4 +1,4 @@
-"""Fetch a repository from the filesystem."""
+"""Fetch a package from the filesystem."""
 import pathlib
 import shutil
 from dataclasses import dataclass

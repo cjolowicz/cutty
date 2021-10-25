@@ -46,7 +46,7 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the repository revision."""
+    """Return the package revision."""
     if revision is None:
         revision = "HEAD"
 

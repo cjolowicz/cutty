@@ -1,4 +1,4 @@
-"""Fetch a repository via HTTP."""
+"""Fetch a package via HTTP."""
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NoReturn

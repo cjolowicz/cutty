@@ -24,7 +24,7 @@ from cutty.packages.domain.stores import Store
 
 
 class Provider:
-    """Provider for a specific type of repository."""
+    """Provider for a specific type of package."""
 
     def __init__(self, name: str = "") -> None:
         """Initialize."""
@@ -33,7 +33,7 @@ class Provider:
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Package]:
-        """Return the repository at the given location."""
+        """Return the package at the given location."""
 
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
@@ -68,7 +68,7 @@ class BaseProvider(Provider):
 
 
 class LocalProvider(BaseProvider):
-    """Provide a repository from the local filesystem."""
+    """Provide a package from the local filesystem."""
 
     def __init__(
         self,
@@ -86,7 +86,7 @@ class LocalProvider(BaseProvider):
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Package]:
-        """Return the repository at the given location."""
+        """Return the package at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
@@ -103,7 +103,7 @@ def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesyste
 
 
 class RemoteProvider(BaseProvider):
-    """Remote providers fetch the repository into local storage first."""
+    """Remote providers fetch the package into local storage first."""
 
     def __init__(
         self,
@@ -131,7 +131,7 @@ class RemoteProvider(BaseProvider):
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Package]:
-        """Return the repository at the given location."""
+        """Return the package at the given location."""
         if isinstance(location, URL):
             url = location
         elif location.exists():

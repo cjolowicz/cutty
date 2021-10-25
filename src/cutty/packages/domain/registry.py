@@ -1,4 +1,4 @@
-"""The provider registry is the main entry point of cutty.repositories."""
+"""The provider registry is the main entry point of cutty.packages."""
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -21,7 +21,7 @@ from cutty.packages.domain.revisions import Revision
 
 @dataclass
 class UnknownLocationError(CuttyError):
-    """The repository location could not be processed by any provider."""
+    """The package location could not be processed by any provider."""
 
     location: Location
 
@@ -31,7 +31,7 @@ def provide(
     location: Location,
     revision: Optional[Revision] = None,
 ) -> Package:
-    """Provide the repository located at the given URL."""
+    """Provide the package located at the given URL."""
     for provider in providers:
         if repository := provider(location, revision):
             return repository
@@ -40,7 +40,7 @@ def provide(
 
 
 class ProviderRegistry:
-    """The provider registry retrieves repositories using registered providers."""
+    """The provider registry retrieves packages using registered providers."""
 
     def __init__(
         self,
@@ -60,7 +60,7 @@ class ProviderRegistry:
         fetchmode: FetchMode = FetchMode.ALWAYS,
         directory: Optional[PurePath] = None,
     ) -> Package:
-        """Return the repository located at the given URL."""
+        """Return the package located at the given URL."""
         location = parselocation(rawlocation)
 
         providername, location = self._extractprovidername(location)

@@ -73,7 +73,7 @@ def findhg(env: Optional[dict[str, str]] = None) -> Hg:
 def hgfetcher(
     url: URL, destination: pathlib.Path, revision: Optional[Revision]
 ) -> None:
-    """Fetch the repository using hg."""
+    """Fetch the package using hg."""
     hg = findhg()
 
     if destination.exists():
