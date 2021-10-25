@@ -62,6 +62,18 @@ class ProviderRegistry:
         directory: Optional[PurePath] = None,
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
+        return self.getrepository2(
+            rawlocation, revision=revision, fetchmode=fetchmode, directory=directory
+        )
+
+    def getrepository2(
+        self,
+        rawlocation: str,
+        revision: Optional[Revision] = None,
+        fetchmode: FetchMode = FetchMode.ALWAYS,
+        directory: Optional[PurePath] = None,
+    ) -> PackageRepository:
+        """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
 
         providername, location = self._extractprovidername(location)
