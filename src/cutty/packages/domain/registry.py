@@ -7,7 +7,6 @@ from typing import Optional
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
@@ -53,23 +52,6 @@ class ProviderRegistry:
         self.registry = {
             providerfactory.name: providerfactory for providerfactory in factories
         }
-
-    def getrepository(
-        self,
-        rawlocation: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
-    ) -> PackageRepository:
-        """Return the package repository located at the given URL."""
-        repository = self.getrepository2(
-            rawlocation, revision=revision, fetchmode=fetchmode
-        )
-
-        with repository.get(revision) as package:
-            return PackageRepository(
-                package if directory is None else package.descend(directory)
-            )
 
     def getrepository2(
         self,
