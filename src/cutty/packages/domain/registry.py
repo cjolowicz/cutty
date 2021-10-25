@@ -62,16 +62,20 @@ class ProviderRegistry:
         directory: Optional[PurePath] = None,
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
-        return self.getrepository2(
-            rawlocation, revision=revision, fetchmode=fetchmode, directory=directory
+        repository = self.getrepository2(
+            rawlocation, revision=revision, fetchmode=fetchmode
         )
+
+        with repository.get(revision) as package:
+            return PackageRepository(
+                package if directory is None else package.descend(directory)
+            )
 
     def getrepository2(
         self,
         rawlocation: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
-        directory: Optional[PurePath] = None,
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
@@ -80,9 +84,7 @@ class ProviderRegistry:
         providers = self._createproviders(fetchmode, providername)
         package = provide(providers, location, revision)
 
-        return PackageRepository(
-            package if directory is None else package.descend(directory)
-        )
+        return PackageRepository(package)
 
     def _extractprovidername(
         self, location: Location
