@@ -32,17 +32,6 @@ class Template:
     root: Path
 
     @classmethod
-    def load(
-        cls,
-        template: str,
-        revision: Optional[str],
-        directory: Optional[pathlib.Path],
-    ) -> Template:
-        """Load a project template."""
-        with cls.load2(template, revision, directory) as template2:
-            return template2
-
-    @classmethod
     @contextmanager
     def load2(
         cls,

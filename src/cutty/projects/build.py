@@ -14,7 +14,8 @@ def createproject(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
 ) -> Project:
     """Create the project."""
-    template = Template.load(config.template, config.revision, config.directory)
+    with Template.load2(config.template, config.revision, config.directory) as template:
+        pass
 
     return generate(
         template,
