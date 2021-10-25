@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.locations."""
+"""Unit tests for cutty.packages.domain.locations."""
 import os
 import platform
 from collections.abc import Iterator

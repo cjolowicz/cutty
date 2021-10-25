@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.providers.zip."""
+"""Unit tests for cutty.packages.adapters.providers.zip."""
 import shutil
 from pathlib import Path
 

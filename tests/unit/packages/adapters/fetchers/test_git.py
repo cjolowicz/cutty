@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.fetchers.git."""
+"""Unit tests for cutty.packages.adapters.fetchers.git."""
 import pathlib
 from textwrap import dedent
 from typing import Iterator

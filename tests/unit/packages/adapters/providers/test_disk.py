@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.providers.disk."""
+"""Unit tests for cutty.packages.adapters.providers.disk."""
 from pathlib import Path
 
 import pytest

@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.fetchers."""
+"""Unit tests for cutty.packages.domain.fetchers."""
 from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher

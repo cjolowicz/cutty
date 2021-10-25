@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.domain.stores."""
+"""Fixtures for cutty.packages.domain.stores."""
 import pathlib
 
 import pytest

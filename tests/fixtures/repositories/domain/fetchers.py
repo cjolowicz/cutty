@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.domain.fetchers."""
+"""Fixtures for cutty.packages.domain.fetchers."""
 import pathlib
 from typing import Optional
 

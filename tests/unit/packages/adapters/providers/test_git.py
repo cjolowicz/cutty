@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.providers.git."""
+"""Unit tests for cutty.packages.adapters.providers.git."""
 import pathlib
 import string
 from typing import Optional

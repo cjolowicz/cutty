@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.matchers."""
+"""Unit tests for cutty.packages.domain.matchers."""
 import pytest
 from yarl import URL
 

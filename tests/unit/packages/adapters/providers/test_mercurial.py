@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.providers.mercurial."""
+"""Unit tests for cutty.packages.adapters.providers.mercurial."""
 import pathlib
 import string
 from typing import Optional

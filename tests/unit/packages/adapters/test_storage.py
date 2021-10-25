@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.storage."""
+"""Unit tests for cutty.packages.adapters.storage."""
 import datetime
 from pathlib import Path
 

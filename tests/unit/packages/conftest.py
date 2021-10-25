@@ -1,4 +1,4 @@
-"""Fixtures for testing cutty.repositories."""
+"""Fixtures for testing cutty.packages."""
 import pytest
 from yarl import URL
 

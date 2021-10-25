@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.registry."""
+"""Unit tests for cutty.packages.domain.registry."""
 import pathlib
 
 import pytest

@@ -1,1 +1,1 @@
-"""Unit tests for cutty.repositories.adapters.providers."""
+"""Unit tests for cutty.packages.adapters.providers."""

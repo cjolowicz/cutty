@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.domain.matchers."""
+"""Fixtures for cutty.packages.domain.matchers."""
 import pytest
 from yarl import URL
 

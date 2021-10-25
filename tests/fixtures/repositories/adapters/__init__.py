@@ -1,1 +1,1 @@
-"""Fixtures for cutty.repositories.adapters."""
+"""Fixtures for cutty.packages.adapters."""

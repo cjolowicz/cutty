@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.domain.providers."""
+"""Fixtures for cutty.packages.domain.providers."""
 from collections.abc import Callable
 from typing import Any
 from typing import Optional

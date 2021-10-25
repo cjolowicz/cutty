@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.fetchers.http."""
+"""Unit tests for cutty.packages.adapters.fetchers.http."""
 import os
 from collections.abc import Iterator
 from functools import partial

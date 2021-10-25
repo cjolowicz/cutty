@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.adapters.fetchers.hg."""
+"""Unit tests for cutty.packages.adapters.fetchers.hg."""
 import os
 import pathlib
 import shutil

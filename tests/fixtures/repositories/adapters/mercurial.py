@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.adapters.providers.mercurial."""
+"""Fixtures for cutty.packages.adapters.providers.mercurial."""
 import pytest
 
 from cutty.packages.adapters.fetchers.mercurial import findhg

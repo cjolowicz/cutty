@@ -1,4 +1,4 @@
-"""Unit tests for cutty.repositories.domain.providers."""
+"""Unit tests for cutty.packages.domain.providers."""
 import json
 import pathlib
 from typing import Optional

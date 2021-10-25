@@ -1,4 +1,4 @@
-"""Fixtures for cutty.repositories.domain.mounters."""
+"""Fixtures for cutty.packages.domain.mounters."""
 import json
 import pathlib
 from typing import Optional
