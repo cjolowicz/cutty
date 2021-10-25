@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 from cutty.projects.build import commitproject
-from cutty.projects.build import createproject
+from cutty.projects.build import createproject2
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.repository import ProjectRepository
@@ -24,10 +24,9 @@ def create(
     """Generate projects from templates."""
     config = ProjectConfig(location, extrabindings, revision, directory)
 
-    project = createproject(config, interactive=interactive)
-    projectdir = outputdir if in_place else outputdir / project.name
-    repository = ProjectRepository.create(projectdir, message="Initial commit")
-
-    commit = commitproject(repository, project, commitmessage=createcommitmessage)
+    with createproject2(config, interactive=interactive) as project:
+        projectdir = outputdir if in_place else outputdir / project.name
+        repository = ProjectRepository.create(projectdir, message="Initial commit")
+        commit = commitproject(repository, project, commitmessage=createcommitmessage)
 
     repository.import_(commit)

@@ -12,16 +12,6 @@ from cutty.projects.store import storeproject
 from cutty.projects.template import Template
 
 
-def createproject(
-    config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
-) -> Project:
-    """Create the project."""
-    with createproject2(
-        config, interactive=interactive, createconfigfile=createconfigfile
-    ) as project:
-        return project
-
-
 @contextmanager
 def createproject2(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
@@ -59,8 +49,7 @@ def buildproject(
     commitmessage: MessageBuilder,
 ) -> str:
     """Build the project, returning the commit ID."""
-    project = createproject(config, interactive=interactive)
-
-    return commitproject(
-        repository, project, parent=parent, commitmessage=commitmessage
-    )
+    with createproject2(config, interactive=interactive) as project:
+        return commitproject(
+            repository, project, parent=parent, commitmessage=commitmessage
+        )
