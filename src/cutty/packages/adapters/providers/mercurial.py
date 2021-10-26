@@ -2,9 +2,10 @@
 import pathlib
 from typing import Optional
 
+from cutty.filesystems.adapters.disk import DiskFilesystem
+from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
-from cutty.packages.domain.providers import _defaultmount
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
@@ -23,6 +24,10 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
         cwd=path,
     )
     return result.stdout
+
+
+def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
+    return DiskFilesystem(path)
 
 
 hgproviderfactory = RemoteProviderFactory(
