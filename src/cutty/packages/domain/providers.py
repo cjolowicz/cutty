@@ -88,21 +88,14 @@ class LocalProvider(BaseProvider):
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
-        if package := self(location, revision):
-            return PackageRepository(package)
-        return None
-
-    def __call__(
-        self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
 
         if path.exists() and self.match(path):
-            return self._loadpackage(location, revision, path)
+            package = self._loadpackage(location, revision, path)
+            return PackageRepository(package)
 
         return None
 
