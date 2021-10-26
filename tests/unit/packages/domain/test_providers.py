@@ -166,7 +166,7 @@ def test_remoteproviderfactory_mounter(
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
     revision = "v1.0.0"
-    if path := emptyfetcher(url, store, revision):
+    if path := emptyfetcher(url, store):
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 

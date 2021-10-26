@@ -2,7 +2,6 @@
 import pathlib
 from dataclasses import dataclass
 from typing import NoReturn
-from typing import Optional
 
 import pygit2
 from yarl import URL
@@ -10,7 +9,6 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import defaultstore
 from cutty.util.exceptionhandlers import ExceptionHandler
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -37,9 +35,7 @@ def _errorhandler(url: URL) -> ExceptionHandler:
     match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )
-def gitfetcher(
-    url: URL, destination: pathlib.Path, revision: Optional[Revision]
-) -> None:
+def gitfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch a git repository."""
     with _errorhandler(url):
         if destination.exists():

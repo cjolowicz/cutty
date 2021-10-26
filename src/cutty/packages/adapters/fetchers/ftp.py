@@ -2,19 +2,15 @@
 import pathlib
 import shutil
 import urllib.request
-from typing import Optional
 
 from yarl import URL
 
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
-from cutty.packages.domain.revisions import Revision
 
 
 @fetcher(match=scheme("ftp"))
-def ftpfetcher(
-    url: URL, destination: pathlib.Path, revision: Optional[Revision]
-) -> None:
+def ftpfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch via FTP."""
     # URLs with IPv6 literals are not supported, because
     # urllib.request.FTPHandler uses socket.gethostbyname.
