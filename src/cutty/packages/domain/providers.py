@@ -19,6 +19,7 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.package import SinglePackageRepository
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
@@ -33,7 +34,7 @@ class Provider:
 
     def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[SinglePackageRepository]:
+    ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
 
 
@@ -59,7 +60,7 @@ class BaseProvider(Provider):
 
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> SinglePackageRepository:
+    ) -> PackageRepository:
         filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
@@ -88,7 +89,7 @@ class LocalProvider(BaseProvider):
 
     def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[SinglePackageRepository]:
+    ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
@@ -133,7 +134,7 @@ class RemoteProvider(BaseProvider):
 
     def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[SinglePackageRepository]:
+    ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if isinstance(location, URL):
             url = location
