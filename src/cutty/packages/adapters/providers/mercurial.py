@@ -2,6 +2,8 @@
 import pathlib
 from typing import Optional
 
+from cutty.filesystems.adapters.disk import DiskFilesystem
+from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.providers import RemoteProviderFactory
@@ -24,6 +26,16 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return result.stdout
 
 
+def mount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
+    """Mount the working directory as a disk filesystem."""
+    hg = findhg()
+
+    options = ["--rev", revision] if revision is not None else []
+    hg("update", *options, cwd=path)
+
+    return DiskFilesystem(path)
+
+
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], getrevision=getrevision
+    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=mount
 )

@@ -6,8 +6,10 @@ from typing import Optional
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
+from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
@@ -137,3 +139,28 @@ def test_not_matching(hgprovider: Provider) -> None:
     repository = hgprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
+
+
+@pytest.mark.parametrize("fetchmode", [FetchMode.ALWAYS, FetchMode.AUTO])
+def test_update(hgrepository: pathlib.Path, store: Store, fetchmode: FetchMode) -> None:
+    """It updates the repository from a previous fetch."""
+    hgprovider = hgproviderfactory(store, fetchmode)
+
+    def fetchrevision(revision: Optional[str]) -> Optional[str]:
+        repository = hgprovider.provide(hgrepository, revision)
+
+        assert repository is not None
+
+        with repository.get(revision) as package:
+            return package.revision
+
+    revision1 = fetchrevision("v1.0")
+    revision2 = fetchrevision(None)
+
+    assert revision1 != revision2
+
+
+def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It raises an exception."""
+    with pytest.raises(CuttyError):
+        hgprovider.provide(hgrepository, "invalid")

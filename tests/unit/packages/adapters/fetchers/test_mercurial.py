@@ -8,8 +8,6 @@ import pytest
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.filesystems.adapters.disk import DiskFilesystem
-from cutty.filesystems.domain.path import Path
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.locations import asurl
@@ -42,10 +40,8 @@ def url(sessionrepository: pathlib.Path) -> URL:
 def test_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
     destination = hgfetcher(url, store)
-    assert destination is not None
 
-    path = Path("marker", filesystem=DiskFilesystem(destination))
-    assert path.read_text() == "Lorem"
+    assert destination is not None and (destination / ".hg").is_dir()
 
 
 def test_not_matched(store: Store) -> None:
@@ -76,17 +72,19 @@ def test_update(repository: pathlib.Path, hg: Hg, store: Store) -> None:
     # First fetch.
     hgfetcher(asurl(repository), store)
 
-    # Remove the marker file.
+    # Create a commit in the upstream repository.
     hg("rm", "marker", cwd=repository)
     hg("commit", "--message=Remove the marker file", cwd=repository)
+
+    upstreamhead = hg("heads", "--template={node}", cwd=repository).stdout
 
     # Second fetch.
     destination = hgfetcher(asurl(repository), store)
     assert destination is not None
 
-    # Check that the marker file is gone.
-    path = Path("marker", filesystem=DiskFilesystem(destination))
-    assert not (path / "marker").is_file()
+    # Check that upstream and downstream heads are identical.
+    downstreamhead = hg("heads", "--template={node}", cwd=destination).stdout
+    assert upstreamhead == downstreamhead
 
 
 @pytest.fixture(scope="session")
@@ -116,9 +114,3 @@ def test_fetch_error(url: URL, hg: Hg, store: Store, skip_on_http_errors: None) 
     """It raises an exception."""
     with pytest.raises(CuttyError):
         hgfetcher(url, store)
-
-
-def test_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
-    """It raises an exception."""
-    with pytest.raises(CuttyError):
-        hgfetcher(url, store, "invalid")
