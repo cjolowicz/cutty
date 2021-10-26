@@ -32,7 +32,13 @@ def url(tmp_path: pathlib.Path) -> URL:
     return asurl(path)
 
 
-@pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
+@pytest.mark.parametrize(
+    ("revision", "expected"),
+    [
+        ("v1.0", "Lorem"),
+        (None, "Ipsum"),
+    ],
+)
 def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
     """It provides a package from a local directory."""
     repository = localgitprovider.provide(url, revision)
@@ -88,7 +94,13 @@ def gitprovider(store: Store) -> Provider:
     return gitproviderfactory(store)
 
 
-@pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
+@pytest.mark.parametrize(
+    ("revision", "expected"),
+    [
+        ("v1.0", "Lorem"),
+        (None, "Ipsum"),
+    ],
+)
 def test_remote_happy(
     gitprovider: Provider, url: URL, revision: Optional[str], expected: str
 ) -> None:
