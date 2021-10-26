@@ -32,7 +32,7 @@ class Package:
 
 @dataclass
 class SinglePackageRepository:
-    """A package repository."""
+    """A package repository with a single package."""
 
     package: Package
 
