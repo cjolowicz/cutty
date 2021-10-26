@@ -137,3 +137,20 @@ def test_not_matching(hgprovider: Provider) -> None:
     repository = hgprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
+
+
+def test_update(hgprovider: Provider, hgrepository: pathlib.Path, hg: Hg) -> None:
+    """It updates the repository from a previous fetch."""
+
+    def fetchrevision(revision: Optional[str]) -> Optional[str]:
+        repository = hgprovider.provide(hgrepository, revision)
+
+        assert repository is not None
+
+        with repository.get(revision) as package:
+            return package.revision
+
+    revision1 = fetchrevision("v1.0")
+    revision2 = fetchrevision(None)
+
+    assert revision1 != revision2
