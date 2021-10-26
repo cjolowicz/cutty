@@ -8,7 +8,6 @@ from typing import Protocol
 from yarl import URL
 
 from cutty.packages.domain.matchers import Matcher
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import defaultstore
 from cutty.packages.domain.stores import Store
 
@@ -28,13 +27,12 @@ class Fetcher(Protocol):
         self,
         url: URL,
         store: Store,
-        revision: Optional[Revision] = None,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         """Retrieve the package at the URL into local storage."""
 
 
-FetchFunction = Callable[[URL, pathlib.Path, Optional[Revision]], None]
+FetchFunction = Callable[[URL, pathlib.Path], None]
 FetchDecorator = Callable[[FetchFunction], Fetcher]
 
 
@@ -46,7 +44,6 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
         def _fetcher(
             url: URL,
             store: Store,
-            revision: Optional[Revision] = None,
             mode: FetchMode = FetchMode.ALWAYS,
         ) -> Optional[pathlib.Path]:
             if not match(url):
@@ -59,7 +56,7 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
                 or mode is FetchMode.AUTO
                 and not destination.exists()
             ):
-                fetch(url, destination, revision)
+                fetch(url, destination)
 
             return destination
 

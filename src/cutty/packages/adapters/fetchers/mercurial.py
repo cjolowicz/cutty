@@ -12,7 +12,6 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
-from cutty.packages.domain.revisions import Revision
 
 
 class HgNotFoundError(CuttyError):
@@ -70,9 +69,7 @@ def findhg(env: Optional[dict[str, str]] = None) -> Hg:
 
 
 @fetcher(match=scheme("file", "http", "https", "ssh"))
-def hgfetcher(
-    url: URL, destination: pathlib.Path, revision: Optional[Revision]
-) -> None:
+def hgfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch the package using hg."""
     hg = findhg()
 

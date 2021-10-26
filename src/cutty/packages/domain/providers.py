@@ -144,7 +144,7 @@ class RemoteProvider(BaseProvider):
 
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
-                if path := fetcher(url, self.store, revision, self.fetchmode):
+                if path := fetcher(url, self.store, self.fetchmode):
                     return self._loadrepository(location, revision, path)
 
         return None

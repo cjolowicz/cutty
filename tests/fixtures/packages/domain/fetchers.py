@@ -9,7 +9,6 @@ from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 from tests.fixtures.packages.domain.types import FetcherCalls
 
@@ -19,10 +18,7 @@ def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
     def _(
-        url: URL,
-        store: Store,
-        revision: Optional[Revision] = None,
-        mode: FetchMode = FetchMode.ALWAYS,
+        url: URL, store: Store, mode: FetchMode = FetchMode.ALWAYS
     ) -> Optional[pathlib.Path]:
         return None
 
@@ -34,10 +30,7 @@ def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     def _(
-        url: URL,
-        store: Store,
-        revision: Optional[Revision] = None,
-        mode: FetchMode = FetchMode.ALWAYS,
+        url: URL, store: Store, mode: FetchMode = FetchMode.ALWAYS
     ) -> Optional[pathlib.Path]:
         path = store(url) / url.name
 
@@ -62,8 +55,8 @@ def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
     """Fixture for a fetcher."""
 
     @fetcher(match=scheme("https"))
-    def _(url: URL, destination: pathlib.Path, revision: Optional[str]) -> None:
+    def _(url: URL, destination: pathlib.Path) -> None:
         """Fake fetcher."""
-        fetchercalls.append((url, destination, revision))
+        fetchercalls.append((url, destination))
 
     return _

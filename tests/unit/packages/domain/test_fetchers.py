@@ -27,7 +27,7 @@ def test_fetch_always(
     path = fakefetcher(url, store)
 
     assert path == destination
-    assert fetchercalls == [(url, destination, None)]
+    assert fetchercalls == [(url, destination)]
 
 
 def test_fetch_never(
@@ -35,7 +35,7 @@ def test_fetch_never(
 ) -> None:
     """It returns the destination without fetching."""
     destination = store(url) / url.name
-    path = fakefetcher(url, store, None, FetchMode.NEVER)
+    path = fakefetcher(url, store, FetchMode.NEVER)
 
     assert path == destination
     assert not fetchercalls
