@@ -8,6 +8,7 @@ from yarl import URL
 
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
+from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
 pytest_plugins = ["tests.fixtures.packages.adapters.mercurial"]
@@ -37,6 +38,12 @@ def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
     return path
 
 
+@pytest.fixture
+def hgprovider(store: Store) -> Provider:
+    """Return a Mercurial provider."""
+    return hgproviderfactory(store)
+
+
 @pytest.mark.parametrize(
     ("revision", "expected"),
     [
@@ -45,10 +52,12 @@ def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
     ],
 )
 def test_happy(
-    store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
+    hgprovider: Provider,
+    hgrepository: pathlib.Path,
+    revision: Optional[str],
+    expected: str,
 ) -> None:
     """It fetches a hg repository into storage."""
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(hgrepository, revision)
 
     assert repository is not None
@@ -63,9 +72,8 @@ def is_mercurial_shorthash(revision: str) -> bool:
     return len(revision) == 12 and all(c in string.hexdigits for c in revision)
 
 
-def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
+def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It returns the short changeset identification hash."""
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(hgrepository)
 
     assert repository is not None
@@ -74,9 +82,8 @@ def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
         assert package.revision is not None and is_mercurial_shorthash(package.revision)
 
 
-def test_revision_tag(store: Store, hgrepository: pathlib.Path) -> None:
+def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It returns the tag name."""
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(hgrepository, "tip~2")
 
     assert repository is not None
@@ -85,7 +92,7 @@ def test_revision_tag(store: Store, hgrepository: pathlib.Path) -> None:
         assert package.revision == "v1.0"
 
 
-def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
+def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) -> None:
     """It returns the changeset hash in a repository without tags."""
     path = tmp_path / "repository"
     path.mkdir()
@@ -95,7 +102,6 @@ def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     hg("add", "marker", cwd=path)
     hg("commit", "--message=Initial", cwd=path)
 
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(path)
 
     assert repository is not None
@@ -104,7 +110,9 @@ def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
         assert package.revision is not None and is_mercurial_shorthash(package.revision)
 
 
-def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
+def test_revision_multiple_tags(
+    hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path
+) -> None:
     """It returns the tag names separated by colon."""
     path = tmp_path / "repository"
     path.mkdir()
@@ -116,7 +124,6 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
     hg("tag", "--rev=0", "tag1", cwd=path)
     hg("tag", "--rev=0", "tag2", cwd=path)
 
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(path, "tip~2")
 
     assert repository is not None
@@ -125,9 +132,8 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
         assert package.revision == "tag1:tag2"
 
 
-def test_not_matching(store: Store) -> None:
+def test_not_matching(hgprovider: Provider) -> None:
     """It returns None if the URL scheme is not recognized."""
-    hgprovider = hgproviderfactory(store)
     repository = hgprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
