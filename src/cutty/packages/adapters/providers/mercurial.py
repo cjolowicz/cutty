@@ -28,6 +28,11 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
 def mount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
     """Mount the working directory as a disk filesystem."""
+    hg = findhg()
+
+    options = ["--rev", revision] if revision is not None else []
+    hg("update", *options, cwd=path)
+
     return DiskFilesystem(path)
 
 

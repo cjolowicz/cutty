@@ -80,6 +80,3 @@ def hgfetcher(
         hg("pull", cwd=destination)
     else:
         hg("clone", "--noupdate", str(url), str(destination))
-
-    options = ["--rev", revision] if revision is not None else []
-    hg("update", *options, cwd=destination)
