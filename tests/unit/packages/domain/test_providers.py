@@ -178,7 +178,7 @@ def test_remoteproviderfactory_mounter(
 
     assert repository is not None
 
-    with repository.get() as package:
+    with repository.get(revision) as package:
         assert (package.path / "marker").read_text() == "Lorem"
 
 
