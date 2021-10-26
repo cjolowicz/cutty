@@ -40,7 +40,7 @@ def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
 
 @pytest.fixture
 def hgprovider(store: Store) -> Provider:
-    """Return a Mercurial provider."""
+    """Fixture for a Mercurial provider."""
     return hgproviderfactory(store)
 
 
@@ -73,7 +73,7 @@ def is_mercurial_shorthash(revision: str) -> bool:
 
 
 def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
-    """It returns the short changeset identification hash."""
+    """It retrieves the short hash as the package revision."""
     repository = hgprovider.provide(hgrepository)
 
     assert repository is not None
@@ -83,7 +83,7 @@ def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> No
 
 
 def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
-    """It returns the tag name."""
+    """It retrieves the tag name as the package revision."""
     repository = hgprovider.provide(hgrepository, "tip~2")
 
     assert repository is not None
@@ -93,7 +93,7 @@ def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
 
 
 def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) -> None:
-    """It returns the changeset hash in a repository without tags."""
+    """It retrieves the short hash as the package revision when there are no tags."""
     path = tmp_path / "repository"
     path.mkdir()
     (path / "marker").touch()
@@ -113,7 +113,7 @@ def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) 
 def test_revision_multiple_tags(
     hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path
 ) -> None:
-    """It returns the tag names separated by colon."""
+    """It retrieves multiple tag names separated by colon as the package revision."""
     path = tmp_path / "repository"
     path.mkdir()
     (path / "marker").touch()
