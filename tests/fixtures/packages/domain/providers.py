@@ -30,14 +30,9 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
                 self, location: Location, revision: Optional[Revision] = None
             ) -> Optional[PackageRepository]:
                 """Retrieve the package repository at the given location."""
-                if package := self(location, revision):
+                if package := function(location, revision):
                     return PackageRepository(package)
                 return None
-
-            def __call__(
-                self, location: Location, revision: Optional[Revision] = None
-            ) -> Optional[Package]:
-                return function(location, revision)
 
         return _Provider()
 
