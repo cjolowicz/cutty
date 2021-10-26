@@ -36,11 +36,6 @@ class Provider:
     ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
 
-    def __call__(
-        self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
-
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
