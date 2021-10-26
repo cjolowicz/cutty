@@ -32,7 +32,7 @@ def test_local_happy(url: URL) -> None:
 
     with repository.get() as package:
         text = (package.path / "marker").read_text()
-        assert text == "Lorem"
+        assert "Lorem" == text
 
 
 def test_local_revision(url: URL) -> None:
@@ -57,7 +57,7 @@ def test_remote_happy(store: Store, url: URL) -> None:
 
     with repository.get() as package:
         text = (package.path / "marker").read_text()
-        assert text == "Lorem"
+        assert "Lorem" == text
 
 
 def test_remote_not_matching(store: Store) -> None:
