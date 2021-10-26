@@ -4,6 +4,7 @@ from typing import Optional
 
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
+from cutty.packages.domain.providers import _defaultmount
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
@@ -25,5 +26,5 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], getrevision=getrevision
+    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=_defaultmount
 )
