@@ -121,8 +121,7 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
 
 def test_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
-    url = URL("mailto:you@example.com")
     hgprovider = hgproviderfactory(store)
-    repository = hgprovider.provide(url)
+    repository = hgprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
