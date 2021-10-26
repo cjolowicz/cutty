@@ -55,7 +55,7 @@ def test_happy(
 
     with repository.get(revision) as package:
         text = (package.path / "marker").read_text()
-        assert text == expected
+        assert expected == text
 
 
 def is_mercurial_shorthash(revision: str) -> bool:
