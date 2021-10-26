@@ -41,7 +41,7 @@ def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
 
     with repository.get(revision) as package:
         text = (package.path / "marker").read_text()
-        assert text == expected
+        assert expected == text
 
 
 def test_local_not_matching(tmp_path: pathlib.Path) -> None:
@@ -99,7 +99,7 @@ def test_remote_happy(
 
     with repository.get(revision) as package:
         text = (package.path / "marker").read_text()
-        assert text == expected
+        assert expected == text
 
 
 def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
