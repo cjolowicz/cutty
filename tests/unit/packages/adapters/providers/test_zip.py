@@ -43,8 +43,7 @@ def test_local_revision(url: URL) -> None:
 
 def test_local_not_matching(tmp_path: Path) -> None:
     """It returns None if the path is not a zip package."""
-    url = asurl(tmp_path)
-    repository = localzipprovider.provide(url)
+    repository = localzipprovider.provide(asurl(tmp_path))
 
     assert repository is None
 
@@ -63,8 +62,7 @@ def test_remote_happy(store: Store, url: URL) -> None:
 
 def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
-    url = URL("mailto:you@example.com")
     zipprovider = zipproviderfactory(store)
-    repository = zipprovider.provide(url)
+    repository = zipprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
