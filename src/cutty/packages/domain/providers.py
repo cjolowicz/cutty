@@ -134,14 +134,6 @@ class RemoteProvider(BaseProvider):
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
-        if package := self(location, revision):
-            return PackageRepository(package)
-        return None
-
-    def __call__(
-        self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
         if isinstance(location, URL):
             url = location
         elif location.exists():
@@ -152,7 +144,8 @@ class RemoteProvider(BaseProvider):
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
                 if path := fetcher(url, self.store, revision, self.fetchmode):
-                    return self._loadpackage(location, revision, path)
+                    package = self._loadpackage(location, revision, path)
+                    return PackageRepository(package)
 
         return None
 
