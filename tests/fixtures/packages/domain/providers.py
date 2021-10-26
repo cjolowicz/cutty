@@ -29,7 +29,7 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
             def __init__(self) -> None:
                 super().__init__(name)
 
-            def provide2(self, location: Location) -> Optional[PackageRepository]:
+            def provide(self, location: Location) -> Optional[PackageRepository]:
                 """Retrieve the package repository at the given location."""
                 return function(location)
 

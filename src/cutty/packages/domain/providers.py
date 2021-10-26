@@ -33,13 +33,7 @@ class Provider:
         """Initialize."""
         self.name = name
 
-    def provide(
-        self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[PackageRepository]:
-        """Retrieve the package repository at the given location."""
-        return self.provide2(location)
-
-    def provide2(self, location: Location) -> Optional[PackageRepository]:
+    def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
 
 
@@ -115,7 +109,7 @@ class LocalProvider(BaseProvider):
         super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
 
-    def provide2(self, location: Location) -> Optional[PackageRepository]:
+    def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
@@ -158,7 +152,7 @@ class RemoteProvider(BaseProvider):
         self.store = store
         self.fetchmode = fetchmode
 
-    def provide2(self, location: Location) -> Optional[PackageRepository]:
+    def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if isinstance(location, URL):
             url = location
