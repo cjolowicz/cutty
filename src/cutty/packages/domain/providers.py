@@ -3,10 +3,12 @@ import abc
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterable
+from collections.abc import Iterator
 from typing import Optional
 
 from yarl import URL
 
+from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
@@ -20,7 +22,6 @@ from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
-from cutty.packages.domain.package import SinglePackageRepository
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -61,14 +62,19 @@ class BaseProvider(Provider):
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
     ) -> PackageRepository:
-        filesystem = self.mount(path, revision)
+        parent = self
 
-        if self.getrevision is not None:
-            revision = self.getrevision(path, revision)
+        class _(PackageRepository):  # noqa: N801
+            @contextmanager
+            def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+                filesystem = parent.mount(path, revision)
 
-        package = Package(location.name, Path(filesystem=filesystem), revision)
+                if parent.getrevision is not None:
+                    revision = parent.getrevision(path, revision)
 
-        return SinglePackageRepository(package)
+                yield Package(location.name, Path(filesystem=filesystem), revision)
+
+        return _()
 
 
 class LocalProvider(BaseProvider):
