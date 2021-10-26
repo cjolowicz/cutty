@@ -8,6 +8,7 @@ from yarl import URL
 from cutty.packages.adapters.providers.zip import localzipprovider
 from cutty.packages.adapters.providers.zip import zipproviderfactory
 from cutty.packages.domain.locations import asurl
+from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
 
@@ -48,9 +49,14 @@ def test_local_not_matching(tmp_path: Path) -> None:
     assert repository is None
 
 
-def test_remote_happy(store: Store, url: URL) -> None:
+@pytest.fixture
+def zipprovider(store: Store) -> Provider:
+    """Return a zip provider."""
+    return zipproviderfactory(store)
+
+
+def test_remote_happy(zipprovider: Provider, url: URL) -> None:
     """It fetches a zip package into storage."""
-    zipprovider = zipproviderfactory(store)
     repository = zipprovider.provide(url)
 
     assert repository is not None
@@ -60,9 +66,8 @@ def test_remote_happy(store: Store, url: URL) -> None:
         assert "Lorem" == text
 
 
-def test_remote_not_matching(store: Store) -> None:
+def test_remote_not_matching(zipprovider: Provider) -> None:
     """It returns None if the URL scheme is not recognized."""
-    zipprovider = zipproviderfactory(store)
     repository = zipprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
