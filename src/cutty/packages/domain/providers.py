@@ -42,6 +42,34 @@ class Provider:
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
+class DefaultPackageRepository(PackageRepository):
+    """Default implementation of a package repository."""
+
+    def __init__(
+        self,
+        name: str,
+        path: pathlib.Path,
+        *,
+        mount: Mounter,
+        getrevision: Optional[GetRevision],
+    ) -> None:
+        """Initialize."""
+        self.name = name
+        self.path = path
+        self.mount = mount
+        self.getrevision = getrevision
+
+    @contextmanager
+    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+        """Retrieve the package with the given revision."""
+        filesystem = self.mount(self.path, revision)
+
+        if self.getrevision is not None:
+            revision = self.getrevision(self.path, revision)
+
+        yield Package(self.name, Path(filesystem=filesystem), revision)
+
+
 class BaseProvider(Provider):
     """Base class for local and remote providers."""
 
@@ -62,19 +90,9 @@ class BaseProvider(Provider):
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
     ) -> PackageRepository:
-        parent = self
-
-        class _(PackageRepository):  # noqa: N801
-            @contextmanager
-            def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
-                filesystem = parent.mount(path, revision)
-
-                if parent.getrevision is not None:
-                    revision = parent.getrevision(path, revision)
-
-                yield Package(location.name, Path(filesystem=filesystem), revision)
-
-        return _()
+        return DefaultPackageRepository(
+            location.name, path, mount=self.mount, getrevision=self.getrevision
+        )
 
 
 class LocalProvider(BaseProvider):
