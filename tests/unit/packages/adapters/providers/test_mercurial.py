@@ -6,6 +6,7 @@ from typing import Optional
 import pytest
 from yarl import URL
 
+from cutty.errors import CuttyError
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
 from cutty.packages.domain.fetchers import FetchMode
@@ -157,3 +158,9 @@ def test_update(hgrepository: pathlib.Path, store: Store, fetchmode: FetchMode) 
     revision2 = fetchrevision(None)
 
     assert revision1 != revision2
+
+
+def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It raises an exception."""
+    with pytest.raises(CuttyError):
+        hgprovider.provide(hgrepository, "invalid")

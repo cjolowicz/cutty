@@ -114,9 +114,3 @@ def test_fetch_error(url: URL, hg: Hg, store: Store, skip_on_http_errors: None) 
     """It raises an exception."""
     with pytest.raises(CuttyError):
         hgfetcher(url, store)
-
-
-def test_revision_not_found(url: URL, hg: Hg, store: Store) -> None:
-    """It raises an exception."""
-    with pytest.raises(CuttyError):
-        hgfetcher(url, store, "invalid")
