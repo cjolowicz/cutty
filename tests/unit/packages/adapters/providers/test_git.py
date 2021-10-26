@@ -124,8 +124,7 @@ def test_remote_revision_commit(store: Store, url: URL) -> None:
 
 def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
-    url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store)
-    repository = gitprovider.provide(url)
+    repository = gitprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
