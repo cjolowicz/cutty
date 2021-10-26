@@ -7,6 +7,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.revisions import Revision
 
@@ -24,6 +25,14 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
         class _Provider(Provider):
             def __init__(self) -> None:
                 super().__init__(name)
+
+            def provide(
+                self, location: Location, revision: Optional[Revision] = None
+            ) -> Optional[PackageRepository]:
+                """Retrieve the package repository at the given location."""
+                if package := self(location, revision):
+                    return PackageRepository(package)
+                return None
 
             def __call__(
                 self, location: Location, revision: Optional[Revision] = None

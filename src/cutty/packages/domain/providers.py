@@ -35,9 +35,6 @@ class Provider:
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
-        if package := self(location, revision):
-            return PackageRepository(package)
-        return None
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
@@ -92,6 +89,14 @@ class LocalProvider(BaseProvider):
         super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
 
+    def provide(
+        self, location: Location, revision: Optional[Revision] = None
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
+        if package := self(location, revision):
+            return PackageRepository(package)
+        return None
+
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
     ) -> Optional[Package]:
@@ -136,6 +141,14 @@ class RemoteProvider(BaseProvider):
         self.fetch = tuple(fetch)
         self.store = store
         self.fetchmode = fetchmode
+
+    def provide(
+        self, location: Location, revision: Optional[Revision] = None
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
+        if package := self(location, revision):
+            return PackageRepository(package)
+        return None
 
     def __call__(
         self, location: Location, revision: Optional[Revision] = None
