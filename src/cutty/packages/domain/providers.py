@@ -60,18 +60,14 @@ class BaseProvider(Provider):
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
     ) -> PackageRepository:
-        package = self._loadpackage(location, revision, path)
-        return PackageRepository(package)
-
-    def _loadpackage(
-        self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> Package:
         filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
             revision = self.getrevision(path, revision)
 
-        return Package(location.name, Path(filesystem=filesystem), revision)
+        package = Package(location.name, Path(filesystem=filesystem), revision)
+
+        return PackageRepository(package)
 
 
 class LocalProvider(BaseProvider):
