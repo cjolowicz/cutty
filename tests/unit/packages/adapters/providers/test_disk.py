@@ -19,15 +19,16 @@ def repositorypath(tmp_path: Path) -> Path:
 def test_happy(repositorypath: Path) -> None:
     """It provides a repository from a local directory."""
     url = asurl(repositorypath)
-    package = diskprovider(url)
-    assert package is not None
+    repository = diskprovider.provide(url)
+    assert repository is not None
 
-    text = (package.path / "marker").read_text()
-    assert text == "Lorem"
+    with repository.get() as package:
+        text = (package.path / "marker").read_text()
+        assert text == "Lorem"
 
 
 def test_revision(repositorypath: Path) -> None:
     """It raises an exception when passed a revision."""
     url = asurl(repositorypath)
     with pytest.raises(Exception):
-        diskprovider(url, "v1.0")
+        diskprovider.provide(url, "v1.0")
