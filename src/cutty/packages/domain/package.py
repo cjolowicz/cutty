@@ -1,6 +1,7 @@
 """Package."""
 from __future__ import annotations
 
+import abc
 from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Optional
@@ -30,9 +31,18 @@ class Package:
         )
 
 
-@dataclass
-class PackageRepository:
+class PackageRepository(abc.ABC):
     """A package repository."""
+
+    @contextmanager
+    @abc.abstractmethod
+    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+        """Retrieve the package with the given revision."""
+
+
+@dataclass
+class SinglePackageRepository(PackageRepository):
+    """A package repository with a single package."""
 
     package: Package
 

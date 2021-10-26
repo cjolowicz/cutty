@@ -3,10 +3,12 @@ import abc
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterable
+from collections.abc import Iterator
 from typing import Optional
 
 from yarl import URL
 
+from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
@@ -40,6 +42,34 @@ class Provider:
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
 
+class DefaultPackageRepository(PackageRepository):
+    """Default implementation of a package repository."""
+
+    def __init__(
+        self,
+        name: str,
+        path: pathlib.Path,
+        *,
+        mount: Mounter,
+        getrevision: Optional[GetRevision],
+    ) -> None:
+        """Initialize."""
+        self.name = name
+        self.path = path
+        self.mount = mount
+        self.getrevision = getrevision
+
+    @contextmanager
+    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+        """Retrieve the package with the given revision."""
+        filesystem = self.mount(self.path, revision)
+
+        if self.getrevision is not None:
+            revision = self.getrevision(self.path, revision)
+
+        yield Package(self.name, Path(filesystem=filesystem), revision)
+
+
 class BaseProvider(Provider):
     """Base class for local and remote providers."""
 
@@ -60,14 +90,9 @@ class BaseProvider(Provider):
     def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
     ) -> PackageRepository:
-        filesystem = self.mount(path, revision)
-
-        if self.getrevision is not None:
-            revision = self.getrevision(path, revision)
-
-        package = Package(location.name, Path(filesystem=filesystem), revision)
-
-        return PackageRepository(package)
+        return DefaultPackageRepository(
+            location.name, path, mount=self.mount, getrevision=self.getrevision
+        )
 
 
 class LocalProvider(BaseProvider):

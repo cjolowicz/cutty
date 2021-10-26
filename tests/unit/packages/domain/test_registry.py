@@ -104,7 +104,7 @@ def test_with_path(
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(str(directory))
 
-    with repository.get(str(directory)) as package:
+    with repository.get() as package:
         [entry] = package.path.iterdir()
 
     assert entry.name == "marker"

@@ -8,6 +8,7 @@ from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
+from cutty.packages.domain.package import SinglePackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.revisions import Revision
 
@@ -31,7 +32,7 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
             ) -> Optional[PackageRepository]:
                 """Retrieve the package repository at the given location."""
                 if package := function(location, revision):
-                    return PackageRepository(package)
+                    return SinglePackageRepository(package)
                 return None
 
         return _Provider()
