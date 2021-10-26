@@ -31,7 +31,7 @@ class Package:
 
 
 @dataclass
-class PackageRepository:
+class SinglePackageRepository:
     """A package repository."""
 
     package: Package

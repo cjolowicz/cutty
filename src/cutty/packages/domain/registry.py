@@ -10,7 +10,7 @@ from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
-from cutty.packages.domain.package import PackageRepository
+from cutty.packages.domain.package import SinglePackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
@@ -29,7 +29,7 @@ def _provide(
     providers: Iterable[Provider],
     location: Location,
     revision: Optional[Revision] = None,
-) -> PackageRepository:
+) -> SinglePackageRepository:
     """Provide the package repository located at the given URL."""
     for provider in providers:
         if repository := provider.provide(location, revision):
@@ -57,7 +57,7 @@ class ProviderRegistry:
         rawlocation: str,
         revision: Optional[Revision] = None,
         fetchmode: FetchMode = FetchMode.ALWAYS,
-    ) -> PackageRepository:
+    ) -> SinglePackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
 
