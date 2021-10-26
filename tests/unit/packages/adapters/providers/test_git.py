@@ -15,7 +15,6 @@ from cutty.packages.domain.stores import Store
 from cutty.util.git import Repository
 from tests.util.git import updatefile
 
-
 signature = pygit2.Signature("you", "you@example.com")
 
 
@@ -35,42 +34,51 @@ def url(tmp_path: pathlib.Path) -> URL:
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
     """It provides a package from a local directory."""
-    package = localgitprovider(url, revision)
-    assert package is not None
+    repository = localgitprovider.provide(url, revision)
 
-    text = (package.path / "marker").read_text()
-    assert text == expected
+    assert repository is not None
+
+    with repository.get(revision) as package:
+        text = (package.path / "marker").read_text()
+        assert text == expected
 
 
 def test_local_not_matching(tmp_path: pathlib.Path) -> None:
     """It returns None if the path is not a git repository."""
     url = asurl(tmp_path)
-    package = localgitprovider(url)
-    assert package is None
+    repository = localgitprovider.provide(url)
+
+    assert repository is None
 
 
 def test_local_invalid_revision(url: URL) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
-        localgitprovider(url, "invalid")
+        localgitprovider.provide(url, "invalid")
 
 
 def test_local_revision_tag(url: URL) -> None:
     """It returns the tag name."""
-    package = localgitprovider(url, "HEAD^")
-    assert package is not None
-    assert package.revision == "v1.0"
+    repository = localgitprovider.provide(url, "HEAD^")
+
+    assert repository is not None
+
+    with repository.get("HEAD^") as package:
+        assert package.revision == "v1.0"
 
 
 def test_local_revision_commit(url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
-    package = localgitprovider(url)
-    assert (
-        package is not None
-        and package.revision is not None
-        and len(package.revision) >= 7
-        and all(c in string.hexdigits for c in package.revision)
-    )
+    repository = localgitprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert (
+            package.revision is not None
+            and len(package.revision) >= 7
+            and all(c in string.hexdigits for c in package.revision)
+        )
 
 
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
@@ -79,35 +87,45 @@ def test_remote_happy(
 ) -> None:
     """It fetches a git repository into storage."""
     gitprovider = gitproviderfactory(store)
-    package = gitprovider(url, revision)
-    assert package is not None
+    repository = gitprovider.provide(url, revision)
 
-    text = (package.path / "marker").read_text()
-    assert text == expected
+    assert repository is not None
+
+    with repository.get(revision) as package:
+        text = (package.path / "marker").read_text()
+        assert text == expected
 
 
 def test_remote_revision_tag(store: Store, url: URL) -> None:
     """It returns the tag name."""
     gitprovider = gitproviderfactory(store)
-    package = gitprovider(url, "HEAD^")
-    assert package is not None and package.revision == "v1.0"
+    repository = gitprovider.provide(url, "HEAD^")
+
+    assert repository is not None
+
+    with repository.get("HEAD^") as package:
+        assert package.revision == "v1.0"
 
 
 def test_remote_revision_commit(store: Store, url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
     gitprovider = gitproviderfactory(store)
-    package = gitprovider(url)
-    assert (
-        package is not None
-        and package.revision is not None
-        and len(package.revision) >= 7
-        and all(c in string.hexdigits for c in package.revision)
-    )
+    repository = gitprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert (
+            package.revision is not None
+            and len(package.revision) >= 7
+            and all(c in string.hexdigits for c in package.revision)
+        )
 
 
 def test_remote_not_matching(store: Store) -> None:
     """It returns None if the URL scheme is not recognized."""
     url = URL("mailto:you@example.com")
     gitprovider = gitproviderfactory(store)
-    package = gitprovider(url)
-    assert package is None
+    repository = gitprovider.provide(url)
+
+    assert repository is None
