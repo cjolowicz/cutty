@@ -11,6 +11,7 @@ from cutty.errors import CuttyError
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
 from cutty.packages.domain.locations import asurl
+from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 from cutty.util.git import Repository
 from tests.util.git import updatefile
@@ -81,12 +82,17 @@ def test_local_revision_commit(url: URL) -> None:
         )
 
 
+@pytest.fixture
+def gitprovider(store: Store) -> Provider:
+    """Return a git provider."""
+    return gitproviderfactory(store)
+
+
 @pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
 def test_remote_happy(
-    store: Store, url: URL, revision: Optional[str], expected: str
+    gitprovider: Provider, url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a git repository into storage."""
-    gitprovider = gitproviderfactory(store)
     repository = gitprovider.provide(url, revision)
 
     assert repository is not None
@@ -96,9 +102,8 @@ def test_remote_happy(
         assert text == expected
 
 
-def test_remote_revision_tag(store: Store, url: URL) -> None:
+def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
     """It returns the tag name."""
-    gitprovider = gitproviderfactory(store)
     repository = gitprovider.provide(url, "HEAD^")
 
     assert repository is not None
@@ -107,9 +112,8 @@ def test_remote_revision_tag(store: Store, url: URL) -> None:
         assert package.revision == "v1.0"
 
 
-def test_remote_revision_commit(store: Store, url: URL) -> None:
+def test_remote_revision_commit(gitprovider: Provider, url: URL) -> None:
     """It returns seven or more hexadecimal digits."""
-    gitprovider = gitproviderfactory(store)
     repository = gitprovider.provide(url)
 
     assert repository is not None
@@ -122,9 +126,8 @@ def test_remote_revision_commit(store: Store, url: URL) -> None:
         )
 
 
-def test_remote_not_matching(store: Store) -> None:
+def test_remote_not_matching(gitprovider: Provider) -> None:
     """It returns None if the URL scheme is not recognized."""
-    gitprovider = gitproviderfactory(store)
     repository = gitprovider.provide(URL("mailto:you@example.com"))
 
     assert repository is None
