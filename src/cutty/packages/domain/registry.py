@@ -15,7 +15,6 @@ from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
 from cutty.packages.domain.providers import ProviderStore
-from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -49,10 +48,7 @@ class ProviderRegistry:
         }
 
     def getrepository(
-        self,
-        rawlocation: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
+        self, rawlocation: str, fetchmode: FetchMode = FetchMode.ALWAYS
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
