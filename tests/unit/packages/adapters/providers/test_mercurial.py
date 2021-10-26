@@ -37,7 +37,13 @@ def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
     return path
 
 
-@pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
+@pytest.mark.parametrize(
+    ("revision", "expected"),
+    [
+        ("v1.0", "Lorem"),
+        (None, "Ipsum"),
+    ],
+)
 def test_happy(
     store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
 ) -> None:
