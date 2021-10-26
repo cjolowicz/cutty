@@ -7,6 +7,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.revisions import Revision
 
@@ -25,10 +26,13 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
             def __init__(self) -> None:
                 super().__init__(name)
 
-            def __call__(
+            def provide(
                 self, location: Location, revision: Optional[Revision] = None
-            ) -> Optional[Package]:
-                return function(location, revision)
+            ) -> Optional[PackageRepository]:
+                """Retrieve the package repository at the given location."""
+                if package := function(location, revision):
+                    return PackageRepository(package)
+                return None
 
         return _Provider()
 
@@ -49,10 +53,12 @@ def constprovider(name: str, package: Package) -> Provider:
     return _
 
 
-def dictprovider(mapping: Optional[dict[str, Any]] = None) -> Provider:
+def dictprovider(
+    mapping: Optional[dict[str, Any]] = None, name: str = "dict"
+) -> Provider:
     """Provider that matches every URL with a package."""
 
-    @provider("dict")
+    @provider(name)
     def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
         filesystem = DictFilesystem(mapping or {})
         path = Path(filesystem=filesystem)

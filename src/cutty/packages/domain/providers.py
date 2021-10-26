@@ -19,6 +19,7 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
+from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -30,10 +31,10 @@ class Provider:
         """Initialize."""
         self.name = name
 
-    def __call__(
+    def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
 
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
@@ -56,15 +57,17 @@ class BaseProvider(Provider):
         self.mount = mount
         self.getrevision = getrevision
 
-    def _loadpackage(
+    def _loadrepository(
         self, location: Location, revision: Optional[Revision], path: pathlib.Path
-    ) -> Package:
+    ) -> PackageRepository:
         filesystem = self.mount(path, revision)
 
         if self.getrevision is not None:
             revision = self.getrevision(path, revision)
 
-        return Package(location.name, Path(filesystem=filesystem), revision)
+        package = Package(location.name, Path(filesystem=filesystem), revision)
+
+        return PackageRepository(package)
 
 
 class LocalProvider(BaseProvider):
@@ -83,17 +86,17 @@ class LocalProvider(BaseProvider):
         super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
 
-    def __call__(
+    def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
         try:
             path = location if isinstance(location, pathlib.Path) else aspath(location)
         except ValueError:
             return None
 
         if path.exists() and self.match(path):
-            return self._loadpackage(location, revision, path)
+            return self._loadrepository(location, revision, path)
 
         return None
 
@@ -128,10 +131,10 @@ class RemoteProvider(BaseProvider):
         self.store = store
         self.fetchmode = fetchmode
 
-    def __call__(
+    def provide(
         self, location: Location, revision: Optional[Revision] = None
-    ) -> Optional[Package]:
-        """Return the package at the given location."""
+    ) -> Optional[PackageRepository]:
+        """Retrieve the package repository at the given location."""
         if isinstance(location, URL):
             url = location
         elif location.exists():
@@ -142,7 +145,7 @@ class RemoteProvider(BaseProvider):
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
                 if path := fetcher(url, self.store, revision, self.fetchmode):
-                    return self._loadpackage(location, revision, path)
+                    return self._loadrepository(location, revision, path)
 
         return None
 

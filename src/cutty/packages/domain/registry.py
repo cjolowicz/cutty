@@ -10,7 +10,6 @@ from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
-from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
@@ -26,15 +25,15 @@ class UnknownLocationError(CuttyError):
     location: Location
 
 
-def provide(
+def _provide(
     providers: Iterable[Provider],
     location: Location,
     revision: Optional[Revision] = None,
-) -> Package:
-    """Provide the package located at the given URL."""
+) -> PackageRepository:
+    """Provide the package repository located at the given URL."""
     for provider in providers:
-        if package := provider(location, revision):
-            return package
+        if repository := provider.provide(location, revision):
+            return repository
 
     raise UnknownLocationError(location)
 
@@ -64,9 +63,7 @@ class ProviderRegistry:
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-        package = provide(providers, location, revision)
-
-        return PackageRepository(package)
+        return _provide(providers, location, revision)
 
     def _extractprovidername(
         self, location: Location

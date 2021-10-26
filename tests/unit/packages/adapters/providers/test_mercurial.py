@@ -8,8 +8,8 @@ from yarl import URL
 
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
+from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
-
 
 pytest_plugins = ["tests.fixtures.packages.adapters.mercurial"]
 
@@ -38,17 +38,33 @@ def hgrepository(hg: Hg, session_tmp_path: pathlib.Path) -> pathlib.Path:
     return path
 
 
-@pytest.mark.parametrize(("revision", "expected"), [("v1.0", "Lorem"), (None, "Ipsum")])
+@pytest.fixture
+def hgprovider(store: Store) -> Provider:
+    """Fixture for a Mercurial provider."""
+    return hgproviderfactory(store)
+
+
+@pytest.mark.parametrize(
+    ("revision", "expected"),
+    [
+        ("v1.0", "Lorem"),
+        (None, "Ipsum"),
+    ],
+)
 def test_happy(
-    store: Store, hgrepository: pathlib.Path, revision: Optional[str], expected: str
+    hgprovider: Provider,
+    hgrepository: pathlib.Path,
+    revision: Optional[str],
+    expected: str,
 ) -> None:
     """It fetches a hg repository into storage."""
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(hgrepository, revision)
-    assert package is not None
+    repository = hgprovider.provide(hgrepository, revision)
 
-    text = (package.path / "marker").read_text()
-    assert text == expected
+    assert repository is not None
+
+    with repository.get(revision) as package:
+        text = (package.path / "marker").read_text()
+        assert expected == text
 
 
 def is_mercurial_shorthash(revision: str) -> bool:
@@ -56,26 +72,28 @@ def is_mercurial_shorthash(revision: str) -> bool:
     return len(revision) == 12 and all(c in string.hexdigits for c in revision)
 
 
-def test_revision_commit(store: Store, hgrepository: pathlib.Path) -> None:
-    """It returns the short changeset identification hash."""
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(hgrepository)
-    assert (
-        package is not None
-        and package.revision is not None
-        and is_mercurial_shorthash(package.revision)
-    )
+def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It retrieves the short hash as the package revision."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.revision is not None and is_mercurial_shorthash(package.revision)
 
 
-def test_revision_tag(store: Store, hgrepository: pathlib.Path) -> None:
-    """It returns the tag name."""
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(hgrepository, "tip~2")
-    assert package is not None and package.revision == "v1.0"
+def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It retrieves the tag name as the package revision."""
+    repository = hgprovider.provide(hgrepository, "tip~2")
+
+    assert repository is not None
+
+    with repository.get("tip~2") as package:
+        assert package.revision == "v1.0"
 
 
-def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
-    """It returns the changeset hash in a repository without tags."""
+def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) -> None:
+    """It retrieves the short hash as the package revision when there are no tags."""
     path = tmp_path / "repository"
     path.mkdir()
     (path / "marker").touch()
@@ -84,17 +102,18 @@ def test_revision_no_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
     hg("add", "marker", cwd=path)
     hg("commit", "--message=Initial", cwd=path)
 
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(path)
-    assert (
-        package is not None
-        and package.revision is not None
-        and is_mercurial_shorthash(package.revision)
-    )
+    repository = hgprovider.provide(path)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.revision is not None and is_mercurial_shorthash(package.revision)
 
 
-def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) -> None:
-    """It returns the tag names separated by colon."""
+def test_revision_multiple_tags(
+    hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path
+) -> None:
+    """It retrieves multiple tag names separated by colon as the package revision."""
     path = tmp_path / "repository"
     path.mkdir()
     (path / "marker").touch()
@@ -105,14 +124,16 @@ def test_revision_multiple_tags(store: Store, hg: Hg, tmp_path: pathlib.Path) ->
     hg("tag", "--rev=0", "tag1", cwd=path)
     hg("tag", "--rev=0", "tag2", cwd=path)
 
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(path, "tip~2")
-    assert package is not None and package.revision == "tag1:tag2"
+    repository = hgprovider.provide(path, "tip~2")
+
+    assert repository is not None
+
+    with repository.get("tip~2") as package:
+        assert package.revision == "tag1:tag2"
 
 
-def test_not_matching(store: Store) -> None:
+def test_not_matching(hgprovider: Provider) -> None:
     """It returns None if the URL scheme is not recognized."""
-    url = URL("mailto:you@example.com")
-    hgprovider = hgproviderfactory(store)
-    package = hgprovider(url)
-    assert package is None
+    repository = hgprovider.provide(URL("mailto:you@example.com"))
+
+    assert repository is None

@@ -27,7 +27,7 @@ def test_localprovider_not_local(url: URL, diskmounter: Mounter) -> None:
     """It returns None if the location is not local."""
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
-    assert provider(url) is None
+    assert provider.provide(url) is None
 
 
 def test_localprovider_not_matching(
@@ -37,7 +37,7 @@ def test_localprovider_not_matching(
     url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: False, mount=diskmounter)
 
-    assert provider(url) is None
+    assert provider.provide(url) is None
 
 
 def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
@@ -45,22 +45,24 @@ def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
     path = pathlib.Path("/no/such/file/or/directory")
 
-    assert provider(path) is None
+    assert provider.provide(path) is None
 
 
 def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
-    """It returns the package."""
-    repository = tmp_path / "repository"
-    repository.mkdir()
-    (repository / "marker").touch()
+    """It returns the package repository."""
+    path = tmp_path / "repository"
+    path.mkdir()
+    (path / "marker").touch()
 
-    url = asurl(repository)
+    url = asurl(path)
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
-    package = provider(url)
+    repository = provider.provide(url)
 
-    assert package is not None
-    [entry] = package.path.iterdir()
-    assert entry.name == "marker"
+    assert repository is not None
+
+    with repository.get() as package:
+        [entry] = package.path.iterdir()
+        assert entry.name == "marker"
 
 
 def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
@@ -69,7 +71,7 @@ def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) ->
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
     with pytest.raises(Exception):
-        provider(url, "v1.0.0")
+        provider.provide(url, "v1.0.0")
 
 
 def test_localprovider_package_revision(
@@ -91,17 +93,19 @@ def test_localprovider_package_revision(
     path.mkdir()
     (path / "VERSION").write_text("1.0")
 
-    package = provider(asurl(path))
+    repository = provider.provide(asurl(path))
 
-    assert package is not None
-    assert "1.0" == package.revision
+    assert repository is not None
+
+    with repository.get() as package:
+        assert "1.0" == package.revision
 
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = RemoteProviderFactory(fetch=[])
     provider = providerfactory(store)
-    assert provider(URL()) is None
+    assert provider.provide(URL()) is None
 
 
 def test_remoteproviderfactory_no_matching_fetchers(
@@ -110,7 +114,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
     """It returns None if all fetchers return None."""
     providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
     provider = providerfactory(store)
-    assert provider(URL()) is None
+    assert provider.provide(URL()) is None
 
 
 def test_remoteproviderfactory_happy(
@@ -119,9 +123,9 @@ def test_remoteproviderfactory_happy(
     """It mounts a filesystem for the fetched package."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
     provider = providerfactory(store)
-    package = provider(url)
+    repository = provider.provide(url)
 
-    assert package is not None
+    assert repository is not None
 
 
 def test_remoteproviderfactory_package_revision(
@@ -139,9 +143,12 @@ def test_remoteproviderfactory_package_revision(
         fetch=[emptyfetcher], getrevision=getrevision
     )
     provider = providerfactory(store)
-    package = provider(url)
+    repository = provider.provide(url)
 
-    assert package is not None and package.revision == "v1.0"
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.revision == "v1.0"
 
 
 def test_remoteproviderfactory_not_matching(
@@ -150,7 +157,7 @@ def test_remoteproviderfactory_not_matching(
     """It returns None if the provider itself does not match."""
     providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
     provider = providerfactory(store)
-    assert provider(url) is None
+    assert provider.provide(url) is None
 
 
 def test_remoteproviderfactory_mounter(
@@ -165,10 +172,12 @@ def test_remoteproviderfactory_mounter(
 
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
     provider = providerfactory(store)
-    package = provider(url, revision)
+    repository = provider.provide(url, revision)
 
-    assert package is not None
-    assert (package.path / "marker").read_text() == "Lorem"
+    assert repository is not None
+
+    with repository.get() as package:
+        assert (package.path / "marker").read_text() == "Lorem"
 
 
 def test_remoteproviderfactory_inexistent_path(
@@ -179,4 +188,4 @@ def test_remoteproviderfactory_inexistent_path(
     provider = providerfactory(store)
     path = pathlib.Path("/no/such/file/or/directory")
 
-    assert provider(path) is None
+    assert provider.provide(path) is None

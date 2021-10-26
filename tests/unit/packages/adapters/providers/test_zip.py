@@ -8,6 +8,7 @@ from yarl import URL
 from cutty.packages.adapters.providers.zip import localzipprovider
 from cutty.packages.adapters.providers.zip import zipproviderfactory
 from cutty.packages.domain.locations import asurl
+from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
 
@@ -25,40 +26,48 @@ def url(tmp_path: Path) -> URL:
 
 
 def test_local_happy(url: URL) -> None:
-    """It provides a package from a local directory."""
-    package = localzipprovider(url)
-    assert package is not None
+    """It provides a package repository from a local directory."""
+    repository = localzipprovider.provide(url)
 
-    text = (package.path / "marker").read_text()
-    assert text == "Lorem"
+    assert repository is not None
+
+    with repository.get() as package:
+        text = (package.path / "marker").read_text()
+        assert "Lorem" == text
 
 
 def test_local_revision(url: URL) -> None:
     """It raises an exception when passed a revision."""
     with pytest.raises(Exception):
-        localzipprovider(url, "v1.0")
+        localzipprovider.provide(url, "v1.0")
 
 
 def test_local_not_matching(tmp_path: Path) -> None:
-    """It returns None if the path is not a zip package."""
-    url = asurl(tmp_path)
-    package = localzipprovider(url)
-    assert package is None
+    """It returns None if the path is not a zip archive."""
+    repository = localzipprovider.provide(asurl(tmp_path))
+
+    assert repository is None
 
 
-def test_remote_happy(store: Store, url: URL) -> None:
-    """It fetches a zip package into storage."""
-    zipprovider = zipproviderfactory(store)
-    package = zipprovider(url)
-    assert package is not None
-
-    text = (package.path / "marker").read_text()
-    assert text == "Lorem"
+@pytest.fixture
+def zipprovider(store: Store) -> Provider:
+    """Fixture for a zip provider."""
+    return zipproviderfactory(store)
 
 
-def test_remote_not_matching(store: Store) -> None:
+def test_remote_happy(zipprovider: Provider, url: URL) -> None:
+    """It fetches the package repository into storage."""
+    repository = zipprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        text = (package.path / "marker").read_text()
+        assert "Lorem" == text
+
+
+def test_remote_not_matching(zipprovider: Provider) -> None:
     """It returns None if the URL scheme is not recognized."""
-    url = URL("mailto:you@example.com")
-    zipprovider = zipproviderfactory(store)
-    package = zipprovider(url)
-    assert package is None
+    repository = zipprovider.provide(URL("mailto:you@example.com"))
+
+    assert repository is None
