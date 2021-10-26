@@ -31,4 +31,6 @@ def test_revision(repositorypath: Path) -> None:
     """It raises an exception when passed a revision."""
     url = asurl(repositorypath)
     with pytest.raises(Exception):
-        diskprovider.provide(url, "v1.0")
+        if repository := diskprovider.provide(url, "v1.0"):
+            with repository.get("v1.0"):
+                pass

@@ -71,7 +71,9 @@ def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) ->
     provider = LocalProvider(match=lambda path: True, mount=diskmounter)
 
     with pytest.raises(Exception):
-        provider.provide(url, "v1.0.0")
+        if repository := provider.provide(url, "v1.0.0"):
+            with repository.get("v1.0.0"):
+                pass
 
 
 def test_localprovider_package_revision(

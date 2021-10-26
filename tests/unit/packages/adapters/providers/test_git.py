@@ -61,7 +61,9 @@ def test_local_not_matching(tmp_path: pathlib.Path) -> None:
 def test_local_invalid_revision(url: URL) -> None:
     """It raises an exception if the revision is invalid."""
     with pytest.raises(CuttyError):
-        localgitprovider.provide(url, "invalid")
+        if repository := localgitprovider.provide(url, "invalid"):
+            with repository.get("invalid"):
+                pass
 
 
 def test_local_revision_tag(url: URL) -> None:
