@@ -26,10 +26,11 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return result.stdout
 
 
-def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
+def mount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
+    """Mount the working directory as a disk filesystem."""
     return DiskFilesystem(path)
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=_defaultmount
+    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=mount
 )
