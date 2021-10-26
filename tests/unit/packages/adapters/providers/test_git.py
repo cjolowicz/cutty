@@ -59,13 +59,13 @@ def test_local_not_matching(tmp_path: pathlib.Path) -> None:
 
 
 def test_local_invalid_revision(url: URL) -> None:
-    """It raises an exception."""
+    """It raises an exception if the revision is invalid."""
     with pytest.raises(CuttyError):
         localgitprovider.provide(url, "invalid")
 
 
 def test_local_revision_tag(url: URL) -> None:
-    """It returns the tag name."""
+    """It retrieves the tag name as the package revision."""
     repository = localgitprovider.provide(url, "HEAD^")
 
     assert repository is not None
@@ -75,7 +75,7 @@ def test_local_revision_tag(url: URL) -> None:
 
 
 def test_local_revision_commit(url: URL) -> None:
-    """It returns seven or more hexadecimal digits."""
+    """It retrieves the short hash as the package revision."""
     repository = localgitprovider.provide(url)
 
     assert repository is not None
@@ -90,7 +90,7 @@ def test_local_revision_commit(url: URL) -> None:
 
 @pytest.fixture
 def gitprovider(store: Store) -> Provider:
-    """Return a git provider."""
+    """Fixture for a git provider."""
     return gitproviderfactory(store)
 
 
@@ -115,7 +115,7 @@ def test_remote_happy(
 
 
 def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
-    """It returns the tag name."""
+    """It retrieves the tag name as the package revision."""
     repository = gitprovider.provide(url, "HEAD^")
 
     assert repository is not None
@@ -125,7 +125,7 @@ def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
 
 
 def test_remote_revision_commit(gitprovider: Provider, url: URL) -> None:
-    """It returns seven or more hexadecimal digits."""
+    """It retrieves the short hash as the package revision."""
     repository = gitprovider.provide(url)
 
     assert repository is not None
