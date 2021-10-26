@@ -32,7 +32,7 @@ def _provide(
 ) -> PackageRepository:
     """Provide the package repository located at the given URL."""
     for provider in providers:
-        if repository := provider.provide(location, revision):
+        if repository := provider.provide(location):
             return repository
 
     raise UnknownLocationError(location)

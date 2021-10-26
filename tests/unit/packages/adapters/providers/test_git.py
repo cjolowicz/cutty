@@ -41,7 +41,7 @@ def url(tmp_path: pathlib.Path) -> URL:
 )
 def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
     """It provides a package from a local directory."""
-    repository = localgitprovider.provide(url, revision)
+    repository = localgitprovider.provide(url)
 
     assert repository is not None
 
@@ -61,14 +61,14 @@ def test_local_not_matching(tmp_path: pathlib.Path) -> None:
 def test_local_invalid_revision(url: URL) -> None:
     """It raises an exception if the revision is invalid."""
     with pytest.raises(CuttyError):
-        if repository := localgitprovider.provide(url, "invalid"):
+        if repository := localgitprovider.provide(url):
             with repository.get("invalid"):
                 pass
 
 
 def test_local_revision_tag(url: URL) -> None:
     """It retrieves the tag name as the package revision."""
-    repository = localgitprovider.provide(url, "HEAD^")
+    repository = localgitprovider.provide(url)
 
     assert repository is not None
 
@@ -107,7 +107,7 @@ def test_remote_happy(
     gitprovider: Provider, url: URL, revision: Optional[str], expected: str
 ) -> None:
     """It fetches a git repository into storage."""
-    repository = gitprovider.provide(url, revision)
+    repository = gitprovider.provide(url)
 
     assert repository is not None
 
@@ -118,7 +118,7 @@ def test_remote_happy(
 
 def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
     """It retrieves the tag name as the package revision."""
-    repository = gitprovider.provide(url, "HEAD^")
+    repository = gitprovider.provide(url)
 
     assert repository is not None
 
