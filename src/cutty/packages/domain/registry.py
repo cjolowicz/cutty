@@ -25,11 +25,7 @@ class UnknownLocationError(CuttyError):
     location: Location
 
 
-def _provide(
-    providers: Iterable[Provider],
-    location: Location,
-    revision: Optional[Revision] = None,
-) -> PackageRepository:
+def _provide(providers: Iterable[Provider], location: Location) -> PackageRepository:
     """Provide the package repository located at the given URL."""
     for provider in providers:
         if repository := provider.provide(location):
@@ -63,7 +59,7 @@ class ProviderRegistry:
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-        return _provide(providers, location, revision)
+        return _provide(providers, location)
 
     def _extractprovidername(
         self, location: Location
