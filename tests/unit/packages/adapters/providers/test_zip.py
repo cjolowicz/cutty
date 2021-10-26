@@ -26,7 +26,7 @@ def url(tmp_path: Path) -> URL:
 
 
 def test_local_happy(url: URL) -> None:
-    """It provides a package from a local directory."""
+    """It provides a package repository from a local directory."""
     repository = localzipprovider.provide(url)
 
     assert repository is not None
@@ -43,7 +43,7 @@ def test_local_revision(url: URL) -> None:
 
 
 def test_local_not_matching(tmp_path: Path) -> None:
-    """It returns None if the path is not a zip package."""
+    """It returns None if the path is not a zip archive."""
     repository = localzipprovider.provide(asurl(tmp_path))
 
     assert repository is None
@@ -51,12 +51,12 @@ def test_local_not_matching(tmp_path: Path) -> None:
 
 @pytest.fixture
 def zipprovider(store: Store) -> Provider:
-    """Return a zip provider."""
+    """Fixture for a zip provider."""
     return zipproviderfactory(store)
 
 
 def test_remote_happy(zipprovider: Provider, url: URL) -> None:
-    """It fetches a zip package into storage."""
+    """It fetches the package repository into storage."""
     repository = zipprovider.provide(url)
 
     assert repository is not None
