@@ -60,11 +60,13 @@ class DefaultPackageRepository(PackageRepository):
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-        with self.mount(self.path, revision) as filesystem:
-            if self.getrevision is not None:
-                revision = self.getrevision(self.path, revision)
+        if self.getrevision is not None:
+            resolved_revision = self.getrevision(self.path, revision)
+        else:
+            resolved_revision = revision
 
-            yield Package(self.name, Path(filesystem=filesystem), revision)
+        with self.mount(self.path, revision) as filesystem:
+            yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
 
 
 class BaseProvider(Provider):
