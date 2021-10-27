@@ -163,7 +163,7 @@ def test_remoteproviderfactory_not_matching(
 
 
 def test_remoteproviderfactory_mounter(
-    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter2: Mounter
+    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter: Mounter
 ) -> None:
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
@@ -172,7 +172,7 @@ def test_remoteproviderfactory_mounter(
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter2)
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
     provider = providerfactory(store)
     repository = provider.provide(url)
 

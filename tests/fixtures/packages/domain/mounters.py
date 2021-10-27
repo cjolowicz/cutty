@@ -22,7 +22,7 @@ def diskmounter() -> Mounter:
 
 
 @pytest.fixture
-def jsonmounter2() -> Mounter:
+def jsonmounter() -> Mounter:
     """Mount a versioned dict filesystem read from JSON."""
 
     @contextmanager
