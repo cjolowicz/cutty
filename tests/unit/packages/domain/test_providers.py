@@ -9,8 +9,6 @@ from yarl import URL
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.matchers import Matcher
-from cutty.packages.domain.mounters import asmounter2
-from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.mounters import Mounter2
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
@@ -165,7 +163,7 @@ def test_remoteproviderfactory_not_matching(
 
 
 def test_remoteproviderfactory_mounter(
-    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter: Mounter
+    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter2: Mounter2
 ) -> None:
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
@@ -174,9 +172,7 @@ def test_remoteproviderfactory_mounter(
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = RemoteProviderFactory(
-        fetch=[emptyfetcher], mount2=asmounter2(jsonmounter)
-    )
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount2=jsonmounter2)
     provider = providerfactory(store)
     repository = provider.provide(url)
 
