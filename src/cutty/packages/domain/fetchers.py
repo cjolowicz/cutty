@@ -24,7 +24,7 @@ class Fetcher(abc.ABC):
 
     @abc.abstractmethod
     def match(self, url: URL) -> bool:
-        """Return True."""
+        """Return True if the fetcher can handle the URL."""
 
     @abc.abstractmethod
     def fetch(
