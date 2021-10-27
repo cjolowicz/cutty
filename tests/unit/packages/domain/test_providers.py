@@ -106,7 +106,7 @@ def test_localprovider_package_revision(
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
-    providerfactory = RemoteProviderFactory(fetch2=[])
+    providerfactory = RemoteProviderFactory(fetch=[])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 
@@ -115,7 +115,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
     store: Store, nullfetcher: Fetcher
 ) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(nullfetcher)])
+    providerfactory = RemoteProviderFactory(fetch=[Fetcher2(nullfetcher)])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 
@@ -124,7 +124,7 @@ def test_remoteproviderfactory_happy(
     store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It mounts a filesystem for the fetched package."""
-    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory(fetch=[Fetcher2(emptyfetcher)])
     provider = providerfactory(store)
     repository = provider.provide(url)
 
@@ -143,7 +143,7 @@ def test_remoteproviderfactory_package_revision(
         return "v1.0"
 
     providerfactory = RemoteProviderFactory(
-        fetch2=[Fetcher2(emptyfetcher)], getrevision=getrevision
+        fetch=[Fetcher2(emptyfetcher)], getrevision=getrevision
     )
     provider = providerfactory(store)
     repository = provider.provide(url)
@@ -159,7 +159,7 @@ def test_remoteproviderfactory_not_matching(
 ) -> None:
     """It returns None if the provider itself does not match."""
     providerfactory = RemoteProviderFactory(
-        match=nullmatcher, fetch2=[Fetcher2(emptyfetcher)]
+        match=nullmatcher, fetch=[Fetcher2(emptyfetcher)]
     )
     provider = providerfactory(store)
     assert provider.provide(url) is None
@@ -176,7 +176,7 @@ def test_remoteproviderfactory_mounter(
         path.write_text(text)
 
     providerfactory = RemoteProviderFactory(
-        fetch2=[Fetcher2(emptyfetcher)], mount=jsonmounter
+        fetch=[Fetcher2(emptyfetcher)], mount=jsonmounter
     )
     provider = providerfactory(store)
     repository = provider.provide(url)
@@ -191,7 +191,7 @@ def test_remoteproviderfactory_inexistent_path(
     store: Store, emptyfetcher: Fetcher, nullmatcher: Matcher
 ) -> None:
     """It returns None if the location is an inexistent path."""
-    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory(fetch=[Fetcher2(emptyfetcher)])
     provider = providerfactory(store)
     path = pathlib.Path("/no/such/file/or/directory")
 

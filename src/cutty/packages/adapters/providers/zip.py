@@ -21,6 +21,6 @@ localzipprovider = LocalProvider("localzip", match=match, mount=mount)
 zipproviderfactory = RemoteProviderFactory(
     "zip",
     match=lambda url: url.path.lower().endswith(".zip"),
-    fetch2=[Fetcher2(httpfetcher), Fetcher2(ftpfetcher), Fetcher2(filefetcher)],
+    fetch=[Fetcher2(httpfetcher), Fetcher2(ftpfetcher), Fetcher2(filefetcher)],
     mount=mount,
 )

@@ -199,14 +199,14 @@ class RemoteProviderFactory(ProviderFactory):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch2: Iterable[Fetcher2],
+        fetch: Iterable[Fetcher2],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
-        self.fetch = tuple(fetch2)
+        self.fetch = tuple(fetch)
         self.mount = mount
         self.getrevision = getrevision
 

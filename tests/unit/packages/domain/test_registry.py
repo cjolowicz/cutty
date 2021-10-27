@@ -80,7 +80,7 @@ def test_with_url(
     providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = RemoteProviderFactory("default", fetch2=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(str(url))
 
@@ -117,7 +117,7 @@ def test_with_provider_specific_url(
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     factories = [
-        RemoteProviderFactory("default", fetch2=[Fetcher2(emptyfetcher)]),
+        RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)]),
         ConstProviderFactory(nullprovider),
     ]
     registry = ProviderRegistry(providerstore, factories)
@@ -148,7 +148,7 @@ def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
 
 def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = RemoteProviderFactory("default", fetch2=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(
         "https://example.com/path/to/example?query#fragment"

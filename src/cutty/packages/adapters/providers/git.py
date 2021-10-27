@@ -78,5 +78,5 @@ localgitprovider = LocalProvider(
     "localgit", match=match, mount=mount, getrevision=getrevision
 )
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch2=[Fetcher2(gitfetcher)], mount=mount, getrevision=getrevision
+    "git", fetch=[Fetcher2(gitfetcher)], mount=mount, getrevision=getrevision
 )
