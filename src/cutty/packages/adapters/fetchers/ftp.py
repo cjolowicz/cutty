@@ -10,7 +10,7 @@ from cutty.packages.domain.matchers import scheme
 
 
 @fetcher2(match=scheme("ftp"))
-def ftpfetcher2(url: URL, destination: pathlib.Path) -> None:
+def ftpfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch via FTP."""
     # URLs with IPv6 literals are not supported, because
     # urllib.request.FTPHandler uses socket.gethostbyname.
