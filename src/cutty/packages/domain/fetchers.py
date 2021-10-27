@@ -68,11 +68,11 @@ FetchDecorator = Callable[[FetchFunction], Fetcher]
 FetchDecorator2 = Callable[[FetchFunction], AbstractFetcher]
 
 
-def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
+def fetcher2(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     """A fetcher retrieves a package from a URL into storage."""
     relativestore = store
 
-    def _decorator(fetch: FetchFunction) -> Fetcher:
+    def _decorator(fetch: FetchFunction) -> AbstractFetcher:
         def _fetcher(
             url: URL,
             store: Store,
@@ -92,16 +92,6 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
 
             return destination
 
-        return _fetcher
-
-    return _decorator
-
-
-def fetcher2(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
-    """A fetcher retrieves a package from a URL into storage."""
-    decorator = fetcher(match=match, store=store)
-
-    def _decorator(fetch: FetchFunction) -> AbstractFetcher:
-        return Fetcher2(decorator(fetch))
+        return Fetcher2(_fetcher)
 
     return _decorator
