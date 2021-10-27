@@ -90,7 +90,7 @@ def test_with_url(
 def test_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
-    diskmounter2: Mounter,
+    diskmounter: Mounter,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     directory = tmp_path / "repository"
@@ -98,7 +98,7 @@ def test_with_path(
     (directory / "marker").touch()
 
     providerfactory = ConstProviderFactory(
-        LocalProvider("default", match=lambda path: True, mount=diskmounter2)
+        LocalProvider("default", match=lambda path: True, mount=diskmounter)
     )
 
     registry = ProviderRegistry(providerstore, [providerfactory])

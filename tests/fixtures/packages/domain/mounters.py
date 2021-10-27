@@ -16,7 +16,7 @@ from cutty.packages.domain.revisions import Revision
 
 
 @pytest.fixture
-def diskmounter2() -> Mounter:
+def diskmounter() -> Mounter:
     """Fixture with an unversioned disk filesystem mounter."""
     return unversioned_mounter(DiskFilesystem)
 
