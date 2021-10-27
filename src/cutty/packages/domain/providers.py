@@ -103,12 +103,13 @@ class LocalProvider(BaseProvider):
         /,
         *,
         match: PathMatcher,
-        mount: Mounter,
+        mount: Optional[Mounter] = None,
         mount2: Optional[Mounter2] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         if mount2 is None:
+            assert mount is not None  # noqa: S101
             mount2 = asmounter2(mount)
 
         super().__init__(name, mount=mount2, getrevision=getrevision)
