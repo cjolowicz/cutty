@@ -4,7 +4,6 @@ import enum
 import pathlib
 from collections.abc import Callable
 from typing import Optional
-from typing import Protocol
 
 from yarl import URL
 
@@ -21,18 +20,6 @@ class FetchMode(enum.Enum):
     NEVER = enum.auto()
 
 
-class Fetcher(Protocol):
-    """The typing protocol for a fetcher."""
-
-    def __call__(
-        self,
-        url: URL,
-        store: Store,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> Optional[pathlib.Path]:
-        """Retrieve the package at the URL into local storage."""
-
-
 class AbstractFetcher(abc.ABC):
     """A fetcher retrieves a package repository from a URL into storage."""
 
@@ -47,7 +34,6 @@ class AbstractFetcher(abc.ABC):
 
 
 FetchFunction = Callable[[URL, pathlib.Path], None]
-FetchDecorator = Callable[[FetchFunction], Fetcher]
 FetchDecorator2 = Callable[[FetchFunction], AbstractFetcher]
 
 
