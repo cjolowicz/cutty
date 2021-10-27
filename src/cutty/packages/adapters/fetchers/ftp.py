@@ -6,6 +6,7 @@ import urllib.request
 from yarl import URL
 
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.matchers import scheme
 
 
@@ -22,3 +23,6 @@ def ftpfetcher(url: URL, destination: pathlib.Path) -> None:
 
         with destination.open(mode="wb") as io:
             shutil.copyfileobj(response, io)
+
+
+ftpfetcher2 = Fetcher2(ftpfetcher)
