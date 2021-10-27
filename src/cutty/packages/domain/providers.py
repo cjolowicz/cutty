@@ -104,10 +104,14 @@ class LocalProvider(BaseProvider):
         *,
         match: PathMatcher,
         mount: Mounter,
+        mount2: Optional[Mounter2] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        super().__init__(name, mount=asmounter2(mount), getrevision=getrevision)
+        if mount2 is None:
+            mount2 = asmounter2(mount)
+
+        super().__init__(name, mount=mount2, getrevision=getrevision)
         self.match = match
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
