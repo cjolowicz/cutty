@@ -8,6 +8,7 @@ from yarl import URL
 
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.matchers import scheme
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -40,3 +41,6 @@ def filefetcher(url: URL, destination: pathlib.Path) -> None:
         shutil.copytree(source, destination, symlinks=True)
     else:
         shutil.copy2(source, destination, follow_symlinks=False)
+
+
+filefetcher2 = Fetcher2(filefetcher)
