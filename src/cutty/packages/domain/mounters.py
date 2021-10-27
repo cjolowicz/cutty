@@ -25,16 +25,6 @@ class UnsupportedRevisionError(CuttyError):
     revision: Revision
 
 
-def asmounter2(mount: Mounter) -> Mounter2:
-    """Convert `Mounter` to `Mounter2`."""
-
-    @contextmanager
-    def _(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
-        yield mount(path, revision)
-
-    return _
-
-
 def unversioned_mounter2(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter2:
     """Return a mounter that raises when a revision is passed."""
 
