@@ -8,6 +8,7 @@ from yarl import URL
 
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.matchers import scheme
 from cutty.util.exceptionhandlers import exceptionhandler
 
@@ -34,3 +35,6 @@ def httpfetcher(url: URL, destination: Path) -> None:
         with destination.open(mode="wb") as io:
             for data in response.iter_bytes():
                 io.write(data)
+
+
+httpfetcher2 = Fetcher2(httpfetcher)
