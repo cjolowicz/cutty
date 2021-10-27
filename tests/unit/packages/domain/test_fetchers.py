@@ -23,7 +23,7 @@ def test_fetch_always(
 ) -> None:
     """It delegates to the fetch function."""
     destination = store(url) / url.name
-    path = fakefetcher.fetch2(url, store)
+    path = fakefetcher.fetch(url, store)
 
     assert path == destination
     assert fetchercalls == [(url, destination)]
@@ -34,7 +34,7 @@ def test_fetch_never(
 ) -> None:
     """It returns the destination without fetching."""
     destination = store(url) / url.name
-    path = fakefetcher.fetch2(url, store, FetchMode.NEVER)
+    path = fakefetcher.fetch(url, store, FetchMode.NEVER)
 
     assert path == destination
     assert not fetchercalls

@@ -20,7 +20,7 @@ def nullfetcher() -> Fetcher:
         def match(self, url: URL) -> bool:
             return False
 
-        def fetch2(
+        def fetch(
             self,
             url: URL,
             store: Store,
@@ -39,7 +39,7 @@ def emptyfetcher() -> Fetcher:
         def match(self, url: URL) -> bool:
             return True
 
-        def fetch2(
+        def fetch(
             self,
             url: URL,
             store: Store,

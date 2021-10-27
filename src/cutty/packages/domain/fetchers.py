@@ -27,7 +27,7 @@ class Fetcher(abc.ABC):
         """Return True."""
 
     @abc.abstractmethod
-    def fetch2(
+    def fetch(
         self,
         url: URL,
         store: Store,
@@ -49,7 +49,7 @@ class _Fetcher(Fetcher):
     def match(self, url: URL) -> bool:
         return self._match(url)
 
-    def fetch2(
+    def fetch(
         self,
         url: URL,
         store: Store,

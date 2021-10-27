@@ -169,7 +169,7 @@ def test_remoteproviderfactory_mounter(
     url = url.with_name(f"{url.name}.json")
     revision = "v1.0.0"
 
-    path = emptyfetcher.fetch2(url, store)
+    path = emptyfetcher.fetch(url, store)
     text = json.dumps({revision: {"marker": "Lorem"}})
     path.write_text(text)
 

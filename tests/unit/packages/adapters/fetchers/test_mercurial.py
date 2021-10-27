@@ -39,7 +39,7 @@ def url(sessionrepository: pathlib.Path) -> URL:
 
 def test_happy(url: URL, store: Store) -> None:
     """It clones the Mercurial repository."""
-    destination = hgfetcher.fetch2(url, store)
+    destination = hgfetcher.fetch(url, store)
 
     assert destination is not None and (destination / ".hg").is_dir()
 
@@ -54,7 +54,7 @@ def test_no_executable(url: URL, store: Store, monkeypatch: pytest.MonkeyPatch) 
     """It raises an exception if the hg executable cannot be located."""
     monkeypatch.setattr("shutil.which", lambda _: None)
     with pytest.raises(Exception):
-        hgfetcher.fetch2(url, store)
+        hgfetcher.fetch(url, store)
 
 
 @pytest.fixture
@@ -69,7 +69,7 @@ def repository(tmp_path: pathlib.Path, sessionrepository: pathlib.Path) -> pathl
 def test_update(repository: pathlib.Path, hg: Hg, store: Store) -> None:
     """It updates the repository from a previous fetch."""
     # First fetch.
-    hgfetcher.fetch2(asurl(repository), store)
+    hgfetcher.fetch(asurl(repository), store)
 
     # Create a commit in the upstream repository.
     hg("rm", "marker", cwd=repository)
@@ -78,7 +78,7 @@ def test_update(repository: pathlib.Path, hg: Hg, store: Store) -> None:
     upstreamhead = hg("heads", "--template={node}", cwd=repository).stdout
 
     # Second fetch.
-    destination = hgfetcher.fetch2(asurl(repository), store)
+    destination = hgfetcher.fetch(asurl(repository), store)
 
     # Check that upstream and downstream heads are identical.
     downstreamhead = hg("heads", "--template={node}", cwd=destination).stdout
@@ -111,4 +111,4 @@ def skip_on_http_errors() -> None:
 def test_fetch_error(url: URL, hg: Hg, store: Store, skip_on_http_errors: None) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
-        hgfetcher.fetch2(url, store)
+        hgfetcher.fetch(url, store)

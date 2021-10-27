@@ -62,7 +62,7 @@ def server(repository: Path) -> Iterator[URL]:
 
 def test_happy(server: URL, store: Store, repository: Path) -> None:
     """It downloads the file."""
-    path = ftpfetcher.fetch2(server, store)
+    path = ftpfetcher.fetch(server, store)
     assert path.read_text() == repository.read_text()
 
 
@@ -75,13 +75,13 @@ def test_not_matched(store: Store) -> None:
 def test_not_found(server: URL, store: Store) -> None:
     """It raises an exception if the server responds with an error."""
     with pytest.raises(Exception):
-        ftpfetcher.fetch2(server.with_name("bogus"), store)
+        ftpfetcher.fetch(server.with_name("bogus"), store)
 
 
 def test_update(server: URL, store: Store, repository: Path) -> None:
     """It updates a file from a previous fetch."""
-    ftpfetcher.fetch2(server, store)
+    ftpfetcher.fetch(server, store)
     repository.write_text("ipsum")
-    path = ftpfetcher.fetch2(server, store)
+    path = ftpfetcher.fetch(server, store)
 
     assert path.read_text() == repository.read_text()

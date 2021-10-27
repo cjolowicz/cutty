@@ -22,7 +22,7 @@ def repository(tmp_path: Path) -> Path:
 def test_directory_happy(repository: Path, store: Store) -> None:
     """It copies the filesystem tree."""
     url = asurl(repository)
-    path = filefetcher.fetch2(url, store)
+    path = filefetcher.fetch(url, store)
 
     assert (path / "marker").read_text() == "Lorem"
 
@@ -31,7 +31,7 @@ def test_file_happy(repository: Path, store: Store) -> None:
     """It copies the file."""
     repository /= "marker"
     url = asurl(repository)
-    path = filefetcher.fetch2(url, store)
+    path = filefetcher.fetch(url, store)
 
     assert path.read_text() == "Lorem"
 
@@ -46,11 +46,11 @@ def test_directory_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher.fetch2(url, store)
+    filefetcher.fetch(url, store)
 
     # Second fetch, without the marker file.
     (repository / "marker").unlink()
-    path = filefetcher.fetch2(url, store)
+    path = filefetcher.fetch(url, store)
 
     # Check that the marker file is gone.
     assert not (path / "marker").is_file()
@@ -62,11 +62,11 @@ def test_file_update(repository: Path, store: Store) -> None:
     url = asurl(repository)
 
     # First fetch.
-    filefetcher.fetch2(url, store)
+    filefetcher.fetch(url, store)
 
     # Second fetch, with modified marker file.
     repository.write_text("Ipsum")
-    path = filefetcher.fetch2(url, store)
+    path = filefetcher.fetch(url, store)
 
     # Check that the marker file is updated.
     assert path.read_text() == "Ipsum"
@@ -76,4 +76,4 @@ def test_fetch_error(store: Store) -> None:
     """It raises an exception."""
     url = URL("file:///no/such/file")
     with pytest.raises(CuttyError):
-        filefetcher.fetch2(url, store)
+        filefetcher.fetch(url, store)
