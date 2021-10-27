@@ -54,7 +54,11 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
         revision = "HEAD"
 
     repository = pygit2.Repository(path)
-    commit = repository.revparse_single(revision).peel(pygit2.Commit)
+
+    try:
+        commit = repository.revparse_single(revision).peel(pygit2.Commit)
+    except KeyError:
+        raise RevisionNotFoundError(revision)
 
     try:
         revision = repository.describe(
