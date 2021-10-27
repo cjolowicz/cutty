@@ -7,7 +7,7 @@ import pygit2
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import fetcher2
+from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import defaultstore
 from cutty.util.exceptionhandlers import ExceptionHandler
@@ -31,7 +31,7 @@ def _errorhandler(url: URL) -> ExceptionHandler:
     return _
 
 
-@fetcher2(
+@fetcher(
     match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )

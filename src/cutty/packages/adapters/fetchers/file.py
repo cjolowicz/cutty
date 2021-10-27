@@ -7,7 +7,7 @@ from typing import NoReturn
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import fetcher2
+from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.matchers import scheme
 from cutty.util.exceptionhandlers import exceptionhandler
@@ -25,7 +25,7 @@ def _errorhandler(error: OSError) -> NoReturn:
     raise FileFetcherError(error)
 
 
-@fetcher2(match=scheme("file"))
+@fetcher(match=scheme("file"))
 @_errorhandler
 def filefetcher(url: URL, destination: pathlib.Path) -> None:
     """Copy a file or directory."""

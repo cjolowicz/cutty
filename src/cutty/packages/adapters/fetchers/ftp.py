@@ -5,11 +5,11 @@ import urllib.request
 
 from yarl import URL
 
-from cutty.packages.domain.fetchers import fetcher2
+from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
 
 
-@fetcher2(match=scheme("ftp"))
+@fetcher(match=scheme("ftp"))
 def ftpfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch via FTP."""
     # URLs with IPv6 literals are not supported, because

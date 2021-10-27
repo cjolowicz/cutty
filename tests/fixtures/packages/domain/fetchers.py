@@ -7,7 +7,7 @@ from yarl import URL
 
 from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.fetchers import fetcher2
+from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import Store
@@ -55,7 +55,7 @@ def fetchercalls() -> FetcherCalls:
 def fakefetcher(fetchercalls: FetcherCalls) -> AbstractFetcher:
     """Fixture for a fetcher."""
 
-    @fetcher2(match=scheme("https"))
+    @fetcher(match=scheme("https"))
     def _(url: URL, destination: pathlib.Path) -> None:
         """Fake fetcher."""
         fetchercalls.append((url, destination))

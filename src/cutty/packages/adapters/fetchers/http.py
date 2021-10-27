@@ -7,7 +7,7 @@ import httpx
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import fetcher2
+from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.matchers import scheme
 from cutty.util.exceptionhandlers import exceptionhandler
 
@@ -24,7 +24,7 @@ def _errorhandler(error: httpx.HTTPError) -> NoReturn:
     raise HTTPFetcherError(error)
 
 
-@fetcher2(match=scheme("http", "https"))
+@fetcher(match=scheme("http", "https"))
 @_errorhandler
 def httpfetcher(url: URL, destination: Path) -> None:
     """Fetch via HTTP."""
