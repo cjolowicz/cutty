@@ -34,7 +34,7 @@ class Fetcher(abc.ABC):
 
 
 FetchFunction = Callable[[URL, pathlib.Path], None]
-FetchDecorator2 = Callable[[FetchFunction], Fetcher]
+FetchDecorator = Callable[[FetchFunction], Fetcher]
 
 
 class _Fetcher(Fetcher):
@@ -75,7 +75,7 @@ class _Fetcher(Fetcher):
         return destination
 
 
-def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
+def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
     """A fetcher retrieves a package from a URL into storage."""
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
