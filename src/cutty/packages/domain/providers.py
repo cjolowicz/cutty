@@ -13,6 +13,7 @@ from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.locations import asurl
@@ -151,7 +152,7 @@ class RemoteProvider(BaseProvider):
 
         super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
-        self.fetch = tuple(fetch)
+        self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
         self.store = store
         self.fetchmode = fetchmode
 
@@ -166,7 +167,7 @@ class RemoteProvider(BaseProvider):
 
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
-                if path := fetcher(url, self.store, self.fetchmode):
+                if path := fetcher.fetch(url, self.store, self.fetchmode):
                     return self._loadrepository(location, path)
 
         return None
