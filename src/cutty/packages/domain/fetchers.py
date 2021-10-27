@@ -43,13 +43,16 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
         class _Fetcher(Fetcher):
+            def match(self, url: URL) -> bool:
+                return match(url)
+
             def fetch(
                 self,
                 url: URL,
                 store: Store,
                 mode: FetchMode = FetchMode.ALWAYS,
             ) -> Optional[pathlib.Path]:
-                if not match(url):
+                if not self.match(url):
                     return None
 
                 destination = store(url) / relativestore(url)
