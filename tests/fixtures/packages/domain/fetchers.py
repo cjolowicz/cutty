@@ -5,9 +5,9 @@ from typing import Optional
 import pytest
 from yarl import URL
 
+from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.fetchers import fetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.domain.fetchers import fetcher2
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import Store
@@ -52,18 +52,12 @@ def fetchercalls() -> FetcherCalls:
 
 
 @pytest.fixture
-def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
+def fakefetcher2(fetchercalls: FetcherCalls) -> AbstractFetcher:
     """Fixture for a fetcher."""
 
-    @fetcher(match=scheme("https"))
+    @fetcher2(match=scheme("https"))
     def _(url: URL, destination: pathlib.Path) -> None:
         """Fake fetcher."""
         fetchercalls.append((url, destination))
 
     return _
-
-
-@pytest.fixture
-def fakefetcher2(fakefetcher: Fetcher) -> Fetcher2:
-    """Fixture for a fetcher."""
-    return Fetcher2(fakefetcher)
