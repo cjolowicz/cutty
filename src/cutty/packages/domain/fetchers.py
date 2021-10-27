@@ -24,12 +24,25 @@ class Fetcher(abc.ABC):
     """A fetcher retrieves a package repository from a URL into storage."""
 
     @abc.abstractmethod
+    def match(self, url: URL) -> bool:
+        """Return True."""
+
+    @abc.abstractmethod
     def fetch(
         self,
         url: URL,
         store: Store,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
+        """Retrieve the package repository at the URL into local storage."""
+
+    @abc.abstractmethod
+    def fetch2(
+        self,
+        url: URL,
+        store: Store,
+        mode: FetchMode = FetchMode.ALWAYS,
+    ) -> pathlib.Path:
         """Retrieve the package repository at the URL into local storage."""
 
 
