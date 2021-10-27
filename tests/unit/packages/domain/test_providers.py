@@ -113,10 +113,10 @@ def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
 
 
 def test_remoteproviderfactory_no_matching_fetchers(
-    store: Store, nullfetcher2: AbstractFetcher
+    store: Store, nullfetcher: AbstractFetcher
 ) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = RemoteProviderFactory(fetch=[nullfetcher2])
+    providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 

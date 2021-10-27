@@ -16,7 +16,7 @@ from tests.fixtures.packages.domain.types import FetcherCalls
 
 
 @pytest.fixture
-def nullfetcher2() -> AbstractFetcher:
+def nullfetcher() -> AbstractFetcher:
     """Fixture for a fetcher that matches no URL."""
 
     def _(
