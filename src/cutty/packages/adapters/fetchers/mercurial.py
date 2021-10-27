@@ -10,8 +10,7 @@ from typing import Protocol
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import fetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.domain.fetchers import fetcher2
 from cutty.packages.domain.matchers import scheme
 
 
@@ -69,8 +68,8 @@ def findhg(env: Optional[dict[str, str]] = None) -> Hg:
     return hg
 
 
-@fetcher(match=scheme("file", "http", "https", "ssh"))
-def hgfetcher(url: URL, destination: pathlib.Path) -> None:
+@fetcher2(match=scheme("file", "http", "https", "ssh"))
+def hgfetcher2(url: URL, destination: pathlib.Path) -> None:
     """Fetch the package using hg."""
     hg = findhg()
 
@@ -78,6 +77,3 @@ def hgfetcher(url: URL, destination: pathlib.Path) -> None:
         hg("pull", cwd=destination)
     else:
         hg("clone", str(url), str(destination))
-
-
-hgfetcher2 = Fetcher2(hgfetcher)
