@@ -1,4 +1,4 @@
-"""Fetching packages from URLs."""
+"""Fetching package repositories from URLs."""
 import enum
 import pathlib
 from collections.abc import Callable
