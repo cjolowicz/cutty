@@ -27,7 +27,6 @@ class Fetcher(abc.ABC):
     def match(self, url: URL) -> bool:
         """Return True."""
 
-    @abc.abstractmethod
     def fetch(
         self,
         url: URL,
@@ -35,6 +34,10 @@ class Fetcher(abc.ABC):
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
         """Retrieve the package repository at the URL into local storage."""
+        if not self.match(url):
+            return None
+
+        return self.fetch2(url, store, mode)
 
     @abc.abstractmethod
     def fetch2(
@@ -58,17 +61,6 @@ class _Fetcher(Fetcher):
 
     def match(self, url: URL) -> bool:
         return self._match(url)
-
-    def fetch(
-        self,
-        url: URL,
-        store: Store,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> Optional[pathlib.Path]:
-        if not self.match(url):
-            return None
-
-        return self.fetch2(url, store, mode)
 
     def fetch2(
         self,

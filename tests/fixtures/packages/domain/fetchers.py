@@ -1,6 +1,5 @@
 """Fixtures for cutty.packages.domain.fetchers."""
 import pathlib
-from typing import Optional
 
 import pytest
 from yarl import URL
@@ -21,14 +20,6 @@ def nullfetcher() -> Fetcher:
         def match(self, url: URL) -> bool:
             return False
 
-        def fetch(
-            self,
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
-            return None
-
         def fetch2(
             self,
             url: URL,
@@ -47,14 +38,6 @@ def emptyfetcher() -> Fetcher:
     class _Fetcher(Fetcher):
         def match(self, url: URL) -> bool:
             return True
-
-        def fetch(
-            self,
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
-            return self.fetch2(url, store, mode)
 
         def fetch2(
             self,
