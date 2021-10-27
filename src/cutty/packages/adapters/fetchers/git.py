@@ -35,7 +35,7 @@ def _errorhandler(url: URL) -> ExceptionHandler:
     match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )
-def gitfetcher2(url: URL, destination: pathlib.Path) -> None:
+def gitfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch a git repository."""
     with _errorhandler(url):
         if destination.exists():
