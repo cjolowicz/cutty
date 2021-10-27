@@ -1,4 +1,5 @@
 """Fetching package repositories from URLs."""
+import abc
 import enum
 import pathlib
 from collections.abc import Callable
@@ -32,7 +33,20 @@ class Fetcher(Protocol):
         """Retrieve the package at the URL into local storage."""
 
 
-class Fetcher2:
+class AbstractFetcher(abc.ABC):
+    """A fetcher retrieves a package repository from a URL into storage."""
+
+    @abc.abstractmethod
+    def fetch(
+        self,
+        url: URL,
+        store: Store,
+        mode: FetchMode = FetchMode.ALWAYS,
+    ) -> Optional[pathlib.Path]:
+        """Retrieve the package repository at the URL into local storage."""
+
+
+class Fetcher2(AbstractFetcher):
     """A fetcher retrieves a package repository from a URL into storage."""
 
     def __init__(self, fetcher: Fetcher):
