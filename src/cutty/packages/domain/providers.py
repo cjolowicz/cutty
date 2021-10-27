@@ -19,8 +19,6 @@ from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
-from cutty.packages.domain.mounters import asmounter2
-from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.mounters import Mounter2
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
@@ -103,15 +101,10 @@ class LocalProvider(BaseProvider):
         /,
         *,
         match: PathMatcher,
-        mount: Optional[Mounter] = None,
-        mount2: Optional[Mounter2] = None,
+        mount2: Mounter2,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        if mount2 is None:
-            assert mount is not None  # noqa: S101
-            mount2 = asmounter2(mount)
-
         super().__init__(name, mount=mount2, getrevision=getrevision)
         self.match = match
 
