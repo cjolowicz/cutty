@@ -6,8 +6,7 @@ from yarl import URL
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
@@ -77,10 +76,10 @@ def test_none(providerstore: ProviderStore, url: URL) -> None:
 
 
 def test_with_url(
-    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: AbstractFetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(str(url))
 
@@ -112,12 +111,12 @@ def test_with_path(
 
 
 def test_with_provider_specific_url(
-    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: AbstractFetcher, url: URL
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
     factories = [
-        RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)]),
+        RemoteProviderFactory("default", fetch=[emptyfetcher]),
         ConstProviderFactory(nullprovider),
     ]
     registry = ProviderRegistry(providerstore, factories)
@@ -146,9 +145,11 @@ def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
     registry.getrepository("dict+file:///path/to/repository.zip")  # does not raise
 
 
-def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> None:
+def test_name_from_url(
+    providerstore: ProviderStore, emptyfetcher: AbstractFetcher
+) -> None:
     """It returns a provider that allows traversing repositories."""
-    providerfactory = RemoteProviderFactory("default", fetch=[Fetcher2(emptyfetcher)])
+    providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(
         "https://example.com/path/to/example?query#fragment"

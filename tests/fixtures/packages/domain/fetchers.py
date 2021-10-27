@@ -6,7 +6,6 @@ import pytest
 from yarl import URL
 
 from cutty.packages.domain.fetchers import AbstractFetcher
-from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.fetchers import FetchMode
@@ -28,7 +27,7 @@ def nullfetcher() -> AbstractFetcher:
 
 
 @pytest.fixture
-def emptyfetcher() -> Fetcher:
+def emptyfetcher() -> AbstractFetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     def _(
@@ -43,7 +42,7 @@ def emptyfetcher() -> Fetcher:
 
         return path
 
-    return _
+    return Fetcher2(_)
 
 
 @pytest.fixture
