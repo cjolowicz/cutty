@@ -73,25 +73,27 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     relativestore = store
 
     def _decorator(fetch: FetchFunction) -> AbstractFetcher:
-        def _fetcher(
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
-            if not match(url):
-                return None
+        class _Fetcher(AbstractFetcher):
+            def fetch(
+                self,
+                url: URL,
+                store: Store,
+                mode: FetchMode = FetchMode.ALWAYS,
+            ) -> Optional[pathlib.Path]:
+                if not match(url):
+                    return None
 
-            destination = store(url) / relativestore(url)
+                destination = store(url) / relativestore(url)
 
-            if (
-                mode is FetchMode.ALWAYS
-                or mode is FetchMode.AUTO
-                and not destination.exists()
-            ):
-                fetch(url, destination)
+                if (
+                    mode is FetchMode.ALWAYS
+                    or mode is FetchMode.AUTO
+                    and not destination.exists()
+                ):
+                    fetch(url, destination)
 
-            return destination
+                return destination
 
-        return Fetcher2(_fetcher)
+        return _Fetcher()
 
     return _decorator
