@@ -21,6 +21,7 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import asmounter2
 from cutty.packages.domain.mounters import Mounter
+from cutty.packages.domain.mounters import Mounter2
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -49,13 +50,13 @@ class DefaultPackageRepository(PackageRepository):
         name: str,
         path: pathlib.Path,
         *,
-        mount: Mounter,
+        mount: Mounter2,
         getrevision: Optional[GetRevision],
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
-        self.mount = asmounter2(mount)
+        self.mount = mount
         self.getrevision = getrevision
 
     @contextmanager
@@ -82,7 +83,7 @@ class BaseProvider(Provider):
         """Initialize."""
         super().__init__(name)
 
-        self.mount = mount
+        self.mount = asmounter2(mount)
         self.getrevision = getrevision
 
     def _loadrepository(
