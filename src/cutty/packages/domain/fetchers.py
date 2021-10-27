@@ -3,7 +3,6 @@ import abc
 import enum
 import pathlib
 from collections.abc import Callable
-from typing import Optional
 
 from yarl import URL
 
@@ -26,18 +25,6 @@ class Fetcher(abc.ABC):
     @abc.abstractmethod
     def match(self, url: URL) -> bool:
         """Return True."""
-
-    def fetch(
-        self,
-        url: URL,
-        store: Store,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> Optional[pathlib.Path]:
-        """Retrieve the package repository at the URL into local storage."""
-        if not self.match(url):
-            return None
-
-        return self.fetch2(url, store, mode)
 
     @abc.abstractmethod
     def fetch2(

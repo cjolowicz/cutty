@@ -168,9 +168,10 @@ def test_remoteproviderfactory_mounter(
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
     revision = "v1.0.0"
-    if path := emptyfetcher.fetch(url, store):
-        text = json.dumps({revision: {"marker": "Lorem"}})
-        path.write_text(text)
+
+    path = emptyfetcher.fetch2(url, store)
+    text = json.dumps({revision: {"marker": "Lorem"}})
+    path.write_text(text)
 
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
     provider = providerfactory(store)

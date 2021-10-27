@@ -47,31 +47,28 @@ def server(repository: Path) -> Iterator[URL]:
 
 def test_happy(server: URL, store: Store, repository: Path) -> None:
     """It downloads the file."""
-    path = httpfetcher.fetch(server, store)
-    assert path is not None
+    path = httpfetcher.fetch2(server, store)
     assert path.read_text() == repository.read_text()
 
 
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use the http scheme."""
     url = URL("file:///")
-    path = httpfetcher.fetch(url, store)
-    assert path is None
+    assert not httpfetcher.match(url)
 
 
 def test_not_found(server: URL, store: Store) -> None:
     """It raises an exception if the server responds with an error."""
     with pytest.raises(Exception):
-        httpfetcher.fetch(server.with_name("bogus"), store)
+        httpfetcher.fetch2(server.with_name("bogus"), store)
 
 
 def test_update(server: URL, store: Store, repository: Path) -> None:
     """It updates a file from a previous fetch."""
-    httpfetcher.fetch(server, store)
+    httpfetcher.fetch2(server, store)
     repository.write_text("ipsum")
-    path = httpfetcher.fetch(server, store)
+    path = httpfetcher.fetch2(server, store)
 
-    assert path is not None
     assert path.read_text() == repository.read_text()
 
 
@@ -79,4 +76,4 @@ def test_error(store: Store) -> None:
     """It raises an exception."""
     url = URL("https://example.invalid/repository")
     with pytest.raises(CuttyError):
-        httpfetcher.fetch(url, store)
+        httpfetcher.fetch2(url, store)
