@@ -1,5 +1,6 @@
 """Provider for Mercurial repositories."""
 import pathlib
+import tempfile
 from collections.abc import Iterator
 from typing import Optional
 
@@ -30,13 +31,14 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
 @contextmanager
 def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
-    """Mount the working directory as a disk filesystem."""
+    """Mount an archive of the revision as a disk filesystem."""
     hg = findhg()
 
-    options = ["--rev", revision] if revision is not None else []
-    hg("update", *options, cwd=path)
+    with tempfile.TemporaryDirectory() as directory:
+        options = ["--rev", revision] if revision is not None else []
+        hg("archive", *options, directory, cwd=path)
 
-    yield DiskFilesystem(path)
+        yield DiskFilesystem(pathlib.Path(directory))
 
 
 hgproviderfactory = RemoteProviderFactory(

@@ -40,10 +40,7 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
     revision. If ``revision`` is None, HEAD is used instead.
     """
     if revision is not None:
-        try:
-            yield GitFilesystem(path, revision)
-        except KeyError:
-            raise RevisionNotFoundError(revision)
+        yield GitFilesystem(path, revision)
     else:
         yield GitFilesystem(path)
 
@@ -54,7 +51,11 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
         revision = "HEAD"
 
     repository = pygit2.Repository(path)
-    commit = repository.revparse_single(revision).peel(pygit2.Commit)
+
+    try:
+        commit = repository.revparse_single(revision).peel(pygit2.Commit)
+    except KeyError:
+        raise RevisionNotFoundError(revision)
 
     try:
         revision = repository.describe(

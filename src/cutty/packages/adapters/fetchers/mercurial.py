@@ -76,4 +76,4 @@ def hgfetcher(url: URL, destination: pathlib.Path) -> None:
     if destination.exists():
         hg("pull", cwd=destination)
     else:
-        hg("clone", "--noupdate", str(url), str(destination))
+        hg("clone", str(url), str(destination))
