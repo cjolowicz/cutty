@@ -7,6 +7,7 @@ import pytest
 from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.mounters import Mounter
@@ -105,7 +106,7 @@ def test_localprovider_package_revision(
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
-    providerfactory = RemoteProviderFactory(fetch=[])
+    providerfactory = RemoteProviderFactory(fetch2=[])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 
@@ -114,7 +115,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
     store: Store, nullfetcher: Fetcher
 ) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
+    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(nullfetcher)])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 
@@ -123,7 +124,7 @@ def test_remoteproviderfactory_happy(
     store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It mounts a filesystem for the fetched package."""
-    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(emptyfetcher)])
     provider = providerfactory(store)
     repository = provider.provide(url)
 
@@ -142,7 +143,7 @@ def test_remoteproviderfactory_package_revision(
         return "v1.0"
 
     providerfactory = RemoteProviderFactory(
-        fetch=[emptyfetcher], getrevision=getrevision
+        fetch2=[Fetcher2(emptyfetcher)], getrevision=getrevision
     )
     provider = providerfactory(store)
     repository = provider.provide(url)
@@ -157,7 +158,9 @@ def test_remoteproviderfactory_not_matching(
     store: Store, emptyfetcher: Fetcher, url: URL, nullmatcher: Matcher
 ) -> None:
     """It returns None if the provider itself does not match."""
-    providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory(
+        match=nullmatcher, fetch2=[Fetcher2(emptyfetcher)]
+    )
     provider = providerfactory(store)
     assert provider.provide(url) is None
 
@@ -172,7 +175,9 @@ def test_remoteproviderfactory_mounter(
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter)
+    providerfactory = RemoteProviderFactory(
+        fetch2=[Fetcher2(emptyfetcher)], mount=jsonmounter
+    )
     provider = providerfactory(store)
     repository = provider.provide(url)
 
@@ -186,7 +191,7 @@ def test_remoteproviderfactory_inexistent_path(
     store: Store, emptyfetcher: Fetcher, nullmatcher: Matcher
 ) -> None:
     """It returns None if the location is an inexistent path."""
-    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
+    providerfactory = RemoteProviderFactory(fetch2=[Fetcher2(emptyfetcher)])
     provider = providerfactory(store)
     path = pathlib.Path("/no/such/file/or/directory")
 
