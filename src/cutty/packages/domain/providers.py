@@ -52,20 +52,26 @@ class DefaultPackageRepository(PackageRepository):
         getrevision: Optional[GetRevision],
     ) -> None:
         """Initialize."""
+
+        @contextmanager
+        def mount2(
+            path: pathlib.Path, revision: Optional[Revision]
+        ) -> Iterator[Filesystem]:
+            yield mount(path, revision)
+
         self.name = name
         self.path = path
-        self.mount = mount
+        self.mount = mount2
         self.getrevision = getrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-        filesystem = self.mount(self.path, revision)
+        with self.mount(self.path, revision) as filesystem:
+            if self.getrevision is not None:
+                revision = self.getrevision(self.path, revision)
 
-        if self.getrevision is not None:
-            revision = self.getrevision(self.path, revision)
-
-        yield Package(self.name, Path(filesystem=filesystem), revision)
+            yield Package(self.name, Path(filesystem=filesystem), revision)
 
 
 class BaseProvider(Provider):
