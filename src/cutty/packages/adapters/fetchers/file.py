@@ -27,7 +27,7 @@ def _errorhandler(error: OSError) -> NoReturn:
 
 @fetcher2(match=scheme("file"))
 @_errorhandler
-def filefetcher2(url: URL, destination: pathlib.Path) -> None:
+def filefetcher(url: URL, destination: pathlib.Path) -> None:
     """Copy a file or directory."""
     if destination.is_dir():
         shutil.rmtree(destination)
