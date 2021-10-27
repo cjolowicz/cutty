@@ -9,8 +9,7 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
-from cutty.packages.adapters.fetchers.git import gitfetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.adapters.fetchers.git import gitfetcher2
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
@@ -78,5 +77,5 @@ localgitprovider = LocalProvider(
     "localgit", match=match, mount=mount, getrevision=getrevision
 )
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[Fetcher2(gitfetcher)], mount=mount, getrevision=getrevision
+    "git", fetch=[gitfetcher2], mount=mount, getrevision=getrevision
 )

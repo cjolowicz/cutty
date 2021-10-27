@@ -8,6 +8,7 @@ from yarl import URL
 
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import defaultstore
 from cutty.util.exceptionhandlers import ExceptionHandler
@@ -43,3 +44,6 @@ def gitfetcher(url: URL, destination: pathlib.Path) -> None:
             repository.fetch(prune=True)
         else:
             Repository.clone(str(url), destination, mirror=True)
+
+
+gitfetcher2 = Fetcher2(gitfetcher)
