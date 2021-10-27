@@ -55,6 +55,14 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
                 if not self.match(url):
                     return None
 
+                return self.fetch2(url, store, mode)
+
+            def fetch2(
+                self,
+                url: URL,
+                store: Store,
+                mode: FetchMode = FetchMode.ALWAYS,
+            ) -> pathlib.Path:
                 destination = store(url) / relativestore(url)
 
                 if (
