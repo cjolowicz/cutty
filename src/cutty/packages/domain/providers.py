@@ -200,14 +200,20 @@ class RemoteProviderFactory(ProviderFactory):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch: Iterable[Fetcher],
+        fetch: Iterable[Fetcher] = (),
+        fetch2: Iterable[Fetcher2] = (),
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
-        self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
+
+        if fetch2 := tuple(fetch2):
+            self.fetch = fetch2
+        else:
+            self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
+
         self.mount = mount
         self.getrevision = getrevision
 
