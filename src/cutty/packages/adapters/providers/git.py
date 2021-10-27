@@ -40,10 +40,7 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
     revision. If ``revision`` is None, HEAD is used instead.
     """
     if revision is not None:
-        try:
-            yield GitFilesystem(path, revision)
-        except KeyError:
-            raise RevisionNotFoundError(revision)
+        yield GitFilesystem(path, revision)
     else:
         yield GitFilesystem(path)
 
