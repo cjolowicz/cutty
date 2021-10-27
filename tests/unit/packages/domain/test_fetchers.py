@@ -13,29 +13,29 @@ pytest_plugins = [
 ]
 
 
-def test_match(fakefetcher2: AbstractFetcher, url: URL, store: Store) -> None:
+def test_match(fakefetcher: AbstractFetcher, url: URL, store: Store) -> None:
     """It delegates to the matcher."""
-    path = fakefetcher2.fetch(url.with_scheme("http"), store)
+    path = fakefetcher.fetch(url.with_scheme("http"), store)
     assert path is None
 
 
 def test_fetch_always(
-    fakefetcher2: AbstractFetcher, fetchercalls: FetcherCalls, url: URL, store: Store
+    fakefetcher: AbstractFetcher, fetchercalls: FetcherCalls, url: URL, store: Store
 ) -> None:
     """It delegates to the fetch function."""
     destination = store(url) / url.name
-    path = fakefetcher2.fetch(url, store)
+    path = fakefetcher.fetch(url, store)
 
     assert path == destination
     assert fetchercalls == [(url, destination)]
 
 
 def test_fetch_never(
-    fakefetcher2: AbstractFetcher, fetchercalls: FetcherCalls, url: URL, store: Store
+    fakefetcher: AbstractFetcher, fetchercalls: FetcherCalls, url: URL, store: Store
 ) -> None:
     """It returns the destination without fetching."""
     destination = store(url) / url.name
-    path = fakefetcher2.fetch(url, store, FetchMode.NEVER)
+    path = fakefetcher.fetch(url, store, FetchMode.NEVER)
 
     assert path == destination
     assert not fetchercalls

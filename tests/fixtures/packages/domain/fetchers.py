@@ -52,7 +52,7 @@ def fetchercalls() -> FetcherCalls:
 
 
 @pytest.fixture
-def fakefetcher2(fetchercalls: FetcherCalls) -> AbstractFetcher:
+def fakefetcher(fetchercalls: FetcherCalls) -> AbstractFetcher:
     """Fixture for a fetcher."""
 
     @fetcher2(match=scheme("https"))
