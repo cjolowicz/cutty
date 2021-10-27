@@ -140,7 +140,7 @@ class RemoteProvider(BaseProvider):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch: Iterable[Fetcher],
+        fetch: Iterable[Fetcher2],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
@@ -152,7 +152,7 @@ class RemoteProvider(BaseProvider):
 
         super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
-        self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
+        self.fetch = tuple(fetch)
         self.store = store
         self.fetchmode = fetchmode
 
@@ -207,7 +207,7 @@ class RemoteProviderFactory(ProviderFactory):
         """Initialize."""
         super().__init__(name)
         self.match = match
-        self.fetch = fetch
+        self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
         self.mount = mount
         self.getrevision = getrevision
 
