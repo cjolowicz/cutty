@@ -77,13 +77,13 @@ class BaseProvider(Provider):
         name: str = "",
         /,
         *,
-        mount: Mounter,
+        mount: Mounter2,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
 
-        self.mount = asmounter2(mount)
+        self.mount = mount
         self.getrevision = getrevision
 
     def _loadrepository(
@@ -107,7 +107,7 @@ class LocalProvider(BaseProvider):
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        super().__init__(name, mount=mount, getrevision=getrevision)
+        super().__init__(name, mount=asmounter2(mount), getrevision=getrevision)
         self.match = match
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
@@ -145,7 +145,7 @@ class RemoteProvider(BaseProvider):
         """Initialize."""
         super().__init__(
             name,
-            mount=mount if mount is not None else _defaultmount,
+            mount=asmounter2(mount if mount is not None else _defaultmount),
             getrevision=getrevision,
         )
         self.match = match
