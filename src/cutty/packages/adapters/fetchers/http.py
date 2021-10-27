@@ -26,7 +26,7 @@ def _errorhandler(error: httpx.HTTPError) -> NoReturn:
 
 @fetcher2(match=scheme("http", "https"))
 @_errorhandler
-def httpfetcher2(url: URL, destination: Path) -> None:
+def httpfetcher(url: URL, destination: Path) -> None:
     """Fetch via HTTP."""
     with httpx.stream("GET", str(url)) as response:
         response.raise_for_status()
