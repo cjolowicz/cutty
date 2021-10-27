@@ -20,7 +20,7 @@ class FetchMode(enum.Enum):
     NEVER = enum.auto()
 
 
-class AbstractFetcher(abc.ABC):
+class Fetcher(abc.ABC):
     """A fetcher retrieves a package repository from a URL into storage."""
 
     @abc.abstractmethod
@@ -34,15 +34,15 @@ class AbstractFetcher(abc.ABC):
 
 
 FetchFunction = Callable[[URL, pathlib.Path], None]
-FetchDecorator2 = Callable[[FetchFunction], AbstractFetcher]
+FetchDecorator2 = Callable[[FetchFunction], Fetcher]
 
 
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     """A fetcher retrieves a package from a URL into storage."""
     relativestore = store
 
-    def _decorator(fetch: FetchFunction) -> AbstractFetcher:
-        class _Fetcher(AbstractFetcher):
+    def _decorator(fetch: FetchFunction) -> Fetcher:
+        class _Fetcher(Fetcher):
             def fetch(
                 self,
                 url: URL,

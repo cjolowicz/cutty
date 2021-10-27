@@ -6,7 +6,7 @@ from typing import Optional
 import pytest
 from yarl import URL
 
-from cutty.packages.domain.fetchers import AbstractFetcher
+from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.mounters import Mounter
@@ -111,7 +111,7 @@ def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
 
 
 def test_remoteproviderfactory_no_matching_fetchers(
-    store: Store, nullfetcher: AbstractFetcher
+    store: Store, nullfetcher: Fetcher
 ) -> None:
     """It returns None if all fetchers return None."""
     providerfactory = RemoteProviderFactory(fetch=[nullfetcher])
@@ -120,7 +120,7 @@ def test_remoteproviderfactory_no_matching_fetchers(
 
 
 def test_remoteproviderfactory_happy(
-    store: Store, emptyfetcher: AbstractFetcher, url: URL
+    store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It mounts a filesystem for the fetched package."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])
@@ -131,7 +131,7 @@ def test_remoteproviderfactory_happy(
 
 
 def test_remoteproviderfactory_package_revision(
-    store: Store, emptyfetcher: AbstractFetcher, url: URL
+    store: Store, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns the package revision."""
 
@@ -154,7 +154,7 @@ def test_remoteproviderfactory_package_revision(
 
 
 def test_remoteproviderfactory_not_matching(
-    store: Store, emptyfetcher: AbstractFetcher, url: URL, nullmatcher: Matcher
+    store: Store, emptyfetcher: Fetcher, url: URL, nullmatcher: Matcher
 ) -> None:
     """It returns None if the provider itself does not match."""
     providerfactory = RemoteProviderFactory(match=nullmatcher, fetch=[emptyfetcher])
@@ -163,7 +163,7 @@ def test_remoteproviderfactory_not_matching(
 
 
 def test_remoteproviderfactory_mounter(
-    store: Store, emptyfetcher: AbstractFetcher, url: URL, jsonmounter: Mounter
+    store: Store, emptyfetcher: Fetcher, url: URL, jsonmounter: Mounter
 ) -> None:
     """It uses the mounter to mount the filesystem."""
     url = url.with_name(f"{url.name}.json")
@@ -183,7 +183,7 @@ def test_remoteproviderfactory_mounter(
 
 
 def test_remoteproviderfactory_inexistent_path(
-    store: Store, emptyfetcher: AbstractFetcher, nullmatcher: Matcher
+    store: Store, emptyfetcher: Fetcher, nullmatcher: Matcher
 ) -> None:
     """It returns None if the location is an inexistent path."""
     providerfactory = RemoteProviderFactory(fetch=[emptyfetcher])

@@ -6,7 +6,7 @@ from yarl import URL
 
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.fetchers import AbstractFetcher
+from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
@@ -76,7 +76,7 @@ def test_none(providerstore: ProviderStore, url: URL) -> None:
 
 
 def test_with_url(
-    providerstore: ProviderStore, emptyfetcher: AbstractFetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
@@ -111,7 +111,7 @@ def test_with_path(
 
 
 def test_with_provider_specific_url(
-    providerstore: ProviderStore, emptyfetcher: AbstractFetcher, url: URL
+    providerstore: ProviderStore, emptyfetcher: Fetcher, url: URL
 ) -> None:
     """It selects the provider indicated by the URL scheme."""
     url = url.with_scheme(f"null+{url.scheme}")
@@ -145,9 +145,7 @@ def test_provider_specific_file_url(providerstore: ProviderStore) -> None:
     registry.getrepository("dict+file:///path/to/repository.zip")  # does not raise
 
 
-def test_name_from_url(
-    providerstore: ProviderStore, emptyfetcher: AbstractFetcher
-) -> None:
+def test_name_from_url(providerstore: ProviderStore, emptyfetcher: Fetcher) -> None:
     """It returns a provider that allows traversing repositories."""
     providerfactory = RemoteProviderFactory("default", fetch=[emptyfetcher])
     registry = ProviderRegistry(providerstore, [providerfactory])

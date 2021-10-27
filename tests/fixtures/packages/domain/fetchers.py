@@ -5,7 +5,7 @@ from typing import Optional
 import pytest
 from yarl import URL
 
-from cutty.packages.domain.fetchers import AbstractFetcher
+from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
@@ -14,10 +14,10 @@ from tests.fixtures.packages.domain.types import FetcherCalls
 
 
 @pytest.fixture
-def nullfetcher() -> AbstractFetcher:
+def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
-    class _Fetcher(AbstractFetcher):
+    class _Fetcher(Fetcher):
         def fetch(
             self,
             url: URL,
@@ -30,10 +30,10 @@ def nullfetcher() -> AbstractFetcher:
 
 
 @pytest.fixture
-def emptyfetcher() -> AbstractFetcher:
+def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
-    class _Fetcher(AbstractFetcher):
+    class _Fetcher(Fetcher):
         def fetch(
             self,
             url: URL,
@@ -59,7 +59,7 @@ def fetchercalls() -> FetcherCalls:
 
 
 @pytest.fixture
-def fakefetcher(fetchercalls: FetcherCalls) -> AbstractFetcher:
+def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
     """Fixture for a fetcher."""
 
     @fetcher(match=scheme("https"))
