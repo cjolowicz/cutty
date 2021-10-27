@@ -1,9 +1,9 @@
-"""Fetching packages from URLs."""
+"""Fetching package repositories from URLs."""
+import abc
 import enum
 import pathlib
 from collections.abc import Callable
 from typing import Optional
-from typing import Protocol
 
 from yarl import URL
 
@@ -20,46 +20,49 @@ class FetchMode(enum.Enum):
     NEVER = enum.auto()
 
 
-class Fetcher(Protocol):
-    """The typing protocol for a fetcher."""
+class Fetcher(abc.ABC):
+    """A fetcher retrieves a package repository from a URL into storage."""
 
-    def __call__(
+    @abc.abstractmethod
+    def fetch(
         self,
         url: URL,
         store: Store,
         mode: FetchMode = FetchMode.ALWAYS,
     ) -> Optional[pathlib.Path]:
-        """Retrieve the package at the URL into local storage."""
+        """Retrieve the package repository at the URL into local storage."""
 
 
 FetchFunction = Callable[[URL, pathlib.Path], None]
-FetchDecorator = Callable[[FetchFunction], Fetcher]
+FetchDecorator2 = Callable[[FetchFunction], Fetcher]
 
 
-def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
+def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     """A fetcher retrieves a package from a URL into storage."""
     relativestore = store
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
-        def _fetcher(
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
-            if not match(url):
-                return None
+        class _Fetcher(Fetcher):
+            def fetch(
+                self,
+                url: URL,
+                store: Store,
+                mode: FetchMode = FetchMode.ALWAYS,
+            ) -> Optional[pathlib.Path]:
+                if not match(url):
+                    return None
 
-            destination = store(url) / relativestore(url)
+                destination = store(url) / relativestore(url)
 
-            if (
-                mode is FetchMode.ALWAYS
-                or mode is FetchMode.AUTO
-                and not destination.exists()
-            ):
-                fetch(url, destination)
+                if (
+                    mode is FetchMode.ALWAYS
+                    or mode is FetchMode.AUTO
+                    and not destination.exists()
+                ):
+                    fetch(url, destination)
 
-            return destination
+                return destination
 
-        return _fetcher
+        return _Fetcher()
 
     return _decorator

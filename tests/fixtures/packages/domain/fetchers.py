@@ -17,31 +17,39 @@ from tests.fixtures.packages.domain.types import FetcherCalls
 def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
-    def _(
-        url: URL, store: Store, mode: FetchMode = FetchMode.ALWAYS
-    ) -> Optional[pathlib.Path]:
-        return None
+    class _Fetcher(Fetcher):
+        def fetch(
+            self,
+            url: URL,
+            store: Store,
+            mode: FetchMode = FetchMode.ALWAYS,
+        ) -> Optional[pathlib.Path]:
+            return None
 
-    return _
+    return _Fetcher()
 
 
 @pytest.fixture
 def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
-    def _(
-        url: URL, store: Store, mode: FetchMode = FetchMode.ALWAYS
-    ) -> Optional[pathlib.Path]:
-        path = store(url) / url.name
+    class _Fetcher(Fetcher):
+        def fetch(
+            self,
+            url: URL,
+            store: Store,
+            mode: FetchMode = FetchMode.ALWAYS,
+        ) -> Optional[pathlib.Path]:
+            path = store(url) / url.name
 
-        if path.suffix:
-            path.touch()
-        else:
-            path.mkdir(exist_ok=True)
+            if path.suffix:
+                path.touch()
+            else:
+                path.mkdir(exist_ok=True)
 
-        return path
+            return path
 
-    return _
+    return _Fetcher()
 
 
 @pytest.fixture

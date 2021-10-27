@@ -166,7 +166,7 @@ class RemoteProvider(BaseProvider):
 
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
-                if path := fetcher(url, self.store, self.fetchmode):
+                if path := fetcher.fetch(url, self.store, self.fetchmode):
                     return self._loadrepository(location, path)
 
         return None
@@ -206,7 +206,7 @@ class RemoteProviderFactory(ProviderFactory):
         """Initialize."""
         super().__init__(name)
         self.match = match
-        self.fetch = fetch
+        self.fetch = tuple(fetch)
         self.mount = mount
         self.getrevision = getrevision
 
