@@ -15,7 +15,6 @@ from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
 from cutty.packages.domain.providers import ProviderName
 from cutty.packages.domain.providers import ProviderStore
-from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -25,14 +24,10 @@ class UnknownLocationError(CuttyError):
     location: Location
 
 
-def _provide(
-    providers: Iterable[Provider],
-    location: Location,
-    revision: Optional[Revision] = None,
-) -> PackageRepository:
+def _provide(providers: Iterable[Provider], location: Location) -> PackageRepository:
     """Provide the package repository located at the given URL."""
     for provider in providers:
-        if repository := provider.provide(location, revision):
+        if repository := provider.provide(location):
             return repository
 
     raise UnknownLocationError(location)
@@ -53,17 +48,14 @@ class ProviderRegistry:
         }
 
     def getrepository(
-        self,
-        rawlocation: str,
-        revision: Optional[Revision] = None,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
+        self, rawlocation: str, fetchmode: FetchMode = FetchMode.ALWAYS
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
 
         providername, location = self._extractprovidername(location)
         providers = self._createproviders(fetchmode, providername)
-        return _provide(providers, location, revision)
+        return _provide(providers, location)
 
     def _extractprovidername(
         self, location: Location

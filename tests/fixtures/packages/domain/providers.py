@@ -1,8 +1,10 @@
 """Fixtures for cutty.packages.domain.providers."""
 from collections.abc import Callable
+from collections.abc import Iterator
 from typing import Any
 from typing import Optional
 
+from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
@@ -16,7 +18,7 @@ from cutty.packages.domain.revisions import Revision
 pytest_plugins = ["tests.fixtures.packages.domain.stores"]
 
 
-ProviderFunction = Callable[[Location, Optional[Revision]], Optional[Package]]
+ProviderFunction = Callable[[Location], Optional[PackageRepository]]
 
 
 def provider(name: str) -> Callable[[ProviderFunction], Provider]:
@@ -27,13 +29,9 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
             def __init__(self) -> None:
                 super().__init__(name)
 
-            def provide(
-                self, location: Location, revision: Optional[Revision] = None
-            ) -> Optional[PackageRepository]:
+            def provide(self, location: Location) -> Optional[PackageRepository]:
                 """Retrieve the package repository at the given location."""
-                if package := function(location, revision):
-                    return SinglePackageRepository(package)
-                return None
+                return function(location)
 
         return _Provider()
 
@@ -48,8 +46,8 @@ def constprovider(name: str, package: Package) -> Provider:
     """Provider that returns the same package always."""
 
     @provider(name)
-    def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
-        return package
+    def _(location: Location) -> Optional[PackageRepository]:
+        return SinglePackageRepository(package)
 
     return _
 
@@ -60,9 +58,14 @@ def dictprovider(
     """Provider that matches every URL with a package."""
 
     @provider(name)
-    def _(location: Location, revision: Optional[Revision]) -> Optional[Package]:
-        filesystem = DictFilesystem(mapping or {})
-        path = Path(filesystem=filesystem)
-        return Package(location.name, path, revision)
+    def _(location: Location) -> Optional[PackageRepository]:
+        class _PackageRepository(PackageRepository):
+            @contextmanager
+            def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+                filesystem = DictFilesystem(mapping or {})
+                path = Path(filesystem=filesystem)
+                yield Package(location.name, path, revision)
+
+        return _PackageRepository()
 
     return _

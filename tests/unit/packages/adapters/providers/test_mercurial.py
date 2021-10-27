@@ -60,7 +60,7 @@ def test_happy(
     expected: str,
 ) -> None:
     """It fetches a hg repository into storage."""
-    repository = hgprovider.provide(hgrepository, revision)
+    repository = hgprovider.provide(hgrepository)
 
     assert repository is not None
 
@@ -86,7 +86,7 @@ def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> No
 
 def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It retrieves the tag name as the package revision."""
-    repository = hgprovider.provide(hgrepository, "tip~2")
+    repository = hgprovider.provide(hgrepository)
 
     assert repository is not None
 
@@ -126,7 +126,7 @@ def test_revision_multiple_tags(
     hg("tag", "--rev=0", "tag1", cwd=path)
     hg("tag", "--rev=0", "tag2", cwd=path)
 
-    repository = hgprovider.provide(path, "tip~2")
+    repository = hgprovider.provide(path)
 
     assert repository is not None
 
@@ -147,7 +147,7 @@ def test_update(hgrepository: pathlib.Path, store: Store, fetchmode: FetchMode) 
     hgprovider = hgproviderfactory(store, fetchmode)
 
     def fetchrevision(revision: Optional[str]) -> Optional[str]:
-        repository = hgprovider.provide(hgrepository, revision)
+        repository = hgprovider.provide(hgrepository)
 
         assert repository is not None
 
@@ -163,6 +163,6 @@ def test_update(hgrepository: pathlib.Path, store: Store, fetchmode: FetchMode) 
 def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
-        if repository := hgprovider.provide(hgrepository, "invalid"):
+        if repository := hgprovider.provide(hgrepository):
             with repository.get("invalid"):
                 pass

@@ -39,7 +39,7 @@ def test_local_happy(url: URL) -> None:
 def test_local_revision(url: URL) -> None:
     """It raises an exception when passed a revision."""
     with pytest.raises(Exception):
-        if repository := localzipprovider.provide(url, "v1.0"):
+        if repository := localzipprovider.provide(url):
             with repository.get("v1.0"):
                 pass
 
