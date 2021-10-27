@@ -19,6 +19,7 @@ from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
+from cutty.packages.domain.mounters import asmounter2
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
@@ -52,16 +53,9 @@ class DefaultPackageRepository(PackageRepository):
         getrevision: Optional[GetRevision],
     ) -> None:
         """Initialize."""
-
-        @contextmanager
-        def mount2(
-            path: pathlib.Path, revision: Optional[Revision]
-        ) -> Iterator[Filesystem]:
-            yield mount(path, revision)
-
         self.name = name
         self.path = path
-        self.mount = mount2
+        self.mount = asmounter2(mount)
         self.getrevision = getrevision
 
     @contextmanager
