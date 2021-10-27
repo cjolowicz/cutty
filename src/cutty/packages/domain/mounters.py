@@ -12,7 +12,7 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.revisions import Revision
 
 
-Mounter2 = Callable[
+Mounter = Callable[
     [pathlib.Path, Optional[Revision]], AbstractContextManager[Filesystem]
 ]
 
@@ -24,7 +24,7 @@ class UnsupportedRevisionError(CuttyError):
     revision: Revision
 
 
-def unversioned_mounter2(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter2:
+def unversioned_mounter2(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter:
     """Return a mounter that raises when a revision is passed."""
 
     @contextmanager

@@ -19,7 +19,7 @@ from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
-from cutty.packages.domain.mounters import Mounter2
+from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -48,7 +48,7 @@ class DefaultPackageRepository(PackageRepository):
         name: str,
         path: pathlib.Path,
         *,
-        mount: Mounter2,
+        mount: Mounter,
         getrevision: Optional[GetRevision],
     ) -> None:
         """Initialize."""
@@ -75,7 +75,7 @@ class BaseProvider(Provider):
         name: str = "",
         /,
         *,
-        mount: Mounter2,
+        mount: Mounter,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
@@ -101,7 +101,7 @@ class LocalProvider(BaseProvider):
         /,
         *,
         match: PathMatcher,
-        mount2: Mounter2,
+        mount2: Mounter,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
@@ -138,7 +138,7 @@ class RemoteProvider(BaseProvider):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter2] = None,
+        mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
         fetchmode: FetchMode = FetchMode.ALWAYS,
@@ -198,7 +198,7 @@ class RemoteProviderFactory(ProviderFactory):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount2: Optional[Mounter2] = None,
+        mount2: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""

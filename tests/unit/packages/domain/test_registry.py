@@ -7,7 +7,7 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.mounters import Mounter2
+from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
 from cutty.packages.domain.providers import LocalProvider
@@ -90,7 +90,7 @@ def test_with_url(
 def test_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
-    diskmounter2: Mounter2,
+    diskmounter2: Mounter,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     directory = tmp_path / "repository"
