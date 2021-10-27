@@ -2,6 +2,7 @@
 import os.path
 import pathlib
 import platform
+from typing import Optional
 from typing import Union
 
 from yarl import URL
@@ -96,3 +97,11 @@ def parselocation(location: str) -> Location:
             return url
 
     return path
+
+
+def pathfromlocation(location: Location) -> Optional[pathlib.Path]:
+    """Convert location to filesystem path."""
+    try:
+        return location if isinstance(location, pathlib.Path) else aspath(location)
+    except ValueError:
+        return None
