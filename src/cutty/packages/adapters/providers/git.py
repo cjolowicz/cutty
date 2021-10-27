@@ -1,10 +1,12 @@
 """Providers for git repositories."""
 import pathlib
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Optional
 
 import pygit2
 
+from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
@@ -30,7 +32,8 @@ class RevisionNotFoundError(CuttyError):
     revision: Revision
 
 
-def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
+@contextmanager
+def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFilesystem]:
     """Return a filesystem tree for the given revision.
 
     This function returns the root of a Git filesystem for the given
@@ -38,11 +41,11 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> GitFilesystem:
     """
     if revision is not None:
         try:
-            return GitFilesystem(path, revision)
+            yield GitFilesystem(path, revision)
         except KeyError:
             raise RevisionNotFoundError(revision)
-
-    return GitFilesystem(path)
+    else:
+        yield GitFilesystem(path)
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
@@ -70,8 +73,8 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
 
 localgitprovider = LocalProvider(
-    "localgit", match=match, mount=mount, getrevision=getrevision
+    "localgit", match=match, mount2=mount, getrevision=getrevision
 )
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], mount=mount, getrevision=getrevision
+    "git", fetch=[gitfetcher], mount2=mount, getrevision=getrevision
 )
