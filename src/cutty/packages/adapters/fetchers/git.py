@@ -7,8 +7,7 @@ import pygit2
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import fetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.domain.fetchers import fetcher2
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import defaultstore
 from cutty.util.exceptionhandlers import ExceptionHandler
@@ -32,11 +31,11 @@ def _errorhandler(url: URL) -> ExceptionHandler:
     return _
 
 
-@fetcher(
+@fetcher2(
     match=scheme("file", "git", "http", "https", "ssh"),
     store=lambda url: defaultstore(url).with_suffix(".git"),
 )
-def gitfetcher(url: URL, destination: pathlib.Path) -> None:
+def gitfetcher2(url: URL, destination: pathlib.Path) -> None:
     """Fetch a git repository."""
     with _errorhandler(url):
         if destination.exists():
@@ -44,6 +43,3 @@ def gitfetcher(url: URL, destination: pathlib.Path) -> None:
             repository.fetch(prune=True)
         else:
             Repository.clone(str(url), destination, mirror=True)
-
-
-gitfetcher2 = Fetcher2(gitfetcher)
