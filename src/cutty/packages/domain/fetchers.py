@@ -39,12 +39,18 @@ FetchDecorator2 = Callable[[FetchFunction], Fetcher]
 
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     """A fetcher retrieves a package from a URL into storage."""
-    relativestore = store
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
         class _Fetcher(Fetcher):
+            def __init__(
+                self, fetch: FetchFunction, *, match: Matcher, store: Store
+            ) -> None:
+                self._fetch = fetch
+                self._match = match
+                self._store = store
+
             def match(self, url: URL) -> bool:
-                return match(url)
+                return self._match(url)
 
             def fetch(
                 self,
@@ -63,17 +69,17 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
                 store: Store,
                 mode: FetchMode = FetchMode.ALWAYS,
             ) -> pathlib.Path:
-                destination = store(url) / relativestore(url)
+                destination = store(url) / self._store(url)
 
                 if (
                     mode is FetchMode.ALWAYS
                     or mode is FetchMode.AUTO
                     and not destination.exists()
                 ):
-                    fetch(url, destination)
+                    self._fetch(url, destination)
 
                 return destination
 
-        return _Fetcher()
+        return _Fetcher(fetch, match=match, store=store)
 
     return _decorator
