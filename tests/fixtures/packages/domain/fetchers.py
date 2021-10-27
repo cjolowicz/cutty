@@ -18,6 +18,9 @@ def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
     class _Fetcher(Fetcher):
+        def match(self, url: URL) -> bool:
+            return False
+
         def fetch(
             self,
             url: URL,
@@ -34,6 +37,9 @@ def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     class _Fetcher(Fetcher):
+        def match(self, url: URL) -> bool:
+            return True
+
         def fetch(
             self,
             url: URL,
