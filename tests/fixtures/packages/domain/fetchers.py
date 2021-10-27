@@ -7,6 +7,7 @@ from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import Store
@@ -60,3 +61,9 @@ def fakefetcher(fetchercalls: FetcherCalls) -> Fetcher:
         fetchercalls.append((url, destination))
 
     return _
+
+
+@pytest.fixture
+def fakefetcher2(fakefetcher: Fetcher) -> Fetcher2:
+    """Fixture for a fetcher."""
+    return Fetcher2(fakefetcher)
