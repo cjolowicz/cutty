@@ -12,7 +12,6 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.revisions import Revision
 
 
-Mounter = Callable[[pathlib.Path, Optional[Revision]], Filesystem]
 Mounter2 = Callable[
     [pathlib.Path, Optional[Revision]], AbstractContextManager[Filesystem]
 ]
