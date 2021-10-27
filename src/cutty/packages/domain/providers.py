@@ -12,7 +12,7 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.locations import asurl
@@ -139,7 +139,7 @@ class RemoteProvider(BaseProvider):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch: Iterable[Fetcher2],
+        fetch: Iterable[AbstractFetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
@@ -199,7 +199,7 @@ class RemoteProviderFactory(ProviderFactory):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch: Iterable[Fetcher2],
+        fetch: Iterable[AbstractFetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
