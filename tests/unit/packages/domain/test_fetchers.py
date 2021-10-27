@@ -15,8 +15,7 @@ pytest_plugins = [
 
 def test_match(fakefetcher: Fetcher, url: URL, store: Store) -> None:
     """It delegates to the matcher."""
-    path = fakefetcher.fetch(url.with_scheme("http"), store)
-    assert path is None
+    assert not fakefetcher.match(url.with_scheme("http"))
 
 
 def test_fetch_always(

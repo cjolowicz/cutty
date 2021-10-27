@@ -47,8 +47,7 @@ def test_happy(url: URL, store: Store) -> None:
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = hgfetcher.fetch(url, store)
-    assert path is None
+    assert not hgfetcher.match(url)
 
 
 def test_no_executable(url: URL, store: Store, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -80,7 +79,6 @@ def test_update(repository: pathlib.Path, hg: Hg, store: Store) -> None:
 
     # Second fetch.
     destination = hgfetcher.fetch(asurl(repository), store)
-    assert destination is not None
 
     # Check that upstream and downstream heads are identical.
     downstreamhead = hg("heads", "--template={node}", cwd=destination).stdout

@@ -48,15 +48,13 @@ def server(repository: Path) -> Iterator[URL]:
 def test_happy(server: URL, store: Store, repository: Path) -> None:
     """It downloads the file."""
     path = httpfetcher.fetch(server, store)
-    assert path is not None
     assert path.read_text() == repository.read_text()
 
 
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use the http scheme."""
     url = URL("file:///")
-    path = httpfetcher.fetch(url, store)
-    assert path is None
+    assert not httpfetcher.match(url)
 
 
 def test_not_found(server: URL, store: Store) -> None:
@@ -71,7 +69,6 @@ def test_update(server: URL, store: Store, repository: Path) -> None:
     repository.write_text("ipsum")
     path = httpfetcher.fetch(server, store)
 
-    assert path is not None
     assert path.read_text() == repository.read_text()
 
 

@@ -44,8 +44,7 @@ def test_happy(url: URL, store: Store) -> None:
 def test_not_matched(store: Store) -> None:
     """It returns None if the URL does not use a recognized scheme."""
     url = URL("mailto:you@example.com")
-    path = gitfetcher.fetch(url, store)
-    assert path is None
+    assert not gitfetcher.match(url)
 
 
 def test_update(url: URL, store: Store) -> None:
@@ -58,11 +57,9 @@ def test_update(url: URL, store: Store) -> None:
 
     # Second fetch.
     destination = gitfetcher.fetch(url, store)
-    assert destination is not None
 
     # Check that the marker file is gone.
     path = Path("marker", filesystem=GitFilesystem(destination))
-    assert path is not None
     assert not (path / "marker").is_file()
 
 
@@ -103,7 +100,6 @@ def test_broken_head_after_clone(
 ) -> None:
     """It works around a bug in libgit2 resulting in a broken HEAD reference."""
     destination = gitfetcher.fetch(url, store)
-    assert destination is not None
     repository = Repository.open(destination)
     assert repository.head.name != custom_default_branch
 

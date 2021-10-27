@@ -24,7 +24,6 @@ def test_directory_happy(repository: Path, store: Store) -> None:
     url = asurl(repository)
     path = filefetcher.fetch(url, store)
 
-    assert path is not None
     assert (path / "marker").read_text() == "Lorem"
 
 
@@ -34,14 +33,12 @@ def test_file_happy(repository: Path, store: Store) -> None:
     url = asurl(repository)
     path = filefetcher.fetch(url, store)
 
-    assert path is not None
     assert path.read_text() == "Lorem"
 
 
 def test_not_matched(store: Store, url: URL) -> None:
     """It returns None if the URL does not use the file scheme."""
-    path = filefetcher.fetch(url, store)
-    assert path is None
+    assert not filefetcher.match(url)
 
 
 def test_directory_update(repository: Path, store: Store) -> None:
@@ -56,7 +53,6 @@ def test_directory_update(repository: Path, store: Store) -> None:
     path = filefetcher.fetch(url, store)
 
     # Check that the marker file is gone.
-    assert path is not None
     assert not (path / "marker").is_file()
 
 
@@ -73,7 +69,6 @@ def test_file_update(repository: Path, store: Store) -> None:
     path = filefetcher.fetch(url, store)
 
     # Check that the marker file is updated.
-    assert path is not None
     assert path.read_text() == "Ipsum"
 
 

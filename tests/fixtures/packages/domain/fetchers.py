@@ -1,6 +1,5 @@
 """Fixtures for cutty.packages.domain.fetchers."""
 import pathlib
-from typing import Optional
 
 import pytest
 from yarl import URL
@@ -18,13 +17,16 @@ def nullfetcher() -> Fetcher:
     """Fixture for a fetcher that matches no URL."""
 
     class _Fetcher(Fetcher):
+        def match(self, url: URL) -> bool:
+            return False
+
         def fetch(
             self,
             url: URL,
             store: Store,
             mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
-            return None
+        ) -> pathlib.Path:
+            raise NotImplementedError()
 
     return _Fetcher()
 
@@ -34,12 +36,15 @@ def emptyfetcher() -> Fetcher:
     """Fixture for a fetcher that simply creates the destination path."""
 
     class _Fetcher(Fetcher):
+        def match(self, url: URL) -> bool:
+            return True
+
         def fetch(
             self,
             url: URL,
             store: Store,
             mode: FetchMode = FetchMode.ALWAYS,
-        ) -> Optional[pathlib.Path]:
+        ) -> pathlib.Path:
             path = store(url) / url.name
 
             if path.suffix:
