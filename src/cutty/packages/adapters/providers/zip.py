@@ -5,8 +5,7 @@ from cutty.filesystems.adapters.zip import ZipFilesystem
 from cutty.packages.adapters.fetchers.file import filefetcher
 from cutty.packages.adapters.fetchers.ftp import ftpfetcher
 from cutty.packages.adapters.fetchers.http import httpfetcher
-from cutty.packages.domain.mounters import asmounter2
-from cutty.packages.domain.mounters import unversioned_mounter
+from cutty.packages.domain.mounters import unversioned_mounter2
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 
@@ -16,7 +15,7 @@ def match(path: Path) -> bool:
     return path.suffix.lower() == ".zip" and path.is_file()
 
 
-mount = asmounter2(unversioned_mounter(ZipFilesystem))
+mount = unversioned_mounter2(ZipFilesystem)
 localzipprovider = LocalProvider("localzip", match=match, mount2=mount)
 zipproviderfactory = RemoteProviderFactory(
     "zip",

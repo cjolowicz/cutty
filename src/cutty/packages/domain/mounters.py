@@ -44,3 +44,8 @@ def asmounter2(mount: Mounter) -> Mounter2:
         yield mount(path, revision)
 
     return _
+
+
+def unversioned_mounter2(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter2:
+    """Return a mounter that raises when a revision is passed."""
+    return asmounter2(unversioned_mounter(filesystem))
