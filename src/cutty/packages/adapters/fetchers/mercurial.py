@@ -69,7 +69,7 @@ def findhg(env: Optional[dict[str, str]] = None) -> Hg:
 
 
 @fetcher2(match=scheme("file", "http", "https", "ssh"))
-def hgfetcher2(url: URL, destination: pathlib.Path) -> None:
+def hgfetcher(url: URL, destination: pathlib.Path) -> None:
     """Fetch the package using hg."""
     hg = findhg()
 
