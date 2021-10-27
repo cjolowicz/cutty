@@ -24,7 +24,7 @@ class UnsupportedRevisionError(CuttyError):
     revision: Revision
 
 
-def unversioned_mounter2(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter:
+def unversioned_mounter(filesystem: Callable[[pathlib.Path], Filesystem]) -> Mounter:
     """Return a mounter that raises when a revision is passed."""
 
     @contextmanager
