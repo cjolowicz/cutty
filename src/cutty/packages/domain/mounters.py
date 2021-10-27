@@ -1,6 +1,7 @@
 """Mounting filesystems."""
 import pathlib
 from collections.abc import Callable
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -10,6 +11,9 @@ from cutty.packages.domain.revisions import Revision
 
 
 Mounter = Callable[[pathlib.Path, Optional[Revision]], Filesystem]
+Mounter2 = Callable[
+    [pathlib.Path, Optional[Revision]], AbstractContextManager[Filesystem]
+]
 
 
 @dataclass
