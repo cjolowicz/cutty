@@ -65,6 +65,7 @@ class Fetcher2(AbstractFetcher):
 
 FetchFunction = Callable[[URL, pathlib.Path], None]
 FetchDecorator = Callable[[FetchFunction], Fetcher]
+FetchDecorator2 = Callable[[FetchFunction], AbstractFetcher]
 
 
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
@@ -92,5 +93,15 @@ def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator:
             return destination
 
         return _fetcher
+
+    return _decorator
+
+
+def fetcher2(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
+    """A fetcher retrieves a package from a URL into storage."""
+    decorator = fetcher(match=match, store=store)
+
+    def _decorator(fetch: FetchFunction) -> AbstractFetcher:
+        return Fetcher2(decorator(fetch))
 
     return _decorator
