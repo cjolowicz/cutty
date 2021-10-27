@@ -8,8 +8,7 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
-from cutty.packages.adapters.fetchers.mercurial import hgfetcher
-from cutty.packages.domain.fetchers import Fetcher2
+from cutty.packages.adapters.fetchers.mercurial import hgfetcher2
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
@@ -43,5 +42,5 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[Fetcher2(hgfetcher)], getrevision=getrevision, mount=mount
+    "hg", fetch=[hgfetcher2], getrevision=getrevision, mount=mount
 )

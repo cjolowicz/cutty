@@ -11,6 +11,7 @@ from yarl import URL
 
 from cutty.errors import CuttyError
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.matchers import scheme
 
 
@@ -77,3 +78,6 @@ def hgfetcher(url: URL, destination: pathlib.Path) -> None:
         hg("pull", cwd=destination)
     else:
         hg("clone", str(url), str(destination))
+
+
+hgfetcher2 = Fetcher2(hgfetcher)
