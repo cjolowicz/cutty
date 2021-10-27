@@ -1,7 +1,9 @@
 """Provider for Mercurial repositories."""
 import pathlib
+from collections.abc import Iterator
 from typing import Optional
 
+from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
@@ -26,14 +28,15 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return result.stdout
 
 
-def mount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
+@contextmanager
+def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
     """Mount the working directory as a disk filesystem."""
     hg = findhg()
 
     options = ["--rev", revision] if revision is not None else []
     hg("update", *options, cwd=path)
 
-    return DiskFilesystem(path)
+    yield DiskFilesystem(path)
 
 
 hgproviderfactory = RemoteProviderFactory(
