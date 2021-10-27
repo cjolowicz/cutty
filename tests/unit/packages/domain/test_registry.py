@@ -7,8 +7,7 @@ from yarl import URL
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.mounters import asmounter2
-from cutty.packages.domain.mounters import Mounter
+from cutty.packages.domain.mounters import Mounter2
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
 from cutty.packages.domain.providers import LocalProvider
@@ -91,7 +90,7 @@ def test_with_url(
 def test_with_path(
     tmp_path: pathlib.Path,
     providerstore: ProviderStore,
-    diskmounter: Mounter,
+    diskmounter2: Mounter2,
 ) -> None:
     """It returns a provider that allows traversing repositories."""
     directory = tmp_path / "repository"
@@ -99,9 +98,7 @@ def test_with_path(
     (directory / "marker").touch()
 
     providerfactory = ConstProviderFactory(
-        LocalProvider(
-            "default", match=lambda path: True, mount2=asmounter2(diskmounter)
-        )
+        LocalProvider("default", match=lambda path: True, mount2=diskmounter2)
     )
 
     registry = ProviderRegistry(providerstore, [providerfactory])
