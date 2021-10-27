@@ -37,49 +37,48 @@ FetchFunction = Callable[[URL, pathlib.Path], None]
 FetchDecorator2 = Callable[[FetchFunction], Fetcher]
 
 
+class _Fetcher(Fetcher):
+    def __init__(self, fetch: FetchFunction, *, match: Matcher, store: Store) -> None:
+        self._fetch = fetch
+        self._match = match
+        self._store = store
+
+    def match(self, url: URL) -> bool:
+        return self._match(url)
+
+    def fetch(
+        self,
+        url: URL,
+        store: Store,
+        mode: FetchMode = FetchMode.ALWAYS,
+    ) -> Optional[pathlib.Path]:
+        if not self.match(url):
+            return None
+
+        return self.fetch2(url, store, mode)
+
+    def fetch2(
+        self,
+        url: URL,
+        store: Store,
+        mode: FetchMode = FetchMode.ALWAYS,
+    ) -> pathlib.Path:
+        destination = store(url) / self._store(url)
+
+        if (
+            mode is FetchMode.ALWAYS
+            or mode is FetchMode.AUTO
+            and not destination.exists()
+        ):
+            self._fetch(url, destination)
+
+        return destination
+
+
 def fetcher(*, match: Matcher, store: Store = defaultstore) -> FetchDecorator2:
     """A fetcher retrieves a package from a URL into storage."""
 
     def _decorator(fetch: FetchFunction) -> Fetcher:
-        class _Fetcher(Fetcher):
-            def __init__(
-                self, fetch: FetchFunction, *, match: Matcher, store: Store
-            ) -> None:
-                self._fetch = fetch
-                self._match = match
-                self._store = store
-
-            def match(self, url: URL) -> bool:
-                return self._match(url)
-
-            def fetch(
-                self,
-                url: URL,
-                store: Store,
-                mode: FetchMode = FetchMode.ALWAYS,
-            ) -> Optional[pathlib.Path]:
-                if not self.match(url):
-                    return None
-
-                return self.fetch2(url, store, mode)
-
-            def fetch2(
-                self,
-                url: URL,
-                store: Store,
-                mode: FetchMode = FetchMode.ALWAYS,
-            ) -> pathlib.Path:
-                destination = store(url) / self._store(url)
-
-                if (
-                    mode is FetchMode.ALWAYS
-                    or mode is FetchMode.AUTO
-                    and not destination.exists()
-                ):
-                    self._fetch(url, destination)
-
-                return destination
-
         return _Fetcher(fetch, match=match, store=store)
 
     return _decorator
