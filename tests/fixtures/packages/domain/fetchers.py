@@ -8,6 +8,7 @@ from yarl import URL
 from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
+from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import Store
@@ -24,6 +25,12 @@ def nullfetcher() -> Fetcher:
         return None
 
     return _
+
+
+@pytest.fixture
+def nullfetcher2(nullfetcher: Fetcher) -> AbstractFetcher:
+    """Fixture for a fetcher that matches no URL."""
+    return Fetcher2(nullfetcher)
 
 
 @pytest.fixture

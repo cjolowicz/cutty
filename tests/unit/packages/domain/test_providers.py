@@ -6,6 +6,7 @@ from typing import Optional
 import pytest
 from yarl import URL
 
+from cutty.packages.domain.fetchers import AbstractFetcher
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.locations import asurl
@@ -112,10 +113,10 @@ def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
 
 
 def test_remoteproviderfactory_no_matching_fetchers(
-    store: Store, nullfetcher: Fetcher
+    store: Store, nullfetcher2: AbstractFetcher
 ) -> None:
     """It returns None if all fetchers return None."""
-    providerfactory = RemoteProviderFactory(fetch=[Fetcher2(nullfetcher)])
+    providerfactory = RemoteProviderFactory(fetch=[nullfetcher2])
     provider = providerfactory(store)
     assert provider.provide(URL()) is None
 
