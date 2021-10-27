@@ -201,6 +201,7 @@ class RemoteProviderFactory(ProviderFactory):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
+        mount2: Optional[Mounter2] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
@@ -208,7 +209,11 @@ class RemoteProviderFactory(ProviderFactory):
         self.match = match
         self.fetch = fetch
         self.mount: Optional[Mounter2] = (
-            asmounter2(mount) if mount is not None else None
+            mount2
+            if mount2 is not None
+            else asmounter2(mount)
+            if mount is not None
+            else None
         )
         self.getrevision = getrevision
 
