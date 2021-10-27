@@ -12,7 +12,6 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import Fetcher2
 from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import aspath
@@ -200,20 +199,14 @@ class RemoteProviderFactory(ProviderFactory):
         /,
         *,
         match: Optional[Matcher] = None,
-        fetch: Iterable[Fetcher] = (),
-        fetch2: Iterable[Fetcher2] = (),
+        fetch2: Iterable[Fetcher2],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
-
-        if fetch2 := tuple(fetch2):
-            self.fetch = fetch2
-        else:
-            self.fetch = tuple(Fetcher2(fetcher) for fetcher in fetch)
-
+        self.fetch = tuple(fetch2)
         self.mount = mount
         self.getrevision = getrevision
 
