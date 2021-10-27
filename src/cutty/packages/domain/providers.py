@@ -123,8 +123,11 @@ class LocalProvider(BaseProvider):
         return None
 
 
-def _defaultmount(path: pathlib.Path, revision: Optional[Revision]) -> Filesystem:
-    return DiskFilesystem(path)
+@contextmanager
+def _defaultmount(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Iterator[Filesystem]:
+    yield DiskFilesystem(path)
 
 
 class RemoteProvider(BaseProvider):
@@ -143,11 +146,13 @@ class RemoteProvider(BaseProvider):
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> None:
         """Initialize."""
-        super().__init__(
-            name,
-            mount=asmounter2(mount if mount is not None else _defaultmount),
-            getrevision=getrevision,
-        )
+        mount2: Mounter2
+        if mount is not None:
+            mount2 = asmounter2(mount)
+        else:
+            mount2 = _defaultmount
+
+        super().__init__(name, mount=mount2, getrevision=getrevision)
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
