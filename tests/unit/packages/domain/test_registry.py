@@ -98,7 +98,7 @@ def test_with_path(
     (directory / "marker").touch()
 
     providerfactory = ConstProviderFactory(
-        LocalProvider("default", match=lambda path: True, mount2=diskmounter2)
+        LocalProvider("default", match=lambda path: True, mount=diskmounter2)
     )
 
     registry = ProviderRegistry(providerstore, [providerfactory])

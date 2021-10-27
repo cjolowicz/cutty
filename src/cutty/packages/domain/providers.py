@@ -101,11 +101,11 @@ class LocalProvider(BaseProvider):
         /,
         *,
         match: PathMatcher,
-        mount2: Mounter,
+        mount: Mounter,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        super().__init__(name, mount=mount2, getrevision=getrevision)
+        super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
@@ -198,14 +198,14 @@ class RemoteProviderFactory(ProviderFactory):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount2: Optional[Mounter] = None,
+        mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
         self.fetch = fetch
-        self.mount = mount2
+        self.mount = mount
         self.getrevision = getrevision
 
     def __call__(

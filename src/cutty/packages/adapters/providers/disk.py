@@ -7,5 +7,5 @@ from cutty.packages.domain.providers import LocalProvider
 diskprovider = LocalProvider(
     "local",
     match=lambda path: path.is_dir(),
-    mount2=unversioned_mounter2(DiskFilesystem),
+    mount=unversioned_mounter2(DiskFilesystem),
 )

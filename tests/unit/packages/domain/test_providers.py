@@ -25,7 +25,7 @@ pytest_plugins = [
 
 def test_localprovider_not_local(url: URL, diskmounter2: Mounter) -> None:
     """It returns None if the location is not local."""
-    provider = LocalProvider(match=lambda path: True, mount2=diskmounter2)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter2)
 
     assert provider.provide(url) is None
 
@@ -35,14 +35,14 @@ def test_localprovider_not_matching(
 ) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
-    provider = LocalProvider(match=lambda path: False, mount2=diskmounter2)
+    provider = LocalProvider(match=lambda path: False, mount=diskmounter2)
 
     assert provider.provide(url) is None
 
 
 def test_localprovider_inexistent_path(diskmounter2: Mounter) -> None:
     """It returns None if the location is an inexistent path."""
-    provider = LocalProvider(match=lambda path: True, mount2=diskmounter2)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter2)
     path = pathlib.Path("/no/such/file/or/directory")
 
     assert provider.provide(path) is None
@@ -55,7 +55,7 @@ def test_localprovider_path(tmp_path: pathlib.Path, diskmounter2: Mounter) -> No
     (path / "marker").touch()
 
     url = asurl(path)
-    provider = LocalProvider(match=lambda path: True, mount2=diskmounter2)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter2)
     repository = provider.provide(url)
 
     assert repository is not None
@@ -68,7 +68,7 @@ def test_localprovider_path(tmp_path: pathlib.Path, diskmounter2: Mounter) -> No
 def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter2: Mounter) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
-    provider = LocalProvider(match=lambda path: True, mount2=diskmounter2)
+    provider = LocalProvider(match=lambda path: True, mount=diskmounter2)
 
     with pytest.raises(Exception):
         if repository := provider.provide(url):
@@ -88,7 +88,7 @@ def test_localprovider_package_revision(
         return (path / "VERSION").read_text().strip()
 
     provider = LocalProvider(
-        match=lambda _: True, mount2=diskmounter2, getrevision=getrevision
+        match=lambda _: True, mount=diskmounter2, getrevision=getrevision
     )
 
     path = tmp_path / "repository"
@@ -172,7 +172,7 @@ def test_remoteproviderfactory_mounter(
         text = json.dumps({revision: {"marker": "Lorem"}})
         path.write_text(text)
 
-    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount2=jsonmounter2)
+    providerfactory = RemoteProviderFactory(fetch=[emptyfetcher], mount=jsonmounter2)
     provider = providerfactory(store)
     repository = provider.provide(url)
 

@@ -16,10 +16,10 @@ def match(path: Path) -> bool:
 
 
 mount = unversioned_mounter2(ZipFilesystem)
-localzipprovider = LocalProvider("localzip", match=match, mount2=mount)
+localzipprovider = LocalProvider("localzip", match=match, mount=mount)
 zipproviderfactory = RemoteProviderFactory(
     "zip",
     match=lambda url: url.path.lower().endswith(".zip"),
     fetch=[httpfetcher, ftpfetcher, filefetcher],
-    mount2=mount,
+    mount=mount,
 )

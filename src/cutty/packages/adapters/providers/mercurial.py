@@ -40,5 +40,5 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], getrevision=getrevision, mount2=mount
+    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=mount
 )
