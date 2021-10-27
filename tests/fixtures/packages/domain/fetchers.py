@@ -18,12 +18,16 @@ from tests.fixtures.packages.domain.types import FetcherCalls
 def nullfetcher() -> AbstractFetcher:
     """Fixture for a fetcher that matches no URL."""
 
-    def _(
-        url: URL, store: Store, mode: FetchMode = FetchMode.ALWAYS
-    ) -> Optional[pathlib.Path]:
-        return None
+    class _Fetcher(AbstractFetcher):
+        def fetch(
+            self,
+            url: URL,
+            store: Store,
+            mode: FetchMode = FetchMode.ALWAYS,
+        ) -> Optional[pathlib.Path]:
+            return None
 
-    return Fetcher2(_)
+    return _Fetcher()
 
 
 @pytest.fixture
