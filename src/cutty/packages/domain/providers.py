@@ -140,7 +140,7 @@ class RemoteProvider(BaseProvider):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter] = None,
+        mount: Optional[Mounter2] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
         fetchmode: FetchMode = FetchMode.ALWAYS,
@@ -148,7 +148,7 @@ class RemoteProvider(BaseProvider):
         """Initialize."""
         mount2: Mounter2
         if mount is not None:
-            mount2 = asmounter2(mount)
+            mount2 = mount
         else:
             mount2 = _defaultmount
 
@@ -210,7 +210,9 @@ class RemoteProviderFactory(ProviderFactory):
         super().__init__(name)
         self.match = match
         self.fetch = fetch
-        self.mount = mount
+        self.mount: Optional[Mounter2] = (
+            asmounter2(mount) if mount is not None else None
+        )
         self.getrevision = getrevision
 
     def __call__(
