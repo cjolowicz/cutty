@@ -146,13 +146,10 @@ class RemoteProvider(BaseProvider):
         fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> None:
         """Initialize."""
-        mount2: Mounter2
-        if mount is not None:
-            mount2 = mount
-        else:
-            mount2 = _defaultmount
+        if mount is None:
+            mount = _defaultmount
 
-        super().__init__(name, mount=mount2, getrevision=getrevision)
+        super().__init__(name, mount=mount, getrevision=getrevision)
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
