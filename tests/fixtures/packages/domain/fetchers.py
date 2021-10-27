@@ -29,6 +29,14 @@ def nullfetcher() -> Fetcher:
         ) -> Optional[pathlib.Path]:
             return None
 
+        def fetch2(
+            self,
+            url: URL,
+            store: Store,
+            mode: FetchMode = FetchMode.ALWAYS,
+        ) -> pathlib.Path:
+            raise NotImplementedError()
+
     return _Fetcher()
 
 
