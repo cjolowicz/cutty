@@ -54,6 +54,14 @@ def emptyfetcher() -> Fetcher:
             store: Store,
             mode: FetchMode = FetchMode.ALWAYS,
         ) -> Optional[pathlib.Path]:
+            return self.fetch2(url, store, mode)
+
+        def fetch2(
+            self,
+            url: URL,
+            store: Store,
+            mode: FetchMode = FetchMode.ALWAYS,
+        ) -> pathlib.Path:
             path = store(url) / url.name
 
             if path.suffix:
