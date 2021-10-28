@@ -82,16 +82,17 @@ class ProviderRegistry:
 
 
 def _withscheme(location: URL, scheme: str) -> URL:
-    if location.raw_host is None:
-        # yarl does not allow scheme replacement in URLs without host
-        # https://github.com/aio-libs/yarl/issues/280
-        location = URL.build(
-            scheme=scheme,
-            authority=location.raw_authority,
-            path=location.raw_path,
-            query_string=location.raw_query_string,
-            fragment=location.raw_fragment,
-            encoded=True,
-        )
-        return location
-    return location.with_scheme(scheme)
+    if location.raw_host is not None:
+        return location.with_scheme(scheme)
+
+    # yarl does not allow scheme replacement in URLs without host
+    # https://github.com/aio-libs/yarl/issues/280
+    location = URL.build(
+        scheme=scheme,
+        authority=location.raw_authority,
+        path=location.raw_path,
+        query_string=location.raw_query_string,
+        fragment=location.raw_fragment,
+        encoded=True,
+    )
+    return location
