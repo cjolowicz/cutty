@@ -34,9 +34,7 @@ class ProviderRegistry:
     ) -> None:
         """Initialize."""
         self.store = store
-        self.registry = {
-            providerfactory.name: providerfactory for providerfactory in factories
-        }
+        self.registry = {factory.name: factory for factory in factories}
 
     def getrepository(
         self, rawlocation: str, fetchmode: FetchMode = FetchMode.ALWAYS
