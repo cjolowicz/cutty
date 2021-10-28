@@ -1,6 +1,5 @@
 """Fetching package repositories from URLs."""
 import abc
-import enum
 import pathlib
 from collections.abc import Callable
 
@@ -9,14 +8,6 @@ from yarl import URL
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.stores import defaultstore
 from cutty.packages.domain.stores import Store
-
-
-class FetchMode(enum.Enum):
-    """Fetch mode."""
-
-    ALWAYS = enum.auto()
-    AUTO = enum.auto()
-    NEVER = enum.auto()
 
 
 class Fetcher(abc.ABC):
