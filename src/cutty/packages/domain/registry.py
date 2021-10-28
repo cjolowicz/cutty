@@ -7,7 +7,6 @@ from typing import Optional
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
 from cutty.packages.domain.package import PackageRepository
@@ -34,13 +33,11 @@ class ProviderRegistry:
         self.store = store
         self.registry = {factory.name: factory for factory in factories}
 
-    def getrepository(
-        self, rawlocation: str, fetchmode: FetchMode = FetchMode.ALWAYS
-    ) -> PackageRepository:
+    def getrepository(self, rawlocation: str) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
         name, location = self._extractname(location)
-        providers = self._createproviders(fetchmode, name)
+        providers = self._createproviders(name)
 
         for provider in providers:
             if repository := provider.provide(location):
@@ -60,23 +57,19 @@ class ProviderRegistry:
 
         return None, location
 
-    def _createproviders(
-        self, fetchmode: FetchMode, name: Optional[ProviderName]
-    ) -> Iterator[Provider]:
+    def _createproviders(self, name: Optional[ProviderName]) -> Iterator[Provider]:
         """Create providers."""
         if name is not None:
             factory = self.registry[name]
-            yield self._createprovider(factory, fetchmode)
+            yield self._createprovider(factory)
         else:
             for factory in self.registry.values():
-                yield self._createprovider(factory, fetchmode)
+                yield self._createprovider(factory)
 
-    def _createprovider(
-        self, factory: ProviderFactory, fetchmode: FetchMode
-    ) -> Provider:
+    def _createprovider(self, factory: ProviderFactory) -> Provider:
         """Create a provider."""
         store = self.store(factory.name)
-        return factory(store, fetchmode)
+        return factory(store)
 
 
 def _withscheme(url: URL, scheme: str) -> URL:
