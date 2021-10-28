@@ -125,6 +125,9 @@ class RemoteProvider(Provider):
         if mount is None:
             mount = _defaultmount
 
+        if match is None:
+            match = lambda _: True  # noqa: E731
+
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
@@ -140,7 +143,7 @@ class RemoteProvider(Provider):
         else:
             return None
 
-        if self.match is None or self.match(url):
+        if self.match(url):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
