@@ -166,10 +166,6 @@ class RemoteProvider(BaseProvider):
         return None
 
 
-ProviderName = str
-ProviderStore = Callable[[ProviderName], Store]
-
-
 class ProviderFactory(abc.ABC):
     """Provider factory."""
 

@@ -1,4 +1,5 @@
 """The provider registry is the main entry point of cutty.packages."""
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -12,7 +13,7 @@ from cutty.packages.domain.locations import parselocation
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
-from cutty.packages.domain.providers import ProviderStore
+from cutty.packages.domain.stores import Store
 
 
 @dataclass
@@ -20,6 +21,10 @@ class UnknownLocationError(CuttyError):
     """The package location could not be processed by any provider."""
 
     location: Location
+
+
+ProviderName = str
+ProviderStore = Callable[[ProviderName], Store]
 
 
 class ProviderRegistry:

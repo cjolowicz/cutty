@@ -4,7 +4,7 @@ import pathlib
 import pytest
 from yarl import URL
 
-from cutty.packages.domain.providers import ProviderStore
+from cutty.packages.domain.registry import ProviderStore
 from cutty.packages.domain.stores import Store
 
 
