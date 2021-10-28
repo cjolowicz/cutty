@@ -5,10 +5,12 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
+from cutty.entrypoints.cli.errors import fatal
 from cutty.services.link import link as service_link
 from cutty.templates.domain.bindings import Binding
 
 
+@click.command()
 @click.argument("template", required=False)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
@@ -40,6 +42,7 @@ from cutty.templates.domain.bindings import Binding
         "cookiecutter.json file."
     ),
 )
+@fatal
 def link(
     template: Optional[str],
     extra_context: dict[str, str],

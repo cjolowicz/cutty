@@ -5,11 +5,13 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
+from cutty.entrypoints.cli.errors import fatal
 from cutty.projects.repository import ProjectRepository
 from cutty.services.update import update as service_update
 from cutty.templates.domain.bindings import Binding
 
 
+@click.command()
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
     "--non-interactive",
@@ -53,6 +55,7 @@ from cutty.templates.domain.bindings import Binding
     default=False,
     help="Abort the current update.",
 )
+@fatal
 def update(
     extra_context: dict[str, str],
     non_interactive: bool,

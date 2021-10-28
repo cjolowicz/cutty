@@ -5,6 +5,7 @@ from typing import Optional
 
 import click
 
+from cutty.entrypoints.cli.errors import fatal
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.services.cookiecutter import create
 from cutty.templates.domain.bindings import Binding
@@ -42,6 +43,7 @@ def fileexistspolicy(
     )
 
 
+@click.command()
 @click.argument("location", metavar="TEMPLATE")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
@@ -86,6 +88,7 @@ def fileexistspolicy(
     default=False,
     help="Skip the files in the corresponding directories if they already exist.",
 )
+@fatal
 def cookiecutter(
     location: str,
     extra_context: dict[str, str],

@@ -5,10 +5,12 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
+from cutty.entrypoints.cli.errors import fatal
 from cutty.services.create import create as service_create
 from cutty.templates.domain.bindings import Binding
 
 
+@click.command()
 @click.argument("template")
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @click.option(
@@ -45,6 +47,7 @@ from cutty.templates.domain.bindings import Binding
     default=False,
     help="Strip the leading path component from generated files.",
 )
+@fatal
 def create(
     template: str,
     extra_context: dict[str, str],
