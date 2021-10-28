@@ -75,13 +75,11 @@ class ProviderRegistry:
         return None, location
 
     def _createproviders(
-        self,
-        fetchmode: FetchMode,
-        providername: Optional[ProviderName],
+        self, fetchmode: FetchMode, name: Optional[ProviderName]
     ) -> Iterator[Provider]:
         """Create providers."""
-        if providername is not None:
-            providerfactory = self.registry[providername]
+        if name is not None:
+            providerfactory = self.registry[name]
             yield self._createprovider(providerfactory, fetchmode)
         else:
             for providerfactory in self.registry.values():
