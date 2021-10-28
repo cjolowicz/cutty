@@ -9,7 +9,6 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
-from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
@@ -141,10 +140,9 @@ def test_not_matching(hgprovider: Provider) -> None:
     assert repository is None
 
 
-@pytest.mark.parametrize("fetchmode", [FetchMode.ALWAYS, FetchMode.AUTO])
-def test_update(hgrepository: pathlib.Path, store: Store, fetchmode: FetchMode) -> None:
+def test_update(hgrepository: pathlib.Path, store: Store) -> None:
     """It updates the repository from a previous fetch."""
-    hgprovider = hgproviderfactory(store, fetchmode)
+    hgprovider = hgproviderfactory(store)
 
     def fetchrevision(revision: Optional[str]) -> Optional[str]:
         repository = hgprovider.provide(hgrepository)
