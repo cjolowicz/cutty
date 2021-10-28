@@ -6,7 +6,6 @@ from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.fetchers import fetcher
-from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.matchers import scheme
 from cutty.packages.domain.stores import Store
 from tests.fixtures.packages.domain.types import FetcherCalls
@@ -20,12 +19,7 @@ def nullfetcher() -> Fetcher:
         def match(self, url: URL) -> bool:
             return False
 
-        def fetch(
-            self,
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> pathlib.Path:
+        def fetch(self, url: URL, store: Store) -> pathlib.Path:
             raise NotImplementedError()
 
     return _Fetcher()
@@ -39,12 +33,7 @@ def emptyfetcher() -> Fetcher:
         def match(self, url: URL) -> bool:
             return True
 
-        def fetch(
-            self,
-            url: URL,
-            store: Store,
-            mode: FetchMode = FetchMode.ALWAYS,
-        ) -> pathlib.Path:
+        def fetch(self, url: URL, store: Store) -> pathlib.Path:
             path = store(url) / url.name
 
             if path.suffix:
