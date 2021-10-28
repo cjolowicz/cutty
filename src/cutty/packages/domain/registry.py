@@ -24,81 +24,73 @@ class UnknownLocationError(CuttyError):
     location: Location
 
 
-def _provide(providers: Iterable[Provider], location: Location) -> PackageRepository:
-    """Provide the package repository located at the given URL."""
-    for provider in providers:
-        if repository := provider.provide(location):
-            return repository
-
-    raise UnknownLocationError(location)
-
-
 class ProviderRegistry:
     """The provider registry retrieves packages using registered providers."""
 
     def __init__(
-        self,
-        store: ProviderStore,
-        factories: Iterable[ProviderFactory],
+        self, store: ProviderStore, factories: Iterable[ProviderFactory]
     ) -> None:
         """Initialize."""
         self.store = store
-        self.registry = {
-            providerfactory.name: providerfactory for providerfactory in factories
-        }
+        self.registry = {factory.name: factory for factory in factories}
 
     def getrepository(
         self, rawlocation: str, fetchmode: FetchMode = FetchMode.ALWAYS
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
+        name, location = self._extractname(location)
+        providers = self._createproviders(fetchmode, name)
 
-        providername, location = self._extractprovidername(location)
-        providers = self._createproviders(fetchmode, providername)
-        return _provide(providers, location)
+        for provider in providers:
+            if repository := provider.provide(location):
+                return repository
 
-    def _extractprovidername(
+        raise UnknownLocationError(location)
+
+    def _extractname(
         self, location: Location
     ) -> tuple[Optional[ProviderName], Location]:
         """Split off the provider name from the URL scheme, if any."""
         if isinstance(location, URL):
-            providername, _, scheme = location.scheme.rpartition("+")
+            name, _, scheme = location.scheme.rpartition("+")
 
-            if providername and providername in self.registry:
-                if location.raw_host is None:
-                    # yarl does not allow scheme replacement in URLs without host
-                    # https://github.com/aio-libs/yarl/issues/280
-                    location = URL.build(
-                        scheme=scheme,
-                        authority=location.raw_authority,
-                        path=location.raw_path,
-                        query_string=location.raw_query_string,
-                        fragment=location.raw_fragment,
-                        encoded=True,
-                    )
-                    return providername, location
-                return providername, location.with_scheme(scheme)
+            if name and name in self.registry:
+                return name, _withscheme(location, scheme)
 
         return None, location
 
     def _createproviders(
-        self,
-        fetchmode: FetchMode,
-        providername: Optional[ProviderName],
+        self, fetchmode: FetchMode, name: Optional[ProviderName]
     ) -> Iterator[Provider]:
         """Create providers."""
-        if providername is not None:
-            providerfactory = self.registry[providername]
-            yield self._createprovider(providerfactory, fetchmode)
+        if name is not None:
+            factory = self.registry[name]
+            yield self._createprovider(factory, fetchmode)
         else:
-            for providerfactory in self.registry.values():
-                yield self._createprovider(providerfactory, fetchmode)
+            for factory in self.registry.values():
+                yield self._createprovider(factory, fetchmode)
 
     def _createprovider(
-        self,
-        providerfactory: ProviderFactory,
-        fetchmode: FetchMode,
+        self, factory: ProviderFactory, fetchmode: FetchMode
     ) -> Provider:
         """Create a provider."""
-        store = self.store(providerfactory.name)
-        return providerfactory(store, fetchmode)
+        store = self.store(factory.name)
+        return factory(store, fetchmode)
+
+
+def _withscheme(url: URL, scheme: str) -> URL:
+    if url.raw_host is not None:
+        return url.with_scheme(scheme)
+
+    # yarl does not allow scheme replacement in URLs without host
+    # https://github.com/aio-libs/yarl/issues/280
+    url = URL.build(
+        scheme=scheme,
+        authority=url.raw_authority,
+        path=url.raw_path,
+        query_string=url.raw_query_string,
+        fragment=url.raw_fragment,
+        encoded=True,
+    )
+    return url
