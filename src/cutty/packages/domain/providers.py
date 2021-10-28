@@ -68,32 +68,7 @@ class DefaultPackageRepository(PackageRepository):
             yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
 
 
-class BaseProvider(Provider):
-    """Base class for local and remote providers."""
-
-    def __init__(
-        self,
-        name: str = "",
-        /,
-        *,
-        mount: Mounter,
-        getrevision: Optional[GetRevision] = None,
-    ) -> None:
-        """Initialize."""
-        super().__init__(name)
-
-        self.mount = mount
-        self.getrevision = getrevision
-
-    def _loadrepository(
-        self, location: Location, path: pathlib.Path
-    ) -> PackageRepository:
-        return DefaultPackageRepository(
-            location.name, path, mount=self.mount, getrevision=self.getrevision
-        )
-
-
-class LocalProvider(BaseProvider):
+class LocalProvider(Provider):
     """Provide a package from the local filesystem."""
 
     def __init__(
@@ -106,14 +81,19 @@ class LocalProvider(BaseProvider):
         getrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
-        super().__init__(name, mount=mount, getrevision=getrevision)
+        super().__init__(name)
+
         self.match = match
+        self.mount = mount
+        self.getrevision = getrevision
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
-                return self._loadrepository(location, path)
+                return DefaultPackageRepository(
+                    location.name, path, mount=self.mount, getrevision=self.getrevision
+                )
 
         return None
 
@@ -125,7 +105,7 @@ def _defaultmount(
     yield DiskFilesystem(path)
 
 
-class RemoteProvider(BaseProvider):
+class RemoteProvider(Provider):
     """Remote providers fetch the package into local storage first."""
 
     def __init__(
@@ -143,7 +123,10 @@ class RemoteProvider(BaseProvider):
         if mount is None:
             mount = _defaultmount
 
-        super().__init__(name, mount=mount, getrevision=getrevision)
+        super().__init__(name)
+
+        self.mount = mount
+        self.getrevision = getrevision
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
@@ -161,7 +144,12 @@ class RemoteProvider(BaseProvider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
-                    return self._loadrepository(location, path)
+                    return DefaultPackageRepository(
+                        location.name,
+                        path,
+                        mount=self.mount,
+                        getrevision=self.getrevision,
+                    )
 
         return None
 
