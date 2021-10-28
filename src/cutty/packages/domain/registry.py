@@ -86,10 +86,8 @@ class ProviderRegistry:
                 yield self._createprovider(factory, fetchmode)
 
     def _createprovider(
-        self,
-        providerfactory: ProviderFactory,
-        fetchmode: FetchMode,
+        self, factory: ProviderFactory, fetchmode: FetchMode
     ) -> Provider:
         """Create a provider."""
-        store = self.store(providerfactory.name)
-        return providerfactory(store, fetchmode)
+        store = self.store(factory.name)
+        return factory(store, fetchmode)
