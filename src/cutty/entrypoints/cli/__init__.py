@@ -8,10 +8,8 @@ from cutty.entrypoints.cli.link import link
 from cutty.entrypoints.cli.update import update
 
 
-registercommand = main.command()
-
 for command in [create, update, link, cookiecutter]:
-    registercommand(fatal(command))
+    main.command()(fatal(command))
 
 main.command("import")(import_)
 
