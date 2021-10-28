@@ -34,7 +34,7 @@ class ProviderRegistry:
         self.registry = {factory.name: factory for factory in factories}
 
     def getrepository(self, rawlocation: str) -> PackageRepository:
-        """Return the package repository located at the given URL."""
+        """Return the package repository located at the given location."""
         name, location = self._parselocation(rawlocation)
 
         for provider in self._createproviders(name):
@@ -46,7 +46,7 @@ class ProviderRegistry:
     def _parselocation(
         self, rawlocation: str
     ) -> tuple[Optional[ProviderName], Location]:
-        """Split off the provider name from the URL scheme, if any."""
+        """Parse the location and provider name, if any."""
         location = parselocation(rawlocation)
 
         if isinstance(location, URL):
