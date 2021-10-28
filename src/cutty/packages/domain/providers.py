@@ -13,7 +13,6 @@ from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
-from cutty.packages.domain.fetchers import FetchMode
 from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
@@ -143,7 +142,6 @@ class RemoteProvider(BaseProvider):
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
         store: Store,
-        fetchmode: FetchMode = FetchMode.ALWAYS,
     ) -> None:
         """Initialize."""
         if mount is None:
@@ -153,7 +151,6 @@ class RemoteProvider(BaseProvider):
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
-        self.fetchmode = fetchmode
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -167,7 +164,7 @@ class RemoteProvider(BaseProvider):
         if self.match is None or self.match(url):
             for fetcher in self.fetch:
                 if fetcher.match(url):
-                    path = fetcher.fetch(url, self.store, self.fetchmode)
+                    path = fetcher.fetch(url, self.store)
                     return self._loadrepository(location, path)
 
         return None
@@ -185,9 +182,7 @@ class ProviderFactory(abc.ABC):
         self.name = name
 
     @abc.abstractmethod
-    def __call__(
-        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
-    ) -> Provider:
+    def __call__(self, store: Store) -> Provider:
         """Create a provider."""
 
 
@@ -211,9 +206,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.mount = mount
         self.getrevision = getrevision
 
-    def __call__(
-        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
-    ) -> Provider:
+    def __call__(self, store: Store) -> Provider:
         """Create a provider."""
         return RemoteProvider(
             self.name,
@@ -222,7 +215,6 @@ class RemoteProviderFactory(ProviderFactory):
             mount=self.mount,
             getrevision=self.getrevision,
             store=store,
-            fetchmode=fetchmode,
         )
 
 
@@ -234,8 +226,6 @@ class ConstProviderFactory(ProviderFactory):
         super().__init__(provider.name)
         self.provider = provider
 
-    def __call__(
-        self, store: Store, fetchmode: FetchMode = FetchMode.ALWAYS
-    ) -> Provider:
+    def __call__(self, store: Store) -> Provider:
         """Return the provider."""
         return self.provider

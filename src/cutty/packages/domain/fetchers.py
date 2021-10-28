@@ -1,6 +1,5 @@
 """Fetching package repositories from URLs."""
 import abc
-import enum
 import pathlib
 from collections.abc import Callable
 
@@ -11,14 +10,6 @@ from cutty.packages.domain.stores import defaultstore
 from cutty.packages.domain.stores import Store
 
 
-class FetchMode(enum.Enum):
-    """Fetch mode."""
-
-    ALWAYS = enum.auto()
-    AUTO = enum.auto()
-    NEVER = enum.auto()
-
-
 class Fetcher(abc.ABC):
     """A fetcher retrieves a package repository from a URL into storage."""
 
@@ -27,12 +18,7 @@ class Fetcher(abc.ABC):
         """Return True if the fetcher can handle the URL."""
 
     @abc.abstractmethod
-    def fetch(
-        self,
-        url: URL,
-        store: Store,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> pathlib.Path:
+    def fetch(self, url: URL, store: Store) -> pathlib.Path:
         """Retrieve the package repository at the URL into local storage."""
 
 
@@ -49,20 +35,10 @@ class _Fetcher(Fetcher):
     def match(self, url: URL) -> bool:
         return self._match(url)
 
-    def fetch(
-        self,
-        url: URL,
-        store: Store,
-        mode: FetchMode = FetchMode.ALWAYS,
-    ) -> pathlib.Path:
+    def fetch(self, url: URL, store: Store) -> pathlib.Path:
         destination = store(url) / self._store(url)
 
-        if (
-            mode is FetchMode.ALWAYS
-            or mode is FetchMode.AUTO
-            and not destination.exists()
-        ):
-            self._fetch(url, destination)
+        self._fetch(url, destination)
 
         return destination
 
