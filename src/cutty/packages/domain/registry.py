@@ -35,8 +35,7 @@ class ProviderRegistry:
 
     def getrepository(self, rawlocation: str) -> PackageRepository:
         """Return the package repository located at the given URL."""
-        location = parselocation(rawlocation)
-        name, location = self._extractname(location)
+        name, location = self._extractname(rawlocation)
 
         for provider in self._createproviders(name):
             if repository := provider.provide(location):
@@ -44,10 +43,10 @@ class ProviderRegistry:
 
         raise UnknownLocationError(location)
 
-    def _extractname(
-        self, location: Location
-    ) -> tuple[Optional[ProviderName], Location]:
+    def _extractname(self, rawlocation: str) -> tuple[Optional[ProviderName], Location]:
         """Split off the provider name from the URL scheme, if any."""
+        location = parselocation(rawlocation)
+
         if isinstance(location, URL):
             name, _, scheme = location.scheme.rpartition("+")
 
