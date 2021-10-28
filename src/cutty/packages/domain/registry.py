@@ -37,9 +37,8 @@ class ProviderRegistry:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
         name, location = self._extractname(location)
-        providers = self._createproviders(name)
 
-        for provider in providers:
+        for provider in self._createproviders(name):
             if repository := provider.provide(location):
                 return repository
 
