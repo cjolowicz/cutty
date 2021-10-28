@@ -6,6 +6,7 @@ import pytest
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
+from tests.util.git import updatefile
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -29,3 +30,19 @@ def test_noop(runcutty: RunCutty, project: Path) -> None:
         runcutty("import")
 
     assert head == Repository.open(project).head.commit
+
+
+@pytest.fixture
+def templateproject(template: Path) -> Path:
+    """Return the project directory in the template."""
+    return template / "{{ cookiecutter.project }}"
+
+
+def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It applies the latest changeset by default."""
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import")
+
+    assert "marker" in Repository.open(project).head.commit.tree
