@@ -28,9 +28,7 @@ class ProviderRegistry:
     """The provider registry retrieves packages using registered providers."""
 
     def __init__(
-        self,
-        store: ProviderStore,
-        factories: Iterable[ProviderFactory],
+        self, store: ProviderStore, factories: Iterable[ProviderFactory]
     ) -> None:
         """Initialize."""
         self.store = store
