@@ -58,19 +58,7 @@ class ProviderRegistry:
             name, _, scheme = location.scheme.rpartition("+")
 
             if name and name in self.registry:
-                if location.raw_host is None:
-                    # yarl does not allow scheme replacement in URLs without host
-                    # https://github.com/aio-libs/yarl/issues/280
-                    location = URL.build(
-                        scheme=scheme,
-                        authority=location.raw_authority,
-                        path=location.raw_path,
-                        query_string=location.raw_query_string,
-                        fragment=location.raw_fragment,
-                        encoded=True,
-                    )
-                    return name, location
-                return name, location.with_scheme(scheme)
+                return name, _withscheme(location, scheme)
 
         return None, location
 
@@ -91,3 +79,19 @@ class ProviderRegistry:
         """Create a provider."""
         store = self.store(factory.name)
         return factory(store, fetchmode)
+
+
+def _withscheme(location: URL, scheme: str) -> URL:
+    if location.raw_host is None:
+        # yarl does not allow scheme replacement in URLs without host
+        # https://github.com/aio-libs/yarl/issues/280
+        location = URL.build(
+            scheme=scheme,
+            authority=location.raw_authority,
+            path=location.raw_path,
+            query_string=location.raw_query_string,
+            fragment=location.raw_fragment,
+            encoded=True,
+        )
+        return location
+    return location.with_scheme(scheme)
