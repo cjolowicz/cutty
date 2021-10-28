@@ -7,9 +7,7 @@ from cutty.entrypoints.cli.link import link
 from cutty.entrypoints.cli.update import update
 
 
-for command in [create, update, link, cookiecutter]:
+for command in [create, update, link, cookiecutter, import_]:
     main.add_command(command)
-
-main.add_command(import_)
 
 __all__ = ["main"]
