@@ -120,16 +120,16 @@ class RemoteProvider(Provider):
         store: Store,
     ) -> None:
         """Initialize."""
+        super().__init__(name)
+
         if mount is None:
             mount = _defaultmount
 
-        super().__init__(name)
-
-        self.mount = mount
-        self.getrevision = getrevision
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
+        self.mount = mount
+        self.getrevision = getrevision
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
