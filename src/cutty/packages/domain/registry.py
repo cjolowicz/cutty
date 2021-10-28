@@ -12,7 +12,6 @@ from cutty.packages.domain.locations import parselocation
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
-from cutty.packages.domain.providers import ProviderName
 from cutty.packages.domain.providers import ProviderStore
 
 
@@ -43,9 +42,7 @@ class ProviderRegistry:
 
         raise UnknownLocationError(location)
 
-    def _parselocation(
-        self, rawlocation: str
-    ) -> tuple[Optional[ProviderName], Location]:
+    def _parselocation(self, rawlocation: str) -> tuple[Optional[str], Location]:
         """Parse the location and provider name, if any."""
         location = parselocation(rawlocation)
 
@@ -57,7 +54,7 @@ class ProviderRegistry:
 
         return None, location
 
-    def _createproviders(self, name: Optional[ProviderName]) -> Iterator[Provider]:
+    def _createproviders(self, name: Optional[str]) -> Iterator[Provider]:
         """Create providers."""
         if name is not None:
             factory = self.registry[name]
