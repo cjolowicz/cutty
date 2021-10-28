@@ -1,4 +1,5 @@
 """The provider registry is the main entry point of cutty.packages."""
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -12,8 +13,7 @@ from cutty.packages.domain.locations import parselocation
 from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
-from cutty.packages.domain.providers import ProviderName
-from cutty.packages.domain.providers import ProviderStore
+from cutty.packages.domain.stores import Store
 
 
 @dataclass
@@ -21,6 +21,10 @@ class UnknownLocationError(CuttyError):
     """The package location could not be processed by any provider."""
 
     location: Location
+
+
+ProviderName = str
+ProviderStore = Callable[[ProviderName], Store]
 
 
 class ProviderRegistry:
@@ -34,21 +38,19 @@ class ProviderRegistry:
         self.registry = {factory.name: factory for factory in factories}
 
     def getrepository(self, rawlocation: str) -> PackageRepository:
-        """Return the package repository located at the given URL."""
-        location = parselocation(rawlocation)
-        name, location = self._extractname(location)
-        providers = self._createproviders(name)
+        """Return the package repository located at the given location."""
+        name, location = self._parselocation(rawlocation)
 
-        for provider in providers:
+        for provider in self._createproviders(name):
             if repository := provider.provide(location):
                 return repository
 
         raise UnknownLocationError(location)
 
-    def _extractname(
-        self, location: Location
-    ) -> tuple[Optional[ProviderName], Location]:
-        """Split off the provider name from the URL scheme, if any."""
+    def _parselocation(self, rawlocation: str) -> tuple[Optional[str], Location]:
+        """Parse the location and provider name, if any."""
+        location = parselocation(rawlocation)
+
         if isinstance(location, URL):
             name, _, scheme = location.scheme.rpartition("+")
 
@@ -57,7 +59,7 @@ class ProviderRegistry:
 
         return None, location
 
-    def _createproviders(self, name: Optional[ProviderName]) -> Iterator[Provider]:
+    def _createproviders(self, name: Optional[str]) -> Iterator[Provider]:
         """Create providers."""
         if name is not None:
             factory = self.registry[name]

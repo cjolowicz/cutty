@@ -10,7 +10,7 @@ from cutty.packages.adapters.storage import getdefaultproviderstore
 from cutty.packages.adapters.storage import hashurl
 from cutty.packages.adapters.storage import PackageStorage
 from cutty.packages.adapters.storage import StorageRecord
-from cutty.packages.domain.providers import ProviderStore
+from cutty.packages.domain.registry import ProviderStore
 
 
 @pytest.fixture

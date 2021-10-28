@@ -38,15 +38,3 @@ class PackageRepository(abc.ABC):
     @abc.abstractmethod
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-
-
-@dataclass
-class SinglePackageRepository(PackageRepository):
-    """A package repository with a single package."""
-
-    package: Package
-
-    @contextmanager
-    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
-        """Retrieve the package with the given revision."""
-        yield self.package

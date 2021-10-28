@@ -12,9 +12,9 @@ from cutty.packages.domain.package import Package
 from cutty.packages.domain.providers import ConstProviderFactory
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import Provider
-from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.registry import ProviderRegistry
+from cutty.packages.domain.registry import ProviderStore
 from tests.fixtures.packages.domain.providers import constprovider
 from tests.fixtures.packages.domain.providers import dictprovider
 from tests.fixtures.packages.domain.providers import nullprovider

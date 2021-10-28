@@ -15,9 +15,8 @@ from typing import Optional
 from yarl import URL
 
 from cutty.packages.adapters.registry import defaultproviderfactories
-from cutty.packages.domain.providers import ProviderName
-from cutty.packages.domain.providers import ProviderStore
 from cutty.packages.domain.registry import ProviderRegistry
+from cutty.packages.domain.registry import ProviderStore
 from cutty.packages.domain.stores import Store
 
 
@@ -84,12 +83,12 @@ class PackageStorage:
         self.path.mkdir(parents=True, exist_ok=True)
         self.timer = timer
 
-    def _getrepositorypath(self, url: URL, *, provider: ProviderName) -> pathlib.Path:
+    def _getrepositorypath(self, url: URL, *, provider: str) -> pathlib.Path:
         """Return the path to the package repository."""
         h = hashurl(url)
         return self.path / "repositories" / provider / h[:2] / h[2:]
 
-    def get(self, url: URL, *, provider: ProviderName) -> Optional[StorageRecord]:
+    def get(self, url: URL, *, provider: str) -> Optional[StorageRecord]:
         """Retrieve storage for a package repository."""
         path = self._getrepositorypath(url, provider=provider)
         if not path.exists():
@@ -101,7 +100,7 @@ class PackageStorage:
 
         return record
 
-    def allocate(self, url: URL, *, provider: ProviderName) -> StorageRecord:
+    def allocate(self, url: URL, *, provider: str) -> StorageRecord:
         """Allocate storage for a package repository."""
         path = self._getrepositorypath(url, provider=provider)
         path.mkdir(parents=True)

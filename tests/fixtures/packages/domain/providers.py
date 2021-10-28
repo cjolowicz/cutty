@@ -1,6 +1,7 @@
 """Fixtures for cutty.packages.domain.providers."""
 from collections.abc import Callable
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import Any
 from typing import Optional
 
@@ -10,7 +11,6 @@ from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.package import PackageRepository
-from cutty.packages.domain.package import SinglePackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.revisions import Revision
 
@@ -40,6 +40,18 @@ def provider(name: str) -> Callable[[ProviderFunction], Provider]:
 
 nullprovider = Provider("null")
 """Provider that matches no location."""
+
+
+@dataclass
+class SinglePackageRepository(PackageRepository):
+    """A package repository with a single package."""
+
+    package: Package
+
+    @contextmanager
+    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+        """Retrieve the package with the given revision."""
+        yield self.package
 
 
 def constprovider(name: str, package: Package) -> Provider:
