@@ -41,8 +41,8 @@ class ProviderRegistry:
     ) -> PackageRepository:
         """Return the package repository located at the given URL."""
         location = parselocation(rawlocation)
-        providername, location = self._extractprovidername(location)
-        providers = self._createproviders(fetchmode, providername)
+        name, location = self._extractprovidername(location)
+        providers = self._createproviders(fetchmode, name)
 
         for provider in providers:
             if repository := provider.provide(location):
@@ -55,9 +55,9 @@ class ProviderRegistry:
     ) -> tuple[Optional[ProviderName], Location]:
         """Split off the provider name from the URL scheme, if any."""
         if isinstance(location, URL):
-            providername, _, scheme = location.scheme.rpartition("+")
+            name, _, scheme = location.scheme.rpartition("+")
 
-            if providername and providername in self.registry:
+            if name and name in self.registry:
                 if location.raw_host is None:
                     # yarl does not allow scheme replacement in URLs without host
                     # https://github.com/aio-libs/yarl/issues/280
@@ -69,8 +69,8 @@ class ProviderRegistry:
                         fragment=location.raw_fragment,
                         encoded=True,
                     )
-                    return providername, location
-                return providername, location.with_scheme(scheme)
+                    return name, location
+                return name, location.with_scheme(scheme)
 
         return None, location
 
