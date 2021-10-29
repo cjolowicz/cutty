@@ -14,6 +14,7 @@ from cutty.projects.project import EmptyTemplateError
 from cutty.projects.repository import NoUpdateInProgressError
 from cutty.services.link import TemplateNotSpecifiedError
 from cutty.util.exceptionhandlers import exceptionhandler
+from cutty.util.git import MergeConflictError
 
 
 def _die(message: str) -> NoReturn:
@@ -91,6 +92,11 @@ def _noupdateinprogress(error: NoUpdateInProgressError) -> NoReturn:
     _die("no update in progress")
 
 
+@exceptionhandler
+def _mergeconflict(error: MergeConflictError) -> NoReturn:
+    _die(str(error))
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -103,4 +109,5 @@ fatal = (
     >> _templatenotspecified
     >> _emptytemplate
     >> _noupdateinprogress
+    >> _mergeconflict
 )
