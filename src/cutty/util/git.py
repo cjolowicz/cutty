@@ -89,8 +89,22 @@ class Branch:
         self._branches[self._name] = commit
 
 
+@dataclass
 class MergeConflictError(Exception):
     """The merge resulted in conflicts."""
+
+    paths: set[str]
+
+    @classmethod
+    def fromindex(cls, index: pygit2.Index) -> MergeConflictError:
+        """Create a MergeConflictError from the repository index."""
+        paths = {
+            side.path
+            for _, ours, theirs in index.conflicts
+            for side in (ours, theirs)
+            if side is not None
+        }
+        return cls(paths)
 
 
 @dataclass
@@ -259,13 +273,7 @@ class Repository:
         self._repository.cherrypick(commit.id)
 
         if self._repository.index.conflicts:
-            paths = {
-                side.path
-                for _, ours, theirs in self._repository.index.conflicts
-                for side in (ours, theirs)
-                if side is not None
-            }
-            raise MergeConflictError(f"Merge conflicts: {', '.join(paths)}")
+            raise MergeConflictError.fromindex(self._repository.index)
 
         self.commit(
             message=commit.message,

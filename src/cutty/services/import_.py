@@ -79,19 +79,16 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
 
     try:
         repository.import_(commit)
-    except MergeConflictError as error:
+    except MergeConflictError:
         try:
             resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
         except KeyError:
             pass
 
-        repository.project._repository.index.read()
-        if repository.project._repository.index.conflicts:
-            message = str(error)
-            paths = message.removeprefix("Merge conflicts: ").split(", ")
-            if "cutty.json" in paths:
-                paths.remove("cutty.json")
-            message = f"Merge conflicts: {', '.join(paths)}"
-            raise MergeConflictError(message)
+        index = repository.project._repository.index
+        index.read()
+
+        if index.conflicts:
+            raise MergeConflictError.fromindex(index)
 
         repository.continue_()

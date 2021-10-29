@@ -17,6 +17,7 @@ from cutty.packages.domain.mounters import UnsupportedRevisionError
 from cutty.packages.domain.registry import UnknownLocationError
 from cutty.projects.repository import NoUpdateInProgressError
 from cutty.services.link import TemplateNotSpecifiedError
+from cutty.util.git import MergeConflictError
 
 
 @pytest.mark.parametrize(
@@ -57,6 +58,7 @@ from cutty.services.link import TemplateNotSpecifiedError
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
         TemplateNotSpecifiedError(),
         NoUpdateInProgressError(),
+        MergeConflictError({"README.md"}),
     ],
 )
 def test_errors(error: CuttyError) -> None:
