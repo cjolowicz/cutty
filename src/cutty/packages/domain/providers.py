@@ -1,7 +1,6 @@
 """Package providers."""
 import abc
 import pathlib
-from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
 from typing import Optional
@@ -11,7 +10,6 @@ from yarl import URL
 from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
-from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
@@ -19,7 +17,8 @@ from cutty.packages.domain.locations import pathfromlocation
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
-from cutty.packages.domain.package import Package
+from cutty.packages.domain.repository import DefaultPackageRepository
+from cutty.packages.domain.repository import GetRevision
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
@@ -34,38 +33,6 @@ class Provider:
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
-
-
-GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
-
-
-class DefaultPackageRepository(PackageRepository):
-    """Default implementation of a package repository."""
-
-    def __init__(
-        self,
-        name: str,
-        path: pathlib.Path,
-        *,
-        mount: Mounter,
-        getrevision: Optional[GetRevision],
-    ) -> None:
-        """Initialize."""
-        self.name = name
-        self.path = path
-        self.mount = mount
-        self.getrevision = getrevision
-
-    @contextmanager
-    def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
-        """Retrieve the package with the given revision."""
-        if self.getrevision is not None:
-            resolved_revision = self.getrevision(self.path, revision)
-        else:
-            resolved_revision = revision
-
-        with self.mount(self.path, revision) as filesystem:
-            yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
 
 
 class LocalProvider(Provider):
