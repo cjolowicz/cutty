@@ -72,8 +72,13 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     if commit != parent:
         try:
             repository.import_(commit)
-        except MergeConflictError:
+        except MergeConflictError as error:
             try:
                 resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
             except KeyError:
                 pass
+
+            repository.project._repository.index.read()
+            if repository.project._repository.index.conflicts:
+                # FIXME: remove cutty.json from error message
+                raise error
