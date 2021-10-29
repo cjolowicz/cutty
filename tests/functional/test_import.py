@@ -85,3 +85,13 @@ def test_parent(
 
     assert "marker" in tree(project)
     assert "extra" not in tree(project)
+
+
+def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It exits with non-zero status on merge conflicts."""
+    updatefile(templateproject / "marker", "a")
+    updatefile(project / "marker", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        with chdir(project):
+            runcutty("import")
