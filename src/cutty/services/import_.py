@@ -85,8 +85,10 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
         except KeyError:
             pass
 
-        repository.project._repository.index.read()
-        if repository.project._repository.index.conflicts:
-            raise MergeConflictError.fromindex(repository.project._repository.index)
+        index = repository.project._repository.index
+        index.read()
+
+        if index.conflicts:
+            raise MergeConflictError.fromindex(index)
 
         repository.continue_()
