@@ -61,7 +61,7 @@ def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> Non
     assert repository is not None
 
     with repository.get() as package:
-        [entry] = package.path.iterdir()
+        [entry] = package.tree.iterdir()
         assert entry.name == "marker"
 
 
@@ -180,7 +180,7 @@ def test_remoteproviderfactory_mounter(
     assert repository is not None
 
     with repository.get(revision) as package:
-        assert (package.path / "marker").read_text() == "Lorem"
+        assert (package.tree / "marker").read_text() == "Lorem"
 
 
 def test_remoteproviderfactory_inexistent_path(

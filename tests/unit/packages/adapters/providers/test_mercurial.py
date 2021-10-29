@@ -64,7 +64,7 @@ def test_happy(
     assert repository is not None
 
     with repository.get(revision) as package:
-        text = (package.path / "marker").read_text()
+        text = (package.tree / "marker").read_text()
         assert expected == text
 
 
