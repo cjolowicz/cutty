@@ -58,7 +58,7 @@ from cutty.util.git import MergeConflictError
         UnknownLocationError(pathlib.Path("/no/such/file/or/directory")),
         TemplateNotSpecifiedError(),
         NoUpdateInProgressError(),
-        MergeConflictError(),
+        MergeConflictError({"README.md"}),
     ],
 )
 def test_errors(error: CuttyError) -> None:

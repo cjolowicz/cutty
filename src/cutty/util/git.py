@@ -89,8 +89,11 @@ class Branch:
         self._branches[self._name] = commit
 
 
+@dataclass
 class MergeConflictError(Exception):
     """The merge resulted in conflicts."""
+
+    paths: set[str]
 
     @classmethod
     def fromindex(cls, index: pygit2.Index) -> MergeConflictError:
@@ -101,7 +104,7 @@ class MergeConflictError(Exception):
             for side in (ours, theirs)
             if side is not None
         }
-        return cls(f"Merge conflicts: {', '.join(paths)}")
+        return cls(paths)
 
 
 @dataclass

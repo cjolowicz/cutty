@@ -94,7 +94,7 @@ def _noupdateinprogress(error: NoUpdateInProgressError) -> NoReturn:
 
 @exceptionhandler
 def _mergeconflict(error: MergeConflictError) -> NoReturn:
-    _die(str(error))
+    _die(f"Merge conflicts: {', '.join(error.paths)}")
 
 
 fatal = (
