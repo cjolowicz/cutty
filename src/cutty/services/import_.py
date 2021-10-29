@@ -3,6 +3,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
+from cutty.packages.adapters.providers.git import RevisionNotFoundError
 from cutty.projects.build import buildproject
 from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readprojectconfigfile
@@ -23,12 +24,16 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
 
     repository = ProjectRepository(projectdir)
 
-    parent = buildproject(
-        repository,
-        config1,
-        interactive=True,
-        commitmessage=updatecommitmessage,
-    )
+    parent: Optional[str]
+    try:
+        parent = buildproject(
+            repository,
+            config1,
+            interactive=True,
+            commitmessage=updatecommitmessage,
+        )
+    except RevisionNotFoundError:
+        parent = None
 
     commit = buildproject(
         repository,
