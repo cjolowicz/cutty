@@ -87,6 +87,20 @@ def test_parent(
     assert "extra" not in tree(project)
 
 
+def test_child(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It does not apply the child commit."""
+    updatefile(templateproject / "marker")
+    updatefile(templateproject / "extra")
+
+    with chdir(project):
+        runcutty("import", "--revision=HEAD^")
+
+    assert "marker" in tree(project)
+    assert "extra" not in tree(project)
+
+
 def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It exits with non-zero status on merge conflicts."""
     updatefile(templateproject / "marker", "a")
