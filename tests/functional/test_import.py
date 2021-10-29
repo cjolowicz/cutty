@@ -29,7 +29,7 @@ def commit(repository: Path) -> pygit2.Commit:
 
 
 def test_noop(runcutty: RunCutty, project: Path) -> None:
-    """It doesn't do anything if nothing changed."""
+    """It doesn't do anything if the project is up-to-date."""
     head = commit(project)
 
     with chdir(project):
