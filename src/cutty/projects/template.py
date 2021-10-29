@@ -50,4 +50,4 @@ class Template:
 
             metadata = cls.Metadata(template, directory, package.name, package.revision)
 
-            yield cls(metadata, package.path)
+            yield cls(metadata, package.tree)

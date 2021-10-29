@@ -32,7 +32,7 @@ def test_local_happy(url: URL) -> None:
     assert repository is not None
 
     with repository.get() as package:
-        text = (package.path / "marker").read_text()
+        text = (package.tree / "marker").read_text()
         assert "Lorem" == text
 
 
@@ -64,7 +64,7 @@ def test_remote_happy(zipprovider: Provider, url: URL) -> None:
     assert repository is not None
 
     with repository.get() as package:
-        text = (package.path / "marker").read_text()
+        text = (package.tree / "marker").read_text()
         assert "Lorem" == text
 
 

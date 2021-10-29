@@ -64,8 +64,8 @@ def test_provide_pass(providerstore: ProviderStore, providers: list[Provider]) -
 
     repository = registry.getrepository("")
     with repository.get() as package:
-        assert package.path.is_dir()
-        assert not (package.path / "marker").is_file()
+        assert package.tree.is_dir()
+        assert not (package.tree / "marker").is_file()
 
 
 def test_none(providerstore: ProviderStore, url: URL) -> None:
@@ -84,7 +84,7 @@ def test_with_url(
     repository = registry.getrepository(str(url))
 
     with repository.get() as package:
-        assert not list(package.path.iterdir())
+        assert not list(package.tree.iterdir())
 
 
 def test_with_path(
@@ -105,7 +105,7 @@ def test_with_path(
     repository = registry.getrepository(str(directory))
 
     with repository.get() as package:
-        [entry] = package.path.iterdir()
+        [entry] = package.tree.iterdir()
 
     assert entry.name == "marker"
 

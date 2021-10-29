@@ -46,7 +46,7 @@ def test_local_happy(url: URL, revision: Optional[str], expected: str) -> None:
     assert repository is not None
 
     with repository.get(revision) as package:
-        text = (package.path / "marker").read_text()
+        text = (package.tree / "marker").read_text()
         assert expected == text
 
 
@@ -112,7 +112,7 @@ def test_remote_happy(
     assert repository is not None
 
     with repository.get(revision) as package:
-        text = (package.path / "marker").read_text()
+        text = (package.tree / "marker").read_text()
         assert expected == text
 
 
