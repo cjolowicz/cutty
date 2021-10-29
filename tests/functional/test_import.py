@@ -1,6 +1,7 @@
 """Functional tests for `cutty import`."""
 from pathlib import Path
 
+import pygit2
 import pytest
 
 from cutty.util.git import Repository
@@ -38,6 +39,11 @@ def templateproject(template: Path) -> Path:
     return template / "{{ cookiecutter.project }}"
 
 
+def tree(repository: Path) -> pygit2.Tree:
+    """Return the tree referenced by HEAD."""
+    return Repository.open(repository).head.commit.tree
+
+
 def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It applies the latest changeset by default."""
     updatefile(templateproject / "marker")
@@ -45,7 +51,7 @@ def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
     with chdir(project):
         runcutty("import")
 
-    assert "marker" in Repository.open(project).head.commit.tree
+    assert "marker" in tree(project)
 
 
 def test_revision(
@@ -59,7 +65,7 @@ def test_revision(
     with chdir(project):
         runcutty("import", f"--revision={revision}")
 
-    assert "marker" in Repository.open(project).head.commit.tree
+    assert "marker" in tree(project)
 
 
 def test_parent(
@@ -72,5 +78,5 @@ def test_parent(
     with chdir(project):
         runcutty("import")
 
-    assert "marker" in Repository.open(project).head.commit.tree
-    assert "extra" not in Repository.open(project).head.commit.tree
+    assert "marker" in tree(project)
+    assert "extra" not in tree(project)
