@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Optional
 
 from cutty.projects.build import buildproject
+from cutty.projects.config import ProjectConfig
+from cutty.projects.config import readprojectconfigfile
 from cutty.projects.messages import updatecommitmessage
-from cutty.projects.projectconfig import ProjectConfig
-from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.templates.domain.bindings import Binding
 

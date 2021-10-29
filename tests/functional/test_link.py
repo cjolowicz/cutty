@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cutty.projects.projectconfig import readprojectconfigfile
+from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError

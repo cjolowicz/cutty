@@ -3,10 +3,10 @@ from collections.abc import Iterator
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
+from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
 from cutty.projects.messages import MessageBuilder
 from cutty.projects.project import Project
-from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import Template
