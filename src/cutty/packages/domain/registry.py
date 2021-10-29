@@ -10,9 +10,9 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import parselocation
-from cutty.packages.domain.package import PackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.providers import ProviderFactory
+from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.stores import Store
 
 
