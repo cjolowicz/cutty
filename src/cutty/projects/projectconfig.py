@@ -14,7 +14,7 @@ PROJECT_CONFIG_FILE = "cutty.json"
 COOKIECUTTER_JSON_FILE = ".cookiecutter.json"
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProjectConfig:
     """Project configuration."""
 
