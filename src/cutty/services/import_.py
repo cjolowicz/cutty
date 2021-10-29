@@ -73,5 +73,7 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
         try:
             repository.import_(commit)
         except MergeConflictError:
-            resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
-            # TODO: reraise for remaining conflicts
+            try:
+                resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
+            except KeyError:
+                pass
