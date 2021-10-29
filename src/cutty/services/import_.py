@@ -72,22 +72,26 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
         parent=parent,
     )
 
-    if commit != parent:
+    # If `commit` and `parent` are identical then so is the template revision
+    # stored in their cutty.json. But for the version control systems we
+    # support, commits never have the same hash as their parents.
+    assert commit != parent  # noqa: S101
+
+    try:
+        repository.import_(commit)
+    except MergeConflictError as error:
         try:
-            repository.import_(commit)
-        except MergeConflictError as error:
-            try:
-                resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
-            except KeyError:
-                pass
+            resolveconflicts(projectdir, projectdir / "cutty.json", Side.THEIRS)
+        except KeyError:
+            pass
 
-            repository.project._repository.index.read()
-            if repository.project._repository.index.conflicts:
-                message = str(error)
-                paths = message.removeprefix("Merge conflicts: ").split(", ")
-                if "cutty.json" in paths:
-                    paths.remove("cutty.json")
-                message = f"Merge conflicts: {', '.join(paths)}"
-                raise MergeConflictError(message)
+        repository.project._repository.index.read()
+        if repository.project._repository.index.conflicts:
+            message = str(error)
+            paths = message.removeprefix("Merge conflicts: ").split(", ")
+            if "cutty.json" in paths:
+                paths.remove("cutty.json")
+            message = f"Merge conflicts: {', '.join(paths)}"
+            raise MergeConflictError(message)
 
-            repository.continue_()
+        repository.continue_()
