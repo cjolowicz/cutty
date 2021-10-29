@@ -1,4 +1,5 @@
 """Import changes from templates into projects."""
+from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
@@ -11,7 +12,7 @@ from cutty.projects.repository import ProjectRepository
 
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     """Import changes from a template into a project."""
-    config1 = readprojectconfigfile(projectdir)
+    config1 = replace(readprojectconfigfile(projectdir), revision="HEAD^")
 
     config2 = ProjectConfig(
         config1.template,
