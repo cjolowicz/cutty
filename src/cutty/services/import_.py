@@ -89,3 +89,5 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
                     paths.remove("cutty.json")
                 message = f"Merge conflicts: {', '.join(paths)}"
                 raise MergeConflictError(message)
+
+            repository.continue_()
