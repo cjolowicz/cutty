@@ -23,14 +23,19 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     return Path("example")
 
 
+def commit(repository: Path) -> pygit2.Commit:
+    """Return the commit referenced by HEAD."""
+    return Repository.open(repository).head.commit
+
+
 def test_noop(runcutty: RunCutty, project: Path) -> None:
     """It doesn't do anything if nothing changed."""
-    head = Repository.open(project).head.commit
+    head = commit(project)
 
     with chdir(project):
         runcutty("import")
 
-    assert head == Repository.open(project).head.commit
+    assert head == commit(project)
 
 
 @pytest.fixture
@@ -41,7 +46,7 @@ def templateproject(template: Path) -> Path:
 
 def tree(repository: Path) -> pygit2.Tree:
     """Return the tree referenced by HEAD."""
-    return Repository.open(repository).head.commit.tree
+    return commit(repository).tree
 
 
 def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
@@ -60,7 +65,7 @@ def test_revision(
     """It applies the indicated changeset."""
     updatefile(templateproject / "marker")
 
-    revision = Repository.open(template).head.commit.id
+    revision = commit(template).id
 
     with chdir(project):
         runcutty("import", f"--revision={revision}")
