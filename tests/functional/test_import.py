@@ -95,3 +95,18 @@ def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> N
     with pytest.raises(Exception, match="conflict"):
         with chdir(project):
             runcutty("import")
+
+
+def test_conflict_message(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It does not report cutty.json on merge conflicts."""
+    updatefile(templateproject / "extra")
+    updatefile(templateproject / "marker", "a")
+    updatefile(project / "marker", "b")
+
+    with pytest.raises(Exception) as exceptioninfo:
+        with chdir(project):
+            runcutty("import")
+
+    assert "cutty.json" not in str(exceptioninfo.value)
