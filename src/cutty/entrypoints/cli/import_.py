@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from cutty.entrypoints.cli.errors import fatal
-from cutty.services.update import update
+from cutty.services.import_ import import_ as service
 
 
 @click.command("import")
@@ -17,10 +17,4 @@ from cutty.services.update import update
 @fatal
 def import_(revision: Optional[str]) -> None:
     """Import changesets from templates into projects."""
-    update(
-        Path.cwd(),
-        extrabindings=(),
-        interactive=True,
-        revision=revision,
-        directory=None,
-    )
+    service(Path.cwd(), revision=revision)
