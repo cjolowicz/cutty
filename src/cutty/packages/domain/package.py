@@ -15,13 +15,8 @@ class Package:
     """A package."""
 
     name: str
-    path: Path
+    tree: Path
     revision: Optional[Revision]
-
-    @property
-    def tree(self) -> Path:
-        """."""
-        return self.path
 
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
