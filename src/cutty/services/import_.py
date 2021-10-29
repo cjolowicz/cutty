@@ -39,7 +39,10 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
 
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     """Import changes from a template into a project."""
-    config1 = replace(readprojectconfigfile(projectdir), revision="HEAD^")
+    config1 = replace(
+        readprojectconfigfile(projectdir),
+        revision="HEAD^" if revision is None else f"{revision}^",
+    )
 
     config2 = ProjectConfig(
         config1.template,
