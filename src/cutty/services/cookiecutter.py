@@ -5,7 +5,7 @@ from typing import Optional
 
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.build import createproject
-from cutty.projects.projectconfig import ProjectConfig
+from cutty.projects.config import ProjectConfig
 from cutty.projects.store import storeproject
 from cutty.templates.domain.bindings import Binding
 

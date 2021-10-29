@@ -2,8 +2,8 @@
 import dataclasses
 from pathlib import Path
 
+from cutty.projects.config import PROJECT_CONFIG_FILE
 from cutty.projects.messages import linkcommitmessage
-from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
 from cutty.util.git import Repository

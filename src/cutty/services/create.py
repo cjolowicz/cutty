@@ -5,8 +5,8 @@ from typing import Optional
 
 from cutty.projects.build import commitproject
 from cutty.projects.build import createproject
+from cutty.projects.config import ProjectConfig
 from cutty.projects.messages import createcommitmessage
-from cutty.projects.projectconfig import ProjectConfig
 from cutty.projects.repository import ProjectRepository
 from cutty.templates.domain.bindings import Binding
 

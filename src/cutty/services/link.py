@@ -6,11 +6,11 @@ from typing import Optional
 
 from cutty.errors import CuttyError
 from cutty.projects.build import buildproject
+from cutty.projects.config import PROJECT_CONFIG_FILE
+from cutty.projects.config import ProjectConfig
+from cutty.projects.config import readcookiecutterjson
+from cutty.projects.config import readprojectconfigfile
 from cutty.projects.messages import linkcommitmessage
-from cutty.projects.projectconfig import PROJECT_CONFIG_FILE
-from cutty.projects.projectconfig import ProjectConfig
-from cutty.projects.projectconfig import readcookiecutterjson
-from cutty.projects.projectconfig import readprojectconfigfile
 from cutty.projects.repository import ProjectRepository
 from cutty.templates.domain.bindings import Binding
 
