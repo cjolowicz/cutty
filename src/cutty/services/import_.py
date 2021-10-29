@@ -80,5 +80,9 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
 
             repository.project._repository.index.read()
             if repository.project._repository.index.conflicts:
-                # FIXME: remove cutty.json from error message
-                raise error
+                message = str(error)
+                paths = message.removeprefix("Merge conflicts: ").split(", ")
+                if "cutty.json" in paths:
+                    paths.remove("cutty.json")
+                message = f"Merge conflicts: {', '.join(paths)}"
+                raise MergeConflictError(message)
