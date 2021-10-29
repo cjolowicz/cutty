@@ -60,3 +60,17 @@ def test_revision(
         runcutty("import", f"--revision={revision}")
 
     assert "marker" in Repository.open(project).head.commit.tree
+
+
+def test_parent(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It does not apply the parent commit."""
+    updatefile(templateproject / "extra")
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import")
+
+    assert "marker" in Repository.open(project).head.commit.tree
+    assert "extra" not in Repository.open(project).head.commit.tree
