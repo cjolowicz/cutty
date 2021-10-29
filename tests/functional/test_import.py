@@ -46,3 +46,17 @@ def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
         runcutty("import")
 
     assert "marker" in Repository.open(project).head.commit.tree
+
+
+def test_revision(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It applies the indicated changeset."""
+    updatefile(templateproject / "marker")
+
+    revision = Repository.open(template).head.commit.id
+
+    with chdir(project):
+        runcutty("import", f"--revision={revision}")
+
+    assert "marker" in Repository.open(project).head.commit.tree
