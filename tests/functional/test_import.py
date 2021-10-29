@@ -59,6 +59,21 @@ def test_latest(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
     assert "marker" in tree(project)
 
 
+def test_idempotent(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It doesn't do anything if the change was already imported."""
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import")
+
+    head = commit(project)
+
+    with chdir(project):
+        runcutty("import")
+
+    assert head == commit(project)
+
+
 def test_revision(
     runcutty: RunCutty, template: Path, templateproject: Path, project: Path
 ) -> None:
