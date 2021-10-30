@@ -24,13 +24,13 @@ class TemplateRepository:
     location: str
 
     @classmethod
-    def load(cls, template: str) -> TemplateRepository:
+    def load(cls, location: str) -> TemplateRepository:
         """Load a template repository."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository(template)
+        repository = packageprovider.getrepository(location)
 
-        return cls(repository, template)
+        return cls(repository, location)
 
     @contextmanager
     def get(
