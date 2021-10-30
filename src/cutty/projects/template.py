@@ -16,6 +16,20 @@ from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
 
 
+class TemplateProvider:
+    """Provider of project templates."""
+
+    def provide(
+        self, location: str, directory: Optional[pathlib.Path]
+    ) -> TemplateRepository:
+        """Load a template repository."""
+        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+        packageprovider = getdefaultpackageprovider(cachedir)
+        repository = packageprovider.getrepository(location)
+
+        return TemplateRepository(repository, location, directory)
+
+
 @dataclass
 class TemplateRepository:
     """Repository of project templates."""
@@ -29,11 +43,7 @@ class TemplateRepository:
         cls, location: str, directory: Optional[pathlib.Path]
     ) -> TemplateRepository:
         """Load a template repository."""
-        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository(location)
-
-        return cls(repository, location, directory)
+        return TemplateProvider().provide(location, directory)
 
     @contextmanager
     def get(self, revision: Optional[str]) -> Iterator[Template]:
