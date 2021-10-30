@@ -21,6 +21,7 @@ class TemplateRepository:
     """Repository of project templates."""
 
     repository: PackageRepository
+    location: str
 
     @classmethod
     def load(cls, template: str) -> TemplateRepository:
@@ -29,14 +30,11 @@ class TemplateRepository:
         packageprovider = getdefaultpackageprovider(cachedir)
         repository = packageprovider.getrepository(template)
 
-        return cls(repository)
+        return cls(repository, template)
 
     @contextmanager
     def get(
-        self,
-        template: str,
-        revision: Optional[str],
-        directory: Optional[pathlib.Path],
+        self, revision: Optional[str], directory: Optional[pathlib.Path]
     ) -> Iterator[Template]:
         """Load a project template."""
         with self.repository.get(revision) as package:
@@ -44,7 +42,7 @@ class TemplateRepository:
                 package = package.descend(PurePath(*directory.parts))
 
             metadata = Template.Metadata(
-                template, directory, package.name, package.revision
+                self.location, directory, package.name, package.revision
             )
 
             yield Template(metadata, package.tree)

@@ -19,7 +19,7 @@ def createproject(
     """Create the project."""
     templates = TemplateRepository.load(config.template)
 
-    with templates.get(config.template, config.revision, config.directory) as template:
+    with templates.get(config.revision, config.directory) as template:
         yield generate(
             template,
             config.bindings,
