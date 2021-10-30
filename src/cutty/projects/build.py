@@ -1,8 +1,12 @@
 """Building projects in a repository."""
+import contextlib
 from collections.abc import Iterator
+from dataclasses import replace
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
+from cutty.packages.adapters.providers.git import getparentrevision
+from cutty.packages.adapters.providers.git import RevisionNotFoundError
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
 from cutty.projects.messages import MessageBuilder
@@ -56,3 +60,23 @@ def buildproject(
         return commitproject(
             repository, project, parent=parent, commitmessage=commitmessage
         )
+
+
+def buildparentproject(
+    repository: ProjectRepository,
+    config: ProjectConfig,
+    *,
+    revision: Optional[str],
+    interactive: bool,
+    commitmessage: MessageBuilder,
+) -> Optional[str]:
+    """Build the project for the parent revision."""
+    config = replace(config, revision=getparentrevision(revision))
+
+    if config.revision is not None:  # pragma: no branch
+        with contextlib.suppress(RevisionNotFoundError):
+            return buildproject(
+                repository, config, interactive=interactive, commitmessage=commitmessage
+            )
+
+    return None

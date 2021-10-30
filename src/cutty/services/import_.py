@@ -1,14 +1,11 @@
 """Import changes from templates into projects."""
-import contextlib
 import enum
-from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
 import pygit2
 
-from cutty.packages.adapters.providers.git import getparentrevision
-from cutty.packages.adapters.providers.git import RevisionNotFoundError
+from cutty.projects.build import buildparentproject
 from cutty.projects.build import buildproject
 from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readprojectconfigfile
@@ -52,17 +49,13 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
 
     repository = ProjectRepository(projectdir)
 
-    config1 = replace(config1, revision=getparentrevision(revision))
-
-    parent: Optional[str] = None
-    if config1.revision is not None:  # pragma: no branch
-        with contextlib.suppress(RevisionNotFoundError):
-            parent = buildproject(
-                repository,
-                config1,
-                interactive=True,
-                commitmessage=updatecommitmessage,
-            )
+    parent = buildparentproject(
+        repository,
+        config1,
+        revision=revision,
+        interactive=True,
+        commitmessage=updatecommitmessage,
+    )
 
     commit = buildproject(
         repository,
