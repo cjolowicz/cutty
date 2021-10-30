@@ -19,7 +19,7 @@ class TemplateRepository:
     """Repository of project templates."""
 
     @contextmanager
-    def load(
+    def get(
         self,
         template: str,
         revision: Optional[str],

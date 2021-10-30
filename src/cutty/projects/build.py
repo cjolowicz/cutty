@@ -17,7 +17,7 @@ def createproject(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
 ) -> Iterator[Project]:
     """Create the project."""
-    with TemplateRepository().load(
+    with TemplateRepository().get(
         config.template, config.revision, config.directory
     ) as template:
         yield generate(
