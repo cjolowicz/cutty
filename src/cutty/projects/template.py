@@ -22,27 +22,28 @@ class TemplateRepository:
 
     repository: PackageRepository
     location: str
+    directory: Optional[pathlib.Path]
 
     @classmethod
-    def load(cls, location: str) -> TemplateRepository:
+    def load(
+        cls, location: str, directory: Optional[pathlib.Path]
+    ) -> TemplateRepository:
         """Load a template repository."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
         packageprovider = getdefaultpackageprovider(cachedir)
         repository = packageprovider.getrepository(location)
 
-        return cls(repository, location)
+        return cls(repository, location, directory)
 
     @contextmanager
-    def get(
-        self, revision: Optional[str], directory: Optional[pathlib.Path]
-    ) -> Iterator[Template]:
+    def get(self, revision: Optional[str]) -> Iterator[Template]:
         """Load a project template."""
         with self.repository.get(revision) as package:
-            if directory is not None:
-                package = package.descend(PurePath(*directory.parts))
+            if self.directory is not None:
+                package = package.descend(PurePath(*self.directory.parts))
 
             metadata = Template.Metadata(
-                self.location, directory, package.name, package.revision
+                self.location, self.directory, package.name, package.revision
             )
 
             yield Template(metadata, package.tree)
