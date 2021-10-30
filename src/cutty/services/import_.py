@@ -39,8 +39,9 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
 
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     """Import changes from a template into a project."""
+    config1 = readprojectconfigfile(projectdir)
     config1 = replace(
-        readprojectconfigfile(projectdir),
+        config1,
         revision="HEAD^" if revision is None else f"{revision}^",  # FIXME: git-specific
     )
 
