@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pathlib
 from collections.abc import Iterator
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -57,13 +56,3 @@ class Template:
 
     metadata: Metadata
     root: Path
-
-    @classmethod
-    def load(
-        cls,
-        template: str,
-        revision: Optional[str],
-        directory: Optional[pathlib.Path],
-    ) -> AbstractContextManager[Template]:
-        """Load a project template."""
-        return TemplateRepository().load(template, revision, directory)
