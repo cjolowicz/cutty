@@ -12,11 +12,24 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.adapters.storage import getdefaultpackageprovider
+from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
 
 
+@dataclass
 class TemplateRepository:
     """Repository of project templates."""
+
+    repository: PackageRepository
+
+    @classmethod
+    def load(cls, template: str) -> TemplateRepository:
+        """Load a template repository."""
+        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+        packageprovider = getdefaultpackageprovider(cachedir)
+        repository = packageprovider.getrepository(template)
+
+        return cls(repository)
 
     @contextmanager
     def get(
@@ -26,11 +39,7 @@ class TemplateRepository:
         directory: Optional[pathlib.Path],
     ) -> Iterator[Template]:
         """Load a project template."""
-        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository(template)
-
-        with repository.get(revision) as package:
+        with self.repository.get(revision) as package:
             if directory is not None:
                 package = package.descend(PurePath(*directory.parts))
 
