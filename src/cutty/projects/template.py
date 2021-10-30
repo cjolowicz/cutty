@@ -12,20 +12,30 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.adapters.storage import getdefaultpackageprovider
+from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
 
 
+@dataclass
 class TemplateProvider:
     """Provider of project templates."""
+
+    packageprovider: ProviderRegistry
+
+    @classmethod
+    def create(cls) -> TemplateProvider:
+        """Create the template provider."""
+        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+        packageprovider = getdefaultpackageprovider(cachedir)
+
+        return cls(packageprovider)
 
     def provide(
         self, location: str, directory: Optional[pathlib.Path]
     ) -> TemplateRepository:
         """Load a template repository."""
-        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository(location)
+        repository = self.packageprovider.getrepository(location)
 
         return TemplateRepository(repository, location, directory)
 
