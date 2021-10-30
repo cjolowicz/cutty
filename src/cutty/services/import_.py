@@ -42,7 +42,6 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     """Import changes from a template into a project."""
     config1 = readprojectconfigfile(projectdir)
-    config1 = replace(config1, revision=getparentrevision(revision))
 
     config2 = ProjectConfig(
         config1.template,
@@ -52,6 +51,8 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     )
 
     repository = ProjectRepository(projectdir)
+
+    config1 = replace(config1, revision=getparentrevision(revision))
 
     parent: Optional[str] = None
     if config1.revision is not None:  # pragma: no branch
