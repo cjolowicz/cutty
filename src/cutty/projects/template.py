@@ -38,13 +38,6 @@ class TemplateRepository:
     location: str
     directory: Optional[pathlib.Path]
 
-    @classmethod
-    def load(
-        cls, location: str, directory: Optional[pathlib.Path]
-    ) -> TemplateRepository:
-        """Load a template repository."""
-        return TemplateProvider().provide(location, directory)
-
     @contextmanager
     def get(self, revision: Optional[str]) -> Iterator[Template]:
         """Load a project template."""

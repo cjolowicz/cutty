@@ -9,7 +9,7 @@ from cutty.projects.messages import MessageBuilder
 from cutty.projects.project import Project
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
-from cutty.projects.template import TemplateRepository
+from cutty.projects.template import TemplateProvider
 
 
 @contextmanager
@@ -17,7 +17,7 @@ def createproject(
     config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
 ) -> Iterator[Project]:
     """Create the project."""
-    templates = TemplateRepository.load(config.template, config.directory)
+    templates = TemplateProvider().provide(config.template, config.directory)
 
     with templates.get(config.revision) as template:
         yield generate(
