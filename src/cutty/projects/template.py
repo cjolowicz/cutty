@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import pathlib
 from collections.abc import Iterator
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -13,6 +14,32 @@ from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.adapters.storage import getdefaultpackageprovider
 from cutty.packages.domain.revisions import Revision
+
+
+class TemplateRepository:
+    """Repository of project templates."""
+
+    @contextmanager
+    def load(
+        self,
+        template: str,
+        revision: Optional[str],
+        directory: Optional[pathlib.Path],
+    ) -> Iterator[Template]:
+        """Load a project template."""
+        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
+        packageprovider = getdefaultpackageprovider(cachedir)
+        repository = packageprovider.getrepository(template)
+
+        with repository.get(revision) as package:
+            if directory is not None:
+                package = package.descend(PurePath(*directory.parts))
+
+            metadata = Template.Metadata(
+                template, directory, package.name, package.revision
+            )
+
+            yield Template(metadata, package.tree)
 
 
 @dataclass
@@ -32,22 +59,11 @@ class Template:
     root: Path
 
     @classmethod
-    @contextmanager
     def load(
         cls,
         template: str,
         revision: Optional[str],
         directory: Optional[pathlib.Path],
-    ) -> Iterator[Template]:
+    ) -> AbstractContextManager[Template]:
         """Load a project template."""
-        cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        packageprovider = getdefaultpackageprovider(cachedir)
-        repository = packageprovider.getrepository(template)
-
-        with repository.get(revision) as package:
-            if directory is not None:
-                package = package.descend(PurePath(*directory.parts))
-
-            metadata = cls.Metadata(template, directory, package.name, package.revision)
-
-            yield cls(metadata, package.tree)
+        return TemplateRepository().load(template, revision, directory)
