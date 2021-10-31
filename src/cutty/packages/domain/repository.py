@@ -20,6 +20,9 @@ class PackageRepository(abc.ABC):
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
 
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 
@@ -34,12 +37,14 @@ class DefaultPackageRepository(PackageRepository):
         *,
         mount: Mounter,
         getrevision: Optional[GetRevision],
+        getparentrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
         self.mount = mount
         self.getrevision = getrevision
+        self._getparentrevision = getparentrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -51,3 +56,12 @@ class DefaultPackageRepository(PackageRepository):
 
         with self.mount(self.path, revision) as filesystem:
             yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
+
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+        if self._getparentrevision is None:  # pragma: no cover
+            from cutty.packages.adapters.providers.git import getparentrevision
+
+            return getparentrevision(self.path, revision)
+
+        return self._getparentrevision(self.path, revision)

@@ -46,6 +46,7 @@ class LocalProvider(Provider):
         match: PathMatcher,
         mount: Mounter,
         getrevision: Optional[GetRevision] = None,
+        getparentrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -53,13 +54,18 @@ class LocalProvider(Provider):
         self.match = match
         self.mount = mount
         self.getrevision = getrevision
+        self.getparentrevision = getparentrevision
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
                 return DefaultPackageRepository(
-                    location.name, path, mount=self.mount, getrevision=self.getrevision
+                    location.name,
+                    path,
+                    mount=self.mount,
+                    getrevision=self.getrevision,
+                    getparentrevision=self.getparentrevision,
                 )
 
         return None
@@ -84,6 +90,7 @@ class RemoteProvider(Provider):
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
+        getparentrevision: Optional[GetRevision] = None,
         store: Store,
     ) -> None:
         """Initialize."""
@@ -100,6 +107,7 @@ class RemoteProvider(Provider):
         self.store = store
         self.mount = mount
         self.getrevision = getrevision
+        self.getparentrevision = getparentrevision
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -119,6 +127,7 @@ class RemoteProvider(Provider):
                         path,
                         mount=self.mount,
                         getrevision=self.getrevision,
+                        getparentrevision=self.getparentrevision,
                     )
 
         return None
@@ -148,6 +157,7 @@ class RemoteProviderFactory(ProviderFactory):
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
+        getparentrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -155,6 +165,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.fetch = tuple(fetch)
         self.mount = mount
         self.getrevision = getrevision
+        self.getparentrevision = getparentrevision
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -164,6 +175,7 @@ class RemoteProviderFactory(ProviderFactory):
             fetch=self.fetch,
             mount=self.mount,
             getrevision=self.getrevision,
+            getparentrevision=self.getparentrevision,
             store=store,
         )
 

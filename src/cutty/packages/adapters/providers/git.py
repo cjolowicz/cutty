@@ -73,9 +73,25 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return revision
 
 
+def getparentrevision(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Optional[Revision]:
+    """Return the parent revision, if any."""
+    return "HEAD^" if revision is None else f"{revision}^"
+
+
 localgitprovider = LocalProvider(
-    "localgit", match=match, mount=mount, getrevision=getrevision
+    "localgit",
+    match=match,
+    mount=mount,
+    getrevision=getrevision,
+    getparentrevision=getparentrevision,
 )
+
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], mount=mount, getrevision=getrevision
+    "git",
+    fetch=[gitfetcher],
+    mount=mount,
+    getrevision=getrevision,
+    getparentrevision=getparentrevision,
 )

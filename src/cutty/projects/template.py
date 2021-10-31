@@ -61,6 +61,10 @@ class TemplateRepository:
 
             yield Template(metadata, package.tree)
 
+    def getparentrevision(self, revision: Optional[str]) -> Optional[str]:
+        """Return the parent revision, if any."""
+        return self.repository.getparentrevision(revision)
+
 
 @dataclass
 class Template:
