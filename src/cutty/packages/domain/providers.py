@@ -90,6 +90,7 @@ class RemoteProvider(Provider):
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
+        getparentrevision: Optional[GetRevision] = None,
         store: Store,
     ) -> None:
         """Initialize."""
@@ -106,6 +107,7 @@ class RemoteProvider(Provider):
         self.store = store
         self.mount = mount
         self.getrevision = getrevision
+        self.getparentrevision = getparentrevision
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -125,6 +127,7 @@ class RemoteProvider(Provider):
                         path,
                         mount=self.mount,
                         getrevision=self.getrevision,
+                        getparentrevision=self.getparentrevision,
                     )
 
         return None
