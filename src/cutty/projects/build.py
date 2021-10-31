@@ -1,7 +1,6 @@
 """Building projects in a repository."""
 import contextlib
 from collections.abc import Iterator
-from dataclasses import replace
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
@@ -73,8 +72,7 @@ def buildparentproject(
     """Build the project for the parent revision."""
     provider = TemplateProvider.create()
     templates = provider.provide(config.template, config.directory)
-    config = replace(config, revision=getparentrevision(revision))
-    parentrevision = config.revision
+    parentrevision = getparentrevision(revision)
 
     if parentrevision is not None:  # pragma: no branch
         with contextlib.suppress(RevisionNotFoundError):
