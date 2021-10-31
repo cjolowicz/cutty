@@ -1,10 +1,8 @@
 """Building projects in a repository."""
-import contextlib
 from collections.abc import Iterator
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
-from cutty.packages.adapters.providers.git import RevisionNotFoundError
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
 from cutty.projects.messages import MessageBuilder
@@ -72,10 +70,9 @@ def buildparentproject(
     provider = TemplateProvider.create()
     templates = provider.provide(config.template, config.directory)
 
-    if parentrevision := templates.getparentrevision(revision):  # pragma: no branch
-        with contextlib.suppress(RevisionNotFoundError):
-            with templates.get(parentrevision) as template:
-                project = generate(template, config.bindings, interactive=interactive)
-                return commitproject(repository, project, commitmessage=commitmessage)
+    if parentrevision := templates.getparentrevision(revision):
+        with templates.get(parentrevision) as template:
+            project = generate(template, config.bindings, interactive=interactive)
+            return commitproject(repository, project, commitmessage=commitmessage)
 
     return None
