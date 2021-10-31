@@ -3,13 +3,22 @@ import abc
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
+from cutty.errors import CuttyError
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.revisions import Revision
+
+
+@dataclass
+class ParentRevisionNotImplementedError(CuttyError):
+    """The repository does not support `getparentrevision`."""
+
+    name: str
 
 
 class PackageRepository(abc.ABC):
@@ -60,9 +69,6 @@ class DefaultPackageRepository(PackageRepository):
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
         if self._getparentrevision is None:
-            raise NotImplementedError(
-                f"repository {self.name} does not support retrieving the parent "
-                "revision"
-            )
+            raise ParentRevisionNotImplementedError(self.name)
 
         return self._getparentrevision(self.path, revision)

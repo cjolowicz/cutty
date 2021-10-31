@@ -10,6 +10,7 @@ from cutty.packages.adapters.fetchers.mercurial import HgNotFoundError
 from cutty.packages.adapters.providers.git import RevisionNotFoundError
 from cutty.packages.domain.mounters import UnsupportedRevisionError
 from cutty.packages.domain.registry import UnknownLocationError
+from cutty.packages.domain.repository import ParentRevisionNotImplementedError
 from cutty.projects.project import EmptyTemplateError
 from cutty.projects.repository import NoUpdateInProgressError
 from cutty.services.link import TemplateNotSpecifiedError
@@ -97,6 +98,11 @@ def _mergeconflict(error: MergeConflictError) -> NoReturn:
     _die(f"Merge conflicts: {', '.join(error.paths)}")
 
 
+@exceptionhandler
+def _parentrevisionnotsupported(error: ParentRevisionNotImplementedError) -> NoReturn:
+    _die(f"repository {error.name} does not support retrieving the parent revision")
+
+
 fatal = (
     _unknownlocation
     >> _unsupportedrevision
@@ -110,4 +116,5 @@ fatal = (
     >> _emptytemplate
     >> _noupdateinprogress
     >> _mergeconflict
+    >> _parentrevisionnotsupported
 )
