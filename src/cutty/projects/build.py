@@ -72,9 +72,8 @@ def buildparentproject(
     """Build the project for the parent revision."""
     provider = TemplateProvider.create()
     templates = provider.provide(config.template, config.directory)
-    parentrevision = getparentrevision(revision)
 
-    if parentrevision is not None:  # pragma: no branch
+    if parentrevision := getparentrevision(revision):  # pragma: no branch
         with contextlib.suppress(RevisionNotFoundError):
             with templates.get(parentrevision) as template:
                 project = generate(template, config.bindings, interactive=interactive)
