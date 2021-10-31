@@ -37,12 +37,14 @@ class DefaultPackageRepository(PackageRepository):
         *,
         mount: Mounter,
         getrevision: Optional[GetRevision],
+        getparentrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
         self.mount = mount
         self.getrevision = getrevision
+        self._getparentrevision = getparentrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -57,6 +59,9 @@ class DefaultPackageRepository(PackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        from cutty.packages.adapters.providers.git import getparentrevision
+        if self._getparentrevision is None:
+            from cutty.packages.adapters.providers.git import getparentrevision
 
-        return getparentrevision(self.path, revision)
+            return getparentrevision(self.path, revision)
+        else:  # pragma: no cover
+            return self._getparentrevision(self.path, revision)
