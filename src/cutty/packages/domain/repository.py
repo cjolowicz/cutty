@@ -22,9 +22,6 @@ class PackageRepository(abc.ABC):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        from cutty.packages.adapters.providers.git import getparentrevision
-
-        return getparentrevision(revision)
 
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
@@ -57,3 +54,9 @@ class DefaultPackageRepository(PackageRepository):
 
         with self.mount(self.path, revision) as filesystem:
             yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
+
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+        from cutty.packages.adapters.providers.git import getparentrevision
+
+        return getparentrevision(revision)
