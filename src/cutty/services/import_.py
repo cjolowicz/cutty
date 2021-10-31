@@ -1,4 +1,5 @@
 """Import changes from templates into projects."""
+import contextlib
 import enum
 from dataclasses import replace
 from pathlib import Path
@@ -57,15 +58,13 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     repository = ProjectRepository(projectdir)
 
     parent: Optional[str] = None
-    try:
+    with contextlib.suppress(RevisionNotFoundError):
         parent = buildproject(
             repository,
             config1,
             interactive=True,
             commitmessage=updatecommitmessage,
         )
-    except RevisionNotFoundError:
-        pass
 
     commit = buildproject(
         repository,
