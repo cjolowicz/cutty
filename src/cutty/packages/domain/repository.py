@@ -59,9 +59,10 @@ class DefaultPackageRepository(PackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        if self._getparentrevision is None:  # pragma: no cover
-            from cutty.packages.adapters.providers.git import getparentrevision
-
-            return getparentrevision(self.path, revision)
+        if self._getparentrevision is None:
+            raise NotImplementedError(
+                f"repository {self.name} does not support retrieving the parent "
+                "revision"
+            )
 
         return self._getparentrevision(self.path, revision)
