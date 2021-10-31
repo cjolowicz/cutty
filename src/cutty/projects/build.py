@@ -71,13 +71,12 @@ def buildparentproject(
     commitmessage: MessageBuilder,
 ) -> Optional[str]:
     """Build the project for the parent revision."""
+    provider = TemplateProvider.create()
+    templates = provider.provide(config.template, config.directory)
     config = replace(config, revision=getparentrevision(revision))
 
     if config.revision is not None:  # pragma: no branch
         with contextlib.suppress(RevisionNotFoundError):
-            provider = TemplateProvider.create()
-            templates = provider.provide(config.template, config.directory)
-
             with templates.get(config.revision) as template:
                 project = generate(template, config.bindings, interactive=interactive)
                 return commitproject(repository, project, commitmessage=commitmessage)
