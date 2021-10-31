@@ -58,13 +58,14 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     repository = ProjectRepository(projectdir)
 
     parent: Optional[str] = None
-    with contextlib.suppress(RevisionNotFoundError):
-        parent = buildproject(
-            repository,
-            config1,
-            interactive=True,
-            commitmessage=updatecommitmessage,
-        )
+    if config1.revision is not None:  # pragma: no branch
+        with contextlib.suppress(RevisionNotFoundError):
+            parent = buildproject(
+                repository,
+                config1,
+                interactive=True,
+                commitmessage=updatecommitmessage,
+            )
 
     commit = buildproject(
         repository,
