@@ -139,3 +139,18 @@ def test_conflict_message(
             runcutty("import")
 
     assert "cutty.json" not in str(exceptioninfo.value)
+
+
+def test_no_vcs(runcutty: RunCutty, template: Path, templateproject: Path) -> None:
+    """It returns with non-zero status if the template has no version history."""
+    location = "local+{}".format(template.as_uri())
+
+    runcutty("create", "--non-interactive", location)
+
+    project = Path("example")
+
+    updatefile(templateproject / "marker")
+
+    with pytest.raises(Exception, match="not support"):
+        with chdir(project):
+            runcutty("import")
