@@ -73,7 +73,9 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     return revision
 
 
-def getparentrevision(revision: Optional[Revision]) -> Optional[Revision]:
+def getparentrevision(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Optional[Revision]:
     """Return the parent revision, if any."""
     return "HEAD^" if revision is None else f"{revision}^"
 

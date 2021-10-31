@@ -59,4 +59,4 @@ class DefaultPackageRepository(PackageRepository):
         """Return the parent revision, if any."""
         from cutty.packages.adapters.providers.git import getparentrevision
 
-        return getparentrevision(revision)
+        return getparentrevision(self.path, revision)
