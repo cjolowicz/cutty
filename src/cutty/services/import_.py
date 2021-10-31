@@ -37,13 +37,15 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
 
 
+def getparentrevision(revision: Optional[str]) -> Optional[str]:
+    """Return the parent revision, if any."""
+    return "HEAD^" if revision is None else f"{revision}^"
+
+
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
     """Import changes from a template into a project."""
     config1 = readprojectconfigfile(projectdir)
-    config1 = replace(
-        config1,
-        revision="HEAD^" if revision is None else f"{revision}^",  # FIXME: git-specific
-    )
+    config1 = replace(config1, revision=getparentrevision(revision))
 
     config2 = ProjectConfig(
         config1.template,
