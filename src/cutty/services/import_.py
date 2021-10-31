@@ -56,7 +56,7 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
 
     repository = ProjectRepository(projectdir)
 
-    parent: Optional[str]
+    parent: Optional[str] = None
     try:
         parent = buildproject(
             repository,
@@ -65,7 +65,7 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
             commitmessage=updatecommitmessage,
         )
     except RevisionNotFoundError:
-        parent = None
+        pass
 
     commit = buildproject(
         repository,
