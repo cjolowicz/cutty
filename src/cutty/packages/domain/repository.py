@@ -20,6 +20,12 @@ class PackageRepository(abc.ABC):
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
 
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+        from cutty.packages.adapters.providers.git import getparentrevision
+
+        return getparentrevision(revision)
+
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 

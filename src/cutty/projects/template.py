@@ -11,7 +11,6 @@ import platformdirs
 from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.packages.adapters.providers.git import getparentrevision
 from cutty.packages.adapters.storage import getdefaultpackageprovider
 from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.repository import PackageRepository
@@ -64,7 +63,7 @@ class TemplateRepository:
 
     def getparentrevision(self, revision: Optional[str]) -> Optional[str]:
         """Return the parent revision, if any."""
-        return getparentrevision(revision)
+        return self.repository.getparentrevision(revision)
 
 
 @dataclass
