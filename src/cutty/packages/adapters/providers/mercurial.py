@@ -41,6 +41,20 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
         yield DiskFilesystem(pathlib.Path(directory))
 
 
+def getparentrevision(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Optional[Revision]:
+    """Return the parent revision, if any."""
+    if revision is None:
+        revision = "."
+
+    return getrevision(path, f"p1({revision})")
+
+
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], getrevision=getrevision, mount=mount
+    "hg",
+    fetch=[hgfetcher],
+    getrevision=getrevision,
+    getparentrevision=getparentrevision,
+    mount=mount,
 )
