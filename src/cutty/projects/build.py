@@ -75,8 +75,7 @@ def buildparentproject(
 
     if config.revision is not None:  # pragma: no branch
         with contextlib.suppress(RevisionNotFoundError):
-            return buildproject(
-                repository, config, interactive=interactive, commitmessage=commitmessage
-            )
+            with createproject(config, interactive=interactive) as project:
+                return commitproject(repository, project, commitmessage=commitmessage)
 
     return None
