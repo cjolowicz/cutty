@@ -81,8 +81,17 @@ def getparentrevision(
 
 
 localgitprovider = LocalProvider(
-    "localgit", match=match, mount=mount, getrevision=getrevision
+    "localgit",
+    match=match,
+    mount=mount,
+    getrevision=getrevision,
+    getparentrevision=getparentrevision,
 )
+
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], mount=mount, getrevision=getrevision
+    "git",
+    fetch=[gitfetcher],
+    mount=mount,
+    getrevision=getrevision,
+    getparentrevision=getparentrevision,
 )
