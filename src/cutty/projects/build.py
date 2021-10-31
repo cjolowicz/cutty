@@ -74,10 +74,11 @@ def buildparentproject(
     provider = TemplateProvider.create()
     templates = provider.provide(config.template, config.directory)
     config = replace(config, revision=getparentrevision(revision))
+    parentrevision = config.revision
 
-    if config.revision is not None:  # pragma: no branch
+    if parentrevision is not None:  # pragma: no branch
         with contextlib.suppress(RevisionNotFoundError):
-            with templates.get(config.revision) as template:
+            with templates.get(parentrevision) as template:
                 project = generate(template, config.bindings, interactive=interactive)
                 return commitproject(repository, project, commitmessage=commitmessage)
 
