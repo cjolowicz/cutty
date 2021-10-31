@@ -157,6 +157,7 @@ class RemoteProviderFactory(ProviderFactory):
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
         getrevision: Optional[GetRevision] = None,
+        getparentrevision: Optional[GetRevision] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -164,6 +165,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.fetch = tuple(fetch)
         self.mount = mount
         self.getrevision = getrevision
+        self.getparentrevision = getparentrevision
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -173,6 +175,7 @@ class RemoteProviderFactory(ProviderFactory):
             fetch=self.fetch,
             mount=self.mount,
             getrevision=self.getrevision,
+            getparentrevision=self.getparentrevision,
             store=store,
         )
 
