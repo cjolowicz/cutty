@@ -7,6 +7,7 @@ from typing import Optional
 
 import pygit2
 
+from cutty.packages.adapters.providers.git import getparentrevision
 from cutty.packages.adapters.providers.git import RevisionNotFoundError
 from cutty.projects.build import buildproject
 from cutty.projects.config import ProjectConfig
@@ -36,11 +37,6 @@ def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
     repository.index.add(resolution)
     repository.index.write()
     repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
-
-
-def getparentrevision(revision: Optional[str]) -> Optional[str]:
-    """Return the parent revision, if any."""
-    return "HEAD^" if revision is None else f"{revision}^"
 
 
 def import_(projectdir: Path, *, revision: Optional[str]) -> None:
