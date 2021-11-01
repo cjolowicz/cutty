@@ -118,16 +118,7 @@ class ProjectRepository:
             self._cherrypick(cherry)
             return
 
-        for path in paths:
-            (self.project.path / path).write_bytes((cherry.tree / path).data)
-            self.project._repository.index.add(path)
-
-        self.project.commit(
-            message=cherry.message,
-            author=cherry.author,
-            committer=self.project.default_signature,
-            stageallfiles=False,
-        )
+        self._cherrypickpaths(cherry, paths)
 
     def _cherrypick(self, cherry: pygit2.Commit) -> None:
         """Import changes to the project made by the given commit."""
@@ -148,6 +139,19 @@ class ProjectRepository:
                 raise MergeConflictError.fromindex(index)
 
             self.continue_()
+
+    def _cherrypickpaths(self, cherry: pygit2.Commit, paths: Iterable[Path]) -> None:
+        """Import changes to the project made by the given commit."""
+        for path in paths:
+            (self.project.path / path).write_bytes((cherry.tree / path).data)
+            self.project._repository.index.add(path)
+
+        self.project.commit(
+            message=cherry.message,
+            author=cherry.author,
+            committer=self.project.default_signature,
+            stageallfiles=False,
+        )
 
     def continue_(self) -> None:
         """Continue an update after conflict resolution."""
