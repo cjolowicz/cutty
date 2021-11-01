@@ -58,13 +58,17 @@ class DefaultPackageRepository(PackageRepository):
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-        if self._getrevision is not None:
-            resolved_revision = self._getrevision(self.path, revision)
-        else:
-            resolved_revision = revision
+        resolved_revision = self.getrevision(revision)
 
         with self.mount(self.path, revision) as filesystem:
             yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
+
+    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the resolved revision."""
+        if self._getrevision is not None:
+            return self._getrevision(self.path, revision)
+        else:
+            return revision
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
