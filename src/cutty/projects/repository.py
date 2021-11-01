@@ -101,22 +101,22 @@ class ProjectRepository:
         """Import changes to the project made by the given commit."""
         try:
             self.project.cherrypick(cherry)
-        except MergeConflictError:
+        except MergeConflictError as error:
             repository = self.project._repository
             index = repository.index
 
             try:
                 _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
             except KeyError:
-                pass
-            else:
-                del index.conflicts[PROJECT_CONFIG_FILE]
+                raise error from None
 
-                index.add(theirs)
-                index.write()
-                repository.checkout(
-                    strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
-                )
+            del index.conflicts[PROJECT_CONFIG_FILE]
+
+            index.add(theirs)
+            index.write()
+            repository.checkout(
+                strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
+            )
 
             if index.conflicts:
                 raise MergeConflictError.fromindex(index)
