@@ -45,6 +45,7 @@ class LocalProvider(Provider):
         *,
         match: PathMatcher,
         mount: Mounter,
+        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
     ) -> None:
@@ -53,6 +54,7 @@ class LocalProvider(Provider):
 
         self.match = match
         self.mount = mount
+        self.getcommit = getcommit
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
 
@@ -64,6 +66,7 @@ class LocalProvider(Provider):
                     location.name,
                     path,
                     mount=self.mount,
+                    getcommit=self.getcommit,
                     getrevision=self.getrevision,
                     getparentrevision=self.getparentrevision,
                 )
@@ -89,6 +92,7 @@ class RemoteProvider(Provider):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
+        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         store: Store,
@@ -106,6 +110,7 @@ class RemoteProvider(Provider):
         self.fetch = tuple(fetch)
         self.store = store
         self.mount = mount
+        self.getcommit = getcommit
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
 
@@ -126,6 +131,7 @@ class RemoteProvider(Provider):
                         location.name,
                         path,
                         mount=self.mount,
+                        getcommit=self.getcommit,
                         getrevision=self.getrevision,
                         getparentrevision=self.getparentrevision,
                     )
@@ -156,6 +162,7 @@ class RemoteProviderFactory(ProviderFactory):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
+        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
     ) -> None:
@@ -164,6 +171,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.match = match
         self.fetch = tuple(fetch)
         self.mount = mount
+        self.getcommit = getcommit
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
 
@@ -174,6 +182,7 @@ class RemoteProviderFactory(ProviderFactory):
             match=self.match,
             fetch=self.fetch,
             mount=self.mount,
+            getcommit=self.getcommit,
             getrevision=self.getrevision,
             getparentrevision=self.getparentrevision,
             store=store,
