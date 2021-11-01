@@ -176,3 +176,14 @@ def test_parent_revision_tip(hgprovider: Provider, hgrepository: pathlib.Path) -
 
     with repository.get(revision) as package:
         assert "Lorem" == (package.tree / "marker").read_text()
+
+
+def test_parent_revision_root(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns None for the parent revision of the root."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    revision = repository.getparentrevision("v1.0")
+
+    assert revision is None
