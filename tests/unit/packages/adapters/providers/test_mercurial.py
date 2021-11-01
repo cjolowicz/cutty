@@ -73,6 +73,11 @@ def is_mercurial_shorthash(revision: str) -> bool:
     return len(revision) == 12 and all(c in string.hexdigits for c in revision)
 
 
+def is_mercurial_hash(revision: str) -> bool:
+    """Return True if the text is a full changeset identification hash."""
+    return len(revision) == 40 and all(c in string.hexdigits for c in revision)
+
+
 def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It retrieves the short hash as the package revision."""
     repository = hgprovider.provide(hgrepository)
@@ -164,3 +169,38 @@ def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) ->
         if repository := hgprovider.provide(hgrepository):
             with repository.get("invalid"):
                 pass
+
+
+def test_parent_revision_tip(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns the parent revision of the tip."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    revision = repository.getparentrevision(None)
+
+    with repository.get(revision) as package:
+        assert "Lorem" == (package.tree / "marker").read_text()
+
+
+def test_parent_revision_root(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns None for the parent revision of the root."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    revision = repository.getparentrevision("v1.0")
+
+    assert revision is None
+
+
+def test_parent_revision_hash(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns the full revision identifier."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    # Skip over the changeset adding the tag.
+    revision = repository.getparentrevision(repository.getparentrevision(None))
+
+    assert revision is not None and is_mercurial_hash(revision)
