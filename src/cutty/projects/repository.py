@@ -27,20 +27,6 @@ class Side(enum.Enum):
     THEIRS = 2
 
 
-def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
-    """Resolve conflicts in the given file."""
-    repository = pygit2.Repository(repositorypath)
-    pathstr = str(path.relative_to(repositorypath))
-    ancestor, ours, theirs = repository.index.conflicts[pathstr]
-    resolution = (ancestor, ours, theirs)[side.value]
-
-    del repository.index.conflicts[pathstr]
-
-    repository.index.add(resolution)
-    repository.index.write()
-    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
-
-
 class NoUpdateInProgressError(CuttyError):
     """A sequencer action was invoked without an update in progress."""
 
@@ -125,9 +111,20 @@ class ProjectRepository:
             self.project.cherrypick(cherry)
         except MergeConflictError:
             try:
-                resolveconflicts(
-                    self.project.path, self.project.path / "cutty.json", Side.THEIRS
-                )
+                repositorypath = self.project.path
+                path = self.project.path / "cutty.json"
+                side = Side.THEIRS
+
+                repository = pygit2.Repository(repositorypath)
+                pathstr = str(path.relative_to(repositorypath))
+                ancestor, ours, theirs = repository.index.conflicts[pathstr]
+                resolution = (ancestor, ours, theirs)[side.value]
+
+                del repository.index.conflicts[pathstr]
+
+                repository.index.add(resolution)
+                repository.index.write()
+                repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
             except KeyError:
                 pass
 
