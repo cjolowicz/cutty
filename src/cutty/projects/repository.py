@@ -118,8 +118,6 @@ class ProjectRepository:
             except KeyError:
                 pass
 
-            index.read()
-
             if index.conflicts:
                 raise MergeConflictError.fromindex(index)
 
