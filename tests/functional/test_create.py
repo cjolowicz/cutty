@@ -184,9 +184,9 @@ def test_existing_project_files(runcutty: RunCutty, template: Path) -> None:
 def test_conflict(runcutty: RunCutty, template: Path) -> None:
     """It produces conflict markers if files have conflicting changes."""
     project = Repository.init(Path("example"))
-    conflicting = project.path / "cutty.json"
+    conflicting = project.path / "README.md"
 
-    updatefile(conflicting, "null")
+    updatefile(conflicting, "teapot")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("create", str(template))
