@@ -52,14 +52,14 @@ class DefaultPackageRepository(PackageRepository):
         self.name = name
         self.path = path
         self.mount = mount
-        self.getrevision = getrevision
+        self._getrevision = getrevision
         self._getparentrevision = getparentrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-        if self.getrevision is not None:
-            resolved_revision = self.getrevision(self.path, revision)
+        if self._getrevision is not None:
+            resolved_revision = self._getrevision(self.path, revision)
         else:
             resolved_revision = revision
 
