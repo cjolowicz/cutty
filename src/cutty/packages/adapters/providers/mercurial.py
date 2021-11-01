@@ -48,7 +48,23 @@ def getparentrevision(
     if revision is None:
         revision = "."
 
-    return getrevision(path, f"p1({revision})") or None
+    revision = f"p1({revision})"
+
+    hg = findhg()
+
+    if revision is None:
+        revision = "."
+
+    result = hg(
+        "log",
+        f"--rev={revision}",
+        "--template={ifeq(latesttagdistance, 0, latesttag, short(node))}",
+        cwd=path,
+    )
+
+    parentrevision = result.stdout
+
+    return parentrevision or None
 
 
 hgproviderfactory = RemoteProviderFactory(
