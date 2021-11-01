@@ -26,4 +26,5 @@ class Package:
             directory.name,
             Path(filesystem=PathFilesystem(tree)),
             self.revision,
+            self.commit,
         )
