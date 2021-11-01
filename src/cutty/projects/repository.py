@@ -116,7 +116,7 @@ class ProjectRepository:
             except KeyError:
                 pass
 
-            index = self.project._repository.index
+            index = repository.index
             index.read()
 
             if index.conflicts:
