@@ -104,14 +104,15 @@ class ProjectRepository:
         except MergeConflictError:
             try:
                 repository = pygit2.Repository(self.project.path)
-                pathstr = PROJECT_CONFIG_FILE
-                ancestor, ours, theirs = repository.index.conflicts[pathstr]
+                ancestor, ours, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
 
-                del repository.index.conflicts[pathstr]
+                del repository.index.conflicts[PROJECT_CONFIG_FILE]
 
                 repository.index.add(theirs)
                 repository.index.write()
-                repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
+                repository.checkout(
+                    strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
+                )
             except KeyError:
                 pass
 
