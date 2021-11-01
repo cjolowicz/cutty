@@ -45,6 +45,7 @@ class DefaultPackageRepository(PackageRepository):
         path: pathlib.Path,
         *,
         mount: Mounter,
+        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision],
         getparentrevision: Optional[GetRevision] = None,
     ) -> None:
@@ -52,6 +53,7 @@ class DefaultPackageRepository(PackageRepository):
         self.name = name
         self.path = path
         self.mount = mount
+        self._getcommit = getcommit
         self._getrevision = getrevision
         self._getparentrevision = getparentrevision
 
@@ -62,6 +64,13 @@ class DefaultPackageRepository(PackageRepository):
 
         with self.mount(self.path, revision) as filesystem:
             yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
+
+    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the commit identifier."""
+        if self._getcommit is None:
+            return None
+
+        return self._getcommit(self.path, revision)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
