@@ -107,7 +107,9 @@ class ProjectRepository:
 
             try:
                 _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
-
+            except KeyError:
+                pass
+            else:
                 del index.conflicts[PROJECT_CONFIG_FILE]
 
                 index.add(theirs)
@@ -115,8 +117,6 @@ class ProjectRepository:
                 repository.checkout(
                     strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
                 )
-            except KeyError:
-                pass
 
             if index.conflicts:
                 raise MergeConflictError.fromindex(index)
