@@ -64,9 +64,9 @@ class DefaultPackageRepository(PackageRepository):
         resolved_revision = self.getrevision(revision)
 
         with self.mount(self.path, revision) as filesystem:
-            yield Package(
-                self.name, Path(filesystem=filesystem), resolved_revision, commit
-            )
+            tree = Path(filesystem=filesystem)
+
+            yield Package(self.name, tree, resolved_revision, commit)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
