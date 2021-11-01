@@ -107,11 +107,10 @@ class ProjectRepository:
                     (self.project.path / "cutty.json").relative_to(self.project.path)
                 )
                 ancestor, ours, theirs = repository.index.conflicts[pathstr]
-                resolution = (ancestor, ours, theirs)[2]
 
                 del repository.index.conflicts[pathstr]
 
-                repository.index.add(resolution)
+                repository.index.add(theirs)
                 repository.index.write()
                 repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
             except KeyError:
