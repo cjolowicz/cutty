@@ -102,8 +102,10 @@ class ProjectRepository:
         try:
             self.project.cherrypick(cherry)
         except MergeConflictError:
+            repository = self.project._repository
+            index = repository.index
+
             try:
-                repository = self.project._repository
                 _, _, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
 
                 del repository.index.conflicts[PROJECT_CONFIG_FILE]
@@ -116,7 +118,6 @@ class ProjectRepository:
             except KeyError:
                 pass
 
-            index = repository.index
             index.read()
 
             if index.conflicts:
