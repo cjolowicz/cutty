@@ -78,6 +78,7 @@ class Template:
         directory: Optional[pathlib.Path]
         name: str
         revision: Optional[Revision]
+        commit: Optional[str] = None
 
     metadata: Metadata
     root: Path
