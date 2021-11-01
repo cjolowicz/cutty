@@ -114,11 +114,10 @@ class ProjectRepository:
         """Import changes to the project made by the given commit."""
         cherry = self.project._repository[commit]
 
-        if not paths:
+        if paths:
+            self._cherrypickpaths(cherry, paths)
+        else:
             self._cherrypick(cherry)
-            return
-
-        self._cherrypickpaths(cherry, paths)
 
     def _cherrypick(self, cherry: pygit2.Commit) -> None:
         """Import changes to the project made by the given commit."""
