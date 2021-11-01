@@ -106,12 +106,12 @@ class ProjectRepository:
             index = repository.index
 
             try:
-                _, _, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
+                _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
 
-                del repository.index.conflicts[PROJECT_CONFIG_FILE]
+                del index.conflicts[PROJECT_CONFIG_FILE]
 
-                repository.index.add(theirs)
-                repository.index.write()
+                index.add(theirs)
+                index.write()
                 repository.checkout(
                     strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
                 )
