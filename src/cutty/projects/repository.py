@@ -1,7 +1,6 @@
 """Project repositories."""
 from __future__ import annotations
 
-import enum
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -17,14 +16,6 @@ from cutty.util.git import Repository
 
 
 UPDATE_BRANCH = "cutty/update"
-
-
-class Side(enum.Enum):
-    """The side of a conflict."""
-
-    ANCESTOR = 0
-    OURS = 1
-    THEIRS = 2
 
 
 class NoUpdateInProgressError(CuttyError):
@@ -116,7 +107,7 @@ class ProjectRepository:
                     (self.project.path / "cutty.json").relative_to(self.project.path)
                 )
                 ancestor, ours, theirs = repository.index.conflicts[pathstr]
-                resolution = (ancestor, ours, theirs)[Side.THEIRS.value]
+                resolution = (ancestor, ours, theirs)[2]
 
                 del repository.index.conflicts[pathstr]
 
