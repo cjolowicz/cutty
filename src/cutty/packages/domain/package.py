@@ -17,6 +17,7 @@ class Package:
     name: str
     tree: Path
     revision: Optional[Revision]
+    commit: Optional[str] = None
 
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
