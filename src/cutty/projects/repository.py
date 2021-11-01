@@ -103,7 +103,7 @@ class ProjectRepository:
             self.project.cherrypick(cherry)
         except MergeConflictError:
             try:
-                repository = pygit2.Repository(self.project.path)
+                repository = self.project._repository
                 _, _, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
 
                 del repository.index.conflicts[PROJECT_CONFIG_FILE]
