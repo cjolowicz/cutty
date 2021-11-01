@@ -1,6 +1,7 @@
 """Project repositories."""
 from __future__ import annotations
 
+import enum
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -11,10 +12,33 @@ import pygit2
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
+from cutty.util.git import MergeConflictError
 from cutty.util.git import Repository
 
 
 UPDATE_BRANCH = "cutty/update"
+
+
+class Side(enum.Enum):
+    """The side of a conflict."""
+
+    ANCESTOR = 0
+    OURS = 1
+    THEIRS = 2
+
+
+def resolveconflicts(repositorypath: Path, path: Path, side: Side) -> None:
+    """Resolve conflicts in the given file."""
+    repository = pygit2.Repository(repositorypath)
+    pathstr = str(path.relative_to(repositorypath))
+    ancestor, ours, theirs = repository.index.conflicts[pathstr]
+    resolution = (ancestor, ours, theirs)[side.value]
+
+    del repository.index.conflicts[pathstr]
+
+    repository.index.add(resolution)
+    repository.index.write()
+    repository.checkout(strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[pathstr])
 
 
 class NoUpdateInProgressError(CuttyError):
@@ -91,7 +115,23 @@ class ProjectRepository:
         cherry = self.project._repository[commit]
 
         if not paths:
-            self.project.cherrypick(cherry)
+            try:
+                self.project.cherrypick(cherry)
+            except MergeConflictError:
+                try:
+                    resolveconflicts(
+                        self.project.path, self.project.path / "cutty.json", Side.THEIRS
+                    )
+                except KeyError:
+                    pass
+
+                index = self.project._repository.index
+                index.read()
+
+                if index.conflicts:
+                    raise MergeConflictError.fromindex(index)
+
+                self.continue_()
             return
 
         for path in paths:
