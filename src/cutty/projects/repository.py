@@ -11,6 +11,7 @@ import pygit2
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
+from cutty.projects.config import PROJECT_CONFIG_FILE
 from cutty.util.git import MergeConflictError
 from cutty.util.git import Repository
 
@@ -103,7 +104,7 @@ class ProjectRepository:
         except MergeConflictError:
             try:
                 repository = pygit2.Repository(self.project.path)
-                pathstr = "cutty.json"
+                pathstr = PROJECT_CONFIG_FILE
                 ancestor, ours, theirs = repository.index.conflicts[pathstr]
 
                 del repository.index.conflicts[pathstr]
