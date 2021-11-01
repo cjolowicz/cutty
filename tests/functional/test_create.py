@@ -194,6 +194,18 @@ def test_conflict(runcutty: RunCutty, template: Path) -> None:
     assert ">>>>" in conflicting.read_text()
 
 
+def test_conflict_cutty_json(runcutty: RunCutty, template: Path) -> None:
+    """It resolves conflicts in cutty.json in favor of the new version."""
+    project = Repository.init(Path("example"))
+    conflicting = project.path / "cutty.json"
+
+    updatefile(conflicting, "null")
+
+    runcutty("create", str(template))
+
+    assert ">>>>" not in conflicting.read_text()
+
+
 def test_commit_hash(runcutty: RunCutty, template: Path) -> None:
     """It stores the commit hash."""
     runcutty("create", str(template))
