@@ -48,7 +48,7 @@ def getparentrevision(
     if revision is None:
         revision = "."
 
-    return getrevision(path, f"p1({revision})")
+    return getrevision(path, f"p1({revision})") or None
 
 
 hgproviderfactory = RemoteProviderFactory(
