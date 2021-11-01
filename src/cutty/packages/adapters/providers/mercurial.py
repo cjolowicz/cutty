@@ -48,11 +48,9 @@ def getparentrevision(
     if revision is None:
         revision = "."
 
-    revision = f"p1({revision})"
-
     hg = findhg()
 
-    result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
+    result = hg("log", f"--rev=p1({revision})", "--template={node}", cwd=path)
 
     parentrevision = result.stdout
 
