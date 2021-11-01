@@ -154,3 +154,10 @@ def test_no_vcs(runcutty: RunCutty, template: Path, templateproject: Path) -> No
     with pytest.raises(Exception, match="not support"):
         with chdir(project):
             runcutty("import")
+
+
+def test_invalid_revision(runcutty: RunCutty, project: Path) -> None:
+    """It applies the latest changeset by default."""
+    with pytest.raises(Exception, match="revision not found"):
+        with chdir(project):
+            runcutty("import", "--revision=invalid")
