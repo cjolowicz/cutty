@@ -52,9 +52,6 @@ def getparentrevision(
 
     hg = findhg()
 
-    if revision is None:
-        revision = "."
-
     result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
 
     parentrevision = result.stdout
