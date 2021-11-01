@@ -55,12 +55,7 @@ def getparentrevision(
     if revision is None:
         revision = "."
 
-    result = hg(
-        "log",
-        f"--rev={revision}",
-        "--template={ifeq(latesttagdistance, 0, latesttag, short(node))}",
-        cwd=path,
-    )
+    result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
 
     parentrevision = result.stdout
 
