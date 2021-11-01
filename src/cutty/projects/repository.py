@@ -115,23 +115,7 @@ class ProjectRepository:
         cherry = self.project._repository[commit]
 
         if not paths:
-            try:
-                self.project.cherrypick(cherry)
-            except MergeConflictError:
-                try:
-                    resolveconflicts(
-                        self.project.path, self.project.path / "cutty.json", Side.THEIRS
-                    )
-                except KeyError:
-                    pass
-
-                index = self.project._repository.index
-                index.read()
-
-                if index.conflicts:
-                    raise MergeConflictError.fromindex(index)
-
-                self.continue_()
+            self._cherrypick(cherry)
             return
 
         for path in paths:
@@ -144,6 +128,26 @@ class ProjectRepository:
             committer=self.project.default_signature,
             stageallfiles=False,
         )
+
+    def _cherrypick(self, cherry: pygit2.Commit) -> None:
+        """Import changes to the project made by the given commit."""
+        try:
+            self.project.cherrypick(cherry)
+        except MergeConflictError:
+            try:
+                resolveconflicts(
+                    self.project.path, self.project.path / "cutty.json", Side.THEIRS
+                )
+            except KeyError:
+                pass
+
+            index = self.project._repository.index
+            index.read()
+
+            if index.conflicts:
+                raise MergeConflictError.fromindex(index)
+
+            self.continue_()
 
     def continue_(self) -> None:
         """Continue an update after conflict resolution."""
