@@ -103,9 +103,7 @@ class ProjectRepository:
         except MergeConflictError:
             try:
                 repository = pygit2.Repository(self.project.path)
-                pathstr = str(
-                    (self.project.path / "cutty.json").relative_to(self.project.path)
-                )
+                pathstr = "cutty.json"
                 ancestor, ours, theirs = repository.index.conflicts[pathstr]
 
                 del repository.index.conflicts[pathstr]
