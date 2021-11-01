@@ -65,10 +65,10 @@ class DefaultPackageRepository(PackageRepository):
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        if self._getrevision is not None:
-            return self._getrevision(self.path, revision)
-        else:
+        if self._getrevision is None:
             return revision
+
+        return self._getrevision(self.path, revision)
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
