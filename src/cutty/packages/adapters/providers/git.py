@@ -45,6 +45,21 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
         yield GitFilesystem(path)
 
 
+def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the commit identifier."""
+    if revision is None:
+        revision = "HEAD"
+
+    repository = pygit2.Repository(path)
+
+    try:
+        commit = repository.revparse_single(revision).peel(pygit2.Commit)
+    except KeyError:
+        raise RevisionNotFoundError(revision)
+
+    return str(commit.id)
+
+
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
     if revision is None:
@@ -54,7 +69,7 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
 
     try:
         commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:
+    except KeyError:  # pragma: no cover
         raise RevisionNotFoundError(revision)
 
     try:
@@ -99,6 +114,7 @@ localgitprovider = LocalProvider(
     "localgit",
     match=match,
     mount=mount,
+    getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
 )
@@ -107,6 +123,7 @@ gitproviderfactory = RemoteProviderFactory(
     "git",
     fetch=[gitfetcher],
     mount=mount,
+    getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
 )

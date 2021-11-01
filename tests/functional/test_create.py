@@ -1,9 +1,11 @@
 """Functional tests for the create CLI."""
+import string
 from pathlib import Path
 
 import pytest
 
 from cutty.projects.config import PROJECT_CONFIG_FILE
+from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError
@@ -190,3 +192,16 @@ def test_conflict(runcutty: RunCutty, template: Path) -> None:
         runcutty("create", str(template))
 
     assert ">>>>" in conflicting.read_text()
+
+
+def test_commit_hash(runcutty: RunCutty, template: Path) -> None:
+    """It stores the commit hash."""
+    runcutty("create", str(template))
+
+    revision = readprojectconfigfile(Path("example")).revision
+
+    assert (
+        revision is not None
+        and len(revision) == 40
+        and all(c in string.hexdigits for c in revision)
+    )

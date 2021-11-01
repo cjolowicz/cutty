@@ -13,6 +13,17 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
 
+def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the commit identifier."""
+    hg = findhg()
+
+    if revision is None:
+        revision = "."
+
+    result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
+    return result.stdout
+
+
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
     hg = findhg()
@@ -58,6 +69,7 @@ def getparentrevision(
 hgproviderfactory = RemoteProviderFactory(
     "hg",
     fetch=[hgfetcher],
+    getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
     mount=mount,

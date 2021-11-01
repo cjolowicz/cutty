@@ -204,3 +204,13 @@ def test_parent_revision_hash(hgprovider: Provider, hgrepository: pathlib.Path) 
     revision = repository.getparentrevision(repository.getparentrevision(None))
 
     assert revision is not None and is_mercurial_hash(revision)
+
+
+def test_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns the full revision identifier."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    with repository.get(None) as package:
+        assert package.commit is not None and is_mercurial_hash(package.commit)

@@ -45,6 +45,7 @@ class DefaultPackageRepository(PackageRepository):
         path: pathlib.Path,
         *,
         mount: Mounter,
+        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision],
         getparentrevision: Optional[GetRevision] = None,
     ) -> None:
@@ -52,19 +53,34 @@ class DefaultPackageRepository(PackageRepository):
         self.name = name
         self.path = path
         self.mount = mount
-        self.getrevision = getrevision
+        self._getcommit = getcommit
+        self._getrevision = getrevision
         self._getparentrevision = getparentrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
-        if self.getrevision is not None:
-            resolved_revision = self.getrevision(self.path, revision)
-        else:
-            resolved_revision = revision
+        commit = self.getcommit(revision)
+        resolved_revision = self.getrevision(revision)
 
         with self.mount(self.path, revision) as filesystem:
-            yield Package(self.name, Path(filesystem=filesystem), resolved_revision)
+            tree = Path(filesystem=filesystem)
+
+            yield Package(self.name, tree, resolved_revision, commit)
+
+    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the commit identifier."""
+        if self._getcommit is None:
+            return None
+
+        return self._getcommit(self.path, revision)
+
+    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the resolved revision."""
+        if self._getrevision is None:
+            return revision
+
+        return self._getrevision(self.path, revision)
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""

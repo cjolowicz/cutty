@@ -56,7 +56,11 @@ class TemplateRepository:
                 package = package.descend(PurePath(*self.directory.parts))
 
             metadata = Template.Metadata(
-                self.location, self.directory, package.name, package.revision
+                self.location,
+                self.directory,
+                package.name,
+                package.revision,
+                package.commit,
             )
 
             yield Template(metadata, package.tree)
@@ -78,6 +82,7 @@ class Template:
         directory: Optional[pathlib.Path]
         name: str
         revision: Optional[Revision]
+        commit: Optional[str] = None
 
     metadata: Metadata
     root: Path

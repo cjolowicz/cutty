@@ -54,11 +54,16 @@ class ProjectGenerator:
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
         """Add a configuration file to the project."""
+        revision = (
+            project.template.commit
+            if project.template.commit is not None
+            else project.template.revision
+        )
         projectconfig = ProjectConfig(
             project.template.location,
             bindings,
             directory=project.template.directory,
-            revision=project.template.revision,
+            revision=revision,
         )
         projectconfigfile = createprojectconfigfile(
             PurePath(project.name), projectconfig
