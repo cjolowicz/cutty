@@ -52,9 +52,7 @@ def getparentrevision(
 
     result = hg("log", f"--rev=p1({revision})", "--template={node}", cwd=path)
 
-    parentrevision = result.stdout
-
-    return parentrevision or None
+    return result.stdout or None
 
 
 hgproviderfactory = RemoteProviderFactory(
