@@ -104,7 +104,7 @@ class ProjectRepository:
         except MergeConflictError:
             try:
                 repository = pygit2.Repository(self.project.path)
-                ancestor, ours, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
+                _, _, theirs = repository.index.conflicts[PROJECT_CONFIG_FILE]
 
                 del repository.index.conflicts[PROJECT_CONFIG_FILE]
 
