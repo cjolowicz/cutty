@@ -111,12 +111,11 @@ class ProjectRepository:
             self.project.cherrypick(cherry)
         except MergeConflictError:
             try:
-                repositorypath = self.project.path
                 path = self.project.path / "cutty.json"
                 side = Side.THEIRS
 
-                repository = pygit2.Repository(repositorypath)
-                pathstr = str(path.relative_to(repositorypath))
+                repository = pygit2.Repository(self.project.path)
+                pathstr = str(path.relative_to(self.project.path))
                 ancestor, ours, theirs = repository.index.conflicts[pathstr]
                 resolution = (ancestor, ours, theirs)[side.value]
 
