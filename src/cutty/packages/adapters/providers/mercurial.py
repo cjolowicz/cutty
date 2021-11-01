@@ -45,10 +45,10 @@ def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
     """Return the parent revision, if any."""
+    hg = findhg()
+
     if revision is None:
         revision = "."
-
-    hg = findhg()
 
     result = hg("log", f"--rev=p1({revision})", "--template={node}", cwd=path)
 
