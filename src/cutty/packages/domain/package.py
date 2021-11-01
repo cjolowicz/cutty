@@ -22,9 +22,6 @@ class Package:
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
         tree = self.tree.joinpath(*directory.parts)
-        return Package(
-            directory.name,
-            Path(filesystem=PathFilesystem(tree)),
-            self.revision,
-            self.commit,
-        )
+        tree = Path(filesystem=PathFilesystem(tree))
+
+        return Package(directory.name, tree, self.revision, self.commit)
