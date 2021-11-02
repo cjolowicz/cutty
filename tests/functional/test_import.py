@@ -1,9 +1,11 @@
 """Functional tests for `cutty import`."""
 from pathlib import Path
+from typing import Any
 
 import pygit2
 import pytest
 
+from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
@@ -173,3 +175,21 @@ def test_message(
         runcutty("import")
 
     assert commit(template).message == commit(project).message
+
+
+def projectvariable(project: Path, name: str) -> Any:
+    """Return the bound value of a project variable."""
+    config = readprojectconfigfile(project)
+    return next(binding.value for binding in config.bindings if binding.name == name)
+
+
+def test_extra_context_old_variable(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It allows setting variables on the command-line."""
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import", "project=excellent")
+
+    assert "excellent" == projectvariable(project, "project")
