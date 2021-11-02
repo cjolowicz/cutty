@@ -13,15 +13,22 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
 
-def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the commit identifier."""
+def getmetadata(
+    path: pathlib.Path, revision: Optional[Revision], template: str
+) -> Optional[str]:
+    """Return commit metadata."""
     hg = findhg()
 
     if revision is None:
         revision = "."
 
-    result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
+    result = hg("log", f"--rev={revision}", f"--template={{{template}}}", cwd=path)
     return result.stdout
+
+
+def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the commit identifier."""
+    return getmetadata(path, revision, "node")
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
