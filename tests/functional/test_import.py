@@ -224,3 +224,12 @@ def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> Non
         runcutty("import", input="3\n")
 
     assert "stable" == projectvariable(project, "status")
+
+
+def test_cwd(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It updates the project in the specified directory."""
+    updatefile(templateproject / "marker")
+
+    runcutty("import", f"--cwd={project}")
+
+    assert (project / "marker").exists()

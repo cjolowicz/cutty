@@ -16,10 +16,22 @@ from cutty.templates.domain.bindings import Binding
     metavar="REV",
     help="Branch, tag, or commit hash of the template repository.",
 )
+@click.option(
+    "-C",
+    "--cwd",
+    metavar="DIR",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    help="Directory of the generated project.",
+)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @fatal
-def import_(revision: Optional[str], extra_context: dict[str, str]) -> None:
+def import_(
+    revision: Optional[str], extra_context: dict[str, str], cwd: Optional[Path]
+) -> None:
     """Import changesets from templates into projects."""
+    if cwd is None:
+        cwd = Path.cwd()
+
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
-    service(Path.cwd(), revision=revision, extrabindings=extrabindings)
+    service(cwd, revision=revision, extrabindings=extrabindings)
