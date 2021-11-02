@@ -68,14 +68,7 @@ def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revi
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
     repository = pygit2.Repository(path)
-
-    if revision is None:
-        revision = "HEAD"
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:  # pragma: no cover
-        raise RevisionNotFoundError(revision)
+    commit = _getcommit(repository, revision)
 
     try:
         revision = repository.describe(
