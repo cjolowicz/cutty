@@ -54,14 +54,10 @@ def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
     """Return the parent revision, if any."""
-    hg = findhg()
-
     if revision is None:
         revision = "."
 
-    result = hg("log", f"--rev=p1({revision})", "--template={node}", cwd=path)
-
-    return result.stdout or None
+    return getmetadata(path, f"--rev=p1({revision})", "node") or None
 
 
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
