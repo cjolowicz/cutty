@@ -1,4 +1,5 @@
 """Functional tests for `cutty import`."""
+import json
 from pathlib import Path
 from typing import Any
 
@@ -193,3 +194,23 @@ def test_extra_context_old_variable(
         runcutty("import", "project=excellent")
 
     assert "excellent" == projectvariable(project, "project")
+
+
+def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
+    """Add or update a template variable."""
+    path = template / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    data[name] = value
+    updatefile(path, json.dumps(data))
+
+
+def test_extra_context_new_variable(
+    runcutty: RunCutty, template: Path, project: Path
+) -> None:
+    """It allows setting variables on the command-line."""
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    with chdir(project):
+        runcutty("import", "status=stable")
+
+    assert "stable" == projectvariable(project, "status")
