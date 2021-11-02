@@ -47,10 +47,10 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
 
 def _getcommit(path: pathlib.Path, revision: Optional[Revision]) -> pygit2.Commit:
     """Return the commit object."""
+    repository = pygit2.Repository(path)
+
     if revision is None:
         revision = "HEAD"
-
-    repository = pygit2.Repository(path)
 
     try:
         return repository.revparse_single(revision).peel(pygit2.Commit)
