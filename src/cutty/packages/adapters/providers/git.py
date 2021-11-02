@@ -90,10 +90,10 @@ def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
     """Return the parent revision, if any."""
+    repository = pygit2.Repository(path)
+
     if revision is None:
         revision = "HEAD"
-
-    repository = pygit2.Repository(path)
 
     try:
         commit = repository.revparse_single(revision).peel(pygit2.Commit)
