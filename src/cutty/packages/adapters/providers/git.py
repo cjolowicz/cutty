@@ -67,10 +67,10 @@ def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revi
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
+    repository = pygit2.Repository(path)
+
     if revision is None:
         revision = "HEAD"
-
-    repository = pygit2.Repository(path)
 
     try:
         commit = repository.revparse_single(revision).peel(pygit2.Commit)
