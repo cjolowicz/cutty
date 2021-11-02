@@ -214,3 +214,13 @@ def test_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
 
     with repository.get(None) as package:
         assert package.commit is not None and is_mercurial_hash(package.commit)
+
+
+def test_message(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns the commit message."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    with repository.get(None) as package:
+        assert package.message is not None

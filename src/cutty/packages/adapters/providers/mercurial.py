@@ -66,11 +66,23 @@ def getparentrevision(
     return result.stdout or None
 
 
+def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
+    """Return the commit message."""
+    hg = findhg()
+
+    if revision is None:
+        revision = "."
+
+    result = hg("log", f"--rev={revision}", "--template={desc}", cwd=path)
+    return result.stdout
+
+
 hgproviderfactory = RemoteProviderFactory(
     "hg",
     fetch=[hgfetcher],
     getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
+    getmessage=getmessage,
     mount=mount,
 )

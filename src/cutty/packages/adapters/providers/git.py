@@ -110,6 +110,22 @@ def getparentrevision(
     return None
 
 
+def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
+    """Return the commit message."""
+    if revision is None:
+        revision = "HEAD"
+
+    repository = pygit2.Repository(path)
+
+    try:
+        commit = repository.revparse_single(revision).peel(pygit2.Commit)
+    except KeyError:  # pragma: no cover
+        raise RevisionNotFoundError(revision)
+
+    message: str = commit.message
+    return message
+
+
 localgitprovider = LocalProvider(
     "localgit",
     match=match,
@@ -117,6 +133,7 @@ localgitprovider = LocalProvider(
     getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
+    getmessage=getmessage,
 )
 
 gitproviderfactory = RemoteProviderFactory(
@@ -126,4 +143,5 @@ gitproviderfactory = RemoteProviderFactory(
     getcommit=getcommit,
     getrevision=getrevision,
     getparentrevision=getparentrevision,
+    getmessage=getmessage,
 )

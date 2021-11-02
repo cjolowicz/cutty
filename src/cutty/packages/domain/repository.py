@@ -34,6 +34,7 @@ class PackageRepository(abc.ABC):
 
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
+GetMessage = Callable[[pathlib.Path, Optional[Revision]], Optional[str]]
 
 
 class DefaultPackageRepository(PackageRepository):
@@ -48,6 +49,7 @@ class DefaultPackageRepository(PackageRepository):
         getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision],
         getparentrevision: Optional[GetRevision] = None,
+        getmessage: Optional[GetMessage] = None,
     ) -> None:
         """Initialize."""
         self.name = name
@@ -56,17 +58,19 @@ class DefaultPackageRepository(PackageRepository):
         self._getcommit = getcommit
         self._getrevision = getrevision
         self._getparentrevision = getparentrevision
+        self._getmessage = getmessage
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
         commit = self.getcommit(revision)
         resolved_revision = self.getrevision(revision)
+        message = self.getmessage(revision)
 
         with self.mount(self.path, revision) as filesystem:
             tree = Path(filesystem=filesystem)
 
-            yield Package(self.name, tree, resolved_revision, commit)
+            yield Package(self.name, tree, resolved_revision, commit, message)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
@@ -88,3 +92,10 @@ class DefaultPackageRepository(PackageRepository):
             raise ParentRevisionNotImplementedError(self.name)
 
         return self._getparentrevision(self.path, revision)
+
+    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit message."""
+        if self._getmessage is None:
+            return None
+
+        return self._getmessage(self.path, revision)

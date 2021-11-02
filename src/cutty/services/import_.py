@@ -6,7 +6,7 @@ from cutty.projects.build import buildparentproject
 from cutty.projects.build import buildproject
 from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readprojectconfigfile
-from cutty.projects.messages import updatecommitmessage
+from cutty.projects.messages import importcommitmessage
 from cutty.projects.repository import ProjectRepository
 
 
@@ -28,14 +28,14 @@ def import_(projectdir: Path, *, revision: Optional[str]) -> None:
         config1,
         revision=revision,
         interactive=True,
-        commitmessage=updatecommitmessage,
+        commitmessage=importcommitmessage,
     )
 
     commit = buildproject(
         repository,
         config2,
         interactive=True,
-        commitmessage=updatecommitmessage,
+        commitmessage=importcommitmessage,
         parent=parent,
     )
 

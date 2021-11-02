@@ -61,6 +61,7 @@ class TemplateRepository:
                 package.name,
                 package.revision,
                 package.commit,
+                package.message,
             )
 
             yield Template(metadata, package.tree)
@@ -83,6 +84,7 @@ class Template:
         name: str
         revision: Optional[Revision]
         commit: Optional[str] = None
+        message: Optional[str] = None
 
     metadata: Metadata
     root: Path
