@@ -272,3 +272,16 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
     runcutty("import", f"--cwd={project}", "--continue")
 
     assert (project / "LICENSE").read_text() == "b"
+
+
+def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It restores the previous state of the project."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("import", f"--cwd={project}")
+
+    runcutty("import", f"--cwd={project}", "--abort")
+
+    assert (project / "LICENSE").read_text() == "a"
