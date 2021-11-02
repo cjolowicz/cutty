@@ -46,6 +46,12 @@ from cutty.templates.domain.bindings import Binding
     default=False,
     help="Resume importing after conflict resolution.",
 )
+@click.option(
+    "--abort",
+    is_flag=True,
+    default=False,
+    help="Abort the current update.",
+)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @fatal
 def import_(
@@ -55,6 +61,7 @@ def import_(
     non_interactive: bool,
     template_directory: Optional[Path],
     continue_: bool,
+    abort: bool,
 ) -> None:
     """Import changesets from templates into projects."""
     if cwd is None:
@@ -64,6 +71,10 @@ def import_(
 
     if continue_:
         project.continue_()
+        return
+
+    if abort:
+        project.abort()
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
