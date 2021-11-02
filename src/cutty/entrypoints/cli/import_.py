@@ -23,10 +23,19 @@ from cutty.templates.domain.bindings import Binding
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
     help="Directory of the generated project.",
 )
+@click.option(
+    "--non-interactive",
+    is_flag=True,
+    default=False,
+    help="Do not prompt for template variables.",
+)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @fatal
 def import_(
-    revision: Optional[str], extra_context: dict[str, str], cwd: Optional[Path]
+    revision: Optional[str],
+    extra_context: dict[str, str],
+    cwd: Optional[Path],
+    non_interactive: bool,
 ) -> None:
     """Import changesets from templates into projects."""
     if cwd is None:
@@ -34,4 +43,9 @@ def import_(
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
-    service(cwd, revision=revision, extrabindings=extrabindings)
+    service(
+        cwd,
+        revision=revision,
+        extrabindings=extrabindings,
+        interactive=not non_interactive,
+    )
