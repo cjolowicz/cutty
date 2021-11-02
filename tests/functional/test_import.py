@@ -161,3 +161,15 @@ def test_invalid_revision(runcutty: RunCutty, project: Path) -> None:
     with pytest.raises(Exception, match="revision not found"):
         with chdir(project):
             runcutty("import", "--revision=invalid")
+
+
+def test_message(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It uses the commit message from the imported changeset."""
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import")
+
+    assert commit(template).message == commit(project).message
