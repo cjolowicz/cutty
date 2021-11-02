@@ -214,3 +214,13 @@ def test_extra_context_new_variable(
         runcutty("import", "status=stable")
 
     assert "stable" == projectvariable(project, "status")
+
+
+def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It prompts for variables added after the last project generation."""
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    with chdir(project):
+        runcutty("import", input="3\n")
+
+    assert "stable" == projectvariable(project, "status")
