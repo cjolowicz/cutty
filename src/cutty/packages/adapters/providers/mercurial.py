@@ -45,7 +45,7 @@ def getparentrevision(
     if revision is None:
         revision = "."
 
-    return getmetadata(path, f"--rev=p1({revision})", "node") or None
+    return getmetadata(path, f"p1({revision})", "node") or None
 
 
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
