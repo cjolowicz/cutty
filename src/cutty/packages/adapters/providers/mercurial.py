@@ -38,18 +38,6 @@ def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Re
     )
 
 
-@contextmanager
-def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
-    """Mount an archive of the revision as a disk filesystem."""
-    hg = findhg()
-
-    with tempfile.TemporaryDirectory() as directory:
-        options = ["--rev", revision] if revision is not None else []
-        hg("archive", *options, directory, cwd=path)
-
-        yield DiskFilesystem(pathlib.Path(directory))
-
-
 def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
@@ -63,6 +51,18 @@ def getparentrevision(
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
     """Return the commit message."""
     return getmetadata(path, revision, "desc")
+
+
+@contextmanager
+def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
+    """Mount an archive of the revision as a disk filesystem."""
+    hg = findhg()
+
+    with tempfile.TemporaryDirectory() as directory:
+        options = ["--rev", revision] if revision is not None else []
+        hg("archive", *options, directory, cwd=path)
+
+        yield DiskFilesystem(pathlib.Path(directory))
 
 
 hgproviderfactory = RemoteProviderFactory(
