@@ -61,6 +61,7 @@ class TemplateRepository:
                 package.name,
                 package.revision,
                 package.commit,
+                package.message,
             )
 
             yield Template(metadata, package.tree)
