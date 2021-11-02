@@ -233,3 +233,13 @@ def test_cwd(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     runcutty("import", f"--cwd={project}")
 
     assert (project / "marker").exists()
+
+
+def test_non_interactive(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It does not prompt for variables added after the last project generation."""
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    with chdir(project):
+        runcutty("import", "--non-interactive", input="3\n")
+
+    assert "alpha" == projectvariable(project, "status")

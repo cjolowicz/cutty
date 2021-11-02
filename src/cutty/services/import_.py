@@ -13,7 +13,11 @@ from cutty.templates.domain.bindings import Binding
 
 
 def import_(
-    projectdir: Path, *, revision: Optional[str], extrabindings: Sequence[Binding]
+    projectdir: Path,
+    *,
+    revision: Optional[str],
+    extrabindings: Sequence[Binding],
+    interactive: bool
 ) -> None:
     """Import changes from a template into a project."""
     config1 = readprojectconfigfile(projectdir)
@@ -31,14 +35,14 @@ def import_(
         repository,
         config1,
         revision=revision,
-        interactive=True,
+        interactive=interactive,
         commitmessage=importcommitmessage,
     )
 
     commit = buildproject(
         repository,
         config2,
-        interactive=True,
+        interactive=interactive,
         commitmessage=importcommitmessage,
         parent=parent,
     )
