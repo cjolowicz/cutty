@@ -1,4 +1,5 @@
 """Import changes from templates into projects."""
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -8,15 +9,18 @@ from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readprojectconfigfile
 from cutty.projects.messages import importcommitmessage
 from cutty.projects.repository import ProjectRepository
+from cutty.templates.domain.bindings import Binding
 
 
-def import_(projectdir: Path, *, revision: Optional[str]) -> None:
+def import_(
+    projectdir: Path, *, revision: Optional[str], extrabindings: Sequence[Binding]
+) -> None:
     """Import changes from a template into a project."""
     config1 = readprojectconfigfile(projectdir)
 
     config2 = ProjectConfig(
         config1.template,
-        config1.bindings,
+        [*config1.bindings, *extrabindings],
         revision,
         config1.directory,
     )
