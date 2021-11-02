@@ -101,14 +101,14 @@ class ProjectRepository:
         """Import changes to the project made by the given commit."""
         try:
             self.project.cherrypick(cherry)
-        except MergeConflictError as error:
+        except MergeConflictError:
             repository = self.project._repository
             index = repository.index
 
             try:
                 _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
             except KeyError:
-                raise error from None
+                raise MergeConflictError.fromindex(index)
 
             del index.conflicts[PROJECT_CONFIG_FILE]
 
