@@ -104,16 +104,9 @@ def getparentrevision(
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
     """Return the commit message."""
     repository = pygit2.Repository(path)
-
-    if revision is None:
-        revision = "HEAD"
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:  # pragma: no cover
-        raise RevisionNotFoundError(revision)
-
+    commit = _getcommit(repository, revision)
     message: str = commit.message
+
     return message
 
 
