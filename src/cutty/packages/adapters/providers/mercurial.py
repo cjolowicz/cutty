@@ -33,18 +33,9 @@ def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revi
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
-    hg = findhg()
-
-    if revision is None:
-        revision = "."
-
-    result = hg(
-        "log",
-        f"--rev={revision}",
-        "--template={ifeq(latesttagdistance, 0, latesttag, short(node))}",
-        cwd=path,
+    return getmetadata(
+        path, revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
     )
-    return result.stdout
 
 
 @contextmanager
