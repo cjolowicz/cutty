@@ -1,9 +1,12 @@
 """Functional tests for `cutty import`."""
+import json
 from pathlib import Path
+from typing import Any
 
 import pygit2
 import pytest
 
+from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
@@ -173,3 +176,51 @@ def test_message(
         runcutty("import")
 
     assert commit(template).message == commit(project).message
+
+
+def projectvariable(project: Path, name: str) -> Any:
+    """Return the bound value of a project variable."""
+    config = readprojectconfigfile(project)
+    return next(binding.value for binding in config.bindings if binding.name == name)
+
+
+def test_extra_context_old_variable(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It allows setting variables on the command-line."""
+    updatefile(templateproject / "marker")
+
+    with chdir(project):
+        runcutty("import", "project=excellent")
+
+    assert "excellent" == projectvariable(project, "project")
+
+
+def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
+    """Add or update a template variable."""
+    path = template / "cookiecutter.json"
+    data = json.loads(path.read_text())
+    data[name] = value
+    updatefile(path, json.dumps(data))
+
+
+def test_extra_context_new_variable(
+    runcutty: RunCutty, template: Path, project: Path
+) -> None:
+    """It allows setting variables on the command-line."""
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    with chdir(project):
+        runcutty("import", "status=stable")
+
+    assert "stable" == projectvariable(project, "status")
+
+
+def test_new_variables(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It prompts for variables added after the last project generation."""
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    with chdir(project):
+        runcutty("import", input="3\n")
+
+    assert "stable" == projectvariable(project, "status")
