@@ -45,32 +45,30 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
         yield GitFilesystem(path)
 
 
-def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the commit identifier."""
+def _getcommit(
+    repository: pygit2.Repository, revision: Optional[Revision]
+) -> pygit2.Commit:
+    """Return the commit object."""
     if revision is None:
         revision = "HEAD"
 
-    repository = pygit2.Repository(path)
-
     try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
+        return repository.revparse_single(revision).peel(pygit2.Commit)
     except KeyError:
         raise RevisionNotFoundError(revision)
 
+
+def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the commit identifier."""
+    repository = pygit2.Repository(path)
+    commit = _getcommit(repository, revision)
     return str(commit.id)
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
-    if revision is None:
-        revision = "HEAD"
-
     repository = pygit2.Repository(path)
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:  # pragma: no cover
-        raise RevisionNotFoundError(revision)
+    commit = _getcommit(repository, revision)
 
     try:
         revision = repository.describe(
@@ -92,15 +90,8 @@ def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
     """Return the parent revision, if any."""
-    if revision is None:
-        revision = "HEAD"
-
     repository = pygit2.Repository(path)
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:
-        raise RevisionNotFoundError(revision)
+    commit = _getcommit(repository, revision)
 
     if parents := commit.parents:
         [parent] = parents
@@ -112,17 +103,10 @@ def getparentrevision(
 
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
     """Return the commit message."""
-    if revision is None:
-        revision = "HEAD"
-
     repository = pygit2.Repository(path)
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:  # pragma: no cover
-        raise RevisionNotFoundError(revision)
-
+    commit = _getcommit(repository, revision)
     message: str = commit.message
+
     return message
 
 

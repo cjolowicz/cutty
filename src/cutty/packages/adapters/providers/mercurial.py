@@ -13,31 +13,44 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.revisions import Revision
 
 
-def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the commit identifier."""
+def getmetadata(
+    path: pathlib.Path, revision: Optional[Revision], template: str
+) -> Optional[str]:
+    """Return commit metadata."""
     hg = findhg()
 
     if revision is None:
         revision = "."
 
-    result = hg("log", f"--rev={revision}", "--template={node}", cwd=path)
+    result = hg("log", f"--rev={revision}", f"--template={{{template}}}", cwd=path)
     return result.stdout
+
+
+def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
+    """Return the commit identifier."""
+    return getmetadata(path, revision, "node")
 
 
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
-    hg = findhg()
+    return getmetadata(
+        path, revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
+    )
 
+
+def getparentrevision(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Optional[Revision]:
+    """Return the parent revision, if any."""
     if revision is None:
         revision = "."
 
-    result = hg(
-        "log",
-        f"--rev={revision}",
-        "--template={ifeq(latesttagdistance, 0, latesttag, short(node))}",
-        cwd=path,
-    )
-    return result.stdout
+    return getmetadata(path, f"p1({revision})", "node") or None
+
+
+def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
+    """Return the commit message."""
+    return getmetadata(path, revision, "desc")
 
 
 @contextmanager
@@ -50,31 +63,6 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
         hg("archive", *options, directory, cwd=path)
 
         yield DiskFilesystem(pathlib.Path(directory))
-
-
-def getparentrevision(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Optional[Revision]:
-    """Return the parent revision, if any."""
-    hg = findhg()
-
-    if revision is None:
-        revision = "."
-
-    result = hg("log", f"--rev=p1({revision})", "--template={node}", cwd=path)
-
-    return result.stdout or None
-
-
-def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
-    """Return the commit message."""
-    hg = findhg()
-
-    if revision is None:
-        revision = "."
-
-    result = hg("log", f"--rev={revision}", "--template={desc}", cwd=path)
-    return result.stdout
 
 
 hgproviderfactory = RemoteProviderFactory(
