@@ -102,26 +102,30 @@ class ProjectRepository:
         try:
             self.project.cherrypick(cherry)
         except MergeConflictError:
-            repository = self.project._repository
-            index = repository.index
+            self._resolveconflicts()
 
-            try:
-                _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
-            except KeyError:
-                raise MergeConflictError.fromindex(index)
+    def _resolveconflicts(self) -> None:
+        """Resolve conflicts in project configuration file."""
+        repository = self.project._repository
+        index = repository.index
 
-            del index.conflicts[PROJECT_CONFIG_FILE]
+        try:
+            _, _, theirs = index.conflicts[PROJECT_CONFIG_FILE]
+        except KeyError:
+            raise MergeConflictError.fromindex(index)
 
-            index.add(theirs)
-            index.write()
-            repository.checkout(
-                strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
-            )
+        del index.conflicts[PROJECT_CONFIG_FILE]
 
-            if index.conflicts:
-                raise MergeConflictError.fromindex(index)
+        index.add(theirs)
+        index.write()
+        repository.checkout(
+            strategy=pygit2.GIT_CHECKOUT_FORCE, paths=[PROJECT_CONFIG_FILE]
+        )
 
-            self.continue_()
+        if index.conflicts:
+            raise MergeConflictError.fromindex(index)
+
+        self.continue_()
 
     def _cherrypickpaths(self, cherry: pygit2.Commit, paths: Iterable[Path]) -> None:
         """Import changes to the project made by the given commit."""
