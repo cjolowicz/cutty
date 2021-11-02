@@ -184,14 +184,26 @@ def test_existing_project_files(runcutty: RunCutty, template: Path) -> None:
 def test_conflict(runcutty: RunCutty, template: Path) -> None:
     """It produces conflict markers if files have conflicting changes."""
     project = Repository.init(Path("example"))
-    conflicting = project.path / "cutty.json"
+    conflicting = project.path / "README.md"
 
-    updatefile(conflicting, "null")
+    updatefile(conflicting, "teapot")
 
     with pytest.raises(Exception, match="conflict"):
         runcutty("create", str(template))
 
     assert ">>>>" in conflicting.read_text()
+
+
+def test_conflict_cutty_json(runcutty: RunCutty, template: Path) -> None:
+    """It resolves conflicts in cutty.json in favor of the new version."""
+    project = Repository.init(Path("example"))
+    conflicting = project.path / "cutty.json"
+
+    updatefile(conflicting, "null")
+
+    runcutty("create", str(template))
+
+    assert ">>>>" not in conflicting.read_text()
 
 
 def test_commit_hash(runcutty: RunCutty, template: Path) -> None:
