@@ -29,3 +29,11 @@ def linkcommitmessage(template: Template.Metadata) -> str:
         return f"Link to {template.name} {template.revision}"
     else:
         return f"Link to {template.name}"
+
+
+def importcommitmessage(template: Template.Metadata) -> str:
+    """Build the commit message for importing a template commit."""
+    if template.message:
+        return template.message
+    else:
+        return updatecommitmessage(template)
