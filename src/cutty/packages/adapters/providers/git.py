@@ -45,10 +45,10 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFiles
         yield GitFilesystem(path)
 
 
-def _getcommit(path: pathlib.Path, revision: Optional[Revision]) -> pygit2.Commit:
+def _getcommit(
+    repository: pygit2.Repository, revision: Optional[Revision]
+) -> pygit2.Commit:
     """Return the commit object."""
-    repository = pygit2.Repository(path)
-
     if revision is None:
         revision = "HEAD"
 
@@ -60,7 +60,8 @@ def _getcommit(path: pathlib.Path, revision: Optional[Revision]) -> pygit2.Commi
 
 def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the commit identifier."""
-    commit = _getcommit(path, revision)
+    repository = pygit2.Repository(path)
+    commit = _getcommit(repository, revision)
     return str(commit.id)
 
 
