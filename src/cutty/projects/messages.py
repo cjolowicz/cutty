@@ -35,5 +35,5 @@ def importcommitmessage(template: Template.Metadata) -> str:
     """Build the commit message for importing a template commit."""
     if template.message:
         return template.message
-    else:
+    else:  # pragma: no cover
         return updatecommitmessage(template)
