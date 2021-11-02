@@ -91,14 +91,7 @@ def getparentrevision(
 ) -> Optional[Revision]:
     """Return the parent revision, if any."""
     repository = pygit2.Repository(path)
-
-    if revision is None:
-        revision = "HEAD"
-
-    try:
-        commit = repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:
-        raise RevisionNotFoundError(revision)
+    commit = _getcommit(repository, revision)
 
     if parents := commit.parents:
         [parent] = parents
