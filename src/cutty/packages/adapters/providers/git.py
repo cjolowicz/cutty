@@ -1,6 +1,7 @@
 """Providers for git repositories."""
 import pathlib
 from collections.abc import Iterator
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -9,6 +10,7 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
+from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
@@ -118,7 +120,11 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def __init__(self, name: str, path: pathlib.Path) -> None:
         """Initialize."""
-        super().__init__(name, path, mount=mount)
+        super().__init__(name, path)
+
+    def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
+        """Mount the package filesystem."""
+        return mount(self.path, revision)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
