@@ -17,6 +17,9 @@ from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.variables import projectvariable
+from tests.util.variables import templatevariable
+from tests.util.variables import updatetemplatevariable
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -32,27 +35,6 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     runcutty("create", "--non-interactive", str(template), f"project={project.name}")
 
     return project
-
-
-def templatevariable(template: Path, name: str) -> Any:
-    """Return the value of a template variable."""
-    path = template / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    return data[name]
-
-
-def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
-    """Add or update a template variable."""
-    path = template / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    data[name] = value
-    updatefile(path, json.dumps(data))
-
-
-def projectvariable(project: Path, name: str) -> Any:
-    """Return the bound value of a project variable."""
-    config = readprojectconfigfile(project)
-    return next(binding.value for binding in config.bindings if binding.name == name)
 
 
 @pytest.fixture

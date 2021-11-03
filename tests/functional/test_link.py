@@ -7,10 +7,10 @@ from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.functional.conftest import RunCuttyError
-from tests.functional.test_update import projectvariable
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import updatefile
+from tests.util.variables import projectvariable
 
 
 def test_help(runcutty: RunCutty) -> None:

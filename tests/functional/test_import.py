@@ -1,7 +1,5 @@
 """Functional tests for `cutty import`."""
-import json
 from pathlib import Path
-from typing import Any
 
 import pygit2
 import pytest
@@ -14,6 +12,8 @@ from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.variables import projectvariable
+from tests.util.variables import updatetemplatevariable
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -181,12 +181,6 @@ def test_message(
     assert commit(template).message == commit(project).message
 
 
-def projectvariable(project: Path, name: str) -> Any:
-    """Return the bound value of a project variable."""
-    config = readprojectconfigfile(project)
-    return next(binding.value for binding in config.bindings if binding.name == name)
-
-
 def test_extra_context_old_variable(
     runcutty: RunCutty, templateproject: Path, project: Path
 ) -> None:
@@ -197,14 +191,6 @@ def test_extra_context_old_variable(
         runcutty("import", "project=excellent")
 
     assert "excellent" == projectvariable(project, "project")
-
-
-def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
-    """Add or update a template variable."""
-    path = template / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    data[name] = value
-    updatefile(path, json.dumps(data))
 
 
 def test_extra_context_new_variable(
