@@ -186,6 +186,7 @@ class RemoteProviderFactory(ProviderFactory):
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -196,6 +197,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -208,6 +210,7 @@ class RemoteProviderFactory(ProviderFactory):
             getrevision=self.getrevision,
             getparentrevision=self.getparentrevision,
             getmessage=self.getmessage,
+            provider=self.provider,
             store=store,
         )
 
