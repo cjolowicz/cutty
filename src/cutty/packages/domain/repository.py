@@ -1,7 +1,6 @@
 """Package repositories."""
 import abc
 import pathlib
-from collections.abc import Callable
 from collections.abc import Iterator
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
@@ -43,25 +42,16 @@ class PackageRepositoryProvider(abc.ABC):
         """Load a package repository."""
 
 
-GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
-
-
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 
     def __init__(
-        self,
-        name: str,
-        path: pathlib.Path,
-        *,
-        mount: Optional[Mounter] = None,
-        getrevision: Optional[GetRevision] = None,
+        self, name: str, path: pathlib.Path, *, mount: Optional[Mounter] = None
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
         self._mount = mount
-        self._getrevision = getrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -87,10 +77,7 @@ class DefaultPackageRepository(PackageRepository):
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        if self._getrevision is None:
-            return revision
-
-        return self._getrevision(self.path, revision)
+        return revision
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
