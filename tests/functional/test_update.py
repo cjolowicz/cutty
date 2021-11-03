@@ -18,6 +18,7 @@ from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
 from tests.util.variables import projectvariable
+from tests.util.variables import templatevariable
 from tests.util.variables import updatetemplatevariable
 
 
@@ -34,13 +35,6 @@ def project(runcutty: RunCutty, template: Path) -> Path:
     runcutty("create", "--non-interactive", str(template), f"project={project.name}")
 
     return project
-
-
-def templatevariable(template: Path, name: str) -> Any:
-    """Return the value of a template variable."""
-    path = template / "cookiecutter.json"
-    data = json.loads(path.read_text())
-    return data[name]
 
 
 @pytest.fixture
