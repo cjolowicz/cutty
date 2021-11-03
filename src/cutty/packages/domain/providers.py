@@ -21,6 +21,7 @@ from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import GetMessage
 from cutty.packages.domain.repository import GetRevision
 from cutty.packages.domain.repository import PackageRepository
+from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -45,11 +46,12 @@ class LocalProvider(Provider):
         /,
         *,
         match: PathMatcher,
-        mount: Mounter,
+        mount: Optional[Mounter] = None,
         getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -60,11 +62,17 @@ class LocalProvider(Provider):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
+                if self.provider is not None:
+                    return self.provider.provide(location.name, path)
+
+                assert self.mount is not None  # noqa: S101
+
                 return DefaultPackageRepository(
                     location.name,
                     path,
@@ -100,6 +108,7 @@ class RemoteProvider(Provider):
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
         store: Store,
     ) -> None:
         """Initialize."""
@@ -119,6 +128,7 @@ class RemoteProvider(Provider):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -133,6 +143,9 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
+                    if self.provider is not None:
+                        return self.provider.provide(location.name, path)
+
                     return DefaultPackageRepository(
                         location.name,
                         path,
@@ -173,6 +186,7 @@ class RemoteProviderFactory(ProviderFactory):
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -183,6 +197,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -195,6 +210,7 @@ class RemoteProviderFactory(ProviderFactory):
             getrevision=self.getrevision,
             getparentrevision=self.getparentrevision,
             getmessage=self.getmessage,
+            provider=self.provider,
             store=store,
         )
 

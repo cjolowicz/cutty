@@ -3,11 +3,13 @@ import abc
 import pathlib
 from collections.abc import Callable
 from collections.abc import Iterator
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
+from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
@@ -33,6 +35,14 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
+class PackageRepositoryProvider(abc.ABC):
+    """A provider of package repositories."""
+
+    @abc.abstractmethod
+    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+        """Load a package repository."""
+
+
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 GetMessage = Callable[[pathlib.Path, Optional[Revision]], Optional[str]]
 
@@ -45,16 +55,16 @@ class DefaultPackageRepository(PackageRepository):
         name: str,
         path: pathlib.Path,
         *,
-        mount: Mounter,
+        mount: Optional[Mounter] = None,
         getcommit: Optional[GetRevision] = None,
-        getrevision: Optional[GetRevision],
+        getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
-        self.mount = mount
+        self._mount = mount
         self._getcommit = getcommit
         self._getrevision = getrevision
         self._getparentrevision = getparentrevision
@@ -67,10 +77,16 @@ class DefaultPackageRepository(PackageRepository):
         resolved_revision = self.getrevision(revision)
         message = self.getmessage(revision)
 
-        with self.mount(self.path, revision) as filesystem:
+        with self.mount(revision) as filesystem:
             tree = Path(filesystem=filesystem)
 
             yield Package(self.name, tree, resolved_revision, commit, message)
+
+    def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
+        """Mount the package filesystem."""
+        assert self._mount is not None  # noqa: S101
+
+        return self._mount(self.path, revision)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
