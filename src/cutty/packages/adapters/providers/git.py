@@ -113,12 +113,16 @@ def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str
     return message
 
 
+class GitPackageRepository(DefaultPackageRepository):
+    """Git package repository."""
+
+
 class GitProvider(PackageRepositoryProvider):
     """Git repository provider."""
 
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository."""
-        return DefaultPackageRepository(
+        return GitPackageRepository(
             name,
             path,
             mount=mount,
