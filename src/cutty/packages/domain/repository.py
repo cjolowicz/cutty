@@ -44,7 +44,6 @@ class PackageRepositoryProvider(abc.ABC):
 
 
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
-GetMessage = Callable[[pathlib.Path, Optional[Revision]], Optional[str]]
 
 
 class DefaultPackageRepository(PackageRepository):
@@ -56,19 +55,13 @@ class DefaultPackageRepository(PackageRepository):
         path: pathlib.Path,
         *,
         mount: Optional[Mounter] = None,
-        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
-        getparentrevision: Optional[GetRevision] = None,
-        getmessage: Optional[GetMessage] = None,
     ) -> None:
         """Initialize."""
         self.name = name
         self.path = path
         self._mount = mount
-        self._getcommit = getcommit
         self._getrevision = getrevision
-        self._getparentrevision = getparentrevision
-        self._getmessage = getmessage
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -90,10 +83,7 @@ class DefaultPackageRepository(PackageRepository):
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
-        if self._getcommit is None:
-            return None
-
-        return self._getcommit(self.path, revision)
+        return None
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
@@ -104,14 +94,8 @@ class DefaultPackageRepository(PackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        if self._getparentrevision is None:
-            raise ParentRevisionNotImplementedError(self.name)
-
-        return self._getparentrevision(self.path, revision)
+        raise ParentRevisionNotImplementedError(self.name)
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
-        if self._getmessage is None:
-            return None
-
-        return self._getmessage(self.path, revision)
+        return None

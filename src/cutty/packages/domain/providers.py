@@ -18,7 +18,6 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.repository import DefaultPackageRepository
-from cutty.packages.domain.repository import GetMessage
 from cutty.packages.domain.repository import GetRevision
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.repository import PackageRepositoryProvider
@@ -47,10 +46,7 @@ class LocalProvider(Provider):
         *,
         match: PathMatcher,
         mount: Optional[Mounter] = None,
-        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
-        getparentrevision: Optional[GetRevision] = None,
-        getmessage: Optional[GetMessage] = None,
         provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
@@ -58,10 +54,7 @@ class LocalProvider(Provider):
 
         self.match = match
         self.mount = mount
-        self.getcommit = getcommit
         self.getrevision = getrevision
-        self.getparentrevision = getparentrevision
-        self.getmessage = getmessage
         self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
@@ -74,13 +67,7 @@ class LocalProvider(Provider):
                 assert self.mount is not None  # noqa: S101
 
                 return DefaultPackageRepository(
-                    location.name,
-                    path,
-                    mount=self.mount,
-                    getcommit=self.getcommit,
-                    getrevision=self.getrevision,
-                    getparentrevision=self.getparentrevision,
-                    getmessage=self.getmessage,
+                    location.name, path, mount=self.mount, getrevision=self.getrevision
                 )
 
         return None
@@ -104,10 +91,7 @@ class RemoteProvider(Provider):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
-        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
-        getparentrevision: Optional[GetRevision] = None,
-        getmessage: Optional[GetMessage] = None,
         provider: Optional[PackageRepositoryProvider] = None,
         store: Store,
     ) -> None:
@@ -124,10 +108,7 @@ class RemoteProvider(Provider):
         self.fetch = tuple(fetch)
         self.store = store
         self.mount = mount
-        self.getcommit = getcommit
         self.getrevision = getrevision
-        self.getparentrevision = getparentrevision
-        self.getmessage = getmessage
         self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
@@ -150,10 +131,7 @@ class RemoteProvider(Provider):
                         location.name,
                         path,
                         mount=self.mount,
-                        getcommit=self.getcommit,
                         getrevision=self.getrevision,
-                        getparentrevision=self.getparentrevision,
-                        getmessage=self.getmessage,
                     )
 
         return None
@@ -182,10 +160,7 @@ class RemoteProviderFactory(ProviderFactory):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
-        getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
-        getparentrevision: Optional[GetRevision] = None,
-        getmessage: Optional[GetMessage] = None,
         provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
@@ -193,10 +168,7 @@ class RemoteProviderFactory(ProviderFactory):
         self.match = match
         self.fetch = tuple(fetch)
         self.mount = mount
-        self.getcommit = getcommit
         self.getrevision = getrevision
-        self.getparentrevision = getparentrevision
-        self.getmessage = getmessage
         self.provider = provider
 
     def __call__(self, store: Store) -> Provider:
@@ -206,10 +178,7 @@ class RemoteProviderFactory(ProviderFactory):
             match=self.match,
             fetch=self.fetch,
             mount=self.mount,
-            getcommit=self.getcommit,
             getrevision=self.getrevision,
-            getparentrevision=self.getparentrevision,
-            getmessage=self.getmessage,
             provider=self.provider,
             store=store,
         )
