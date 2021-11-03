@@ -10,6 +10,8 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.providers import RemoteProviderFactory
+from cutty.packages.domain.repository import DefaultPackageRepository
+from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
@@ -65,12 +67,22 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
         yield DiskFilesystem(pathlib.Path(directory))
 
 
+class MercurialProvider(PackageRepositoryProvider):
+    """Mercurial repository provider."""
+
+    def provide(self, name: str, path: pathlib.Path) -> DefaultPackageRepository:
+        """Load a package repository."""
+        return DefaultPackageRepository(
+            name,
+            path,
+            getcommit=getcommit,
+            getrevision=getrevision,
+            getparentrevision=getparentrevision,
+            getmessage=getmessage,
+            mount=mount,
+        )
+
+
 hgproviderfactory = RemoteProviderFactory(
-    "hg",
-    fetch=[hgfetcher],
-    getcommit=getcommit,
-    getrevision=getrevision,
-    getparentrevision=getparentrevision,
-    getmessage=getmessage,
-    mount=mount,
+    "hg", fetch=[hgfetcher], provider=MercurialProvider()
 )
