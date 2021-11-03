@@ -1,7 +1,6 @@
 """Unit tests for cutty.packages.domain.providers."""
 import json
 import pathlib
-from typing import Optional
 
 import pytest
 from yarl import URL
@@ -12,7 +11,6 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
 
@@ -76,33 +74,6 @@ def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) ->
                 pass
 
 
-def test_localprovider_package_revision(
-    tmp_path: pathlib.Path, diskmounter: Mounter
-) -> None:
-    """It determines the revision of the package."""
-
-    def getrevision(
-        path: pathlib.Path, revision: Optional[Revision]
-    ) -> Optional[Revision]:
-        """Return the contents of the VERSION file."""
-        return (path / "VERSION").read_text().strip()
-
-    provider = LocalProvider(
-        match=lambda _: True, mount=diskmounter, getrevision=getrevision
-    )
-
-    path = tmp_path / "repository"
-    path.mkdir()
-    (path / "VERSION").write_text("1.0")
-
-    repository = provider.provide(asurl(path))
-
-    assert repository is not None
-
-    with repository.get() as package:
-        assert "1.0" == package.revision
-
-
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
     """It returns None if there are no fetchers."""
     providerfactory = RemoteProviderFactory(fetch=[])
@@ -128,29 +99,6 @@ def test_remoteproviderfactory_happy(
     repository = provider.provide(url)
 
     assert repository is not None
-
-
-def test_remoteproviderfactory_package_revision(
-    store: Store, emptyfetcher: Fetcher, url: URL
-) -> None:
-    """It returns the package revision."""
-
-    def getrevision(
-        path: pathlib.Path, revision: Optional[Revision]
-    ) -> Optional[Revision]:
-        """Return a fake version."""
-        return "v1.0"
-
-    providerfactory = RemoteProviderFactory(
-        fetch=[emptyfetcher], getrevision=getrevision
-    )
-    provider = providerfactory(store)
-    repository = provider.provide(url)
-
-    assert repository is not None
-
-    with repository.get() as package:
-        assert package.revision == "v1.0"
 
 
 def test_remoteproviderfactory_not_matching(
