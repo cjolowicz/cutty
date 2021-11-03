@@ -21,6 +21,7 @@ from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import GetMessage
 from cutty.packages.domain.repository import GetRevision
 from cutty.packages.domain.repository import PackageRepository
+from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
@@ -50,6 +51,7 @@ class LocalProvider(Provider):
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -60,11 +62,15 @@ class LocalProvider(Provider):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
+                if self.provider is not None:
+                    return self.provider.provide(location.name, path)
+
                 return DefaultPackageRepository(
                     location.name,
                     path,
