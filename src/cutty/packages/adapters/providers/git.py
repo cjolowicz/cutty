@@ -129,15 +129,7 @@ class GitProvider(PackageRepositoryProvider):
         )
 
 
-localgitprovider = LocalProvider(
-    "localgit",
-    match=match,
-    mount=mount,
-    getcommit=getcommit,
-    getrevision=getrevision,
-    getparentrevision=getparentrevision,
-    getmessage=getmessage,
-)
+localgitprovider = LocalProvider("localgit", match=match, provider=GitProvider())
 
 gitproviderfactory = RemoteProviderFactory(
     "git",
