@@ -10,11 +10,11 @@ from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.repository import PackageRepositoryLoader
 from cutty.packages.domain.revisions import Revision
 
 

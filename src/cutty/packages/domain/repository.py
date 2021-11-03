@@ -34,14 +34,6 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
-class PackageRepositoryLoader(abc.ABC):
-    """Loader for package repositories."""
-
-    @abc.abstractmethod
-    def load(self, name: str, path: pathlib.Path) -> PackageRepository:
-        """Load a package repository from disk."""
-
-
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 

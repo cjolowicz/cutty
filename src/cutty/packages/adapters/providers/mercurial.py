@@ -9,9 +9,9 @@ from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
-from cutty.packages.domain.repository import PackageRepositoryLoader
 from cutty.packages.domain.revisions import Revision
 
 

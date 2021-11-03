@@ -11,6 +11,7 @@ from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import pathfromlocation
@@ -19,7 +20,6 @@ from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.repository import PackageRepositoryLoader
 from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
