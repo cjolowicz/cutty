@@ -55,7 +55,7 @@ class DefaultPackageRepository(PackageRepository):
         *,
         mount: Mounter,
         getcommit: Optional[GetRevision] = None,
-        getrevision: Optional[GetRevision],
+        getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
     ) -> None:
