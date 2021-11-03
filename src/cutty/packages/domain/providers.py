@@ -45,21 +45,21 @@ class LocalProvider(Provider):
         *,
         match: PathMatcher,
         mount: Optional[Mounter] = None,
-        provider: Optional[PackageRepositoryLoader] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
 
         self.match = match
         self.mount = mount
-        self.provider = provider
+        self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
-                if self.provider is not None:
-                    return self.provider.load(location.name, path)
+                if self.loader is not None:
+                    return self.loader.load(location.name, path)
 
                 assert self.mount is not None  # noqa: S101
 
@@ -86,7 +86,7 @@ class RemoteProvider(Provider):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
-        provider: Optional[PackageRepositoryLoader] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
         store: Store,
     ) -> None:
         """Initialize."""
@@ -102,7 +102,7 @@ class RemoteProvider(Provider):
         self.fetch = tuple(fetch)
         self.store = store
         self.mount = mount
-        self.provider = provider
+        self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -117,8 +117,8 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
-                    if self.provider is not None:
-                        return self.provider.load(location.name, path)
+                    if self.loader is not None:
+                        return self.loader.load(location.name, path)
 
                     return DefaultPackageRepository(
                         location.name, path, mount=self.mount
@@ -150,14 +150,14 @@ class RemoteProviderFactory(ProviderFactory):
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
         mount: Optional[Mounter] = None,
-        provider: Optional[PackageRepositoryLoader] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
         self.fetch = tuple(fetch)
         self.mount = mount
-        self.provider = provider
+        self.loader = loader
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -166,7 +166,7 @@ class RemoteProviderFactory(ProviderFactory):
             match=self.match,
             fetch=self.fetch,
             mount=self.mount,
-            provider=self.provider,
+            loader=self.loader,
             store=store,
         )
 

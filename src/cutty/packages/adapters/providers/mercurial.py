@@ -72,5 +72,5 @@ class MercurialRepositoryLoader(PackageRepositoryLoader):
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], provider=MercurialRepositoryLoader()
+    "hg", fetch=[hgfetcher], loader=MercurialRepositoryLoader()
 )

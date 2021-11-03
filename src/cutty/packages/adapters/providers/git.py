@@ -118,9 +118,7 @@ def match(path: pathlib.Path) -> bool:
     return path in (repositorypath, repositorypath.parent)
 
 
-localgitprovider = LocalProvider(
-    "localgit", match=match, provider=GitRepositoryLoader()
-)
+localgitprovider = LocalProvider("localgit", match=match, loader=GitRepositoryLoader())
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], provider=GitRepositoryLoader()
+    "git", fetch=[gitfetcher], loader=GitRepositoryLoader()
 )
