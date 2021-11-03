@@ -62,7 +62,7 @@ class DefaultPackageRepository(PackageRepository):
         """Initialize."""
         self.name = name
         self.path = path
-        self.mount = mount
+        self._mount = mount
         self._getcommit = getcommit
         self._getrevision = getrevision
         self._getparentrevision = getparentrevision
@@ -75,7 +75,7 @@ class DefaultPackageRepository(PackageRepository):
         resolved_revision = self.getrevision(revision)
         message = self.getmessage(revision)
 
-        with self.mount(self.path, revision) as filesystem:
+        with self._mount(self.path, revision) as filesystem:
             tree = Path(filesystem=filesystem)
 
             yield Package(self.name, tree, resolved_revision, commit, message)
