@@ -63,13 +63,6 @@ def _getcommit(
         raise RevisionNotFoundError(revision)
 
 
-def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the commit identifier."""
-    repository = pygit2.Repository(path)
-    commit = _getcommit(repository, revision)
-    return str(commit.id)
-
-
 def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
     """Return the package revision."""
     repository = pygit2.Repository(path)
@@ -128,7 +121,9 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
-        return getcommit(self.path, revision)
+        repository = pygit2.Repository(self.path)
+        commit = _getcommit(repository, revision)
+        return str(commit.id)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
