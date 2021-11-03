@@ -14,6 +14,7 @@ from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.variables import projectvariable
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -179,12 +180,6 @@ def test_message(
         runcutty("import")
 
     assert commit(template).message == commit(project).message
-
-
-def projectvariable(project: Path, name: str) -> Any:
-    """Return the bound value of a project variable."""
-    config = readprojectconfigfile(project)
-    return next(binding.value for binding in config.bindings if binding.name == name)
 
 
 def test_extra_context_old_variable(
