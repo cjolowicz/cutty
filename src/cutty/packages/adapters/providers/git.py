@@ -55,6 +55,8 @@ class GitPackageRepository(DefaultPackageRepository):
         """Initialize."""
         super().__init__(name, path)
 
+        self.repository = pygit2.Repository(path)
+
     @contextmanager
     def mount(self, revision: Optional[Revision]) -> Iterator[GitFilesystem]:
         """Return a filesystem tree for the given revision.
@@ -69,17 +71,15 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
-        repository = pygit2.Repository(self.path)
-        commit = _getcommit(repository, revision)
+        commit = _getcommit(self.repository, revision)
         return str(commit.id)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        repository = pygit2.Repository(self.path)
-        commit = _getcommit(repository, revision)
+        commit = _getcommit(self.repository, revision)
 
         try:
-            revision = repository.describe(
+            revision = self.repository.describe(
                 commit,
                 describe_strategy=pygit2.GIT_DESCRIBE_TAGS,
                 max_candidates_tags=0,
@@ -95,8 +95,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        repository = pygit2.Repository(self.path)
-        commit = _getcommit(repository, revision)
+        commit = _getcommit(self.repository, revision)
 
         if parents := commit.parents:
             [parent] = parents
@@ -107,8 +106,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
-        repository = pygit2.Repository(self.path)
-        commit = _getcommit(repository, revision)
+        commit = _getcommit(self.repository, revision)
         message: str = commit.message
 
         return message
