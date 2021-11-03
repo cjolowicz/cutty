@@ -118,12 +118,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def __init__(self, name: str, path: pathlib.Path) -> None:
         """Initialize."""
-        super().__init__(
-            name,
-            path,
-            mount=mount,
-            getmessage=getmessage,
-        )
+        super().__init__(name, path, mount=mount)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
@@ -136,6 +131,10 @@ class GitPackageRepository(DefaultPackageRepository):
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
         return getparentrevision(self.path, revision)
+
+    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit message."""
+        return getmessage(self.path, revision)
 
 
 class GitProvider(PackageRepositoryProvider):
