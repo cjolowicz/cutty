@@ -11,6 +11,8 @@ from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
+from tests.util.git import resolveconflicts
+from tests.util.git import Side
 from tests.util.git import updatefile
 
 
@@ -255,3 +257,31 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)
+
+
+def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It continues the import after the conflicts have been resolved."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("import", f"--cwd={project}")
+
+    resolveconflicts(project, project / "LICENSE", Side.THEIRS)
+
+    runcutty("import", f"--cwd={project}", "--continue")
+
+    assert (project / "LICENSE").read_text() == "b"
+
+
+def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
+    """It restores the previous state of the project."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("import", f"--cwd={project}")
+
+    runcutty("import", f"--cwd={project}", "--abort")
+
+    assert (project / "LICENSE").read_text() == "a"

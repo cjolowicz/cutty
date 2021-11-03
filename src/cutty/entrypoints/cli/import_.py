@@ -6,6 +6,7 @@ import click
 
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.entrypoints.cli.errors import fatal
+from cutty.projects.repository import ProjectRepository
 from cutty.services.import_ import import_ as service
 from cutty.templates.domain.bindings import Binding
 
@@ -38,6 +39,19 @@ from cutty.templates.domain.bindings import Binding
         "cookiecutter.json file."
     ),
 )
+@click.option(
+    "continue_",
+    "--continue",
+    is_flag=True,
+    default=False,
+    help="Resume importing after conflict resolution.",
+)
+@click.option(
+    "--abort",
+    is_flag=True,
+    default=False,
+    help="Abort the current update.",
+)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @fatal
 def import_(
@@ -46,10 +60,22 @@ def import_(
     cwd: Optional[Path],
     non_interactive: bool,
     template_directory: Optional[Path],
+    continue_: bool,
+    abort: bool,
 ) -> None:
     """Import changesets from templates into projects."""
     if cwd is None:
         cwd = Path.cwd()
+
+    project = ProjectRepository(cwd)
+
+    if continue_:
+        project.continue_()
+        return
+
+    if abort:
+        project.abort()
+        return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
 
