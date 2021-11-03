@@ -103,7 +103,7 @@ class GitPackageRepository(DefaultPackageRepository):
 class GitRepositoryLoader(PackageRepositoryLoader):
     """Git repository loader."""
 
-    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+    def load(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository."""
         return GitPackageRepository(name, path)
 

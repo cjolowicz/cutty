@@ -38,7 +38,7 @@ class PackageRepositoryLoader(abc.ABC):
     """Loader for package repositories."""
 
     @abc.abstractmethod
-    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+    def load(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository from disk."""
 
 

@@ -59,7 +59,7 @@ class LocalProvider(Provider):
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
                 if self.provider is not None:
-                    return self.provider.provide(location.name, path)
+                    return self.provider.load(location.name, path)
 
                 assert self.mount is not None  # noqa: S101
 
@@ -118,7 +118,7 @@ class RemoteProvider(Provider):
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
                     if self.provider is not None:
-                        return self.provider.provide(location.name, path)
+                        return self.provider.load(location.name, path)
 
                     return DefaultPackageRepository(
                         location.name, path, mount=self.mount
