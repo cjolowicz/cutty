@@ -46,7 +46,7 @@ class LocalProvider(Provider):
         /,
         *,
         match: PathMatcher,
-        mount: Mounter,
+        mount: Optional[Mounter] = None,
         getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
@@ -70,6 +70,8 @@ class LocalProvider(Provider):
             if path.exists() and self.match(path):
                 if self.provider is not None:
                     return self.provider.provide(location.name, path)
+
+                assert self.mount is not None  # noqa: S101
 
                 return DefaultPackageRepository(
                     location.name,
