@@ -100,7 +100,7 @@ class GitPackageRepository(DefaultPackageRepository):
         return message
 
 
-class GitProvider(PackageRepositoryLoader):
+class GitRepositoryLoader(PackageRepositoryLoader):
     """Git repository provider."""
 
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
@@ -118,7 +118,9 @@ def match(path: pathlib.Path) -> bool:
     return path in (repositorypath, repositorypath.parent)
 
 
-localgitprovider = LocalProvider("localgit", match=match, provider=GitProvider())
+localgitprovider = LocalProvider(
+    "localgit", match=match, provider=GitRepositoryLoader()
+)
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], provider=GitProvider()
+    "git", fetch=[gitfetcher], provider=GitRepositoryLoader()
 )
