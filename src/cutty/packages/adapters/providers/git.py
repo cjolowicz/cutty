@@ -46,7 +46,7 @@ class GitPackageRepository(DefaultPackageRepository):
         else:
             yield GitFilesystem(self.path)
 
-    def _getcommit(self, revision: Optional[Revision]) -> pygit2.Commit:
+    def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""
         if revision is None:
             revision = "HEAD"
@@ -58,13 +58,13 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
-        commit = self._getcommit(revision)
+        commit = self._lookup(revision)
 
         return str(commit.id)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        commit = self._getcommit(revision)
+        commit = self._lookup(revision)
 
         try:
             revision = self.repository.describe(
@@ -83,7 +83,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        commit = self._getcommit(revision)
+        commit = self._lookup(revision)
 
         if parents := commit.parents:
             [parent] = parents
@@ -94,7 +94,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
-        commit = self._getcommit(revision)
+        commit = self._lookup(revision)
         message: str = commit.message
 
         return message
