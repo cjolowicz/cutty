@@ -63,7 +63,7 @@ class MercurialPackageRepository(DefaultPackageRepository):
         return self.getmetadata(revision, "desc")
 
 
-class MercurialProvider(PackageRepositoryLoader):
+class MercurialRepositoryLoader(PackageRepositoryLoader):
     """Mercurial repository provider."""
 
     def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
@@ -72,5 +72,5 @@ class MercurialProvider(PackageRepositoryLoader):
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], provider=MercurialProvider()
+    "hg", fetch=[hgfetcher], provider=MercurialRepositoryLoader()
 )
