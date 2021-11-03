@@ -55,7 +55,7 @@ class DefaultPackageRepository(PackageRepository):
         name: str,
         path: pathlib.Path,
         *,
-        mount: Mounter,
+        mount: Optional[Mounter] = None,
         getcommit: Optional[GetRevision] = None,
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
@@ -84,6 +84,8 @@ class DefaultPackageRepository(PackageRepository):
 
     def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
         """Mount the package filesystem."""
+        assert self._mount is not None  # noqa: S101
+
         return self._mount(self.path, revision)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
