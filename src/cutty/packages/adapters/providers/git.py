@@ -116,13 +116,9 @@ def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str
 class GitPackageRepository(DefaultPackageRepository):
     """Git package repository."""
 
-
-class GitProvider(PackageRepositoryProvider):
-    """Git repository provider."""
-
-    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
-        """Load a package repository."""
-        return GitPackageRepository(
+    def __init__(self, name: str, path: pathlib.Path) -> None:
+        """Initialize."""
+        super().__init__(
             name,
             path,
             mount=mount,
@@ -131,6 +127,14 @@ class GitProvider(PackageRepositoryProvider):
             getparentrevision=getparentrevision,
             getmessage=getmessage,
         )
+
+
+class GitProvider(PackageRepositoryProvider):
+    """Git repository provider."""
+
+    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+        """Load a package repository."""
+        return GitPackageRepository(name, path)
 
 
 localgitprovider = LocalProvider("localgit", match=match, provider=GitProvider())
