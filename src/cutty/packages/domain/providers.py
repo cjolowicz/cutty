@@ -108,6 +108,7 @@ class RemoteProvider(Provider):
         getrevision: Optional[GetRevision] = None,
         getparentrevision: Optional[GetRevision] = None,
         getmessage: Optional[GetMessage] = None,
+        provider: Optional[PackageRepositoryProvider] = None,
         store: Store,
     ) -> None:
         """Initialize."""
@@ -127,6 +128,7 @@ class RemoteProvider(Provider):
         self.getrevision = getrevision
         self.getparentrevision = getparentrevision
         self.getmessage = getmessage
+        self.provider = provider
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -141,6 +143,9 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
+                    if self.provider is not None:
+                        return self.provider.provide(location.name, path)
+
                     return DefaultPackageRepository(
                         location.name,
                         path,
