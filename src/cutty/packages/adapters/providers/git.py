@@ -1,7 +1,6 @@
 """Providers for git repositories."""
 import pathlib
 from collections.abc import Iterator
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -10,7 +9,6 @@ import pygit2
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
-from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
@@ -37,19 +35,6 @@ class RevisionNotFoundError(CuttyError):
     revision: Revision
 
 
-@contextmanager
-def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[GitFilesystem]:
-    """Return a filesystem tree for the given revision.
-
-    This function returns the root of a Git filesystem for the given
-    revision. If ``revision`` is None, HEAD is used instead.
-    """
-    if revision is not None:
-        yield GitFilesystem(path, revision)
-    else:
-        yield GitFilesystem(path)
-
-
 def _getcommit(
     repository: pygit2.Repository, revision: Optional[Revision]
 ) -> pygit2.Commit:
@@ -70,9 +55,17 @@ class GitPackageRepository(DefaultPackageRepository):
         """Initialize."""
         super().__init__(name, path)
 
-    def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
-        """Mount the package filesystem."""
-        return mount(self.path, revision)
+    @contextmanager
+    def mount(self, revision: Optional[Revision]) -> Iterator[GitFilesystem]:
+        """Return a filesystem tree for the given revision.
+
+        This function returns the root of a Git filesystem for the given
+        revision. If ``revision`` is None, HEAD is used instead.
+        """
+        if revision is not None:
+            yield GitFilesystem(self.path, revision)
+        else:
+            yield GitFilesystem(self.path)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
