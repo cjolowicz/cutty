@@ -18,16 +18,6 @@ from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
-def match(path: pathlib.Path) -> bool:
-    """Return True if the path is a git repository."""
-    repository = pygit2.discover_repository(path)
-    if repository is None:
-        return False
-
-    repositorypath = pathlib.Path(repository)
-    return path in (repositorypath, repositorypath.parent)
-
-
 @dataclass
 class RevisionNotFoundError(CuttyError):
     """The specified revision does not exist in the repository."""
@@ -116,6 +106,16 @@ class GitProvider(PackageRepositoryProvider):
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository."""
         return GitPackageRepository(name, path)
+
+
+def match(path: pathlib.Path) -> bool:
+    """Return True if the path is a git repository."""
+    repository = pygit2.discover_repository(path)
+    if repository is None:
+        return False
+
+    repositorypath = pathlib.Path(repository)
+    return path in (repositorypath, repositorypath.parent)
 
 
 localgitprovider = LocalProvider("localgit", match=match, provider=GitProvider())
