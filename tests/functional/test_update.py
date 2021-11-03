@@ -17,6 +17,7 @@ from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.variables import projectvariable
 
 
 def test_help(runcutty: RunCutty) -> None:
@@ -47,12 +48,6 @@ def updatetemplatevariable(template: Path, name: str, value: Any) -> None:
     data = json.loads(path.read_text())
     data[name] = value
     updatefile(path, json.dumps(data))
-
-
-def projectvariable(project: Path, name: str) -> Any:
-    """Return the bound value of a project variable."""
-    config = readprojectconfigfile(project)
-    return next(binding.value for binding in config.bindings if binding.name == name)
 
 
 @pytest.fixture
