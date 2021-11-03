@@ -63,15 +63,6 @@ def _getcommit(
         raise RevisionNotFoundError(revision)
 
 
-def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
-    """Return the commit message."""
-    repository = pygit2.Repository(path)
-    commit = _getcommit(repository, revision)
-    message: str = commit.message
-
-    return message
-
-
 class GitPackageRepository(DefaultPackageRepository):
     """Git package repository."""
 
@@ -123,7 +114,11 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
-        return getmessage(self.path, revision)
+        repository = pygit2.Repository(self.path)
+        commit = _getcommit(repository, revision)
+        message: str = commit.message
+
+        return message
 
 
 class GitProvider(PackageRepositoryProvider):
