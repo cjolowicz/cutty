@@ -63,27 +63,6 @@ def _getcommit(
         raise RevisionNotFoundError(revision)
 
 
-def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the package revision."""
-    repository = pygit2.Repository(path)
-    commit = _getcommit(repository, revision)
-
-    try:
-        revision = repository.describe(
-            commit,
-            describe_strategy=pygit2.GIT_DESCRIBE_TAGS,
-            max_candidates_tags=0,
-            show_commit_oid_as_fallback=True,
-        )
-    except KeyError:
-        # Emulate `show_commit_oid_as_fallback` when no tag matches exactly,
-        # which results in GIT_ENOTFOUND ("cannot describe - no tag exactly
-        # matches '...'").
-        revision = commit.short_id
-
-    return revision
-
-
 def getparentrevision(
     path: pathlib.Path, revision: Optional[Revision]
 ) -> Optional[Revision]:
@@ -127,7 +106,23 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        return getrevision(self.path, revision)
+        repository = pygit2.Repository(self.path)
+        commit = _getcommit(repository, revision)
+
+        try:
+            revision = repository.describe(
+                commit,
+                describe_strategy=pygit2.GIT_DESCRIBE_TAGS,
+                max_candidates_tags=0,
+                show_commit_oid_as_fallback=True,
+            )
+        except KeyError:
+            # Emulate `show_commit_oid_as_fallback` when no tag matches exactly,
+            # which results in GIT_ENOTFOUND ("cannot describe - no tag exactly
+            # matches '...'").
+            revision = commit.short_id
+
+        return revision
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
