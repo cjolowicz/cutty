@@ -29,6 +29,15 @@ from cutty.templates.domain.bindings import Binding
     default=False,
     help="Do not prompt for template variables.",
 )
+@click.option(
+    "--template-directory",
+    metavar="DIR",
+    type=click.Path(path_type=Path),
+    help=(
+        "Directory within the template repository that contains the "
+        "cookiecutter.json file."
+    ),
+)
 @click.argument("extra-context", nargs=-1, callback=extra_context_callback)
 @fatal
 def import_(
@@ -36,6 +45,7 @@ def import_(
     extra_context: dict[str, str],
     cwd: Optional[Path],
     non_interactive: bool,
+    template_directory: Optional[Path],
 ) -> None:
     """Import changesets from templates into projects."""
     if cwd is None:
@@ -48,4 +58,5 @@ def import_(
         revision=revision,
         extrabindings=extrabindings,
         interactive=not non_interactive,
+        directory=template_directory,
     )

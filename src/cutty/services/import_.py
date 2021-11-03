@@ -17,7 +17,8 @@ def import_(
     *,
     revision: Optional[str],
     extrabindings: Sequence[Binding],
-    interactive: bool
+    interactive: bool,
+    directory: Optional[Path]
 ) -> None:
     """Import changes from a template into a project."""
     config1 = readprojectconfigfile(projectdir)
@@ -26,7 +27,7 @@ def import_(
         config1.template,
         [*config1.bindings, *extrabindings],
         revision,
-        config1.directory,
+        config1.directory if directory is None else directory,
     )
 
     repository = ProjectRepository(projectdir)

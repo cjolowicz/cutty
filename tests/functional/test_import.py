@@ -10,6 +10,7 @@ from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
+from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import updatefile
 
 
@@ -243,3 +244,14 @@ def test_non_interactive(runcutty: RunCutty, template: Path, project: Path) -> N
         runcutty("import", "--non-interactive", input="3\n")
 
     assert "alpha" == projectvariable(project, "status")
+
+
+def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> None:
+    """It uses the template directory specified when updating."""
+    directory = "a"
+    move_repository_files_to_subdirectory(template, directory)
+
+    runcutty("import", f"--cwd={project}", f"--template-directory={directory}")
+
+    config = readprojectconfigfile(project)
+    assert directory == str(config.directory)
