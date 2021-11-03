@@ -35,11 +35,11 @@ class PackageRepository(abc.ABC):
 
 
 class PackageRepositoryLoader(abc.ABC):
-    """A provider of package repositories."""
+    """Loader for package repositories."""
 
     @abc.abstractmethod
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
-        """Load a package repository."""
+        """Load a package repository from disk."""
 
 
 class DefaultPackageRepository(PackageRepository):
