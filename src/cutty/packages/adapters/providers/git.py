@@ -14,7 +14,7 @@ from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.repository import PackageRepositoryProvider
+from cutty.packages.domain.repository import PackageRepositoryLoader
 from cutty.packages.domain.revisions import Revision
 
 
@@ -100,7 +100,7 @@ class GitPackageRepository(DefaultPackageRepository):
         return message
 
 
-class GitProvider(PackageRepositoryProvider):
+class GitProvider(PackageRepositoryLoader):
     """Git repository provider."""
 
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:

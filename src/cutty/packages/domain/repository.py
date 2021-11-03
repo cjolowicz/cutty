@@ -34,7 +34,7 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
-class PackageRepositoryProvider(abc.ABC):
+class PackageRepositoryLoader(abc.ABC):
     """A provider of package repositories."""
 
     @abc.abstractmethod

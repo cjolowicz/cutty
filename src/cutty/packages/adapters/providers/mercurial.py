@@ -11,7 +11,7 @@ from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
-from cutty.packages.domain.repository import PackageRepositoryProvider
+from cutty.packages.domain.repository import PackageRepositoryLoader
 from cutty.packages.domain.revisions import Revision
 
 
@@ -63,7 +63,7 @@ class MercurialPackageRepository(DefaultPackageRepository):
         return self.getmetadata(revision, "desc")
 
 
-class MercurialProvider(PackageRepositoryProvider):
+class MercurialProvider(PackageRepositoryLoader):
     """Mercurial repository provider."""
 
     def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
