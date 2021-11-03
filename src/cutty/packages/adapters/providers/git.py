@@ -122,7 +122,6 @@ class GitPackageRepository(DefaultPackageRepository):
             name,
             path,
             mount=mount,
-            getrevision=getrevision,
             getparentrevision=getparentrevision,
             getmessage=getmessage,
         )
@@ -130,6 +129,10 @@ class GitPackageRepository(DefaultPackageRepository):
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
         return getcommit(self.path, revision)
+
+    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the resolved revision."""
+        return getrevision(self.path, revision)
 
 
 class GitProvider(PackageRepositoryProvider):
