@@ -12,6 +12,9 @@ from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
+from cutty.packages.domain.repository import DefaultPackageRepository
+from cutty.packages.domain.repository import PackageRepository
+from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
@@ -108,6 +111,22 @@ def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str
     message: str = commit.message
 
     return message
+
+
+class GitProvider(PackageRepositoryProvider):
+    """Git repository provider."""
+
+    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+        """Load a package repository."""
+        return DefaultPackageRepository(
+            name,
+            path,
+            mount=mount,
+            getcommit=getcommit,
+            getrevision=getrevision,
+            getparentrevision=getparentrevision,
+            getmessage=getmessage,
+        )
 
 
 localgitprovider = LocalProvider(
