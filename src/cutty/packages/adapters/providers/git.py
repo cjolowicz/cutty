@@ -122,7 +122,6 @@ class GitPackageRepository(DefaultPackageRepository):
             name,
             path,
             mount=mount,
-            getparentrevision=getparentrevision,
             getmessage=getmessage,
         )
 
@@ -133,6 +132,10 @@ class GitPackageRepository(DefaultPackageRepository):
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
         return getrevision(self.path, revision)
+
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+        return getparentrevision(self.path, revision)
 
 
 class GitProvider(PackageRepositoryProvider):
