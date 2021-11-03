@@ -33,6 +33,14 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
+class PackageRepositoryProvider(abc.ABC):
+    """A provider of package repositories."""
+
+    @abc.abstractmethod
+    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+        """Load a package repository."""
+
+
 GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
 GetMessage = Callable[[pathlib.Path, Optional[Revision]], Optional[str]]
 
