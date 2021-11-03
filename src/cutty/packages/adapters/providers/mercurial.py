@@ -15,60 +15,52 @@ from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
-def getmetadata(
-    path: pathlib.Path, revision: Optional[Revision], template: str
-) -> Optional[str]:
-    """Return commit metadata."""
-    hg = findhg()
-
-    if revision is None:
-        revision = "."
-
-    result = hg("log", f"--rev={revision}", f"--template={{{template}}}", cwd=path)
-    return result.stdout
-
-
-def getcommit(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the commit identifier."""
-    return getmetadata(path, revision, "node")
-
-
-def getrevision(path: pathlib.Path, revision: Optional[Revision]) -> Optional[Revision]:
-    """Return the package revision."""
-    return getmetadata(
-        path, revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
-    )
-
-
-def getparentrevision(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Optional[Revision]:
-    """Return the parent revision, if any."""
-    if revision is None:
-        revision = "."
-
-    return getmetadata(path, f"p1({revision})", "node") or None
-
-
-def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
-    """Return the commit message."""
-    return getmetadata(path, revision, "desc")
-
-
-@contextmanager
-def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesystem]:
-    """Mount an archive of the revision as a disk filesystem."""
-    hg = findhg()
-
-    with tempfile.TemporaryDirectory() as directory:
-        options = ["--rev", revision] if revision is not None else []
-        hg("archive", *options, directory, cwd=path)
-
-        yield DiskFilesystem(pathlib.Path(directory))
-
-
 class MercurialPackageRepository(DefaultPackageRepository):
     """Mercurial package repository."""
+
+    @contextmanager
+    def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
+        """Mount an archive of the revision as a disk filesystem."""
+        hg = findhg()
+
+        with tempfile.TemporaryDirectory() as directory:
+            options = ["--rev", revision] if revision is not None else []
+            hg("archive", *options, directory, cwd=self.path)
+
+            yield DiskFilesystem(pathlib.Path(directory))
+
+    def getmetadata(self, revision: Optional[Revision], template: str) -> Optional[str]:
+        """Return commit metadata."""
+        hg = findhg()
+
+        if revision is None:
+            revision = "."
+
+        result = hg(
+            "log", f"--rev={revision}", f"--template={{{template}}}", cwd=self.path
+        )
+        return result.stdout
+
+    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the commit identifier."""
+        return self.getmetadata(revision, "node")
+
+    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the package revision."""
+        return self.getmetadata(
+            revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
+        )
+
+    def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+        """Return the parent revision, if any."""
+        if revision is None:
+            revision = "."
+
+        return self.getmetadata(f"p1({revision})", "node") or None
+
+    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit message."""
+        return self.getmetadata(revision, "desc")
 
 
 class MercurialProvider(PackageRepositoryProvider):
@@ -76,15 +68,7 @@ class MercurialProvider(PackageRepositoryProvider):
 
     def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
         """Load a package repository."""
-        return MercurialPackageRepository(
-            name,
-            path,
-            getcommit=getcommit,
-            getrevision=getrevision,
-            getparentrevision=getparentrevision,
-            getmessage=getmessage,
-            mount=mount,
-        )
+        return MercurialPackageRepository(name, path)
 
 
 hgproviderfactory = RemoteProviderFactory(
