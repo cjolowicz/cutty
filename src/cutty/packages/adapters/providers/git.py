@@ -35,19 +35,6 @@ class RevisionNotFoundError(CuttyError):
     revision: Revision
 
 
-def _getcommit(
-    repository: pygit2.Repository, revision: Optional[Revision]
-) -> pygit2.Commit:
-    """Return the commit object."""
-    if revision is None:
-        revision = "HEAD"
-
-    try:
-        return repository.revparse_single(revision).peel(pygit2.Commit)
-    except KeyError:
-        raise RevisionNotFoundError(revision)
-
-
 class GitPackageRepository(DefaultPackageRepository):
     """Git package repository."""
 
@@ -69,14 +56,25 @@ class GitPackageRepository(DefaultPackageRepository):
         else:
             yield GitFilesystem(self.path)
 
+    def _getcommit(self, revision: Optional[Revision]) -> pygit2.Commit:
+        """Return the commit object."""
+        if revision is None:
+            revision = "HEAD"
+
+        try:
+            return self.repository.revparse_single(revision).peel(pygit2.Commit)
+        except KeyError:
+            raise RevisionNotFoundError(revision)
+
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
-        commit = _getcommit(self.repository, revision)
+        commit = self._getcommit(revision)
+
         return str(commit.id)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        commit = _getcommit(self.repository, revision)
+        commit = self._getcommit(revision)
 
         try:
             revision = self.repository.describe(
@@ -95,7 +93,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        commit = _getcommit(self.repository, revision)
+        commit = self._getcommit(revision)
 
         if parents := commit.parents:
             [parent] = parents
@@ -106,7 +104,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
-        commit = _getcommit(self.repository, revision)
+        commit = self._getcommit(revision)
         message: str = commit.message
 
         return message
