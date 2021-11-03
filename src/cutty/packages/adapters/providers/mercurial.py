@@ -67,12 +67,16 @@ def mount(path: pathlib.Path, revision: Optional[Revision]) -> Iterator[Filesyst
         yield DiskFilesystem(pathlib.Path(directory))
 
 
+class MercurialPackageRepository(DefaultPackageRepository):
+    """Mercurial package repository."""
+
+
 class MercurialProvider(PackageRepositoryProvider):
     """Mercurial repository provider."""
 
-    def provide(self, name: str, path: pathlib.Path) -> DefaultPackageRepository:
+    def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
         """Load a package repository."""
-        return DefaultPackageRepository(
+        return MercurialPackageRepository(
             name,
             path,
             getcommit=getcommit,
