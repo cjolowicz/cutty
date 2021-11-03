@@ -101,7 +101,7 @@ class GitPackageRepository(DefaultPackageRepository):
 
 
 class GitRepositoryLoader(PackageRepositoryLoader):
-    """Git repository provider."""
+    """Git repository loader."""
 
     def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository."""

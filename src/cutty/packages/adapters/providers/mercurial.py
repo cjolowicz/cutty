@@ -64,7 +64,7 @@ class MercurialPackageRepository(DefaultPackageRepository):
 
 
 class MercurialRepositoryLoader(PackageRepositoryLoader):
-    """Mercurial repository provider."""
+    """Mercurial repository loader."""
 
     def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
         """Load a package repository."""
