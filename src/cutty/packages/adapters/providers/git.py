@@ -63,21 +63,6 @@ def _getcommit(
         raise RevisionNotFoundError(revision)
 
 
-def getparentrevision(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Optional[Revision]:
-    """Return the parent revision, if any."""
-    repository = pygit2.Repository(path)
-    commit = _getcommit(repository, revision)
-
-    if parents := commit.parents:
-        [parent] = parents
-
-        return str(parent.id)
-
-    return None
-
-
 def getmessage(path: pathlib.Path, revision: Optional[Revision]) -> Optional[str]:
     """Return the commit message."""
     repository = pygit2.Repository(path)
@@ -126,7 +111,15 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
-        return getparentrevision(self.path, revision)
+        repository = pygit2.Repository(self.path)
+        commit = _getcommit(repository, revision)
+
+        if parents := commit.parents:
+            [parent] = parents
+
+            return str(parent.id)
+
+        return None
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
