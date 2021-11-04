@@ -142,14 +142,12 @@ class RemoteProviderFactory(ProviderFactory):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter] = None,
         loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
         self.fetch = tuple(fetch)
-        self.mount = mount
         self.loader = loader
 
     def __call__(self, store: Store) -> Provider:
@@ -158,7 +156,6 @@ class RemoteProviderFactory(ProviderFactory):
             self.name,
             match=self.match,
             fetch=self.fetch,
-            mount=self.mount,
             loader=self.loader,
             store=store,
         )
