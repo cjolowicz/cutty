@@ -17,7 +17,6 @@ from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import pathfromlocation
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
-from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -78,15 +77,11 @@ class RemoteProvider(Provider):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter] = None,
         loader: Optional[PackageRepositoryLoader] = None,
         store: Store,
     ) -> None:
         """Initialize."""
         super().__init__(name)
-
-        if mount is None:
-            mount = _defaultmount
 
         if match is None:
             match = lambda _: True  # noqa: E731
@@ -94,7 +89,6 @@ class RemoteProvider(Provider):
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
-        self.mount = mount
         self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
@@ -114,7 +108,7 @@ class RemoteProvider(Provider):
                         return self.loader.load(location.name, path)
 
                     return DefaultPackageRepository(
-                        location.name, path, mount=self.mount
+                        location.name, path, mount=_defaultmount
                     )
 
         return None
