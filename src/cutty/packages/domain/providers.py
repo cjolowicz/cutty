@@ -1,15 +1,10 @@
 """Package providers."""
 import abc
-import pathlib
 from collections.abc import Iterable
-from collections.abc import Iterator
 from typing import Optional
 
 from yarl import URL
 
-from cutty.compat.contextlib import contextmanager
-from cutty.filesystems.adapters.disk import DiskFilesystem
-from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
@@ -19,7 +14,6 @@ from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
 
@@ -58,13 +52,6 @@ class LocalProvider(Provider):
                 return self.loader.load(location.name, path)
 
         return None
-
-
-@contextmanager
-def _defaultmount(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Iterator[Filesystem]:
-    yield DiskFilesystem(path)
 
 
 class RemoteProvider(Provider):
@@ -107,9 +94,7 @@ class RemoteProvider(Provider):
                     if self.loader is not None:
                         return self.loader.load(location.name, path)
 
-                    return DefaultPackageRepository(
-                        location.name, path, mount=_defaultmount
-                    )
+                    return DefaultPackageRepository(location.name, path)
 
         return None
 

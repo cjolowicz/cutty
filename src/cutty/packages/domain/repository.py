@@ -8,6 +8,7 @@ from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
+from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
 from cutty.packages.domain.mounters import Mounter
@@ -34,11 +35,18 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
+@contextmanager
+def _defaultmount(
+    path: pathlib.Path, revision: Optional[Revision]
+) -> Iterator[Filesystem]:
+    yield DiskFilesystem(path)
+
+
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 
     def __init__(
-        self, name: str, path: pathlib.Path, *, mount: Optional[Mounter] = None
+        self, name: str, path: pathlib.Path, *, mount: Mounter = _defaultmount
     ) -> None:
         """Initialize."""
         self.name = name
@@ -59,8 +67,6 @@ class DefaultPackageRepository(PackageRepository):
 
     def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
         """Mount the package filesystem."""
-        assert self._mount is not None  # noqa: S101
-
         return self._mount(self.path, revision)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
