@@ -6,13 +6,13 @@ from typing import Optional
 from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.loader import DefaultPackageRepositoryLoader
 from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import pathfromlocation
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
-from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.stores import Store
 
@@ -73,6 +73,9 @@ class RemoteProvider(Provider):
         if match is None:
             match = lambda _: True  # noqa: E731
 
+        if loader is None:
+            loader = DefaultPackageRepositoryLoader()
+
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
@@ -91,10 +94,7 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
-                    if self.loader is not None:
-                        return self.loader.load(location.name, path)
-
-                    return DefaultPackageRepository(location.name, path)
+                    return self.loader.load(location.name, path)
 
         return None
 

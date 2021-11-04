@@ -15,6 +15,14 @@ class PackageRepositoryLoader(abc.ABC):
         """Load a package repository from disk."""
 
 
+class DefaultPackageRepositoryLoader(PackageRepositoryLoader):
+    """Default implementation of a repository loader."""
+
+    def load(self, name: str, path: pathlib.Path) -> PackageRepository:
+        """Load a package repository from disk."""
+        return DefaultPackageRepository(name, path)
+
+
 class MountedPackageRepositoryLoader(PackageRepositoryLoader):
     """Loader for repositories of mounted packages."""
 
