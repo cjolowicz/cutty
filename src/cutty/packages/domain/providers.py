@@ -44,14 +44,12 @@ class LocalProvider(Provider):
         /,
         *,
         match: PathMatcher,
-        mount: Optional[Mounter] = None,
         loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
 
         self.match = match
-        self.mount = mount
         self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
