@@ -44,7 +44,7 @@ class LocalProvider(Provider):
         /,
         *,
         match: PathMatcher,
-        loader: Optional[PackageRepositoryLoader] = None,
+        loader: PackageRepositoryLoader,
     ) -> None:
         """Initialize."""
         super().__init__(name)
@@ -56,8 +56,6 @@ class LocalProvider(Provider):
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
-                assert self.loader is not None  # noqa: S101
-
                 return self.loader.load(location.name, path)
 
         return None
