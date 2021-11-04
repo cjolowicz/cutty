@@ -58,12 +58,9 @@ class LocalProvider(Provider):
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
-                if self.loader is not None:
-                    return self.loader.load(location.name, path)
+                assert self.loader is not None  # noqa: S101
 
-                assert self.mount is not None  # noqa: S101
-
-                return DefaultPackageRepository(location.name, path, mount=self.mount)
+                return self.loader.load(location.name, path)
 
         return None
 
