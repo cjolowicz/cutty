@@ -64,16 +64,13 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
         assert entry.name == "marker"
 
 
-def test_localprovider_revision(
-    tmp_path: pathlib.Path,
-) -> None:
+def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     """It raises an exception if the mounter does not support revisions."""
     loader = MountedPackageRepositoryLoader(unversioned_mounter(DiskFilesystem))
-    url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: True, loader=loader)
 
     with pytest.raises(Exception):
-        if repository := provider.provide(url):
+        if repository := provider.provide(tmp_path):
             with repository.get("v1.0.0"):
                 pass
 
