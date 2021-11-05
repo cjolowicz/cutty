@@ -76,9 +76,10 @@ def test_localprovider_path(
 
 
 def test_localprovider_revision(
-    tmp_path: pathlib.Path, loader: PackageRepositoryLoader
+    tmp_path: pathlib.Path,
 ) -> None:
     """It raises an exception if the mounter does not support revisions."""
+    loader = MountedPackageRepositoryLoader(unversioned_mounter(DiskFilesystem))
     url = asurl(tmp_path)
     provider = LocalProvider(match=lambda path: True, loader=loader)
 
