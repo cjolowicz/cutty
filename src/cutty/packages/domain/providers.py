@@ -36,11 +36,14 @@ class LocalProvider(Provider):
         name: str = "local",
         /,
         *,
-        match: PathMatcher,
+        match: Optional[PathMatcher] = None,
         loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
+
+        if match is None:
+            match = lambda _: True  # noqa: E731
 
         if loader is None:
             loader = DefaultPackageRepositoryLoader()
