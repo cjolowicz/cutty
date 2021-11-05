@@ -5,12 +5,14 @@ import pathlib
 import pytest
 from yarl import URL
 
+from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.loader import MountedPackageRepositoryLoader
 from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.mounters import Mounter
+from cutty.packages.domain.mounters import unversioned_mounter
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.stores import Store
@@ -24,9 +26,9 @@ pytest_plugins = [
 
 
 @pytest.fixture
-def loader(diskmounter: Mounter) -> PackageRepositoryLoader:
+def loader() -> PackageRepositoryLoader:
     """Fixture for a repository loader."""
-    return MountedPackageRepositoryLoader(diskmounter)
+    return MountedPackageRepositoryLoader(unversioned_mounter(DiskFilesystem))
 
 
 def test_localprovider_not_local(url: URL, loader: PackageRepositoryLoader) -> None:
