@@ -7,6 +7,7 @@ from yarl import URL
 
 from cutty.packages.domain.fetchers import Fetcher
 from cutty.packages.domain.loader import MountedPackageRepositoryLoader
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.mounters import Mounter
@@ -22,47 +23,47 @@ pytest_plugins = [
 ]
 
 
-def test_localprovider_not_local(url: URL, diskmounter: Mounter) -> None:
+@pytest.fixture
+def loader(diskmounter: Mounter) -> PackageRepositoryLoader:
+    """Fixture for a repository loader."""
+    return MountedPackageRepositoryLoader(diskmounter)
+
+
+def test_localprovider_not_local(url: URL, loader: PackageRepositoryLoader) -> None:
     """It returns None if the location is not local."""
-    provider = LocalProvider(
-        match=lambda path: True, loader=MountedPackageRepositoryLoader(diskmounter)
-    )
+    provider = LocalProvider(match=lambda path: True, loader=loader)
 
     assert provider.provide(url) is None
 
 
 def test_localprovider_not_matching(
-    tmp_path: pathlib.Path, diskmounter: Mounter
+    tmp_path: pathlib.Path, loader: PackageRepositoryLoader
 ) -> None:
     """It returns None if the provider does not match."""
     url = asurl(tmp_path)
-    provider = LocalProvider(
-        match=lambda path: False, loader=MountedPackageRepositoryLoader(diskmounter)
-    )
+    provider = LocalProvider(match=lambda path: False, loader=loader)
 
     assert provider.provide(url) is None
 
 
-def test_localprovider_inexistent_path(diskmounter: Mounter) -> None:
+def test_localprovider_inexistent_path(loader: PackageRepositoryLoader) -> None:
     """It returns None if the location is an inexistent path."""
-    provider = LocalProvider(
-        match=lambda path: True, loader=MountedPackageRepositoryLoader(diskmounter)
-    )
+    provider = LocalProvider(match=lambda path: True, loader=loader)
     path = pathlib.Path("/no/such/file/or/directory")
 
     assert provider.provide(path) is None
 
 
-def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
+def test_localprovider_path(
+    tmp_path: pathlib.Path, loader: PackageRepositoryLoader
+) -> None:
     """It returns the package repository."""
     path = tmp_path / "repository"
     path.mkdir()
     (path / "marker").touch()
 
     url = asurl(path)
-    provider = LocalProvider(
-        match=lambda path: True, loader=MountedPackageRepositoryLoader(diskmounter)
-    )
+    provider = LocalProvider(match=lambda path: True, loader=loader)
     repository = provider.provide(url)
 
     assert repository is not None
@@ -72,12 +73,12 @@ def test_localprovider_path(tmp_path: pathlib.Path, diskmounter: Mounter) -> Non
         assert entry.name == "marker"
 
 
-def test_localprovider_revision(tmp_path: pathlib.Path, diskmounter: Mounter) -> None:
+def test_localprovider_revision(
+    tmp_path: pathlib.Path, loader: PackageRepositoryLoader
+) -> None:
     """It raises an exception if the mounter does not support revisions."""
     url = asurl(tmp_path)
-    provider = LocalProvider(
-        match=lambda path: True, loader=MountedPackageRepositoryLoader(diskmounter)
-    )
+    provider = LocalProvider(match=lambda path: True, loader=loader)
 
     with pytest.raises(Exception):
         if repository := provider.provide(url):
