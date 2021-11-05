@@ -7,6 +7,7 @@ from yarl import URL
 
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.loader import DefaultPackageRepositoryLoader
 from cutty.packages.domain.loader import MountedPackageRepositoryLoader
 from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
@@ -28,7 +29,7 @@ pytest_plugins = [
 @pytest.fixture
 def loader() -> PackageRepositoryLoader:
     """Fixture for a repository loader."""
-    return MountedPackageRepositoryLoader(unversioned_mounter(DiskFilesystem))
+    return DefaultPackageRepositoryLoader()
 
 
 def test_localprovider_not_local(url: URL, loader: PackageRepositoryLoader) -> None:
