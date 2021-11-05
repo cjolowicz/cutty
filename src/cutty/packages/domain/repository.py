@@ -2,7 +2,6 @@
 import abc
 import pathlib
 from collections.abc import Iterator
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
@@ -34,13 +33,6 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
-@contextmanager
-def _defaultmount(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Iterator[Filesystem]:
-    yield DiskFilesystem(path)
-
-
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 
@@ -48,7 +40,6 @@ class DefaultPackageRepository(PackageRepository):
         """Initialize."""
         self.name = name
         self.path = path
-        self._mount = _defaultmount
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -62,9 +53,10 @@ class DefaultPackageRepository(PackageRepository):
 
             yield Package(self.name, tree, resolved_revision, commit, message)
 
-    def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
+    @contextmanager
+    def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
         """Mount the package filesystem."""
-        return self._mount(self.path, revision)
+        yield DiskFilesystem(self.path)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
