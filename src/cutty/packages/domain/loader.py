@@ -28,7 +28,7 @@ class DefaultPackageRepositoryLoader(PackageRepositoryLoader):
 
 
 class MountedPackageRepositoryLoader(PackageRepositoryLoader):
-    """Loader for repositories of mounted packages."""
+    """Repository loader with a custom mounter."""
 
     def __init__(self, mount: Mounter) -> None:
         """Initialize."""
