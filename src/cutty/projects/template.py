@@ -22,23 +22,23 @@ from cutty.packages.domain.revisions import Revision
 class TemplateProvider:
     """Provider of project templates."""
 
-    packageprovider: ProviderRegistry
+    registry: ProviderRegistry
 
     @classmethod
     def create(cls) -> TemplateProvider:
         """Create the template provider."""
         cachedir = pathlib.Path(platformdirs.user_cache_dir("cutty"))
-        packageprovider = ProviderRegistry(
+        registry = ProviderRegistry(
             getdefaultproviderstore(cachedir), defaultproviderfactories
         )
 
-        return cls(packageprovider)
+        return cls(registry)
 
     def provide(
         self, location: str, directory: Optional[pathlib.Path]
     ) -> TemplateRepository:
         """Load a template repository."""
-        repository = self.packageprovider.getrepository(location)
+        repository = self.registry.getrepository(location)
 
         return TemplateRepository(repository, location, directory)
 
