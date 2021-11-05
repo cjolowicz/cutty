@@ -1,10 +1,14 @@
 """Loaders for package repositories."""
 import abc
 import pathlib
+from contextlib import AbstractContextManager
+from typing import Optional
 
+from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
+from cutty.packages.domain.revisions import Revision
 
 
 class PackageRepositoryLoader(abc.ABC):
@@ -32,4 +36,12 @@ class MountedPackageRepositoryLoader(PackageRepositoryLoader):
 
     def load(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository from disk."""
-        return DefaultPackageRepository(name, path, mount=self.mount)
+        mount = self.mount
+
+        class _Repository(DefaultPackageRepository):
+            def mount(
+                self, revision: Optional[Revision]
+            ) -> AbstractContextManager[Filesystem]:
+                return mount(self.path, revision)
+
+        return _Repository(name, path)
