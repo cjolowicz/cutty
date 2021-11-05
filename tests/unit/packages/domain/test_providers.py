@@ -26,7 +26,7 @@ pytest_plugins = [
 
 def test_localprovider_not_local(url: URL) -> None:
     """It returns None if the location is not local."""
-    provider = LocalProvider(match=lambda path: True)
+    provider = LocalProvider()
 
     assert provider.provide(url) is None
 
@@ -41,7 +41,7 @@ def test_localprovider_not_matching(tmp_path: pathlib.Path) -> None:
 
 def test_localprovider_inexistent_path() -> None:
     """It returns None if the location is an inexistent path."""
-    provider = LocalProvider(match=lambda path: True)
+    provider = LocalProvider()
     path = pathlib.Path("/no/such/file/or/directory")
 
     assert provider.provide(path) is None
@@ -54,7 +54,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
     (path / "marker").touch()
 
     url = asurl(path)
-    provider = LocalProvider(match=lambda path: True)
+    provider = LocalProvider()
     repository = provider.provide(url)
 
     assert repository is not None
@@ -67,7 +67,7 @@ def test_localprovider_path(tmp_path: pathlib.Path) -> None:
 def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     """It raises an exception if the mounter does not support revisions."""
     loader = MountedPackageRepositoryLoader(unversioned_mounter(DiskFilesystem))
-    provider = LocalProvider(match=lambda path: True, loader=loader)
+    provider = LocalProvider(loader=loader)
 
     with pytest.raises(Exception):
         if repository := provider.provide(tmp_path):

@@ -95,9 +95,7 @@ def test_with_path(
     directory.mkdir()
     (directory / "marker").touch()
 
-    providerfactory = ConstProviderFactory(
-        LocalProvider("default", match=lambda path: True)
-    )
+    providerfactory = ConstProviderFactory(LocalProvider("default"))
 
     registry = ProviderRegistry(providerstore, [providerfactory])
     repository = registry.getrepository(str(directory))
