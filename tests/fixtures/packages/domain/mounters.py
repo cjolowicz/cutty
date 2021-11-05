@@ -8,17 +8,9 @@ import pytest
 
 from cutty.compat.contextlib import contextmanager
 from cutty.filesystems.adapters.dict import DictFilesystem
-from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.mounters import Mounter
-from cutty.packages.domain.mounters import unversioned_mounter
 from cutty.packages.domain.revisions import Revision
-
-
-@pytest.fixture
-def diskmounter() -> Mounter:
-    """Fixture with an unversioned disk filesystem mounter."""
-    return unversioned_mounter(DiskFilesystem)
 
 
 @pytest.fixture

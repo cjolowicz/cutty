@@ -1,27 +1,19 @@
 """Package providers."""
 import abc
-import pathlib
 from collections.abc import Iterable
-from collections.abc import Iterator
 from typing import Optional
 
 from yarl import URL
 
-from cutty.compat.contextlib import contextmanager
-from cutty.filesystems.adapters.disk import DiskFilesystem
-from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.domain.fetchers import Fetcher
+from cutty.packages.domain.loader import DefaultPackageRepositoryLoader
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.locations import Location
 from cutty.packages.domain.locations import pathfromlocation
 from cutty.packages.domain.matchers import Matcher
 from cutty.packages.domain.matchers import PathMatcher
-from cutty.packages.domain.mounters import Mounter
-from cutty.packages.domain.repository import DefaultPackageRepository
-from cutty.packages.domain.repository import GetRevision
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.repository import PackageRepositoryProvider
-from cutty.packages.domain.revisions import Revision
 from cutty.packages.domain.stores import Store
 
 
@@ -44,40 +36,28 @@ class LocalProvider(Provider):
         name: str = "local",
         /,
         *,
-        match: PathMatcher,
-        mount: Optional[Mounter] = None,
-        getrevision: Optional[GetRevision] = None,
-        provider: Optional[PackageRepositoryProvider] = None,
+        match: Optional[PathMatcher] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
 
+        if match is None:
+            match = lambda _: True  # noqa: E731
+
+        if loader is None:
+            loader = DefaultPackageRepositoryLoader()
+
         self.match = match
-        self.mount = mount
-        self.getrevision = getrevision
-        self.provider = provider
+        self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
         if path := pathfromlocation(location):
             if path.exists() and self.match(path):
-                if self.provider is not None:
-                    return self.provider.provide(location.name, path)
-
-                assert self.mount is not None  # noqa: S101
-
-                return DefaultPackageRepository(
-                    location.name, path, mount=self.mount, getrevision=self.getrevision
-                )
+                return self.loader.load(location.name, path)
 
         return None
-
-
-@contextmanager
-def _defaultmount(
-    path: pathlib.Path, revision: Optional[Revision]
-) -> Iterator[Filesystem]:
-    yield DiskFilesystem(path)
 
 
 class RemoteProvider(Provider):
@@ -90,26 +70,22 @@ class RemoteProvider(Provider):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter] = None,
-        getrevision: Optional[GetRevision] = None,
-        provider: Optional[PackageRepositoryProvider] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
         store: Store,
     ) -> None:
         """Initialize."""
         super().__init__(name)
 
-        if mount is None:
-            mount = _defaultmount
-
         if match is None:
             match = lambda _: True  # noqa: E731
+
+        if loader is None:
+            loader = DefaultPackageRepositoryLoader()
 
         self.match = match
         self.fetch = tuple(fetch)
         self.store = store
-        self.mount = mount
-        self.getrevision = getrevision
-        self.provider = provider
+        self.loader = loader
 
     def provide(self, location: Location) -> Optional[PackageRepository]:
         """Retrieve the package repository at the given location."""
@@ -124,15 +100,7 @@ class RemoteProvider(Provider):
             for fetcher in self.fetch:
                 if fetcher.match(url):
                     path = fetcher.fetch(url, self.store)
-                    if self.provider is not None:
-                        return self.provider.provide(location.name, path)
-
-                    return DefaultPackageRepository(
-                        location.name,
-                        path,
-                        mount=self.mount,
-                        getrevision=self.getrevision,
-                    )
+                    return self.loader.load(location.name, path)
 
         return None
 
@@ -159,17 +127,13 @@ class RemoteProviderFactory(ProviderFactory):
         *,
         match: Optional[Matcher] = None,
         fetch: Iterable[Fetcher],
-        mount: Optional[Mounter] = None,
-        getrevision: Optional[GetRevision] = None,
-        provider: Optional[PackageRepositoryProvider] = None,
+        loader: Optional[PackageRepositoryLoader] = None,
     ) -> None:
         """Initialize."""
         super().__init__(name)
         self.match = match
         self.fetch = tuple(fetch)
-        self.mount = mount
-        self.getrevision = getrevision
-        self.provider = provider
+        self.loader = loader
 
     def __call__(self, store: Store) -> Provider:
         """Create a provider."""
@@ -177,9 +141,7 @@ class RemoteProviderFactory(ProviderFactory):
             self.name,
             match=self.match,
             fetch=self.fetch,
-            mount=self.mount,
-            getrevision=self.getrevision,
-            provider=self.provider,
+            loader=self.loader,
             store=store,
         )
 

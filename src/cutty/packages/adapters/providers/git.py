@@ -10,11 +10,11 @@ from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
@@ -100,10 +100,10 @@ class GitPackageRepository(DefaultPackageRepository):
         return message
 
 
-class GitProvider(PackageRepositoryProvider):
-    """Git repository provider."""
+class GitRepositoryLoader(PackageRepositoryLoader):
+    """Git repository loader."""
 
-    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
+    def load(self, name: str, path: pathlib.Path) -> PackageRepository:
         """Load a package repository."""
         return GitPackageRepository(name, path)
 
@@ -118,7 +118,7 @@ def match(path: pathlib.Path) -> bool:
     return path in (repositorypath, repositorypath.parent)
 
 
-localgitprovider = LocalProvider("localgit", match=match, provider=GitProvider())
+localgitprovider = LocalProvider("localgit", match=match, loader=GitRepositoryLoader())
 gitproviderfactory = RemoteProviderFactory(
-    "git", fetch=[gitfetcher], provider=GitProvider()
+    "git", fetch=[gitfetcher], loader=GitRepositoryLoader()
 )

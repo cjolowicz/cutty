@@ -9,9 +9,9 @@ from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
+from cutty.packages.domain.loader import PackageRepositoryLoader
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
-from cutty.packages.domain.repository import PackageRepositoryProvider
 from cutty.packages.domain.revisions import Revision
 
 
@@ -63,14 +63,14 @@ class MercurialPackageRepository(DefaultPackageRepository):
         return self.getmetadata(revision, "desc")
 
 
-class MercurialProvider(PackageRepositoryProvider):
-    """Mercurial repository provider."""
+class MercurialRepositoryLoader(PackageRepositoryLoader):
+    """Mercurial repository loader."""
 
-    def provide(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
+    def load(self, name: str, path: pathlib.Path) -> MercurialPackageRepository:
         """Load a package repository."""
         return MercurialPackageRepository(name, path)
 
 
 hgproviderfactory = RemoteProviderFactory(
-    "hg", fetch=[hgfetcher], provider=MercurialProvider()
+    "hg", fetch=[hgfetcher], loader=MercurialRepositoryLoader()
 )

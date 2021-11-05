@@ -1,17 +1,15 @@
 """Package repositories."""
 import abc
 import pathlib
-from collections.abc import Callable
 from collections.abc import Iterator
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
 from cutty.errors import CuttyError
+from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.revisions import Revision
 
@@ -35,33 +33,13 @@ class PackageRepository(abc.ABC):
         """Return the parent revision, if any."""
 
 
-class PackageRepositoryProvider(abc.ABC):
-    """A provider of package repositories."""
-
-    @abc.abstractmethod
-    def provide(self, name: str, path: pathlib.Path) -> PackageRepository:
-        """Load a package repository."""
-
-
-GetRevision = Callable[[pathlib.Path, Optional[Revision]], Optional[Revision]]
-
-
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 
-    def __init__(
-        self,
-        name: str,
-        path: pathlib.Path,
-        *,
-        mount: Optional[Mounter] = None,
-        getrevision: Optional[GetRevision] = None,
-    ) -> None:
+    def __init__(self, name: str, path: pathlib.Path) -> None:
         """Initialize."""
         self.name = name
         self.path = path
-        self._mount = mount
-        self._getrevision = getrevision
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
@@ -75,11 +53,10 @@ class DefaultPackageRepository(PackageRepository):
 
             yield Package(self.name, tree, resolved_revision, commit, message)
 
-    def mount(self, revision: Optional[Revision]) -> AbstractContextManager[Filesystem]:
+    @contextmanager
+    def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
         """Mount the package filesystem."""
-        assert self._mount is not None  # noqa: S101
-
-        return self._mount(self.path, revision)
+        yield DiskFilesystem(self.path)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
@@ -87,10 +64,7 @@ class DefaultPackageRepository(PackageRepository):
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
-        if self._getrevision is None:
-            return revision
-
-        return self._getrevision(self.path, revision)
+        return revision
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
