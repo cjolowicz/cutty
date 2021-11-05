@@ -11,7 +11,6 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
-from cutty.packages.domain.mounters import Mounter
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.revisions import Revision
 
@@ -45,13 +44,11 @@ def _defaultmount(
 class DefaultPackageRepository(PackageRepository):
     """Default implementation of a package repository."""
 
-    def __init__(
-        self, name: str, path: pathlib.Path, *, mount: Mounter = _defaultmount
-    ) -> None:
+    def __init__(self, name: str, path: pathlib.Path) -> None:
         """Initialize."""
         self.name = name
         self.path = path
-        self._mount = mount
+        self._mount = _defaultmount
 
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
