@@ -93,6 +93,7 @@ module = [
     "jinja2_time",
     "pyftpdlib.*",
     "pygit2.*",
+    "pygments.*",
 ]
 ignore_missing_imports = true
 
