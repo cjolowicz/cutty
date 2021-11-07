@@ -6,8 +6,8 @@ from collections.abc import Sequence
 from cutty.filestorage.domain.files import File
 from cutty.filestorage.domain.files import loadfile
 from cutty.filesystems.domain.path import Path
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
+from cutty.variables.bindings import Binding
 
 
 def renderfiles(

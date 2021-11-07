@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.bindings import Binding
 
 
 @pytest.mark.parametrize(

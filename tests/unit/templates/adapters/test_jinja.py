@@ -10,11 +10,11 @@ from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.jinja import createjinjarenderer
 from cutty.templates.adapters.jinja import import_object
 from cutty.templates.adapters.jinja import load_extension
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
+from cutty.variables.bindings import Binding
 
 
 @pytest.mark.parametrize(

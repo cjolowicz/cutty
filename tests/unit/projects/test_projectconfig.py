@@ -14,7 +14,7 @@ from cutty.projects.config import createprojectconfigfile
 from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readcookiecutterjson
 from cutty.projects.config import readprojectconfigfile
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.bindings import Binding
 
 
 @pytest.fixture

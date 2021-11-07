@@ -15,10 +15,10 @@ from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.variables.bindings import Binding
 from cutty.variables.variables import Variable
 
 

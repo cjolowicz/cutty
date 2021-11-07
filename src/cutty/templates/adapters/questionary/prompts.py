@@ -15,7 +15,7 @@ from questionary import Validator
 from cutty.templates.domain.binders import bind
 from cutty.templates.domain.binders import binddefault
 from cutty.templates.domain.binders import Binder
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.bindings import Binding
 from cutty.variables.variables import Variable
 
 

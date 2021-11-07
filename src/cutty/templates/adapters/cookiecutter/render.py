@@ -10,13 +10,13 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.templates.adapters.jinja import createjinjarenderer
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
+from cutty.variables.bindings import Binding
 
 
 def is_binary(blob: bytes) -> bool:
