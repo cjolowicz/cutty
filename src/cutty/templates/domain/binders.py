@@ -5,8 +5,8 @@ from typing import Any
 
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.variables import validate
-from cutty.templates.domain.variables import Variable
+from cutty.variables.variables import validate
+from cutty.variables.variables import Variable
 
 
 Binder = Callable[[Variable], Binding]

@@ -4,7 +4,7 @@ from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.domain.config import Config
-from cutty.templates.domain.variables import Variable
+from cutty.variables.variables import Variable
 
 
 def test_config(variable: Variable) -> None:
