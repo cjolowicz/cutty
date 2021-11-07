@@ -5,7 +5,7 @@ from typing import Any
 
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.config import Config
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import Variable
 
 
 def loadvalue(value: Any) -> Any:

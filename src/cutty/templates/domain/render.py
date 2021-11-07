@@ -14,8 +14,8 @@ from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import GenericVariable
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import GenericVariable
+from cutty.variables.domain.variables import Variable
 
 
 T = TypeVar("T")

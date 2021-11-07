@@ -4,8 +4,8 @@ from collections.abc import Sequence
 from typing import Any
 
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import validate
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import validate
+from cutty.variables.domain.variables import Variable
 
 
 Binder = Callable[[Variable], Binding]

@@ -19,7 +19,7 @@ from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import Variable
 
 
 @dataclass(frozen=True)

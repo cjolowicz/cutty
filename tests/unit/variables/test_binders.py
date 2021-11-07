@@ -1,7 +1,7 @@
 """Unit tests for cutty.variables.binders."""
 from cutty.variables.binders import binddefault
 from cutty.variables.binders import override
-from cutty.variables.variables import GenericVariable
+from cutty.variables.domain.variables import GenericVariable
 
 
 def test_override_empty(variable: GenericVariable[str]) -> None:
