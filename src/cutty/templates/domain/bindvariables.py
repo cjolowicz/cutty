@@ -2,7 +2,6 @@
 from collections.abc import Sequence
 
 from cutty.templates.domain.render import Renderer
-from cutty.variables.binders import binddefault
 from cutty.variables.binders import Binder
 from cutty.variables.binders import override
 from cutty.variables.bindings import Binding
@@ -24,12 +23,10 @@ def renderbind(
 def bindvariables(
     variables: Sequence[Variable],
     render: Renderer,
-    prompt: Binder,
+    binder: Binder,
     *,
-    interactive: bool,
     bindings: Sequence[Binding],
 ) -> Sequence[Binding]:
     """Bind the template variables."""
-    binder: Binder = prompt if interactive else binddefault
     binder = override(binder, bindings)
     return renderbind(render, binder, variables)
