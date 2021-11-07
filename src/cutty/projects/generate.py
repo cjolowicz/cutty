@@ -5,10 +5,10 @@ from cutty.projects.generator import ProjectGenerator
 from cutty.projects.project import Project
 from cutty.projects.template import Template
 from cutty.templates.domain.bindvariables import bindvariables
+from cutty.variables.adapters.prompts import createprompt
 from cutty.variables.domain.binders import binddefault
 from cutty.variables.domain.binders import Binder
 from cutty.variables.domain.bindings import Binding
-from cutty.variables.prompts import createprompt
 
 
 def generate(
