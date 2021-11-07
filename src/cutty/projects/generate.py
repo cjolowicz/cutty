@@ -4,9 +4,9 @@ from collections.abc import Sequence
 from cutty.projects.generator import ProjectGenerator
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.templates.adapters.questionary.prompts import createprompt
 from cutty.templates.domain.binders import bindvariables
 from cutty.variables.bindings import Binding
+from cutty.variables.prompts import createprompt
 
 
 def generate(
