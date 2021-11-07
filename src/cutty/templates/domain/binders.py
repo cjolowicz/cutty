@@ -1,5 +1,4 @@
 """Binding variables."""
-from collections.abc import Callable
 from collections.abc import Sequence
 
 from cutty.templates.domain.render import Renderer
@@ -8,9 +7,6 @@ from cutty.variables.binders import Binder
 from cutty.variables.binders import override
 from cutty.variables.bindings import Binding
 from cutty.variables.variables import Variable
-
-
-RenderingBinder = Callable[[Renderer, Sequence[Variable]], Sequence[Binding]]
 
 
 def renderbind(
@@ -25,11 +21,6 @@ def renderbind(
     return bindings
 
 
-def renderbindwith(binder: Binder) -> RenderingBinder:
-    """Render and bind variables using the given binder."""
-    return lambda render, variables: renderbind(render, binder, variables)
-
-
 def bindvariables(
     variables: Sequence[Variable],
     render: Renderer,
@@ -41,4 +32,4 @@ def bindvariables(
     """Bind the template variables."""
     binder: Binder = prompt if interactive else binddefault
     binder = override(binder, bindings)
-    return renderbindwith(binder)(render, variables)
+    return renderbind(render, binder, variables)
