@@ -13,6 +13,8 @@ from tests.util.files import project_files
 from tests.util.files import template_files
 from tests.util.git import move_repository_files_to_subdirectory
 from tests.util.git import updatefile
+from tests.util.keys import BACKSPACE
+from tests.util.keys import RETURN
 
 
 EXTRA = {Path("post_gen_project"), Path(PROJECT_CONFIG_FILE)}
@@ -25,28 +27,32 @@ def test_help(runcutty: RunCutty) -> None:
 
 def test_input(runcutty: RunCutty, template: Path) -> None:
     """It binds project variables from user input."""
-    runcutty("create", str(template), input="foobar\n\n\n")
+    runcutty(
+        "create",
+        str(template),
+        input=BACKSPACE * len("example") + "foobar" + RETURN * 3,
+    )
 
     assert Path("foobar", "README.md").read_text() == "# foobar\n"
 
 
 def test_hook(runcutty: RunCutty, template: Path) -> None:
     """It runs hooks."""
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     assert Path("example", "post_gen_project").is_file()
 
 
 def test_files(runcutty: RunCutty, template: Path) -> None:
     """It renders the project files."""
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     assert template_files(template) == project_files("example") - EXTRA
 
 
 def test_cutty_json(runcutty: RunCutty, template: Path) -> None:
     """It creates a cutty.json file."""
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     assert Path("example", PROJECT_CONFIG_FILE).is_file()
 
@@ -56,7 +62,7 @@ def test_cutty_json_already_exists(runcutty: RunCutty, template: Path) -> None:
     updatefile(template / "{{ cookiecutter.project }}" / PROJECT_CONFIG_FILE)
 
     with pytest.raises(FileExistsError):
-        runcutty("create", str(template))
+        runcutty("create", "--non-interactive", str(template))
 
 
 def test_cwd(runcutty: RunCutty, template: Path) -> None:
@@ -64,7 +70,7 @@ def test_cwd(runcutty: RunCutty, template: Path) -> None:
     outputdir = Path("output")
     outputdir.mkdir()
 
-    runcutty("create", f"--cwd={outputdir}", str(template))
+    runcutty("create", "--non-interactive", f"--cwd={outputdir}", str(template))
 
     assert template_files(template) == project_files(outputdir / "example") - EXTRA
 
@@ -81,14 +87,19 @@ def test_directory(runcutty: RunCutty, template: Path) -> None:
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--template-directory={directory}", str(template))
+    runcutty(
+        "create",
+        "--non-interactive",
+        f"--template-directory={directory}",
+        str(template),
+    )
 
     assert template_files(template / "a") == project_files("example") - EXTRA
 
 
 def test_commit_message_template(runcutty: RunCutty, template: Path) -> None:
     """It includes the template name in the commit message."""
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
     repository = Repository.open(Path("example"))
     assert template.name in repository.head.commit.message
 
@@ -99,7 +110,7 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
 
     updatefile(template / "{{ cookiecutter.project }}" / "LICENSE")
 
-    runcutty("create", f"--revision={revision}", str(template))
+    runcutty("create", "--non-interactive", f"--revision={revision}", str(template))
 
     repository = Repository.open(Path("example"))
 
@@ -109,13 +120,13 @@ def test_commit_message_revision(runcutty: RunCutty, template: Path) -> None:
 def test_cutty_error(runcutty: RunCutty) -> None:
     """It prints an error message for known exceptions."""
     with pytest.raises(Exception, match="unknown location"):
-        runcutty("create", "invalid://location")
+        runcutty("create", "--non-interactive", "invalid://location")
 
 
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
-        runcutty("create", str(emptytemplate))
+        runcutty("create", "--non-interactive", str(emptytemplate))
 
 
 def test_no_branches(runcutty: RunCutty, template: Path) -> None:
@@ -125,7 +136,13 @@ def test_no_branches(runcutty: RunCutty, template: Path) -> None:
 
     branches = list(project.heads)
 
-    runcutty("create", f"--cwd={project.path}", "--in-place", str(template))
+    runcutty(
+        "create",
+        "--non-interactive",
+        f"--cwd={project.path}",
+        "--in-place",
+        str(template),
+    )
 
     assert branches == list(project.heads)
 
@@ -136,7 +153,7 @@ def test_existing_files(runcutty: RunCutty, template: Path) -> None:
     existing.parent.mkdir()
     existing.touch()
 
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     project = Repository.open(existing.parent)
     assert existing.name not in project.head.commit.tree
@@ -149,7 +166,7 @@ def test_untracked_files(runcutty: RunCutty, template: Path) -> None:
     untracked = project.path / "untracked-file"
     untracked.touch()
 
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     assert untracked.name not in project.head.commit.tree
 
@@ -162,7 +179,7 @@ def test_untracked_project_files(runcutty: RunCutty, template: Path) -> None:
     untracked.touch()
 
     with pytest.raises(Exception, match="uncommitted change"):
-        runcutty("create", str(template))
+        runcutty("create", "--non-interactive", str(template))
 
     assert {untracked.relative_to(project.path)} == project_files(project.path)
 
@@ -176,7 +193,7 @@ def test_existing_project_files(runcutty: RunCutty, template: Path) -> None:
     existing.touch()
 
     with pytest.raises(Exception, match="uncommitted change"):
-        runcutty("create", str(template))
+        runcutty("create", "--non-interactive", str(template))
 
     assert {existing.relative_to(project)} == project_files(project)
 
@@ -189,7 +206,7 @@ def test_conflict(runcutty: RunCutty, template: Path) -> None:
     updatefile(conflicting, "teapot")
 
     with pytest.raises(Exception, match="conflict"):
-        runcutty("create", str(template))
+        runcutty("create", "--non-interactive", str(template))
 
     assert ">>>>" in conflicting.read_text()
 
@@ -201,14 +218,14 @@ def test_conflict_cutty_json(runcutty: RunCutty, template: Path) -> None:
 
     updatefile(conflicting, "null")
 
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     assert ">>>>" not in conflicting.read_text()
 
 
 def test_commit_hash(runcutty: RunCutty, template: Path) -> None:
     """It stores the commit hash."""
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     revision = readprojectconfigfile(Path("example")).revision
 
