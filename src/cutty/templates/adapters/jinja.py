@@ -12,9 +12,9 @@ from typing import Union
 import jinja2
 
 from cutty.filesystems.domain.path import Path
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import GenericRenderer
 from cutty.util.reraise import reraise
+from cutty.variables.bindings import Binding
 
 
 @dataclass

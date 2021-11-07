@@ -3,8 +3,8 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
+from cutty.variables.bindings import Binding
 from cutty.variables.variables import validate
 from cutty.variables.variables import Variable
 
