@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from cutty.projects.generator import ProjectGenerator
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.prompts import prompt
+from cutty.templates.adapters.questionary.prompts import createprompt
 from cutty.templates.domain.binders import bindvariables
 from cutty.templates.domain.bindings import Binding
 
@@ -23,7 +23,7 @@ def generate(
     bindings = bindvariables(
         generator.variables,
         generator.renderer,
-        prompt,
+        createprompt(),
         interactive=interactive,
         bindings=bindings,
     )
