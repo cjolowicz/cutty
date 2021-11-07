@@ -1,10 +1,10 @@
 """Unit tests for cutty.templates.domain.binders."""
 import pytest
 
-from cutty.templates.domain.binders import binddefault
-from cutty.templates.domain.binders import override
 from cutty.templates.domain.binders import renderbindwith
 from cutty.templates.domain.render import Renderer
+from cutty.variables.binders import binddefault
+from cutty.variables.binders import override
 from cutty.variables.bindings import Binding
 from cutty.variables.variables import GenericVariable
 
@@ -37,12 +37,3 @@ def test_renderbind_with_override(
     [binding] = renderbind(render, [variable])
 
     assert binding == expected
-
-
-def test_override_empty(variable: GenericVariable[str]) -> None:
-    """It does not override the variable."""
-    binder = override(binddefault, [])
-    binding = binder(variable)
-
-    assert binding.name == variable.name
-    assert binding.value == variable.default
