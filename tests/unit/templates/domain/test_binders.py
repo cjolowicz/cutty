@@ -1,6 +1,6 @@
-"""Unit tests for cutty.variables.binders."""
-from cutty.variables.binders import binddefault
-from cutty.variables.binders import override
+"""Unit tests for cutty.variables.domain.binders."""
+from cutty.variables.domain.binders import binddefault
+from cutty.variables.domain.binders import override
 from cutty.variables.domain.variables import GenericVariable
 
 

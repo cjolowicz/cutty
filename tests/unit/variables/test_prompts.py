@@ -8,7 +8,7 @@ from prompt_toolkit.input.base import PipeInput
 from prompt_toolkit.input.defaults import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
-from cutty.variables.binders import Binder
+from cutty.variables.domain.binders import Binder
 from cutty.variables.domain.bindings import GenericBinding
 from cutty.variables.domain.variables import GenericVariable
 from cutty.variables.prompts import createprompt

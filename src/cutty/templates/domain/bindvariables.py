@@ -2,8 +2,8 @@
 from collections.abc import Sequence
 
 from cutty.templates.domain.render import Renderer
-from cutty.variables.binders import Binder
-from cutty.variables.binders import override
+from cutty.variables.domain.binders import Binder
+from cutty.variables.domain.binders import override
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import Variable
 
