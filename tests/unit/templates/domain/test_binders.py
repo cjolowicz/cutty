@@ -1,7 +1,7 @@
 """Unit tests for cutty.templates.domain.binders."""
 import pytest
 
-from cutty.templates.domain.binders import renderbindwith
+from cutty.templates.domain.binders import renderbind
 from cutty.templates.domain.render import Renderer
 from cutty.variables.binders import binddefault
 from cutty.variables.binders import override
@@ -13,9 +13,7 @@ def test_renderbind_with_binddefault(
     variable: GenericVariable[str], render: Renderer
 ) -> None:
     """It binds variables using only defaults."""
-    renderbind = renderbindwith(binddefault)
-
-    [binding] = renderbind(render, [variable])
+    [binding] = renderbind(render, binddefault, [variable])
 
     assert binding.name == "project"
     assert binding.value == "example"
@@ -32,8 +30,8 @@ def test_renderbind_with_override(
     variable: GenericVariable[str], render: Renderer, given: Binding, expected: Binding
 ) -> None:
     """It binds variables using defaults, unless overridden."""
-    renderbind = renderbindwith(override(binddefault, [given]))
+    binder = override(binddefault, [given])
 
-    [binding] = renderbind(render, [variable])
+    [binding] = renderbind(render, binder, [variable])
 
     assert binding == expected
