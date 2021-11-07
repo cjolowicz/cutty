@@ -1,8 +1,8 @@
-"""Unit tests for cutty.variables.variables."""
+"""Unit tests for cutty.variables.domain.variables."""
 import pytest
 
-from cutty.variables.variables import validate
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import validate
+from cutty.variables.domain.variables import Variable
 
 
 def test_validate_type_valid() -> None:

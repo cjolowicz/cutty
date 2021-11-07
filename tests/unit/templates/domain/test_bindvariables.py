@@ -6,7 +6,7 @@ from cutty.templates.domain.render import Renderer
 from cutty.variables.binders import binddefault
 from cutty.variables.binders import override
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import GenericVariable
+from cutty.variables.domain.variables import GenericVariable
 
 
 def test_renderbind_with_binddefault(

@@ -16,7 +16,7 @@ from cutty.variables.binders import bind
 from cutty.variables.binders import binddefault
 from cutty.variables.binders import Binder
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import Variable
 
 
 def _loadjsondict(value: str) -> dict[str, Any]:

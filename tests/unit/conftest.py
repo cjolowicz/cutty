@@ -4,7 +4,7 @@ import pytest
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
-from cutty.variables.variables import GenericVariable
+from cutty.variables.domain.variables import GenericVariable
 
 
 @pytest.fixture

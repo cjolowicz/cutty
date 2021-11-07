@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import Variable
 
 
 @dataclass

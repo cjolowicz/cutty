@@ -5,7 +5,7 @@ from cutty.templates.domain.render import Renderer
 from cutty.variables.binders import Binder
 from cutty.variables.binders import override
 from cutty.variables.bindings import Binding
-from cutty.variables.variables import Variable
+from cutty.variables.domain.variables import Variable
 
 
 def renderbind(
