@@ -731,7 +731,7 @@ cffi = ">=1.4.0"
 name = "pygments"
 version = "2.10.0"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 
@@ -1258,7 +1258,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "06a368db5a42850d044b899a037e038b7b430c925ea68017c46890df2d988ded"
+content-hash = "876467cb393f6bb58387f28a3487b3616e8fe8fb723ed7f2d0bed8daf3ca5640"
 
 [metadata.files]
 alabaster = [
