@@ -8,9 +8,24 @@ from typing import Protocol
 
 import pytest
 from click.testing import CliRunner
+from prompt_toolkit.application import create_app_session
+from prompt_toolkit.input import create_pipe_input
+from prompt_toolkit.input.base import PipeInput
+from prompt_toolkit.output import DummyOutput
 
 from cutty.entrypoints.cli import main
 from cutty.util.git import Repository
+
+
+@pytest.fixture
+def pipeinput() -> Iterator[PipeInput]:
+    """Fixture for piping input to prompt_toolkit."""
+    pipe = create_pipe_input()
+    try:
+        with create_app_session(input=pipe, output=DummyOutput()):
+            yield pipe
+    finally:
+        pipe.close()
 
 
 @pytest.fixture
