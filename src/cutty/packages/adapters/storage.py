@@ -14,8 +14,6 @@ from typing import Optional
 
 from yarl import URL
 
-from cutty.packages.adapters.registry import defaultproviderfactories
-from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.registry import ProviderStore
 from cutty.packages.domain.stores import Store
 
@@ -146,13 +144,3 @@ def getdefaultproviderstore(
         return store
 
     return providerstore
-
-
-def getdefaultpackageprovider(
-    path: pathlib.Path, *, timer: Timer = defaulttimer
-) -> ProviderRegistry:
-    """Return a package provider."""
-    return ProviderRegistry(
-        getdefaultproviderstore(path, timer=timer),
-        defaultproviderfactories,
-    )
