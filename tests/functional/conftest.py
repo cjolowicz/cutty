@@ -48,11 +48,14 @@ class RunCuttyError(Exception):
 
 
 @pytest.fixture
-def runcutty(runner: CliRunner) -> RunCutty:
+def runcutty(runner: CliRunner, pipeinput: PipeInput) -> RunCutty:
     """Fixture for invoking the cutty CLI."""
 
     def _run(*args: str, input: Optional[str] = None) -> str:
-        result = runner.invoke(main, args, input=input, catch_exceptions=False)
+        if input is not None:
+            pipeinput.send_text(input)
+
+        result = runner.invoke(main, args, catch_exceptions=False)
 
         if result.exit_code != 0:
             raise RunCuttyError(result.output or str(result.exit_code))
