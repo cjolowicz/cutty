@@ -4,7 +4,8 @@ from collections.abc import Sequence
 from cutty.projects.generator import ProjectGenerator
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.binders import bindcookiecuttervariables
+from cutty.templates.adapters.cookiecutter.prompts import prompt
+from cutty.templates.domain.binders import bindvariables
 from cutty.templates.domain.bindings import Binding
 
 
@@ -19,9 +20,10 @@ def generate(
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
 
-    bindings = bindcookiecuttervariables(
+    bindings = bindvariables(
         generator.variables,
         generator.renderer,
+        prompt,
         interactive=interactive,
         bindings=bindings,
     )
