@@ -8,9 +8,24 @@ from typing import Protocol
 
 import pytest
 from click.testing import CliRunner
+from prompt_toolkit.application import create_app_session
+from prompt_toolkit.input import create_pipe_input
+from prompt_toolkit.input.base import PipeInput
+from prompt_toolkit.output import DummyOutput
 
 from cutty.entrypoints.cli import main
 from cutty.util.git import Repository
+
+
+@pytest.fixture
+def pipeinput() -> Iterator[PipeInput]:
+    """Fixture for piping input to prompt_toolkit."""
+    pipe = create_pipe_input()
+    try:
+        with create_app_session(input=pipe, output=DummyOutput()):
+            yield pipe
+    finally:
+        pipe.close()
 
 
 @pytest.fixture
@@ -33,11 +48,14 @@ class RunCuttyError(Exception):
 
 
 @pytest.fixture
-def runcutty(runner: CliRunner) -> RunCutty:
+def runcutty(runner: CliRunner, pipeinput: PipeInput) -> RunCutty:
     """Fixture for invoking the cutty CLI."""
 
     def _run(*args: str, input: Optional[str] = None) -> str:
-        result = runner.invoke(main, args, input=input, catch_exceptions=False)
+        if input is not None:
+            pipeinput.send_text(input)
+
+        result = runner.invoke(main, args, catch_exceptions=False)
 
         if result.exit_code != 0:
             raise RunCuttyError(result.output or str(result.exit_code))

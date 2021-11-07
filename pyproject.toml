@@ -25,6 +25,9 @@ httpx = ">=0.18.1,<0.21.0"
 binaryornot = "^0.4.4"
 pluggy = ">=0.13.1,<1.1.0"
 platformdirs = "^2.0.2"
+questionary = "^1.10.0"
+prompt-toolkit = "^3.0.22"
+Pygments = "^2.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -90,6 +93,7 @@ module = [
     "jinja2_time",
     "pyftpdlib.*",
     "pygit2.*",
+    "pygments.*",
 ]
 ignore_missing_imports = true
 

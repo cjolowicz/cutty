@@ -17,6 +17,9 @@ from tests.util.git import removefile
 from tests.util.git import resolveconflicts
 from tests.util.git import Side
 from tests.util.git import updatefile
+from tests.util.keys import BACKSPACE
+from tests.util.keys import ESCAPE
+from tests.util.keys import RETURN
 from tests.util.variables import projectvariable
 from tests.util.variables import templatevariable
 from tests.util.variables import updatetemplatevariable
@@ -48,7 +51,7 @@ def test_trivial(runcutty: RunCutty, templateproject: Path, project: Path) -> No
     appendfile(templateproject / "README.md", "An awesome project.\n")
 
     with chdir(project):
-        runcutty("update")
+        runcutty("update", "--non-interactive")
 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
@@ -59,7 +62,7 @@ def test_merge(runcutty: RunCutty, templateproject: Path, project: Path) -> None
     updatefile(templateproject / "LICENSE")
 
     with chdir(project):
-        runcutty("update")
+        runcutty("update", "--non-interactive")
 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
     assert (project / "LICENSE").is_file()
@@ -72,7 +75,7 @@ def test_conflict(runcutty: RunCutty, templateproject: Path, project: Path) -> N
 
     with chdir(project):
         with pytest.raises(Exception):
-            runcutty("update")
+            runcutty("update", "--non-interactive")
 
 
 def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
@@ -81,7 +84,7 @@ def test_remove(runcutty: RunCutty, templateproject: Path, project: Path) -> Non
     updatefile(templateproject / ".keep")
 
     with chdir(project):
-        runcutty("update")
+        runcutty("update", "--non-interactive")
 
     assert not (project / "README.md").is_file()
 
@@ -92,7 +95,7 @@ def test_noop(runcutty: RunCutty, template: Path, project: Path) -> None:
     oldhead = repository.head.commit
 
     with chdir(project):
-        runcutty("update")
+        runcutty("update", "--non-interactive")
 
     assert oldhead == repository.head.commit
 
@@ -112,7 +115,7 @@ def test_extra_context_old_variable(
 ) -> None:
     """It allows setting variables on the command-line."""
     with chdir(project):
-        runcutty("update", "project=excellent")
+        runcutty("update", "--non-interactive", "project=excellent")
 
     assert "excellent" == projectvariable(project, "project")
 
@@ -124,7 +127,7 @@ def test_extra_context_new_variable(
     updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
 
     with chdir(project):
-        runcutty("update", "status=stable")
+        runcutty("update", "--non-interactive", "status=stable")
 
     assert "stable" == projectvariable(project, "status")
 
@@ -149,7 +152,7 @@ def test_rename_projectdir(
     appendfile(templateproject / "README.md", "An awesome project.\n")
 
     with chdir(project2):
-        runcutty("update")
+        runcutty("update", "--non-interactive")
 
     assert (project2 / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
@@ -158,7 +161,7 @@ def test_cwd(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     """It updates the project in the specified directory."""
     appendfile(templateproject / "README.md", "An awesome project.\n")
 
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert (project / "README.md").read_text() == "# awesome\nAn awesome project.\n"
 
@@ -189,15 +192,19 @@ def test_dictvariable(
         images = templatevariable(template, "images")
         return {key: value for key, value in images.items() if key == "png"}
 
+    default = json.dumps(templatevariable(template, "images"), indent=2)
     runcutty(
         "create",
         str(template),
-        input="\n".join(
+        input="".join(
             [
-                "",  # project
-                "",  # license
-                "",  # cli
-                json.dumps(pngimages(template)),
+                RETURN,  # project
+                RETURN,  # license
+                RETURN,  # cli
+                BACKSPACE * len(default)
+                + json.dumps(pngimages(template))
+                + ESCAPE
+                + RETURN,
             ]
         ),
     )
@@ -206,7 +213,7 @@ def test_dictvariable(
 
     project = Path("example")
 
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert pngimages(template) == projectvariable(project, "images")
 
@@ -231,14 +238,14 @@ def test_private_variables(
 
     project = Path("example")
 
-    runcutty("create", str(template))
+    runcutty("create", "--non-interactive", str(template))
 
     # Add another Jinja extension to `_extensions`.
     extensions: list[str] = privatevariable(project, "_extensions")
     extensions.append("jinja2.ext.i18n")
     updatetemplatevariable(template, "_extensions", extensions)
 
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert extensions == privatevariable(project, "_extensions")
 
@@ -249,9 +256,14 @@ def test_directory_projectconfig(runcutty: RunCutty, template: Path) -> None:
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("create", f"--template-directory={directory}", str(template))
+    runcutty(
+        "create",
+        "--non-interactive",
+        f"--template-directory={directory}",
+        str(template),
+    )
     updatefile(template / "a" / "{{ cookiecutter.project }}" / "LICENSE")
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert (project / "LICENSE").is_file()
 
@@ -261,7 +273,12 @@ def test_directory_update(runcutty: RunCutty, template: Path, project: Path) -> 
     directory = "a"
     move_repository_files_to_subdirectory(template, directory)
 
-    runcutty("update", f"--cwd={project}", f"--template-directory={directory}")
+    runcutty(
+        "update",
+        "--non-interactive",
+        f"--cwd={project}",
+        f"--template-directory={directory}",
+    )
 
     config = readprojectconfigfile(project)
     assert directory == str(config.directory)
@@ -277,7 +294,9 @@ def test_revision(
 
     updatefile(templateproject / "LICENSE", "b")
 
-    runcutty("update", f"--cwd={project}", f"--revision={revision}")
+    runcutty(
+        "update", "--non-interactive", f"--cwd={project}", f"--revision={revision}"
+    )
 
     assert (project / "LICENSE").read_text() == "a"
 
@@ -288,7 +307,7 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
     updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
-        runcutty("update", f"--cwd={project}")
+        runcutty("update", "--non-interactive", f"--cwd={project}")
 
     # Abort the update.
     runcutty("update", f"--cwd={project}", "--abort")
@@ -298,7 +317,7 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
 
     # Repeat the update, it should fail again.
     with pytest.raises(Exception, match="conflict"):
-        runcutty("update", f"--cwd={project}")
+        runcutty("update", "--non-interactive", f"--cwd={project}")
 
 
 def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
@@ -307,11 +326,11 @@ def test_continue(runcutty: RunCutty, templateproject: Path, project: Path) -> N
     updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
-        runcutty("update", f"--cwd={project}")
+        runcutty("update", "--non-interactive", f"--cwd={project}")
 
     resolveconflicts(project, project / "LICENSE", Side.THEIRS)
 
-    runcutty("update", f"--cwd={project}", "--continue")
+    runcutty("update", "--non-interactive", f"--cwd={project}", "--continue")
 
     assert (project / "LICENSE").read_text() == "b"
 
@@ -322,14 +341,14 @@ def test_skip(runcutty: RunCutty, templateproject: Path, project: Path) -> None:
     updatefile(templateproject / "LICENSE", "b")
 
     with pytest.raises(Exception, match="conflict"):
-        runcutty("update", f"--cwd={project}")
+        runcutty("update", "--non-interactive", f"--cwd={project}")
 
-    runcutty("update", f"--cwd={project}", "--abort")
-    runcutty("link", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}", "--abort")
+    runcutty("link", "--non-interactive", f"--cwd={project}")
 
     updatefile(templateproject / "INSTALL")
 
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert (project / "LICENSE").read_text() == "a"
     assert (project / "INSTALL").is_file()
@@ -341,25 +360,25 @@ def test_sequencer_without_update(
 ) -> None:
     """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
-        runcutty("update", f"--cwd={project}", f"--{option}")
+        runcutty("update", "--non-interactive", f"--cwd={project}", f"--{option}")
 
 
 def test_continue_without_update(runcutty: RunCutty, project: Path) -> None:
     """It exits with a non-zero status code."""
     with pytest.raises(RunCuttyError):
-        runcutty("update", f"--cwd={project}", "--continue")
+        runcutty("update", "--non-interactive", f"--cwd={project}", "--continue")
 
 
 def test_empty_template(emptytemplate: Path, runcutty: RunCutty) -> None:
     """It exits with a non-zero status code."""
     (emptytemplate / "{{ cookiecutter.project }}" / "marker").touch()
 
-    runcutty("create", str(emptytemplate))
+    runcutty("create", "--non-interactive", str(emptytemplate))
 
     (emptytemplate / "{{ cookiecutter.project }}" / "marker").unlink()
 
     with pytest.raises(RunCuttyError):
-        runcutty("update", "--cwd=project")
+        runcutty("update", "--non-interactive", "--cwd=project")
 
 
 def undo(repository: Repository) -> None:
@@ -374,11 +393,11 @@ def test_reverted_update(
     """It does not skip changes when a previous update was reverted."""
     # Update #1: Add file 'a'
     updatefile(templateproject / "a")
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     # Update #2: Add file 'b'
     updatefile(templateproject / "b")
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     # "Revert" project updates (hard reset).
     repository = Repository.open(project)
@@ -386,7 +405,7 @@ def test_reverted_update(
     undo(repository)
 
     # Update #3: Add files 'a' and 'b'
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert "a" in repository.head.commit.tree
     assert "b" in repository.head.commit.tree
@@ -398,7 +417,7 @@ def test_no_branches(runcutty: RunCutty, templateproject: Path, project: Path) -
     branches = list(repository.heads)
 
     updatefile(templateproject / "LICENSE")
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert branches == list(repository.heads)
 
@@ -411,6 +430,6 @@ def test_untracked_files(
     untracked.touch()
 
     updatefile(templateproject / "LICENSE")
-    runcutty("update", f"--cwd={project}")
+    runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert untracked.name not in Repository.open(project).head.commit.tree
