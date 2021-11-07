@@ -19,7 +19,7 @@ from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.variables import Variable
 
 
-def _load_json_dict(value: str) -> dict[str, Any]:
+def _loadjsondict(value: str) -> dict[str, Any]:
     """Load entered value as a JSON dict."""
     try:
         result = json.loads(value)
@@ -35,7 +35,7 @@ def _load_json_dict(value: str) -> dict[str, Any]:
 class _JSONValidator(Validator):
     def validate(self, document: Document) -> None:
         try:
-            _load_json_dict(document.text)
+            _loadjsondict(document.text)
         except ValueError as error:
             raise ValidationError(
                 message=str(error), cursor_position=len(document.text)
@@ -66,7 +66,7 @@ def createprompt(
                 output=output,
             )
 
-            return bind(variable, _load_json_dict(question.ask()))
+            return bind(variable, _loadjsondict(question.ask()))
 
         if variable.choices:
             question = questionary.select(
