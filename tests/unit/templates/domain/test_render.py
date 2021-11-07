@@ -7,7 +7,7 @@ from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.bindings import Binding
 from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.variables import GenericVariable
+from cutty.variables.variables import GenericVariable
 
 
 @pytest.mark.parametrize(
