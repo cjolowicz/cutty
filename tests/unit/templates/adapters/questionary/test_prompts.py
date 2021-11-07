@@ -12,11 +12,9 @@ from cutty.templates.adapters.questionary.prompts import createprompt
 from cutty.templates.domain.binders import Binder
 from cutty.templates.domain.bindings import GenericBinding
 from cutty.templates.domain.variables import GenericVariable
-
-
-BACKSPACE = "\x7f"
-ESCAPE = "\x1b"
-RETURN = "\r"
+from tests.util.keys import BACKSPACE
+from tests.util.keys import ESCAPE
+from tests.util.keys import RETURN
 
 
 @pytest.fixture
