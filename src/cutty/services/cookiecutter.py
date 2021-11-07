@@ -7,7 +7,7 @@ from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.projects.build import createproject
 from cutty.projects.config import ProjectConfig
 from cutty.projects.store import storeproject
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 def create(

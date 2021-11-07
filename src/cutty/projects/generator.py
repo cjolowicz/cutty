@@ -18,7 +18,7 @@ from cutty.templates.adapters.cookiecutter.render import createcookiecutterrende
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import Variable
 
 

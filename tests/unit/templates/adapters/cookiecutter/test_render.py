@@ -11,7 +11,7 @@ from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 @pytest.fixture

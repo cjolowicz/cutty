@@ -3,7 +3,7 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
 
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import validate
 from cutty.variables.domain.variables import Variable
 

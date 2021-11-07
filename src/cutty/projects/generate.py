@@ -7,7 +7,7 @@ from cutty.projects.template import Template
 from cutty.templates.domain.bindvariables import bindvariables
 from cutty.variables.binders import binddefault
 from cutty.variables.binders import Binder
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 from cutty.variables.prompts import createprompt
 
 
