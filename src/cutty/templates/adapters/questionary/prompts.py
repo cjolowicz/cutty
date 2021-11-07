@@ -80,15 +80,3 @@ def createprompt(*, input: Any = None, output: Any = None) -> Binder:
         return bind(variable, value)
 
     return prompt
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from cutty.templates.domain.variables import GenericVariable
-
-    name, default = "metadata", {"name": "example"}
-    variable = GenericVariable(name, name, type(default), default, (), True)
-
-    prompt = createprompt()
-    binding = prompt(variable)
-
-    print(binding)
