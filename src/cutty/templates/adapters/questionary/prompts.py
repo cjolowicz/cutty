@@ -47,16 +47,7 @@ def createprompt(*, input: Any = None, output: Any = None) -> Binder:
         if not variable.interactive:
             return binddefault(variable)
 
-        if variable.choices:
-            question = questionary.select(
-                variable.name,
-                choices=variable.choices,
-                default=variable.default,
-                use_shortcuts=True,
-                input=input,
-                output=output,
-            )
-        elif issubclass(variable.type, dict):
+        if issubclass(variable.type, dict):
             default = json.dumps(variable.default, indent=2)
             question = questionary.text(
                 variable.name,
@@ -69,6 +60,16 @@ def createprompt(*, input: Any = None, output: Any = None) -> Binder:
             )
 
             return bind(variable, _load_json_dict(question.ask()))
+
+        if variable.choices:
+            question = questionary.select(
+                variable.name,
+                choices=variable.choices,
+                default=variable.default,
+                use_shortcuts=True,
+                input=input,
+                output=output,
+            )
         else:
             question = questionary.text(
                 variable.name, default=variable.default, input=input, output=output
