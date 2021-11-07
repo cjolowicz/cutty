@@ -6,7 +6,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 @pytest.fixture

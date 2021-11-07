@@ -14,7 +14,7 @@ from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 @pytest.mark.parametrize(

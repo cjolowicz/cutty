@@ -16,7 +16,7 @@ from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 def is_binary(blob: bytes) -> bool:

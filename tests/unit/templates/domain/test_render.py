@@ -6,7 +6,7 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.templates.domain.render import Renderer
-from cutty.variables.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import GenericVariable
 
 
