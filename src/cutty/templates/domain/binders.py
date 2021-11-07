@@ -57,3 +57,17 @@ def renderbind(
 def renderbindwith(binder: Binder) -> RenderingBinder:
     """Render and bind variables using the given binder."""
     return lambda render, variables: renderbind(render, binder, variables)
+
+
+def bindvariables(
+    variables: Sequence[Variable],
+    render: Renderer,
+    prompt: Binder,
+    *,
+    interactive: bool,
+    bindings: Sequence[Binding],
+) -> Sequence[Binding]:
+    """Bind the template variables."""
+    binder: Binder = prompt if interactive else binddefault
+    binder = override(binder, bindings)
+    return renderbindwith(binder)(render, variables)
