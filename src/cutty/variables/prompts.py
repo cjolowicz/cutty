@@ -12,9 +12,9 @@ from pygments.lexers.data import JsonLexer
 from questionary import ValidationError
 from questionary import Validator
 
-from cutty.variables.binders import bind
-from cutty.variables.binders import binddefault
-from cutty.variables.binders import Binder
+from cutty.variables.domain.binders import bind
+from cutty.variables.domain.binders import binddefault
+from cutty.variables.domain.binders import Binder
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import Variable
 

@@ -3,8 +3,8 @@ import pytest
 
 from cutty.templates.domain.bindvariables import renderbind
 from cutty.templates.domain.render import Renderer
-from cutty.variables.binders import binddefault
-from cutty.variables.binders import override
+from cutty.variables.domain.binders import binddefault
+from cutty.variables.domain.binders import override
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import GenericVariable
 
