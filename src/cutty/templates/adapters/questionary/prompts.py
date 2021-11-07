@@ -1,10 +1,13 @@
 """Prompts using questionary."""
 import json
 from typing import Any
+from typing import Optional
 
 import questionary
 from prompt_toolkit.document import Document
+from prompt_toolkit.input.base import Input
 from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.output import Output
 from pygments.lexers.data import JsonLexer
 from questionary import ValidationError
 from questionary import Validator
@@ -39,7 +42,11 @@ class _JSONValidator(Validator):
             )
 
 
-def createprompt(*, input: Any = None, output: Any = None) -> Binder:
+def createprompt(
+    *,
+    input: Optional[Input] = None,
+    output: Optional[Output] = None,
+) -> Binder:
     """Create a prompt."""
 
     def prompt(variable: Variable) -> Binding:
