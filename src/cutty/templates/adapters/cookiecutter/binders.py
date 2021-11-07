@@ -11,9 +11,10 @@ from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.variables import Variable
 
 
-def bindcookiecuttervariables(
+def bindvariables(
     variables: Sequence[Variable],
     render: Renderer,
+    prompt: Binder,
     *,
     interactive: bool,
     bindings: Sequence[Binding],
@@ -22,3 +23,16 @@ def bindcookiecuttervariables(
     binder: Binder = prompt if interactive else binddefault
     binder = override(binder, bindings)
     return renderbindwith(binder)(render, variables)
+
+
+def bindcookiecuttervariables(
+    variables: Sequence[Variable],
+    render: Renderer,
+    *,
+    interactive: bool,
+    bindings: Sequence[Binding],
+) -> Sequence[Binding]:
+    """Bind the template variables."""
+    return bindvariables(
+        variables, render, prompt, interactive=interactive, bindings=bindings
+    )
