@@ -14,8 +14,8 @@ from cutty.projects.cookiecutter import findcookiecutterpaths
 from cutty.projects.cookiecutter import loadcookiecutterconfig
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.rendering.adapters.cookiecutter.render import CookiecutterConfig
-from cutty.rendering.adapters.cookiecutter.render import createcookiecutterrenderer
+from cutty.rendering.adapters.cookiecutter import CookiecutterConfig
+from cutty.rendering.adapters.cookiecutter import createcookiecutterrenderer
 from cutty.rendering.domain.render import Renderer
 from cutty.rendering.domain.renderbind import renderbind
 from cutty.rendering.domain.renderfiles import renderfiles
