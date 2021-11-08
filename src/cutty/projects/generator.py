@@ -24,7 +24,6 @@ from cutty.variables.domain.binders import binddefault
 from cutty.variables.domain.binders import Binder
 from cutty.variables.domain.binders import override
 from cutty.variables.domain.bindings import Binding
-from cutty.variables.domain.variables import Variable
 
 
 @dataclass(frozen=True)
@@ -52,12 +51,7 @@ class ProjectGenerator:
         """Bind the variables."""
         binder: Binder = createprompt() if interactive else binddefault
         binder = override(binder, bindings)
-        return renderbind(self._renderer, binder, self.variables)
-
-    @property
-    def variables(self) -> Sequence[Variable]:
-        """Return the template variables."""
-        return self._config.variables
+        return renderbind(self._renderer, binder, self._config.variables)
 
     def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
