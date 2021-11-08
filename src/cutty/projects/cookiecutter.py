@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from cutty.filesystems.domain.path import Path
-from cutty.rendering.adapters.cookiecutter.render import CookiecutterConfig
+from cutty.rendering.adapters.cookiecutter import CookiecutterConfig
 from cutty.variables.domain.variables import Variable
 
 
