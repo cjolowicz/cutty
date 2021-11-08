@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from cutty.filesystems.domain.path import Path
-from cutty.templates.domain.config import Config
+from cutty.templates.adapters.cookiecutter.render import CookiecutterConfig
 from cutty.variables.domain.variables import Variable
 
 
@@ -44,7 +44,7 @@ def loadvariable(name: str, value: Any) -> Variable:
     )
 
 
-def loadcookiecutterconfig(template: str, path: Path) -> Config:
+def loadcookiecutterconfig(template: str, path: Path) -> CookiecutterConfig:
     """Load the configuration for a Cookiecutter template."""
     text = (path / "cookiecutter.json").read_text()
     data = json.loads(text)
@@ -63,10 +63,10 @@ def loadcookiecutterconfig(template: str, path: Path) -> Config:
         if not name.startswith("_")
     )
 
-    return Config(settings, variables)
+    return CookiecutterConfig(settings, variables)
 
 
-def findcookiecutterpaths(path: Path, config: Config) -> Iterator[Path]:
+def findcookiecutterpaths(path: Path, config: CookiecutterConfig) -> Iterator[Path]:
     """Load project files in a Cookiecutter template."""
     for template_dir in path.iterdir():
         if all(token in template_dir.name for token in ("{{", "cookiecutter", "}}")):

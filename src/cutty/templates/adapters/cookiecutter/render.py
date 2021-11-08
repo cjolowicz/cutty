@@ -1,6 +1,7 @@
 """Rendering Cookiecutter templates."""
 import fnmatch
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from binaryornot.helpers import is_binary_string
@@ -10,13 +11,13 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
 from cutty.templates.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
 from cutty.templates.adapters.jinja import createjinjarenderer
-from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import asrendercontinuation
 from cutty.templates.domain.render import createrenderer
 from cutty.templates.domain.render import defaultrenderregistry
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.render import RenderRegistry
 from cutty.variables.domain.bindings import Binding
+from cutty.variables.domain.variables import Variable
 
 
 def is_binary(blob: bytes) -> bool:
@@ -54,7 +55,17 @@ def renderdict(
     }
 
 
-def registerrenderers(path: Path, config: Config) -> RenderRegistry:  # noqa: C901
+@dataclass
+class CookiecutterConfig:
+    """Configuration for a Cookiecutter template."""
+
+    settings: dict[str, Any]
+    variables: tuple[Variable, ...]
+
+
+def registerrenderers(
+    path: Path, config: CookiecutterConfig
+) -> RenderRegistry:  # noqa: C901
     """Register render functions."""
     copy_without_render = asstringlist(config.settings, "_copy_without_render")
     extensions = DEFAULT_EXTENSIONS[:]
@@ -95,7 +106,7 @@ def registerrenderers(path: Path, config: Config) -> RenderRegistry:  # noqa: C9
     }
 
 
-def createcookiecutterrenderer(path: Path, config: Config) -> Renderer:
+def createcookiecutterrenderer(path: Path, config: CookiecutterConfig) -> Renderer:
     """Create Cookiecutter renderer."""
     renderregistry = registerrenderers(path, config)
     return createrenderer({**defaultrenderregistry, **renderregistry})

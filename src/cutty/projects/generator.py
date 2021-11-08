@@ -14,8 +14,8 @@ from cutty.projects.cookiecutter import findcookiecutterpaths
 from cutty.projects.cookiecutter import loadcookiecutterconfig
 from cutty.projects.project import Project
 from cutty.projects.template import Template
+from cutty.templates.adapters.cookiecutter.render import CookiecutterConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderbind import renderbind
 from cutty.templates.domain.renderfiles import renderfiles
@@ -32,7 +32,7 @@ class ProjectGenerator:
     """A project generator."""
 
     _template: Template.Metadata
-    _config: Config
+    _config: CookiecutterConfig
     renderer: Renderer
     _paths: Iterable[Path]
     _hooks: Iterable[Path]
