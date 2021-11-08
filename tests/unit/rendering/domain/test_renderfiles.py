@@ -1,11 +1,11 @@
-"""Unit tests for cutty.templates.domain.renderfiles."""
+"""Unit tests for cutty.rendering.domain.renderfiles."""
 import pytest
 
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.renderfiles import renderfiles
+from cutty.rendering.domain.render import Renderer
+from cutty.rendering.domain.renderfiles import renderfiles
 from cutty.variables.domain.bindings import Binding
 
 

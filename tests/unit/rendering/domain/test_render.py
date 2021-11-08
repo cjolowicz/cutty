@@ -1,11 +1,11 @@
-"""Unit tests for cutty.templates.domain.render."""
+"""Unit tests for cutty.rendering.domain.render."""
 import pytest
 
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.files import SymbolicLink
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.templates.domain.render import Renderer
+from cutty.rendering.domain.render import Renderer
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import GenericVariable
 

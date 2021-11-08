@@ -9,13 +9,13 @@ from binaryornot.helpers import is_binary_string
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
-from cutty.templates.adapters.jinja import createjinjarenderer
-from cutty.templates.domain.render import asrendercontinuation
-from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
-from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.render import RenderRegistry
+from cutty.rendering.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
+from cutty.rendering.adapters.jinja import createjinjarenderer
+from cutty.rendering.domain.render import asrendercontinuation
+from cutty.rendering.domain.render import createrenderer
+from cutty.rendering.domain.render import defaultrenderregistry
+from cutty.rendering.domain.render import Renderer
+from cutty.rendering.domain.render import RenderRegistry
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import Variable
 

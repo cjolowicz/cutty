@@ -14,11 +14,11 @@ from cutty.projects.cookiecutter import findcookiecutterpaths
 from cutty.projects.cookiecutter import loadcookiecutterconfig
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.render import CookiecutterConfig
-from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.renderbind import renderbind
-from cutty.templates.domain.renderfiles import renderfiles
+from cutty.rendering.adapters.cookiecutter.render import CookiecutterConfig
+from cutty.rendering.adapters.cookiecutter.render import createcookiecutterrenderer
+from cutty.rendering.domain.render import Renderer
+from cutty.rendering.domain.renderbind import renderbind
+from cutty.rendering.domain.renderfiles import renderfiles
 from cutty.variables.adapters.prompts import createprompt
 from cutty.variables.domain.binders import binddefault
 from cutty.variables.domain.binders import Binder
