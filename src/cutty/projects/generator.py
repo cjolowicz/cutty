@@ -15,9 +15,13 @@ from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
+from cutty.templates.domain.bindvariables import bindvariables
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.templates.domain.renderfiles import renderfiles
+from cutty.variables.adapters.prompts import createprompt
+from cutty.variables.domain.binders import binddefault
+from cutty.variables.domain.binders import Binder
 from cutty.variables.domain.bindings import Binding
 from cutty.variables.domain.variables import Variable
 
@@ -40,6 +44,13 @@ class ProjectGenerator:
         paths = findcookiecutterpaths(template.root, config)
         hooks = findcookiecutterhooks(template.root)
         return cls(template.metadata, config, renderer, paths, hooks)
+
+    def bind(
+        self, *, interactive: bool = True, bindings: Sequence[Binding] = ()
+    ) -> Sequence[Binding]:
+        """Bind the variables."""
+        binder: Binder = createprompt() if interactive else binddefault
+        return bindvariables(self.variables, self.renderer, binder, bindings=bindings)
 
     @property
     def variables(self) -> Sequence[Variable]:
