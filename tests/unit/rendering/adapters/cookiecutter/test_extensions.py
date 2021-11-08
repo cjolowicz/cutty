@@ -1,13 +1,13 @@
-"""Unit tests for cutty.templates.adapters.cookiecutter.extensions."""
+"""Unit tests for cutty.rendering.adapters.cookiecutter.extensions."""
 import string
 from collections.abc import Callable
 
 import jinja2.ext
 import pytest
 
-from cutty.templates.adapters.cookiecutter.extensions import JsonifyExtension
-from cutty.templates.adapters.cookiecutter.extensions import RandomStringExtension
-from cutty.templates.adapters.cookiecutter.extensions import SlugifyExtension
+from cutty.rendering.adapters.cookiecutter.extensions import JsonifyExtension
+from cutty.rendering.adapters.cookiecutter.extensions import RandomStringExtension
+from cutty.rendering.adapters.cookiecutter.extensions import SlugifyExtension
 
 
 CreateTemplate = Callable[..., jinja2.Template]

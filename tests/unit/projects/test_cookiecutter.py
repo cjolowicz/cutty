@@ -3,7 +3,7 @@ from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.projects.cookiecutter import findcookiecutterhooks
 from cutty.projects.cookiecutter import findcookiecutterpaths
-from cutty.templates.adapters.cookiecutter.render import CookiecutterConfig
+from cutty.rendering.adapters.cookiecutter.render import CookiecutterConfig
 from cutty.variables.domain.variables import Variable
 
 

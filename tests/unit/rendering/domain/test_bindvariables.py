@@ -1,8 +1,8 @@
-"""Unit tests for cutty.templates.domain.renderbind."""
+"""Unit tests for cutty.rendering.domain.renderbind."""
 import pytest
 
-from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.renderbind import renderbind
+from cutty.rendering.domain.render import Renderer
+from cutty.rendering.domain.renderbind import renderbind
 from cutty.variables.domain.binders import binddefault
 from cutty.variables.domain.binders import override
 from cutty.variables.domain.bindings import Binding

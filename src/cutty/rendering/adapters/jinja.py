@@ -12,7 +12,7 @@ from typing import Union
 import jinja2
 
 from cutty.filesystems.domain.path import Path
-from cutty.templates.domain.render import GenericRenderer
+from cutty.rendering.domain.render import GenericRenderer
 from cutty.util.reraise import reraise
 from cutty.variables.domain.bindings import Binding
 
@@ -80,7 +80,7 @@ def splitpath(pathstr: str) -> tuple[str, ...]:
     """
     # TODO: Add string parsing to PurePath?
     # TODO: Add common validation function?
-    # (see cutty.templates.domain.render.renderfiles)
+    # (see cutty.rendering.domain.render.renderfiles)
     import os
 
     parts = tuple(part for part in pathstr.split("/") if part and part != os.curdir)
