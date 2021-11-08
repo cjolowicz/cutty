@@ -1,8 +1,8 @@
-"""Unit tests for cutty.templates.domain.config."""
+"""Unit tests."""
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
-from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
-from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
+from cutty.projects.cookiecutter import findcookiecutterhooks
+from cutty.projects.cookiecutter import findcookiecutterpaths
 from cutty.templates.domain.config import Config
 from cutty.variables.domain.variables import Variable
 
