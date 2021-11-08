@@ -9,7 +9,7 @@ from binaryornot.helpers import is_binary_string
 from cutty.filestorage.domain.files import Executable
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.path import Path
-from cutty.rendering.adapters.cookiecutter.extensions import DEFAULT_EXTENSIONS
+from cutty.rendering.adapters.cookiecutterextensions import DEFAULT_EXTENSIONS
 from cutty.rendering.adapters.jinja import createjinjarenderer
 from cutty.rendering.domain.render import asrendercontinuation
 from cutty.rendering.domain.render import createrenderer
