@@ -15,9 +15,9 @@ from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
 from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
 from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.bindvariables import renderbind
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
+from cutty.templates.domain.renderbind import renderbind
 from cutty.templates.domain.renderfiles import renderfiles
 from cutty.variables.adapters.prompts import createprompt
 from cutty.variables.domain.binders import binddefault
