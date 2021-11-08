@@ -9,11 +9,11 @@ from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.projects.config import createprojectconfigfile
 from cutty.projects.config import ProjectConfig
+from cutty.projects.cookiecutter import findcookiecutterhooks
+from cutty.projects.cookiecutter import findcookiecutterpaths
+from cutty.projects.cookiecutter import loadcookiecutterconfig
 from cutty.projects.project import Project
 from cutty.projects.template import Template
-from cutty.templates.adapters.cookiecutter.config import findcookiecutterhooks
-from cutty.templates.adapters.cookiecutter.config import findcookiecutterpaths
-from cutty.templates.adapters.cookiecutter.config import loadcookiecutterconfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
 from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
