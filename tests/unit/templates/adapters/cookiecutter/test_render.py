@@ -8,8 +8,8 @@ from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.adapters.dict import DictFilesystem
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.templates.adapters.cookiecutter.render import CookiecutterConfig
 from cutty.templates.adapters.cookiecutter.render import createcookiecutterrenderer
-from cutty.templates.domain.config import Config
 from cutty.templates.domain.render import Renderer
 from cutty.variables.domain.bindings import Binding
 
@@ -20,7 +20,7 @@ def rendererfactory() -> Callable[..., Renderer]:
 
     def _create(**settings: Any) -> Renderer:
         searchpath = Path(filesystem=DictFilesystem({}))
-        config = Config(settings, ())
+        config = CookiecutterConfig(settings, ())
         return createcookiecutterrenderer(searchpath, config)
 
     return _create
