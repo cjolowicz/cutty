@@ -33,7 +33,7 @@ class ProjectGenerator:
 
     _template: Template.Metadata
     _config: CookiecutterConfig
-    renderer: Renderer
+    _renderer: Renderer
     _paths: Iterable[Path]
     _hooks: Iterable[Path]
 
@@ -52,7 +52,7 @@ class ProjectGenerator:
         """Bind the variables."""
         binder: Binder = createprompt() if interactive else binddefault
         binder = override(binder, bindings)
-        return renderbind(self.renderer, binder, self.variables)
+        return renderbind(self._renderer, binder, self.variables)
 
     @property
     def variables(self) -> Sequence[Variable]:
@@ -61,8 +61,8 @@ class ProjectGenerator:
 
     def generate(self, bindings: Sequence[Binding]) -> Project:
         """Generate a project using the given bindings."""
-        files = renderfiles(self._paths, self.renderer, bindings)
-        hooks = renderfiles(self._hooks, self.renderer, bindings)
+        files = renderfiles(self._paths, self._renderer, bindings)
+        hooks = renderfiles(self._hooks, self._renderer, bindings)
         return Project.create(self._template, files, hooks)
 
     def addconfig(self, project: Project, bindings: Sequence[Binding]) -> Project:
