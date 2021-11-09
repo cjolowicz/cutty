@@ -84,6 +84,19 @@ def test_continue_state_cleanup(repository: Repository, path: Path) -> None:
     assert repository.cherrypickhead is None
 
 
+def test_continue_untracked(repository: Repository, path: Path) -> None:
+    """It does not commit untracked files."""
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    untracked = repository.path / "untracked"
+    untracked.touch()
+
+    continue_(repository.path)
+
+    assert untracked.name not in repository.head.commit.tree
+
+
 def test_abort(repository: Repository, path: Path) -> None:
     """It uses our version."""
     createconflict(repository, path, ours="a", theirs="b")
