@@ -271,3 +271,20 @@ def test_abort(runcutty: RunCutty, templateproject: Path, project: Path) -> None
     runcutty("import", f"--cwd={project}", "--abort")
 
     assert (project / "LICENSE").read_text() == "a"
+
+
+def test_untracked_files(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It does not commit untracked files."""
+    untracked = project / "untracked-file"
+    untracked.touch()
+
+    # Update twice to produce a conflict in cutty.json.
+    updatefile(templateproject / "LICENSE")
+    updatefile(templateproject / "COPYING")
+
+    with chdir(project):
+        runcutty("import")
+
+    assert untracked.name not in tree(project)

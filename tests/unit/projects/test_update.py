@@ -1,5 +1,6 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -82,6 +83,36 @@ def test_continue_state_cleanup(repository: Repository, path: Path) -> None:
     continue_(repository.path)
 
     assert repository.cherrypickhead is None
+
+
+def test_continue_untracked(repository: Repository, path: Path) -> None:
+    """It does not commit untracked files."""
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    untracked = repository.path / "untracked"
+    untracked.touch()
+
+    continue_(repository.path)
+
+    assert untracked.name not in repository.head.commit.tree
+
+
+def test_continue_dirty(repository: Repository, paths: Iterator[Path]) -> None:
+    """It does not commit local modifications."""
+    dirty, path = next(paths), next(paths)
+
+    updatefile(dirty)
+
+    createconflict(repository, path, ours="a", theirs="b")
+    resolveconflicts(repository.path, path, Side.THEIRS)
+
+    dirty.write_text("local modification")
+
+    continue_(repository.path)
+
+    blob = repository.head.commit.tree / dirty.name
+    assert not blob.data
 
 
 def test_abort(repository: Repository, path: Path) -> None:
