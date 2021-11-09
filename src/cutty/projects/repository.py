@@ -149,6 +149,7 @@ class ProjectRepository:
             message=commit.message,
             author=commit.author,
             committer=self.project.default_signature,
+            stageallfiles=False,
         )
 
     def abort(self) -> None:
