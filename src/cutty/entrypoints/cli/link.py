@@ -7,7 +7,7 @@ import click
 from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.entrypoints.cli.errors import fatal
 from cutty.services.link import link as service_link
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 @click.command()

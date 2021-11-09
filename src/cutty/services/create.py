@@ -8,7 +8,7 @@ from cutty.projects.build import createproject
 from cutty.projects.config import ProjectConfig
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 def create(

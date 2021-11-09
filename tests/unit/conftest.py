@@ -1,10 +1,10 @@
 """Unit test fixtures for cutty."""
 import pytest
 
-from cutty.templates.domain.render import createrenderer
-from cutty.templates.domain.render import defaultrenderregistry
-from cutty.templates.domain.render import Renderer
-from cutty.templates.domain.variables import GenericVariable
+from cutty.rendering.domain.render import createrenderer
+from cutty.rendering.domain.render import defaultrenderregistry
+from cutty.rendering.domain.render import Renderer
+from cutty.variables.domain.variables import GenericVariable
 
 
 @pytest.fixture

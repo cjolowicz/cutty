@@ -9,7 +9,7 @@ from cutty.projects.config import ProjectConfig
 from cutty.projects.config import readprojectconfigfile
 from cutty.projects.messages import importcommitmessage
 from cutty.projects.repository import ProjectRepository
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 def import_(

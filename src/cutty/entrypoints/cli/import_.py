@@ -8,7 +8,7 @@ from cutty.entrypoints.cli.cookiecutter import extra_context_callback
 from cutty.entrypoints.cli.errors import fatal
 from cutty.projects.repository import ProjectRepository
 from cutty.services.import_ import import_ as service
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 @click.command("import")

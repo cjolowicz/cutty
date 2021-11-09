@@ -7,7 +7,7 @@ from typing import Sequence
 
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 PROJECT_CONFIG_FILE = "cutty.json"

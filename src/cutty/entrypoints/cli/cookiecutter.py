@@ -8,7 +8,7 @@ import click
 from cutty.entrypoints.cli.errors import fatal
 from cutty.filestorage.adapters.disk import FileExistsPolicy
 from cutty.services.cookiecutter import create
-from cutty.templates.domain.bindings import Binding
+from cutty.variables.domain.bindings import Binding
 
 
 def extra_context_callback(
