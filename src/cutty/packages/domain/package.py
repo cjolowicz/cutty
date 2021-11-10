@@ -16,7 +16,7 @@ class Package:
 
     name: str
     tree: Path
-    revision: Optional[Revision]
+    revision: Optional[Revision] = None
     commit: Optional[str] = None
     message: Optional[str] = None
     author: Optional[str] = None

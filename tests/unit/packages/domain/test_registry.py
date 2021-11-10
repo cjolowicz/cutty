@@ -123,7 +123,7 @@ def test_with_provider_specific_url(
 def test_unknown_provider_in_url_scheme(providerstore: ProviderStore, url: URL) -> None:
     """It invokes providers with the original scheme."""
     packagepath = Path(filesystem=DictFilesystem({}))
-    package = Package("example", packagepath, None)
+    package = Package("example", packagepath)
 
     factories = [ConstProviderFactory(constprovider("default", package))]
     registry = ProviderRegistry(providerstore, factories)
