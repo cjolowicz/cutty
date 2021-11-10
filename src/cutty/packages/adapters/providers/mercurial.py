@@ -32,11 +32,13 @@ class MercurialPackageRepository(DefaultPackageRepository):
 
     def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
         """Look up the commit metadata for the given revision."""
-        commit = self.getcommit(revision)
-        resolved_revision = self.getrevision(revision)
-        message = self.getmessage(revision)
-        author = self.getauthor(revision)
-        authoremail = self.getauthoremail(revision)
+        commit = self.getmetadata(revision, "node")
+        resolved_revision = self.getmetadata(
+            revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
+        )
+        message = self.getmetadata(revision, "desc")
+        author = self.getmetadata(revision, "author|person")
+        authoremail = self.getmetadata(revision, "author|email")
 
         return Commit.create(resolved_revision, commit, message, author, authoremail)
 
@@ -52,34 +54,12 @@ class MercurialPackageRepository(DefaultPackageRepository):
         )
         return result.stdout
 
-    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the commit identifier."""
-        return self.getmetadata(revision, "node")
-
-    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the package revision."""
-        return self.getmetadata(
-            revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
-        )
-
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
         if revision is None:
             revision = "."
 
         return self.getmetadata(f"p1({revision})", "node") or None
-
-    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit message."""
-        return self.getmetadata(revision, "desc")
-
-    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the name of the commit author."""
-        return self.getmetadata(revision, "author|person")
-
-    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the E-mail address of the commit author."""
-        return self.getmetadata(revision, "author|email")
 
 
 class MercurialRepositoryLoader(PackageRepositoryLoader):
