@@ -54,30 +54,11 @@ class Package:
 
     name: str
     tree: Path
-    _revision: Optional[Revision] = None
-    _commit: Optional[str] = None
-    _message: Optional[str] = None
-    _author: Optional[str] = None
-    _authoremail: Optional[str] = None
-
-    @property
-    def commit2(self) -> Optional[Commit]:
-        """Return the commit metadata."""
-        return Commit.create(
-            self._revision, self._commit, self._message, self._author, self._authoremail
-        )
+    commit2: Optional[Commit] = None
 
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
         tree = self.tree.joinpath(*directory.parts)
         tree = Path(filesystem=PathFilesystem(tree))
 
-        return Package(
-            directory.name,
-            tree,
-            self._revision,
-            self._commit,
-            self._message,
-            self._author,
-            self._authoremail,
-        )
+        return Package(directory.name, tree, self.commit2)

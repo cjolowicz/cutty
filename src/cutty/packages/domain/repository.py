@@ -10,6 +10,7 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.disk import DiskFilesystem
 from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.filesystems.domain.path import Path
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.package import Package
 from cutty.packages.domain.revisions import Revision
 
@@ -54,7 +55,9 @@ class DefaultPackageRepository(PackageRepository):
             tree = Path(filesystem=filesystem)
 
             yield Package(
-                self.name, tree, resolved_revision, commit, message, author, authoremail
+                self.name,
+                tree,
+                Commit.create(resolved_revision, commit, message, author, authoremail),
             )
 
     @contextmanager
