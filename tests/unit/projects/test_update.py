@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
 from cutty.projects.repository import ProjectRepository
@@ -162,11 +164,18 @@ def test_updateproject_commit_message_revision(
     project: Repository, template: Template.Metadata
 ) -> None:
     """It includes the template revision in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
+    commit = Commit(
+        "f4c0629d635865697b3e99b5ca581e78b2c7d976",
+        "v1.0.0",
+        "Release 1.0.0",
+        Author("You", "you@example.com"),
+    )
+    template = dataclasses.replace(template, commit2=commit)
 
     updateproject(project.path, template)
 
-    assert template.revision in project.head.commit.message
+    revision = None if template.commit2 is None else template.commit2.revision
+    assert revision in project.head.commit.message
 
 
 def test_updateproject_no_changes(

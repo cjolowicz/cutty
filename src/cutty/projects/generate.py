@@ -64,7 +64,11 @@ class ProjectGenerator:
         revision = (
             project.template.commit
             if project.template.commit is not None
-            else project.template.revision
+            else (
+                None
+                if project.template.commit2 is None
+                else project.template.commit2.revision
+            )
         )
         projectconfig = ProjectConfig(
             project.template.location,

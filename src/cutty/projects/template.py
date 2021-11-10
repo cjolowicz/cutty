@@ -16,7 +16,6 @@ from cutty.packages.adapters.storage import getdefaultproviderstore
 from cutty.packages.domain.package import Commit
 from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -82,11 +81,6 @@ class Template:
         directory: Optional[pathlib.Path]
         name: str
         commit2: Optional[Commit] = None
-
-        @property
-        def revision(self) -> Optional[Revision]:
-            """Return the revision."""
-            return None if self.commit2 is None else self.commit2.revision
 
         @property
         def commit(self) -> Optional[str]:
