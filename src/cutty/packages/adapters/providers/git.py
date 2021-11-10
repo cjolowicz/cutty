@@ -99,6 +99,13 @@ class GitPackageRepository(DefaultPackageRepository):
 
         return message
 
+    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit author."""
+        commit = self._lookup(revision)
+        author: str = commit.author.name
+
+        return author
+
 
 class GitRepositoryLoader(PackageRepositoryLoader):
     """Git repository loader."""
