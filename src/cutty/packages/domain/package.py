@@ -7,7 +7,6 @@ from typing import Optional
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.pathfs import PathFilesystem
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -26,26 +25,6 @@ class Commit:
     revision: str
     message: str
     author: Author
-
-    @classmethod
-    def create(
-        cls,
-        _revision: Optional[Revision] = None,
-        _commit: Optional[str] = None,
-        _message: Optional[str] = None,
-        _author: Optional[str] = None,
-        _authoremail: Optional[str] = None,
-    ) -> Optional[Commit]:
-        """Create a commit instance."""
-        if _commit is None:
-            return None
-
-        assert _revision is not None  # noqa: S101
-        assert _message is not None  # noqa: S101
-        assert _author is not None  # noqa: S101
-        assert _authoremail is not None  # noqa: S101
-
-        return cls(_commit, _revision, _message, Author(_author, _authoremail))
 
 
 @dataclass

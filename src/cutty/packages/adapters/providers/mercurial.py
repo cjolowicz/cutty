@@ -12,6 +12,7 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
+from cutty.packages.domain.package import Author
 from cutty.packages.domain.package import Commit
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
@@ -54,8 +55,11 @@ class MercurialPackageRepository(DefaultPackageRepository):
         text = self.getmetadata(revision, template)
         data = json.loads(text)
 
-        return Commit.create(
-            data["revision"], data["id"], data["message"], data["name"], data["email"]
+        return Commit(
+            data["id"],
+            data["revision"],
+            data["message"],
+            Author(data["name"], data["email"]),
         )
 
     def getmetadata(self, revision: Optional[Revision], template: str) -> str:

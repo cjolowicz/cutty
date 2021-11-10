@@ -59,13 +59,7 @@ class DefaultPackageRepository(PackageRepository):
 
     def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
         """Look up the commit metadata for the given revision."""
-        commit = None
-        resolved_revision = revision
-        message = None
-        author = None
-        authoremail = None
-
-        return Commit.create(resolved_revision, commit, message, author, authoremail)
+        return None
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
