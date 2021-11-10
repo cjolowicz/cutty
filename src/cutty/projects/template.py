@@ -13,6 +13,7 @@ from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.adapters.registry import defaultproviderfactories
 from cutty.packages.adapters.storage import getdefaultproviderstore
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -58,21 +59,9 @@ class TemplateRepository:
             if self.directory is not None:
                 package = package.descend(PurePath(*self.directory.parts))
 
-            if package.commit is None:
-                metadata = Template.Metadata(
-                    self.location, self.directory, package.name
-                )
-            else:
-                metadata = Template.Metadata(
-                    self.location,
-                    self.directory,
-                    package.name,
-                    package.commit.revision,
-                    package.commit.id,
-                    package.commit.message,
-                    package.commit.author.name,
-                    package.commit.author.email,
-                )
+            metadata = Template.Metadata(
+                self.location, self.directory, package.name, package.commit
+            )
 
             yield Template(metadata, package.tree)
 
@@ -92,11 +81,32 @@ class Template:
         location: str
         directory: Optional[pathlib.Path]
         name: str
-        revision: Optional[Revision] = None
-        commit: Optional[str] = None
-        message: Optional[str] = None
-        author: Optional[str] = None
-        authoremail: Optional[str] = None
+        commit2: Optional[Commit] = None
+
+        @property
+        def revision(self) -> Optional[Revision]:
+            """Return the revision."""
+            return None if self.commit2 is None else self.commit2.revision
+
+        @property
+        def commit(self) -> Optional[str]:
+            """Return the commit ID."""
+            return None if self.commit2 is None else self.commit2.id
+
+        @property
+        def message(self) -> Optional[str]:
+            """Return the commit message."""
+            return None if self.commit2 is None else self.commit2.message
+
+        @property
+        def author(self) -> Optional[str]:
+            """Return name of the author."""
+            return None if self.commit2 is None else self.commit2.author.name
+
+        @property
+        def authoremail(self) -> Optional[str]:
+            """Return email of the author."""
+            return None if self.commit2 is None else self.commit2.author.email
 
     metadata: Metadata
     root: Path
