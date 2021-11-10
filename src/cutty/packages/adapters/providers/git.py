@@ -51,10 +51,8 @@ class GitPackageRepository(DefaultPackageRepository):
         """Look up the commit metadata for the given revision."""
         commit = self._lookup(revision)
 
-        resolved_revision = self.getrevision(revision)
-
         return Commit.create(
-            resolved_revision,
+            self.describe(commit),
             str(commit.id),
             commit.message,
             commit.author.name,
@@ -71,9 +69,9 @@ class GitPackageRepository(DefaultPackageRepository):
         except KeyError:
             raise RevisionNotFoundError(revision)
 
-    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+    def describe(self, commit: pygit2.Commit) -> str:
         """Return the resolved revision."""
-        commit = self._lookup(revision)
+        revision: str
 
         try:
             revision = self.repository.describe(
