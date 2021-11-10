@@ -88,6 +88,7 @@ class Template:
         revision: Optional[Revision]
         commit: Optional[str] = None
         message: Optional[str] = None
+        author: Optional[str] = None
 
     metadata: Metadata
     root: Path
