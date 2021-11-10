@@ -90,6 +90,7 @@ class Template:
         commit: Optional[str] = None
         message: Optional[str] = None
         author: Optional[str] = None
+        authoremail: Optional[str] = None
 
     metadata: Metadata
     root: Path
