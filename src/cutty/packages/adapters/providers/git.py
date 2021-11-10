@@ -11,6 +11,7 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
@@ -45,6 +46,16 @@ class GitPackageRepository(DefaultPackageRepository):
             yield GitFilesystem(self.path, revision)
         else:
             yield GitFilesystem(self.path)
+
+    def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
+        """Look up the commit metadata for the given revision."""
+        commit = self.getcommit(revision)
+        resolved_revision = self.getrevision(revision)
+        message = self.getmessage(revision)
+        author = self.getauthor(revision)
+        authoremail = self.getauthoremail(revision)
+
+        return Commit.create(resolved_revision, commit, message, author, authoremail)
 
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""
