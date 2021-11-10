@@ -66,6 +66,7 @@ class TemplateRepository:
                 package.commit,
                 package.message,
                 package.author,
+                package.authoremail,
             )
 
             yield Template(metadata, package.tree)
