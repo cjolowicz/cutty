@@ -47,11 +47,15 @@ class DefaultPackageRepository(PackageRepository):
         commit = self.getcommit(revision)
         resolved_revision = self.getrevision(revision)
         message = self.getmessage(revision)
+        author = self.getauthor(revision)
+        authoremail = self.getauthoremail(revision)
 
         with self.mount(revision) as filesystem:
             tree = Path(filesystem=filesystem)
 
-            yield Package(self.name, tree, resolved_revision, commit, message)
+            yield Package(
+                self.name, tree, resolved_revision, commit, message, author, authoremail
+            )
 
     @contextmanager
     def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
@@ -72,4 +76,12 @@ class DefaultPackageRepository(PackageRepository):
 
     def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
         """Return the commit message."""
+        return None
+
+    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit author."""
+        return None
+
+    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit author email."""
         return None

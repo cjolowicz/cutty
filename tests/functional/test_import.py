@@ -181,6 +181,27 @@ def test_message(
     assert commit(template).message == commit(project).message
 
 
+def test_author(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It preserves author info from the imported changeset."""
+    repository = Repository.open(template)
+
+    path = templateproject / "marker"
+    path.touch()
+
+    expected = pygit2.Signature("The Author", "the.author@example.com")
+    repository.commit(message=f"Add {path.name}", author=expected)
+
+    with chdir(project):
+        runcutty("import")
+
+    author = commit(project).author
+
+    assert expected.name == author.name
+    assert expected.email == author.email
+
+
 def test_extra_context_old_variable(
     runcutty: RunCutty, templateproject: Path, project: Path
 ) -> None:

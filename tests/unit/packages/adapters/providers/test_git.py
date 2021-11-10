@@ -90,6 +90,17 @@ def test_local_revision_commit(url: URL) -> None:
         )
 
 
+def test_local_author(url: URL) -> None:
+    """It retrieves the author name and email."""
+    repository = localgitprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.author is not None
+        assert package.authoremail is not None
+
+
 @pytest.fixture
 def gitprovider(store: Store) -> Provider:
     """Fixture for a git provider."""
