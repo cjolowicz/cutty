@@ -11,6 +11,24 @@ from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
+class Author:
+    """The commit author."""
+
+    name: str
+    email: str
+
+
+@dataclass
+class Commit:
+    """A commit in a versioned repository."""
+
+    id: str
+    revision: str
+    message: str
+    author: Author
+
+
+@dataclass
 class Package:
     """A package."""
 
@@ -21,6 +39,24 @@ class Package:
     message: Optional[str] = None
     author: Optional[str] = None
     authoremail: Optional[str] = None
+
+    @property
+    def commit2(self) -> Optional[Commit]:
+        """Return the commit metadata."""
+        if self.commit is None:
+            return None
+
+        assert self.revision is not None  # noqa: S101
+        assert self.message is not None  # noqa: S101
+        assert self.author is not None  # noqa: S101
+        assert self.authoremail is not None  # noqa: S101
+
+        return Commit(
+            self.commit,
+            self.revision,
+            self.message,
+            Author(self.author, self.authoremail),
+        )
 
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
