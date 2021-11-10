@@ -87,7 +87,7 @@ class Template:
         location: str
         directory: Optional[pathlib.Path]
         name: str
-        revision: Optional[Revision]
+        revision: Optional[Revision] = None
         commit: Optional[str] = None
         message: Optional[str] = None
         author: Optional[str] = None
