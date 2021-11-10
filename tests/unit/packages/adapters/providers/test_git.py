@@ -73,7 +73,7 @@ def test_local_revision_tag(url: URL) -> None:
     assert repository is not None
 
     with repository.get("HEAD^") as package:
-        assert package.commit2 is not None and package.commit2.revision == "v1.0"
+        assert package.commit is not None and package.commit.revision == "v1.0"
 
 
 def test_local_revision_commit(url: URL) -> None:
@@ -84,9 +84,9 @@ def test_local_revision_commit(url: URL) -> None:
 
     with repository.get() as package:
         assert (
-            package.commit2 is not None
-            and len(package.commit2.revision) >= 7
-            and all(c in string.hexdigits for c in package.commit2.revision)
+            package.commit is not None
+            and len(package.commit.revision) >= 7
+            and all(c in string.hexdigits for c in package.commit.revision)
         )
 
 
@@ -97,9 +97,9 @@ def test_local_author(url: URL) -> None:
     assert repository is not None
 
     with repository.get() as package:
-        assert package.commit2 is not None
-        assert "You" == package.commit2.author.name
-        assert "you@example.com" == package.commit2.author.email
+        assert package.commit is not None
+        assert "You" == package.commit.author.name
+        assert "you@example.com" == package.commit.author.email
 
 
 @pytest.fixture
@@ -135,7 +135,7 @@ def test_remote_revision_tag(gitprovider: Provider, url: URL) -> None:
     assert repository is not None
 
     with repository.get("HEAD^") as package:
-        assert package.commit2 is not None and package.commit2.revision == "v1.0"
+        assert package.commit is not None and package.commit.revision == "v1.0"
 
 
 def test_remote_revision_commit(gitprovider: Provider, url: URL) -> None:
@@ -146,9 +146,9 @@ def test_remote_revision_commit(gitprovider: Provider, url: URL) -> None:
 
     with repository.get() as package:
         assert (
-            package.commit2 is not None
-            and len(package.commit2.revision) >= 7
-            and all(c in string.hexdigits for c in package.commit2.revision)
+            package.commit is not None
+            and len(package.commit.revision) >= 7
+            and all(c in string.hexdigits for c in package.commit.revision)
         )
 
 

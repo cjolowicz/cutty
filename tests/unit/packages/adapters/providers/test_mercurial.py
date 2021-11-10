@@ -85,8 +85,8 @@ def test_revision_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> No
     assert repository is not None
 
     with repository.get() as package:
-        assert package.commit2 is not None and is_mercurial_shorthash(
-            package.commit2.revision
+        assert package.commit is not None and is_mercurial_shorthash(
+            package.commit.revision
         )
 
 
@@ -97,7 +97,7 @@ def test_revision_tag(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     assert repository is not None
 
     with repository.get("tip~2") as package:
-        assert package.commit2 is not None and package.commit2.revision == "v1.0"
+        assert package.commit is not None and package.commit.revision == "v1.0"
 
 
 def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) -> None:
@@ -115,8 +115,8 @@ def test_revision_no_tags(hgprovider: Provider, hg: Hg, tmp_path: pathlib.Path) 
     assert repository is not None
 
     with repository.get() as package:
-        assert package.commit2 is not None and is_mercurial_shorthash(
-            package.commit2.revision
+        assert package.commit is not None and is_mercurial_shorthash(
+            package.commit.revision
         )
 
 
@@ -139,7 +139,7 @@ def test_revision_multiple_tags(
     assert repository is not None
 
     with repository.get("tip~2") as package:
-        assert package.commit2 is not None and package.commit2.revision == "tag1:tag2"
+        assert package.commit is not None and package.commit.revision == "tag1:tag2"
 
 
 def test_not_matching(hgprovider: Provider) -> None:
@@ -159,7 +159,7 @@ def test_update(hgrepository: pathlib.Path, store: Store) -> None:
         assert repository is not None
 
         with repository.get(revision) as package:
-            return package.commit2.revision if package.commit2 is not None else None
+            return package.commit.revision if package.commit is not None else None
 
     revision1 = fetchrevision("v1.0")
     revision2 = fetchrevision(None)
@@ -217,7 +217,7 @@ def test_commit(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     assert repository is not None
 
     with repository.get(None) as package:
-        assert package.commit2 is not None and is_mercurial_hash(package.commit2.id)
+        assert package.commit is not None and is_mercurial_hash(package.commit.id)
 
 
 def test_message(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
@@ -227,7 +227,7 @@ def test_message(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     assert repository is not None
 
     with repository.get(None) as package:
-        assert package.commit2 is not None and package.commit2.message
+        assert package.commit is not None and package.commit.message
 
 
 def test_author(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
@@ -237,6 +237,6 @@ def test_author(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     assert repository is not None
 
     with repository.get(None) as package:
-        assert package.commit2 is not None
-        assert "You" == package.commit2.author.name
-        assert "you@example.com" == package.commit2.author.email
+        assert package.commit is not None
+        assert "You" == package.commit.author.name
+        assert "you@example.com" == package.commit.author.email
