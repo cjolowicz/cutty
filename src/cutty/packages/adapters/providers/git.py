@@ -49,13 +49,16 @@ class GitPackageRepository(DefaultPackageRepository):
 
     def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
         """Look up the commit metadata for the given revision."""
-        commit = self.getcommit(revision)
+        commit = self._lookup(revision)
+
         resolved_revision = self.getrevision(revision)
         message = self.getmessage(revision)
         author = self.getauthor(revision)
         authoremail = self.getauthoremail(revision)
 
-        return Commit.create(resolved_revision, commit, message, author, authoremail)
+        return Commit.create(
+            resolved_revision, str(commit.id), message, author, authoremail
+        )
 
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""
@@ -66,12 +69,6 @@ class GitPackageRepository(DefaultPackageRepository):
             return self.repository.revparse_single(revision).peel(pygit2.Commit)
         except KeyError:
             raise RevisionNotFoundError(revision)
-
-    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the commit identifier."""
-        commit = self._lookup(revision)
-
-        return str(commit.id)
 
     def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the resolved revision."""
