@@ -52,12 +52,13 @@ class GitPackageRepository(DefaultPackageRepository):
         commit = self._lookup(revision)
 
         resolved_revision = self.getrevision(revision)
-        message = self.getmessage(revision)
-        author = self.getauthor(revision)
-        authoremail = self.getauthoremail(revision)
 
         return Commit.create(
-            resolved_revision, str(commit.id), message, author, authoremail
+            resolved_revision,
+            str(commit.id),
+            commit.message,
+            commit.author.name,
+            commit.author.email,
         )
 
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
@@ -99,27 +100,6 @@ class GitPackageRepository(DefaultPackageRepository):
             return str(parent.id)
 
         return None
-
-    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit message."""
-        commit = self._lookup(revision)
-        message: str = commit.message
-
-        return message
-
-    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author."""
-        commit = self._lookup(revision)
-        author: str = commit.author.name
-
-        return author
-
-    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author email."""
-        commit = self._lookup(revision)
-        email: str = commit.author.email
-
-        return email
 
 
 class GitRepositoryLoader(PackageRepositoryLoader):
