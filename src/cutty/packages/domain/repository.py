@@ -59,34 +59,14 @@ class DefaultPackageRepository(PackageRepository):
 
     def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
         """Look up the commit metadata for the given revision."""
-        commit = self.getcommit(revision)
-        resolved_revision = self.getrevision(revision)
-        message = self.getmessage(revision)
-        author = self.getauthor(revision)
-        authoremail = self.getauthoremail(revision)
+        commit = None
+        resolved_revision = revision
+        message = None
+        author = None
+        authoremail = None
 
         return Commit.create(resolved_revision, commit, message, author, authoremail)
-
-    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the commit identifier."""
-        return None
-
-    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the resolved revision."""
-        return revision
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
         raise ParentRevisionNotImplementedError(self.name)
-
-    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit message."""
-        return None
-
-    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author."""
-        return None
-
-    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author email."""
-        return None
