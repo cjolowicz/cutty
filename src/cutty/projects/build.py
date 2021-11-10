@@ -41,7 +41,9 @@ def commitproject(
         storeproject(project, builder.path)
 
         return builder.commit(
-            commitmessage(project.template), author=project.template.author
+            commitmessage(project.template),
+            author=project.template.author,
+            authoremail=project.template.authoremail,
         )
 
 
