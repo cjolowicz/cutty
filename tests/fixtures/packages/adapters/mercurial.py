@@ -10,6 +10,6 @@ from cutty.packages.adapters.fetchers.mercurial import HgNotFoundError
 def hg() -> Hg:
     """Fixture for a hg command."""
     try:
-        return findhg(env={"HGUSER": "you@example.com"})
+        return findhg(env={"HGUSER": "You <you@example.com>"})
     except HgNotFoundError:
         pytest.skip("cannot locate hg")
