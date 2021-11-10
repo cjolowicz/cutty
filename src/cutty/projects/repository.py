@@ -34,9 +34,15 @@ class ProjectBuilder:
         """Return the project directory."""
         return self._worktree.path
 
-    def commit(self, message: str) -> str:
+    def commit(self, message: str, author: Optional[str] = None) -> str:
         """Commit the project."""
-        self._worktree.commit(message=message)
+        signature = self._worktree.default_signature
+        if author is not None:
+            signature = pygit2.Signature(
+                author, signature.email, signature.time, signature.offset
+            )
+
+        self._worktree.commit(message=message, author=signature)
         return str(self._worktree.head.commit.id)
 
 
