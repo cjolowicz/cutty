@@ -27,6 +27,26 @@ class Commit:
     message: str
     author: Author
 
+    @classmethod
+    def create(
+        cls,
+        _revision: Optional[Revision] = None,
+        _commit: Optional[str] = None,
+        _message: Optional[str] = None,
+        _author: Optional[str] = None,
+        _authoremail: Optional[str] = None,
+    ) -> Optional[Commit]:
+        """Create a commit instance."""
+        if _commit is None:
+            return None
+
+        assert _revision is not None  # noqa: S101
+        assert _message is not None  # noqa: S101
+        assert _author is not None  # noqa: S101
+        assert _authoremail is not None  # noqa: S101
+
+        return cls(_commit, _revision, _message, Author(_author, _authoremail))
+
 
 @dataclass
 class Package:
@@ -43,19 +63,8 @@ class Package:
     @property
     def commit2(self) -> Optional[Commit]:
         """Return the commit metadata."""
-        if self._commit is None:
-            return None
-
-        assert self._revision is not None  # noqa: S101
-        assert self._message is not None  # noqa: S101
-        assert self._author is not None  # noqa: S101
-        assert self._authoremail is not None  # noqa: S101
-
-        return Commit(
-            self._commit,
-            self._revision,
-            self._message,
-            Author(self._author, self._authoremail),
+        return Commit.create(
+            self._revision, self._commit, self._message, self._author, self._authoremail
         )
 
     def descend(self, directory: PurePath) -> Package:
