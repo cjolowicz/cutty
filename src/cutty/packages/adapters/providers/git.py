@@ -106,6 +106,13 @@ class GitPackageRepository(DefaultPackageRepository):
 
         return author
 
+    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the commit author email."""
+        commit = self._lookup(revision)
+        email: str = commit.author.email
+
+        return email
+
 
 class GitRepositoryLoader(PackageRepositoryLoader):
     """Git repository loader."""
