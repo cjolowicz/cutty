@@ -1,6 +1,7 @@
 """Provider for Mercurial repositories."""
 import json
 import pathlib
+import subprocess  # noqa: S404
 import tempfile
 from collections.abc import Iterator
 from typing import Optional
@@ -20,14 +21,22 @@ from cutty.packages.domain.revisions import Revision
 class MercurialPackageRepository(DefaultPackageRepository):
     """Mercurial package repository."""
 
+    def __init__(self, name: str, path: pathlib.Path) -> None:
+        """Initialize."""
+        super().__init__(name, path)
+
+        self._hg = findhg()
+
+    def hg(self, *args: str) -> subprocess.CompletedProcess[str]:
+        """Invoke hg."""
+        return self._hg(*args, cwd=self.path)
+
     @contextmanager
     def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
         """Mount an archive of the revision as a disk filesystem."""
-        hg = findhg()
-
         with tempfile.TemporaryDirectory() as directory:
             options = ["--rev", revision] if revision is not None else []
-            hg("archive", *options, directory, cwd=self.path)
+            self.hg("archive", *options, directory)
 
             yield DiskFilesystem(pathlib.Path(directory))
 
@@ -51,14 +60,10 @@ class MercurialPackageRepository(DefaultPackageRepository):
 
     def getmetadata(self, revision: Optional[Revision], template: str) -> str:
         """Return commit metadata."""
-        hg = findhg()
-
         if revision is None:
             revision = "."
 
-        result = hg(
-            "log", f"--rev={revision}", f"--template={{{template}}}", cwd=self.path
-        )
+        result = self.hg("log", f"--rev={revision}", f"--template={{{template}}}")
         return result.stdout
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
