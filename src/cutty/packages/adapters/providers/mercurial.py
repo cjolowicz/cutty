@@ -10,6 +10,7 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -28,6 +29,16 @@ class MercurialPackageRepository(DefaultPackageRepository):
             hg("archive", *options, directory, cwd=self.path)
 
             yield DiskFilesystem(pathlib.Path(directory))
+
+    def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
+        """Look up the commit metadata for the given revision."""
+        commit = self.getcommit(revision)
+        resolved_revision = self.getrevision(revision)
+        message = self.getmessage(revision)
+        author = self.getauthor(revision)
+        authoremail = self.getauthoremail(revision)
+
+        return Commit.create(resolved_revision, commit, message, author, authoremail)
 
     def getmetadata(self, revision: Optional[Revision], template: str) -> Optional[str]:
         """Return commit metadata."""
