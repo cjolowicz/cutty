@@ -174,8 +174,7 @@ def test_updateproject_commit_message_revision(
 
     updateproject(project.path, template)
 
-    revision = None if template.commit2 is None else template.commit2.revision
-    assert revision in project.head.commit.message
+    assert template.commit2 and template.commit2.revision in project.head.commit.message
 
 
 def test_updateproject_no_changes(

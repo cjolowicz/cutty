@@ -110,8 +110,9 @@ def test_commit_message_revision(
     creategitrepository(project, template)
 
     repository = Repository.open(project)
-    revision = None if template.commit2 is None else template.commit2.revision
-    assert revision in repository.head.commit.message
+    assert (
+        template.commit2 and template.commit2.revision in repository.head.commit.message
+    )
 
 
 def test_existing_repository(

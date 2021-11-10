@@ -68,5 +68,6 @@ def test_linkproject_commit_message_revision(
 
     linkproject(repository, template)
 
-    revision = None if template.commit2 is None else template.commit2.revision
-    assert revision in repository.head.commit.message
+    assert (
+        template.commit2 and template.commit2.revision in repository.head.commit.message
+    )
