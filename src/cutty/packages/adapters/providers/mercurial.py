@@ -1,4 +1,5 @@
 """Provider for Mercurial repositories."""
+import json
 import pathlib
 import tempfile
 from collections.abc import Iterator
@@ -32,17 +33,23 @@ class MercurialPackageRepository(DefaultPackageRepository):
 
     def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
         """Look up the commit metadata for the given revision."""
-        commit = self.getmetadata(revision, "node")
-        resolved_revision = self.getmetadata(
-            revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
+        template = """
+        json(
+            dict(
+                id=node,
+                revision=ifeq(latesttagdistance, 0, join(latesttag, ":"), short(node)),
+                message=desc,
+                name=person(author),
+                email=email(author)))
+        """
+        text = self.getmetadata(revision, template)
+        data = json.loads(text)
+
+        return Commit.create(
+            data["revision"], data["id"], data["message"], data["name"], data["email"]
         )
-        message = self.getmetadata(revision, "desc")
-        author = self.getmetadata(revision, "author|person")
-        authoremail = self.getmetadata(revision, "author|email")
 
-        return Commit.create(resolved_revision, commit, message, author, authoremail)
-
-    def getmetadata(self, revision: Optional[Revision], template: str) -> Optional[str]:
+    def getmetadata(self, revision: Optional[Revision], template: str) -> str:
         """Return commit metadata."""
         hg = findhg()
 
