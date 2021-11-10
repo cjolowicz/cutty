@@ -224,3 +224,14 @@ def test_message(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
 
     with repository.get(None) as package:
         assert package.message is not None
+
+
+def test_author(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It returns the name and email of the commit author."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert repository is not None
+
+    with repository.get(None) as package:
+        assert "You" == package.author
+        assert "you@example.com" == package.authoremail
