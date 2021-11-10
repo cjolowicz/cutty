@@ -58,16 +58,21 @@ class TemplateRepository:
             if self.directory is not None:
                 package = package.descend(PurePath(*self.directory.parts))
 
-            metadata = Template.Metadata(
-                self.location,
-                self.directory,
-                package.name,
-                package.revision,
-                package.commit,
-                package.message,
-                package.author,
-                package.authoremail,
-            )
+            if package.commit2 is None:
+                metadata = Template.Metadata(
+                    self.location, self.directory, package.name
+                )
+            else:
+                metadata = Template.Metadata(
+                    self.location,
+                    self.directory,
+                    package.name,
+                    package.commit2.revision,
+                    package.commit2.id,
+                    package.commit2.message,
+                    package.commit2.author.name,
+                    package.commit2.author.email,
+                )
 
             yield Template(metadata, package.tree)
 
