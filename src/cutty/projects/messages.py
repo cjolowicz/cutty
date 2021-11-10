@@ -9,27 +9,24 @@ MessageBuilder = Callable[[Template.Metadata], str]
 
 def createcommitmessage(template: Template.Metadata) -> str:
     """Build the commit message for importing the project."""
-    revision = None if template.commit2 is None else template.commit2.revision
-    if revision:
-        return f"Import {template.name} {revision}"
+    if template.commit2:
+        return f"Import {template.name} {template.commit2.revision}"
     else:
         return f"Import {template.name}"
 
 
 def updatecommitmessage(template: Template.Metadata) -> str:
     """Build the commit message for updating the project."""
-    revision = None if template.commit2 is None else template.commit2.revision
-    if revision:
-        return f"Update {template.name} to {revision}"
+    if template.commit2:
+        return f"Update {template.name} to {template.commit2.revision}"
     else:
         return f"Update {template.name}"
 
 
 def linkcommitmessage(template: Template.Metadata) -> str:
     """Build the commit message for linking the project."""
-    revision = None if template.commit2 is None else template.commit2.revision
-    if revision:
-        return f"Link to {template.name} {revision}"
+    if template.commit2:
+        return f"Link to {template.name} {template.commit2.revision}"
     else:
         return f"Link to {template.name}"
 
