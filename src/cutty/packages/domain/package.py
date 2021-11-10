@@ -34,28 +34,28 @@ class Package:
 
     name: str
     tree: Path
-    revision: Optional[Revision] = None
-    commit: Optional[str] = None
-    message: Optional[str] = None
-    author: Optional[str] = None
-    authoremail: Optional[str] = None
+    _revision: Optional[Revision] = None
+    _commit: Optional[str] = None
+    _message: Optional[str] = None
+    _author: Optional[str] = None
+    _authoremail: Optional[str] = None
 
     @property
     def commit2(self) -> Optional[Commit]:
         """Return the commit metadata."""
-        if self.commit is None:
+        if self._commit is None:
             return None
 
-        assert self.revision is not None  # noqa: S101
-        assert self.message is not None  # noqa: S101
-        assert self.author is not None  # noqa: S101
-        assert self.authoremail is not None  # noqa: S101
+        assert self._revision is not None  # noqa: S101
+        assert self._message is not None  # noqa: S101
+        assert self._author is not None  # noqa: S101
+        assert self._authoremail is not None  # noqa: S101
 
         return Commit(
-            self.commit,
-            self.revision,
-            self.message,
-            Author(self.author, self.authoremail),
+            self._commit,
+            self._revision,
+            self._message,
+            Author(self._author, self._authoremail),
         )
 
     def descend(self, directory: PurePath) -> Package:
@@ -66,9 +66,9 @@ class Package:
         return Package(
             directory.name,
             tree,
-            self.revision,
-            self.commit,
-            self.message,
-            self.author,
-            self.authoremail,
+            self._revision,
+            self._commit,
+            self._message,
+            self._author,
+            self._authoremail,
         )
