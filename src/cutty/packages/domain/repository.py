@@ -45,25 +45,27 @@ class DefaultPackageRepository(PackageRepository):
     @contextmanager
     def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
         """Retrieve the package with the given revision."""
+        commit = self.lookup(revision)
+
+        with self.mount(revision) as filesystem:
+            tree = Path(filesystem=filesystem)
+
+            yield Package(self.name, tree, commit)
+
+    @contextmanager
+    def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
+        """Mount the package filesystem."""
+        yield DiskFilesystem(self.path)
+
+    def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
+        """Look up the commit metadata for the given revision."""
         commit = self.getcommit(revision)
         resolved_revision = self.getrevision(revision)
         message = self.getmessage(revision)
         author = self.getauthor(revision)
         authoremail = self.getauthoremail(revision)
 
-        with self.mount(revision) as filesystem:
-            tree = Path(filesystem=filesystem)
-
-            yield Package(
-                self.name,
-                tree,
-                Commit.create(resolved_revision, commit, message, author, authoremail),
-            )
-
-    @contextmanager
-    def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
-        """Mount the package filesystem."""
-        yield DiskFilesystem(self.path)
+        return Commit.create(resolved_revision, commit, message, author, authoremail)
 
     def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the commit identifier."""
