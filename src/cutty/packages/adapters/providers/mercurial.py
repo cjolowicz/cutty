@@ -62,6 +62,10 @@ class MercurialPackageRepository(DefaultPackageRepository):
         """Return the commit message."""
         return self.getmetadata(revision, "desc")
 
+    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
+        """Return the name of the commit author."""
+        return self.getmetadata(revision, "author|person")
+
 
 class MercurialRepositoryLoader(PackageRepositoryLoader):
     """Mercurial repository loader."""
