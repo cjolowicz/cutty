@@ -5,6 +5,7 @@ from typing import Optional
 from cutty.compat.contextlib import contextmanager
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
+from cutty.projects.messages import importcommitmessage
 from cutty.projects.messages import MessageBuilder
 from cutty.projects.project import Project
 from cutty.projects.repository import ProjectRepository
@@ -34,7 +35,7 @@ def commitproject(
     project: Project,
     *,
     parent: Optional[str] = None,
-    commitmessage: MessageBuilder,
+    commitmessage: Optional[MessageBuilder] = None,
 ) -> str:
     """Build the project, returning the commit ID."""
     with repository.build(parent=parent) as builder:
@@ -42,7 +43,12 @@ def commitproject(
 
         author = project.template.commit.author if project.template.commit else None
 
-        return builder.commit(commitmessage(project.template), author=author)
+        if commitmessage is not None:
+            message = commitmessage(project.template)
+        else:
+            message = importcommitmessage(project.template)
+
+        return builder.commit(message, author=author)
 
 
 def buildproject(
