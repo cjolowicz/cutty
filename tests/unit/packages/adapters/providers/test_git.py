@@ -7,7 +7,6 @@ import pytest
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.adapters.providers.git import asdatetime
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
 from cutty.packages.domain.locations import aspath
@@ -15,6 +14,7 @@ from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 from cutty.util.git import Repository
+from cutty.util.time import asdatetime
 from tests.util.git import updatefile
 
 

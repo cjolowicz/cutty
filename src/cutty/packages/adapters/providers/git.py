@@ -1,5 +1,4 @@
 """Providers for git repositories."""
-import datetime
 import pathlib
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -19,14 +18,7 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
-
-
-def asdatetime(timestamp: int, *, offset: int) -> datetime.datetime:
-    """Build a `datetime` instance from a POSIX timestamp."""
-    return datetime.datetime.fromtimestamp(
-        timestamp,
-        tz=datetime.timezone(offset=datetime.timedelta(minutes=offset)),
-    )
+from cutty.util.time import asdatetime
 
 
 @dataclass
