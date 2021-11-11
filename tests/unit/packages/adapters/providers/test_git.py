@@ -1,4 +1,5 @@
 """Unit tests for cutty.packages.adapters.providers.git."""
+import datetime
 import pathlib
 import string
 from typing import Optional
@@ -9,6 +10,7 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
+from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
@@ -101,13 +103,18 @@ def test_local_author(url: URL) -> None:
 
 def test_local_date(url: URL) -> None:
     """It retrieves the commit date."""
+    commit = Repository.open(aspath(url)).head.commit
+    commitdate = datetime.datetime.fromtimestamp(
+        commit.author.time,
+        tz=datetime.timezone(offset=datetime.timedelta(minutes=commit.author.offset)),
+    )
+
     repository = localgitprovider.provide(url)
 
     assert repository is not None
 
     with repository.get() as package:
-        assert package.commit is not None
-        assert package.commit.date
+        assert package.commit is not None and commitdate == package.commit.date
 
 
 @pytest.fixture
