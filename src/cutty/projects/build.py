@@ -49,9 +49,9 @@ def commitproject(
         else:
             if project.template.commit:
                 message = project.template.commit.message
+                author = project.template.commit.author
             else:  # pragma: no cover
                 message = updatecommitmessage(project.template)
-            author = project.template.commit.author if project.template.commit else None
 
         return builder.commit(message, author=author)
 
