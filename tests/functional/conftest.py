@@ -1,6 +1,7 @@
 """Fixtures for functional tests."""
 import json
 from collections.abc import Iterator
+from collections.abc import Mapping
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional
@@ -39,7 +40,12 @@ def runner() -> Iterator[CliRunner]:
 class RunCutty(Protocol):
     """Invoke the cutty CLI."""
 
-    def __call__(self, *args: str, input: Optional[str] = None) -> str:
+    def __call__(
+        self,
+        *args: str,
+        input: Optional[str] = ...,
+        env: Optional[Mapping[str, str]] = ...
+    ) -> str:
         """Invoke the cutty CLI."""
 
 
@@ -51,11 +57,13 @@ class RunCuttyError(Exception):
 def runcutty(runner: CliRunner, pipeinput: PipeInput) -> RunCutty:
     """Fixture for invoking the cutty CLI."""
 
-    def _run(*args: str, input: Optional[str] = None) -> str:
+    def _run(
+        *args: str, input: Optional[str] = None, env: Optional[Mapping[str, str]] = None
+    ) -> str:
         if input is not None:
             pipeinput.send_text(input)
 
-        result = runner.invoke(main, args, catch_exceptions=False)
+        result = runner.invoke(main, args, env=env, catch_exceptions=False)
 
         if result.exit_code != 0:
             raise RunCuttyError(result.output or str(result.exit_code))
