@@ -61,8 +61,11 @@ class GitPackageRepository(DefaultPackageRepository):
         """Look up the commit metadata for the given revision."""
         commit = self._lookup(revision)
         author = Author(commit.author.name, commit.author.email)
+        date = getcommitdate(commit)
 
-        return Commit(str(commit.id), self.describe(commit), commit.message, author)
+        return Commit(
+            str(commit.id), self.describe(commit), commit.message, author, date
+        )
 
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""
