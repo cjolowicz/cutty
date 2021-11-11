@@ -3,7 +3,6 @@ import pathlib
 import string
 from typing import Optional
 
-import pygit2
 import pytest
 from yarl import URL
 
@@ -15,8 +14,6 @@ from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 from cutty.util.git import Repository
 from tests.util.git import updatefile
-
-signature = pygit2.Signature("you", "you@example.com")
 
 
 @pytest.fixture
