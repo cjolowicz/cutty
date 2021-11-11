@@ -1,4 +1,5 @@
 """Provider for Mercurial repositories."""
+import datetime
 import json
 import pathlib
 import subprocess  # noqa: S404
@@ -50,7 +51,8 @@ class MercurialPackageRepository(DefaultPackageRepository):
                 revision=ifeq(latesttagdistance, 0, join(latesttag, ":"), short(node)),
                 message=desc,
                 name=person(author),
-                email=email(author)))
+                email=email(author),
+                date=date(date, "%Y-%m-%dT%H:%M:%S%z")))
         """
         text = self.getmetadata(revision, template)
         data = json.loads(text)
@@ -60,6 +62,7 @@ class MercurialPackageRepository(DefaultPackageRepository):
             data["revision"],
             data["message"],
             Author(data["name"], data["email"]),
+            datetime.datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S%z"),
         )
 
     def getmetadata(self, revision: Optional[Revision], template: str) -> str:
