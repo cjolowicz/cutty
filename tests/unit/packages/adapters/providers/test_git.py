@@ -3,20 +3,19 @@ import pathlib
 import string
 from typing import Optional
 
-import pygit2
 import pytest
 from yarl import URL
 
 from cutty.errors import CuttyError
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
+from cutty.packages.domain.locations import aspath
 from cutty.packages.domain.locations import asurl
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 from cutty.util.git import Repository
+from cutty.util.time import asdatetime
 from tests.util.git import updatefile
-
-signature = pygit2.Signature("you", "you@example.com")
 
 
 @pytest.fixture
@@ -100,6 +99,19 @@ def test_local_author(url: URL) -> None:
         assert package.commit is not None
         assert "You" == package.commit.author.name
         assert "you@example.com" == package.commit.author.email
+
+
+def test_local_date(url: URL) -> None:
+    """It retrieves the commit date."""
+    commit = Repository.open(aspath(url)).head.commit
+    commitdate = asdatetime(commit.author.time, offset=commit.author.offset)
+
+    repository = localgitprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.commit is not None and commitdate == package.commit.date
 
 
 @pytest.fixture

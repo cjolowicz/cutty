@@ -1,4 +1,5 @@
 """Functional tests for `cutty import`."""
+import datetime
 from pathlib import Path
 
 import pygit2
@@ -6,6 +7,7 @@ import pytest
 
 from cutty.projects.config import readprojectconfigfile
 from cutty.util.git import Repository
+from cutty.util.time import asdatetime
 from tests.functional.conftest import RunCutty
 from tests.util.files import chdir
 from tests.util.git import move_repository_files_to_subdirectory
@@ -200,6 +202,31 @@ def test_author(
 
     assert expected.name == author.name
     assert expected.email == author.email
+
+
+def test_date(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It preserves the date from the imported changeset."""
+    repository = Repository.open(template)
+
+    path = templateproject / "marker"
+    path.touch()
+
+    expected = datetime.datetime(2021, 1, 1, tzinfo=datetime.timezone.utc)
+    author = pygit2.Signature(
+        "The Author", "the.author@example.com", int(expected.timestamp())
+    )
+
+    repository.commit(message=f"Add {path.name}", author=author)
+
+    with chdir(project):
+        runcutty("import")
+
+    author = commit(project).author
+    actual = asdatetime(author.time, offset=author.offset)
+
+    assert expected == actual
 
 
 def test_extra_context_old_variable(

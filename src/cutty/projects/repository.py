@@ -1,6 +1,7 @@
 """Project repositories."""
 from __future__ import annotations
 
+import datetime
 from collections.abc import Iterable
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -35,12 +36,21 @@ class ProjectBuilder:
         """Return the project directory."""
         return self._worktree.path
 
-    def commit(self, message: str, author: Optional[Author] = None) -> str:
+    def commit(
+        self,
+        message: str,
+        author: Optional[Author] = None,
+        date: Optional[datetime.datetime] = None,
+    ) -> str:
         """Commit the project."""
         signature = self._worktree.default_signature
         if author is not None:
             signature = pygit2.Signature(
                 author.name, author.email, signature.time, signature.offset
+            )
+        if date is not None:
+            signature = pygit2.Signature(
+                signature.name, signature.email, int(date.timestamp()), 0
             )
 
         self._worktree.commit(message=message, author=signature)

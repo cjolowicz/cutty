@@ -18,6 +18,7 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
+from cutty.util.time import asdatetime
 
 
 @dataclass
@@ -52,8 +53,11 @@ class GitPackageRepository(DefaultPackageRepository):
         """Look up the commit metadata for the given revision."""
         commit = self._lookup(revision)
         author = Author(commit.author.name, commit.author.email)
+        date = asdatetime(commit.author.time, offset=commit.author.offset)
 
-        return Commit(str(commit.id), self.describe(commit), commit.message, author)
+        return Commit(
+            str(commit.id), self.describe(commit), commit.message, author, date
+        )
 
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""

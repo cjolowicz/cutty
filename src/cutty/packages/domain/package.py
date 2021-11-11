@@ -1,6 +1,7 @@
 """Package."""
 from __future__ import annotations
 
+import datetime
 from dataclasses import dataclass
 from typing import Optional
 
@@ -25,6 +26,7 @@ class Commit:
     revision: str
     message: str
     author: Author
+    date: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
 
 
 @dataclass

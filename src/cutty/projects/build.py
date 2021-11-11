@@ -1,4 +1,5 @@
 """Building projects in a repository."""
+import datetime
 from collections.abc import Iterator
 from typing import Optional
 
@@ -42,18 +43,20 @@ def commitproject(
         storeproject(project, builder.path)
 
         author: Optional[Author] = None
+        date: Optional[datetime.datetime] = None
 
         if commitmessage is not None:
             message = commitmessage(project.template)
         elif project.template.commit:
             message = project.template.commit.message
             author = project.template.commit.author
+            date = project.template.commit.date
         else:  # pragma: no cover
             # The `commitmessage` is only None when importing, and imports are only
             # possible when there's a `template.commit`. So this should be unreachable.
             message = f"Import {project.template.name}"
 
-        return builder.commit(message, author=author)
+        return builder.commit(message, author=author, date=date)
 
 
 def buildproject(
