@@ -25,14 +25,14 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     project = ProjectRepository(projectdir)
 
     with project.build() as builder:
-        commit = builder.commit(createcommitmessage(template))
+        parent = builder.commit(createcommitmessage(template))
 
-    with project.build(parent=commit) as builder:
+    with project.build(parent=parent) as builder:
         (builder.path / "cutty.json").touch()
-        commit2 = builder.commit(updatecommitmessage(template))
+        commit = builder.commit(updatecommitmessage(template))
 
-    if commit2 != commit:
-        project.import_(commit2)
+    if commit != parent:
+        project.import_(commit)
 
 
 def continue_(projectdir: Path) -> None:
@@ -186,12 +186,12 @@ def test_updateproject_no_changes(
     repository = ProjectRepository(project.path)
 
     with repository.build() as builder:
-        commit = builder.commit(createcommitmessage(template))
+        parent = builder.commit(createcommitmessage(template))
 
-    with repository.build(parent=commit) as builder:
-        commit2 = builder.commit(updatecommitmessage(template))
+    with repository.build(parent=parent) as builder:
+        commit = builder.commit(updatecommitmessage(template))
 
-    if commit2 != commit:
-        repository.import_(commit2)
+    if commit != parent:
+        repository.import_(commit)
 
     assert tip == project.head.commit
