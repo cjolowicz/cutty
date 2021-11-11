@@ -42,8 +42,12 @@ def commitproject(
 
         return builder.commit(
             commitmessage(project.template),
-            author=project.template.author,
-            authoremail=project.template.authoremail,
+            author=project.template.commit2.author.name
+            if project.template.commit2
+            else None,
+            authoremail=project.template.commit2.author.email
+            if project.template.commit2
+            else None,
         )
 
 

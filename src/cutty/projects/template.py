@@ -82,15 +82,5 @@ class Template:
         name: str
         commit2: Optional[Commit] = None
 
-        @property
-        def author(self) -> Optional[str]:
-            """Return name of the author."""
-            return None if self.commit2 is None else self.commit2.author.name
-
-        @property
-        def authoremail(self) -> Optional[str]:
-            """Return email of the author."""
-            return None if self.commit2 is None else self.commit2.author.email
-
     metadata: Metadata
     root: Path
