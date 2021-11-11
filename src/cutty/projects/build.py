@@ -49,7 +49,7 @@ def commitproject(
             message = project.template.commit.message
             author = project.template.commit.author
         else:  # pragma: no cover
-            message = f"Update {project.template.name}"
+            message = f"Import {project.template.name}"
 
         return builder.commit(message, author=author)
 
