@@ -7,7 +7,6 @@ from cutty.packages.domain.package import Author
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
 from cutty.projects.messages import MessageBuilder
-from cutty.projects.messages import updatecommitmessage
 from cutty.projects.project import Project
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -50,7 +49,7 @@ def commitproject(
             message = project.template.commit.message
             author = project.template.commit.author
         else:  # pragma: no cover
-            message = updatecommitmessage(project.template)
+            message = f"Update {project.template.name}"
 
         return builder.commit(message, author=author)
 
