@@ -1,4 +1,5 @@
 """Unit tests for cutty.packages.adapters.providers.mercurial."""
+import datetime
 import pathlib
 import string
 from typing import Optional
@@ -9,6 +10,7 @@ from yarl import URL
 from cutty.errors import CuttyError
 from cutty.packages.adapters.fetchers.mercurial import Hg
 from cutty.packages.adapters.providers.mercurial import hgproviderfactory
+from cutty.packages.adapters.providers.mercurial import MercurialPackageRepository
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
@@ -240,3 +242,18 @@ def test_author(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
         assert package.commit is not None
         assert "You" == package.commit.author.name
         assert "you@example.com" == package.commit.author.email
+
+
+def test_local_date(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
+    """It retrieves the commit date."""
+    repository = hgprovider.provide(hgrepository)
+
+    assert isinstance(repository, MercurialPackageRepository)
+
+    expected = datetime.datetime.strptime(
+        repository.getmetadata(None, 'date(date, "%Y-%m-%dT%H:%M:%S%z")'),
+        "%Y-%m-%dT%H:%M:%S%z",
+    )
+
+    with repository.get() as package:
+        assert package.commit is not None and expected == package.commit.date
