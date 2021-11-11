@@ -83,11 +83,6 @@ class Template:
         commit2: Optional[Commit] = None
 
         @property
-        def commit(self) -> Optional[str]:
-            """Return the commit ID."""
-            return None if self.commit2 is None else self.commit2.id
-
-        @property
         def message(self) -> Optional[str]:
             """Return the commit message."""
             return None if self.commit2 is None else self.commit2.message
