@@ -7,7 +7,7 @@ import pytest
 from yarl import URL
 
 from cutty.errors import CuttyError
-from cutty.packages.adapters.providers.git import getcommitdate
+from cutty.packages.adapters.providers.git import asdatetime
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
 from cutty.packages.domain.locations import aspath
@@ -104,7 +104,7 @@ def test_local_author(url: URL) -> None:
 def test_local_date(url: URL) -> None:
     """It retrieves the commit date."""
     commit = Repository.open(aspath(url)).head.commit
-    commitdate = getcommitdate(commit)
+    commitdate = asdatetime(commit.author.time, offset=commit.author.offset)
 
     repository = localgitprovider.provide(url)
 

@@ -21,11 +21,11 @@ from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
 
 
-def getcommitdate(commit: pygit2.Commit) -> datetime.datetime:
-    """Return the commit date as a `datetime` instance."""
+def asdatetime(timestamp: int, *, offset: int) -> datetime.datetime:
+    """Build a `datetime` instance from a POSIX timestamp."""
     return datetime.datetime.fromtimestamp(
-        commit.author.time,
-        tz=datetime.timezone(offset=datetime.timedelta(minutes=commit.author.offset)),
+        timestamp,
+        tz=datetime.timezone(offset=datetime.timedelta(minutes=offset)),
     )
 
 
@@ -61,7 +61,7 @@ class GitPackageRepository(DefaultPackageRepository):
         """Look up the commit metadata for the given revision."""
         commit = self._lookup(revision)
         author = Author(commit.author.name, commit.author.email)
-        date = getcommitdate(commit)
+        date = asdatetime(commit.author.time, offset=commit.author.offset)
 
         return Commit(
             str(commit.id), self.describe(commit), commit.message, author, date
