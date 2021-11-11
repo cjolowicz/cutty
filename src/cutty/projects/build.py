@@ -72,7 +72,6 @@ def buildparentproject(
     *,
     revision: Optional[str],
     interactive: bool,
-    commitmessage: MessageBuilder,
 ) -> Optional[str]:
     """Build the project for the parent revision."""
     provider = TemplateProvider.create()
@@ -81,6 +80,6 @@ def buildparentproject(
     if parentrevision := templates.getparentrevision(revision):
         with templates.get(parentrevision) as template:
             project = generate(template, config.bindings, interactive=interactive)
-            return commitproject(repository, project, commitmessage=commitmessage)
+            return commitproject(repository, project)
 
     return None
