@@ -57,7 +57,7 @@ def buildproject(
     *,
     interactive: bool,
     parent: Optional[str] = None,
-    commitmessage: MessageBuilder,
+    commitmessage: Optional[MessageBuilder] = None,
 ) -> str:
     """Build the project, returning the commit ID."""
     with createproject(config, interactive=interactive) as project:
