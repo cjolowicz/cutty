@@ -40,13 +40,7 @@ def import_(
         commitmessage=importcommitmessage,
     )
 
-    commit = buildproject(
-        repository,
-        config2,
-        interactive=interactive,
-        commitmessage=importcommitmessage,
-        parent=parent,
-    )
+    commit = buildproject(repository, config2, interactive=interactive, parent=parent)
 
     # If `commit` and `parent` are identical then so is the template revision
     # stored in their cutty.json. But for the version control systems we
