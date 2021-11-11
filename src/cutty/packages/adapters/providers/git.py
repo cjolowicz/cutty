@@ -1,4 +1,5 @@
 """Providers for git repositories."""
+import datetime
 import pathlib
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -18,6 +19,14 @@ from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.repository import PackageRepository
 from cutty.packages.domain.revisions import Revision
+
+
+def getcommitdate(commit: pygit2.Commit) -> datetime.datetime:
+    """Return the commit date as a `datetime` instance."""
+    return datetime.datetime.fromtimestamp(
+        commit.author.time,
+        tz=datetime.timezone(offset=datetime.timedelta(minutes=commit.author.offset)),
+    )
 
 
 @dataclass

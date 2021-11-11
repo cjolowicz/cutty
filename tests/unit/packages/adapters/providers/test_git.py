@@ -1,14 +1,13 @@
 """Unit tests for cutty.packages.adapters.providers.git."""
-import datetime
 import pathlib
 import string
 from typing import Optional
 
-import pygit2
 import pytest
 from yarl import URL
 
 from cutty.errors import CuttyError
+from cutty.packages.adapters.providers.git import getcommitdate
 from cutty.packages.adapters.providers.git import gitproviderfactory
 from cutty.packages.adapters.providers.git import localgitprovider
 from cutty.packages.domain.locations import aspath
@@ -100,14 +99,6 @@ def test_local_author(url: URL) -> None:
         assert package.commit is not None
         assert "You" == package.commit.author.name
         assert "you@example.com" == package.commit.author.email
-
-
-def getcommitdate(commit: pygit2.Commit) -> datetime.datetime:
-    """Return the commit date as a `datetime` instance."""
-    return datetime.datetime.fromtimestamp(
-        commit.author.time,
-        tz=datetime.timezone(offset=datetime.timedelta(minutes=commit.author.offset)),
-    )
 
 
 def test_local_date(url: URL) -> None:
