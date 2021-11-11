@@ -4,6 +4,7 @@ import pathlib
 import string
 from typing import Optional
 
+import pygit2
 import pytest
 from yarl import URL
 
@@ -101,13 +102,18 @@ def test_local_author(url: URL) -> None:
         assert "you@example.com" == package.commit.author.email
 
 
-def test_local_date(url: URL) -> None:
-    """It retrieves the commit date."""
-    commit = Repository.open(aspath(url)).head.commit
-    commitdate = datetime.datetime.fromtimestamp(
+def getcommitdate(commit: pygit2.Commit) -> datetime.datetime:
+    """Return the commit date as a `datetime` instance."""
+    return datetime.datetime.fromtimestamp(
         commit.author.time,
         tz=datetime.timezone(offset=datetime.timedelta(minutes=commit.author.offset)),
     )
+
+
+def test_local_date(url: URL) -> None:
+    """It retrieves the commit date."""
+    commit = Repository.open(aspath(url)).head.commit
+    commitdate = getcommitdate(commit)
 
     repository = localgitprovider.provide(url)
 
