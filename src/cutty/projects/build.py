@@ -6,8 +6,8 @@ from cutty.compat.contextlib import contextmanager
 from cutty.packages.domain.package import Author
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
-from cutty.projects.messages import importcommitmessage
 from cutty.projects.messages import MessageBuilder
+from cutty.projects.messages import updatecommitmessage
 from cutty.projects.project import Project
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
@@ -47,7 +47,10 @@ def commitproject(
         if commitmessage is not None:
             message = commitmessage(project.template)
         else:
-            message = importcommitmessage(project.template)
+            if project.template.commit:
+                message = project.template.commit.message
+            else:  # pragma: no cover
+                message = updatecommitmessage(project.template)
             author = project.template.commit.author if project.template.commit else None
 
         return builder.commit(message, author=author)
