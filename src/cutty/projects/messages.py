@@ -33,7 +33,7 @@ def linkcommitmessage(template: Template.Metadata) -> str:
 
 def importcommitmessage(template: Template.Metadata) -> str:
     """Build the commit message for importing a template commit."""
-    if template.message:
-        return template.message
+    if template.commit2:
+        return template.commit2.message
     else:  # pragma: no cover
         return updatecommitmessage(template)
