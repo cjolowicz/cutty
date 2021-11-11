@@ -99,6 +99,17 @@ def test_local_author(url: URL) -> None:
         assert "you@example.com" == package.commit.author.email
 
 
+def test_local_date(url: URL) -> None:
+    """It retrieves the commit date."""
+    repository = localgitprovider.provide(url)
+
+    assert repository is not None
+
+    with repository.get() as package:
+        assert package.commit is not None
+        assert package.commit.date
+
+
 @pytest.fixture
 def gitprovider(store: Store) -> Provider:
     """Fixture for a git provider."""
