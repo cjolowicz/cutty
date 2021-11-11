@@ -46,12 +46,11 @@ def commitproject(
 
         if commitmessage is not None:
             message = commitmessage(project.template)
-        else:
-            if project.template.commit:
-                message = project.template.commit.message
-                author = project.template.commit.author
-            else:  # pragma: no cover
-                message = updatecommitmessage(project.template)
+        elif project.template.commit:
+            message = project.template.commit.message
+            author = project.template.commit.author
+        else:  # pragma: no cover
+            message = updatecommitmessage(project.template)
 
         return builder.commit(message, author=author)
 
