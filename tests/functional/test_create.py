@@ -234,3 +234,18 @@ def test_commit_hash(runcutty: RunCutty, template: Path) -> None:
         and len(revision) == 40
         and all(c in string.hexdigits for c in revision)
     )
+
+
+def test_author(runcutty: RunCutty, template: Path) -> None:
+    """It does not copy author metadata from the template."""
+    env = {
+        "GIT_AUTHOR_NAME": "The project author",
+        "GIT_AUTHOR_EMAIL": "the.project.author@example.com",
+    }
+
+    runcutty("create", "--non-interactive", str(template), env=env)
+
+    author = Repository.open(Path("example")).head.commit.author
+
+    assert env["GIT_AUTHOR_NAME"] == author.name
+    assert env["GIT_AUTHOR_EMAIL"] == author.email
