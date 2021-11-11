@@ -49,6 +49,8 @@ def commitproject(
             message = project.template.commit.message
             author = project.template.commit.author
         else:  # pragma: no cover
+            # The `commitmessage` is only None when importing, and imports are only
+            # possible when there's a `template.commit`. So this should be unreachable.
             message = f"Import {project.template.name}"
 
         return builder.commit(message, author=author)
