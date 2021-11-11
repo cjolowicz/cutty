@@ -105,13 +105,13 @@ def test_commit_message_revision(
         "Release 1.0.0",
         Author("You", "you@example.com"),
     )
-    template = dataclasses.replace(template, commit2=commit)
+    template = dataclasses.replace(template, commit=commit)
 
     creategitrepository(project, template)
 
     repository = Repository.open(project)
     assert (
-        template.commit2 and template.commit2.revision in repository.head.commit.message
+        template.commit and template.commit.revision in repository.head.commit.message
     )
 
 

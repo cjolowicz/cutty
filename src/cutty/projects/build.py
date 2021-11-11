@@ -42,9 +42,7 @@ def commitproject(
 
         return builder.commit(
             commitmessage(project.template),
-            author=project.template.commit2.author
-            if project.template.commit2
-            else None,
+            author=project.template.commit.author if project.template.commit else None,
         )
 
 

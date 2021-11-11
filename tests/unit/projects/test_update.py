@@ -170,11 +170,11 @@ def test_updateproject_commit_message_revision(
         "Release 1.0.0",
         Author("You", "you@example.com"),
     )
-    template = dataclasses.replace(template, commit2=commit)
+    template = dataclasses.replace(template, commit=commit)
 
     updateproject(project.path, template)
 
-    assert template.commit2 and template.commit2.revision in project.head.commit.message
+    assert template.commit and template.commit.revision in project.head.commit.message
 
 
 def test_updateproject_no_changes(

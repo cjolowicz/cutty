@@ -80,7 +80,7 @@ class Template:
         location: str
         directory: Optional[pathlib.Path]
         name: str
-        commit2: Optional[Commit] = None
+        commit: Optional[Commit] = None
 
     metadata: Metadata
     root: Path
