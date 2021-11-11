@@ -40,11 +40,9 @@ def commitproject(
     with repository.build(parent=parent) as builder:
         storeproject(project, builder.path)
 
-        return builder.commit(
-            commitmessage(project.template),
-            author=project.template.author,
-            authoremail=project.template.authoremail,
-        )
+        author = project.template.commit.author if project.template.commit else None
+
+        return builder.commit(commitmessage(project.template), author=author)
 
 
 def buildproject(

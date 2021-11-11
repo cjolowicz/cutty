@@ -2,6 +2,8 @@
 import dataclasses
 from pathlib import Path
 
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.projects.config import PROJECT_CONFIG_FILE
 from cutty.projects.messages import linkcommitmessage
 from cutty.projects.repository import ProjectRepository
@@ -56,8 +58,16 @@ def test_linkproject_commit_message_revision(
     repository: Repository, template: Template.Metadata
 ) -> None:
     """It includes the template name in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
+    commit = Commit(
+        "f4c0629d635865697b3e99b5ca581e78b2c7d976",
+        "v1.0.0",
+        "Release 1.0.0",
+        Author("You", "you@example.com"),
+    )
+    template = dataclasses.replace(template, commit=commit)
 
     linkproject(repository, template)
 
-    assert template.revision in repository.head.commit.message
+    assert (
+        template.commit and template.commit.revision in repository.head.commit.message
+    )

@@ -1,5 +1,7 @@
 """Provider for Mercurial repositories."""
+import json
 import pathlib
+import subprocess  # noqa: S404
 import tempfile
 from collections.abc import Iterator
 from typing import Optional
@@ -10,6 +12,8 @@ from cutty.filesystems.domain.filesystem import Filesystem
 from cutty.packages.adapters.fetchers.mercurial import findhg
 from cutty.packages.adapters.fetchers.mercurial import hgfetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
 from cutty.packages.domain.revisions import Revision
@@ -18,38 +22,53 @@ from cutty.packages.domain.revisions import Revision
 class MercurialPackageRepository(DefaultPackageRepository):
     """Mercurial package repository."""
 
+    def __init__(self, name: str, path: pathlib.Path) -> None:
+        """Initialize."""
+        super().__init__(name, path)
+
+        self._hg = findhg()
+
+    def hg(self, *args: str) -> subprocess.CompletedProcess[str]:
+        """Invoke hg."""
+        return self._hg(*args, cwd=self.path)
+
     @contextmanager
     def mount(self, revision: Optional[Revision]) -> Iterator[Filesystem]:
         """Mount an archive of the revision as a disk filesystem."""
-        hg = findhg()
-
         with tempfile.TemporaryDirectory() as directory:
             options = ["--rev", revision] if revision is not None else []
-            hg("archive", *options, directory, cwd=self.path)
+            self.hg("archive", *options, directory)
 
             yield DiskFilesystem(pathlib.Path(directory))
 
-    def getmetadata(self, revision: Optional[Revision], template: str) -> Optional[str]:
-        """Return commit metadata."""
-        hg = findhg()
+    def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
+        """Look up the commit metadata for the given revision."""
+        template = """
+        json(
+            dict(
+                id=node,
+                revision=ifeq(latesttagdistance, 0, join(latesttag, ":"), short(node)),
+                message=desc,
+                name=person(author),
+                email=email(author)))
+        """
+        text = self.getmetadata(revision, template)
+        data = json.loads(text)
 
+        return Commit(
+            data["id"],
+            data["revision"],
+            data["message"],
+            Author(data["name"], data["email"]),
+        )
+
+    def getmetadata(self, revision: Optional[Revision], template: str) -> str:
+        """Return commit metadata."""
         if revision is None:
             revision = "."
 
-        result = hg(
-            "log", f"--rev={revision}", f"--template={{{template}}}", cwd=self.path
-        )
+        result = self.hg("log", f"--rev={revision}", f"--template={{{template}}}")
         return result.stdout
-
-    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the commit identifier."""
-        return self.getmetadata(revision, "node")
-
-    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the package revision."""
-        return self.getmetadata(
-            revision, "ifeq(latesttagdistance, 0, latesttag, short(node))"
-        )
 
     def getparentrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
         """Return the parent revision, if any."""
@@ -57,18 +76,6 @@ class MercurialPackageRepository(DefaultPackageRepository):
             revision = "."
 
         return self.getmetadata(f"p1({revision})", "node") or None
-
-    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit message."""
-        return self.getmetadata(revision, "desc")
-
-    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the name of the commit author."""
-        return self.getmetadata(revision, "author|person")
-
-    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the E-mail address of the commit author."""
-        return self.getmetadata(revision, "author|email")
 
 
 class MercurialRepositoryLoader(PackageRepositoryLoader):

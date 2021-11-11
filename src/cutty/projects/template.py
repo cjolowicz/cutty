@@ -13,9 +13,9 @@ from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.purepath import PurePath
 from cutty.packages.adapters.registry import defaultproviderfactories
 from cutty.packages.adapters.storage import getdefaultproviderstore
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.registry import ProviderRegistry
 from cutty.packages.domain.repository import PackageRepository
-from cutty.packages.domain.revisions import Revision
 
 
 @dataclass
@@ -59,14 +59,7 @@ class TemplateRepository:
                 package = package.descend(PurePath(*self.directory.parts))
 
             metadata = Template.Metadata(
-                self.location,
-                self.directory,
-                package.name,
-                package.revision,
-                package.commit,
-                package.message,
-                package.author,
-                package.authoremail,
+                self.location, self.directory, package.name, package.commit
             )
 
             yield Template(metadata, package.tree)
@@ -87,11 +80,7 @@ class Template:
         location: str
         directory: Optional[pathlib.Path]
         name: str
-        revision: Optional[Revision]
-        commit: Optional[str] = None
-        message: Optional[str] = None
-        author: Optional[str] = None
-        authoremail: Optional[str] = None
+        commit: Optional[Commit] = None
 
     metadata: Metadata
     root: Path

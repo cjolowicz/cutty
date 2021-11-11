@@ -8,6 +8,8 @@ from cutty.filestorage.adapters.disk import DiskFileStorage
 from cutty.filestorage.domain.files import RegularFile
 from cutty.filestorage.domain.storage import FileStorage
 from cutty.filesystems.domain.purepath import PurePath
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.template import Template
@@ -97,11 +99,20 @@ def test_commit_message_revision(
     project: pathlib.Path, template: Template.Metadata
 ) -> None:
     """It includes the revision in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
+    commit = Commit(
+        "f4c0629d635865697b3e99b5ca581e78b2c7d976",
+        "v1.0.0",
+        "Release 1.0.0",
+        Author("You", "you@example.com"),
+    )
+    template = dataclasses.replace(template, commit=commit)
+
     creategitrepository(project, template)
 
     repository = Repository.open(project)
-    assert template.revision in repository.head.commit.message
+    assert (
+        template.commit and template.commit.revision in repository.head.commit.message
+    )
 
 
 def test_existing_repository(

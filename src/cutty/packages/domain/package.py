@@ -7,7 +7,24 @@ from typing import Optional
 from cutty.filesystems.domain.path import Path
 from cutty.filesystems.domain.pathfs import PathFilesystem
 from cutty.filesystems.domain.purepath import PurePath
-from cutty.packages.domain.revisions import Revision
+
+
+@dataclass
+class Author:
+    """The commit author."""
+
+    name: str
+    email: str
+
+
+@dataclass
+class Commit:
+    """A commit in a versioned repository."""
+
+    id: str
+    revision: str
+    message: str
+    author: Author
 
 
 @dataclass
@@ -16,23 +33,11 @@ class Package:
 
     name: str
     tree: Path
-    revision: Optional[Revision]
-    commit: Optional[str] = None
-    message: Optional[str] = None
-    author: Optional[str] = None
-    authoremail: Optional[str] = None
+    commit: Optional[Commit] = None
 
     def descend(self, directory: PurePath) -> Package:
         """Return the subpackage located in the given directory."""
         tree = self.tree.joinpath(*directory.parts)
         tree = Path(filesystem=PathFilesystem(tree))
 
-        return Package(
-            directory.name,
-            tree,
-            self.revision,
-            self.commit,
-            self.message,
-            self.author,
-            self.authoremail,
-        )
+        return Package(directory.name, tree, self.commit)

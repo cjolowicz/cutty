@@ -74,9 +74,11 @@ def dictprovider(
         class _PackageRepository(PackageRepository):
             @contextmanager
             def get(self, revision: Optional[Revision] = None) -> Iterator[Package]:
+                assert revision is None
+
                 filesystem = DictFilesystem(mapping or {})
                 path = Path(filesystem=filesystem)
-                yield Package(location.name, path, revision)
+                yield Package(location.name, path)
 
         return _PackageRepository()
 

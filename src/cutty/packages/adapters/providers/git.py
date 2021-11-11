@@ -11,6 +11,8 @@ from cutty.errors import CuttyError
 from cutty.filesystems.adapters.git import GitFilesystem
 from cutty.packages.adapters.fetchers.git import gitfetcher
 from cutty.packages.domain.loader import PackageRepositoryLoader
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.packages.domain.providers import LocalProvider
 from cutty.packages.domain.providers import RemoteProviderFactory
 from cutty.packages.domain.repository import DefaultPackageRepository
@@ -46,6 +48,13 @@ class GitPackageRepository(DefaultPackageRepository):
         else:
             yield GitFilesystem(self.path)
 
+    def lookup(self, revision: Optional[Revision]) -> Optional[Commit]:
+        """Look up the commit metadata for the given revision."""
+        commit = self._lookup(revision)
+        author = Author(commit.author.name, commit.author.email)
+
+        return Commit(str(commit.id), self.describe(commit), commit.message, author)
+
     def _lookup(self, revision: Optional[Revision]) -> pygit2.Commit:
         """Return the commit object."""
         if revision is None:
@@ -56,15 +65,9 @@ class GitPackageRepository(DefaultPackageRepository):
         except KeyError:
             raise RevisionNotFoundError(revision)
 
-    def getcommit(self, revision: Optional[Revision]) -> Optional[Revision]:
-        """Return the commit identifier."""
-        commit = self._lookup(revision)
-
-        return str(commit.id)
-
-    def getrevision(self, revision: Optional[Revision]) -> Optional[Revision]:
+    def describe(self, commit: pygit2.Commit) -> str:
         """Return the resolved revision."""
-        commit = self._lookup(revision)
+        revision: str
 
         try:
             revision = self.repository.describe(
@@ -91,27 +94,6 @@ class GitPackageRepository(DefaultPackageRepository):
             return str(parent.id)
 
         return None
-
-    def getmessage(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit message."""
-        commit = self._lookup(revision)
-        message: str = commit.message
-
-        return message
-
-    def getauthor(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author."""
-        commit = self._lookup(revision)
-        author: str = commit.author.name
-
-        return author
-
-    def getauthoremail(self, revision: Optional[Revision]) -> Optional[str]:
-        """Return the commit author email."""
-        commit = self._lookup(revision)
-        email: str = commit.author.email
-
-        return email
 
 
 class GitRepositoryLoader(PackageRepositoryLoader):

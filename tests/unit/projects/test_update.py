@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from cutty.packages.domain.package import Author
+from cutty.packages.domain.package import Commit
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
 from cutty.projects.repository import ProjectRepository
@@ -23,14 +25,14 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
     project = ProjectRepository(projectdir)
 
     with project.build() as builder:
-        commit = builder.commit(createcommitmessage(template))
+        parent = builder.commit(createcommitmessage(template))
 
-    with project.build(parent=commit) as builder:
+    with project.build(parent=parent) as builder:
         (builder.path / "cutty.json").touch()
-        commit2 = builder.commit(updatecommitmessage(template))
+        commit = builder.commit(updatecommitmessage(template))
 
-    if commit2 != commit:
-        project.import_(commit2)
+    if commit != parent:
+        project.import_(commit)
 
 
 def continue_(projectdir: Path) -> None:
@@ -162,11 +164,17 @@ def test_updateproject_commit_message_revision(
     project: Repository, template: Template.Metadata
 ) -> None:
     """It includes the template revision in the commit message."""
-    template = dataclasses.replace(template, revision="1.0.0")
+    commit = Commit(
+        "f4c0629d635865697b3e99b5ca581e78b2c7d976",
+        "v1.0.0",
+        "Release 1.0.0",
+        Author("You", "you@example.com"),
+    )
+    template = dataclasses.replace(template, commit=commit)
 
     updateproject(project.path, template)
 
-    assert template.revision in project.head.commit.message
+    assert template.commit and template.commit.revision in project.head.commit.message
 
 
 def test_updateproject_no_changes(
@@ -178,12 +186,12 @@ def test_updateproject_no_changes(
     repository = ProjectRepository(project.path)
 
     with repository.build() as builder:
-        commit = builder.commit(createcommitmessage(template))
+        parent = builder.commit(createcommitmessage(template))
 
-    with repository.build(parent=commit) as builder:
-        commit2 = builder.commit(updatecommitmessage(template))
+    with repository.build(parent=parent) as builder:
+        commit = builder.commit(updatecommitmessage(template))
 
-    if commit2 != commit:
-        repository.import_(commit2)
+    if commit != parent:
+        repository.import_(commit)
 
     assert tip == project.head.commit
