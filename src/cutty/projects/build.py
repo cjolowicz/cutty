@@ -3,6 +3,7 @@ from collections.abc import Iterator
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
+from cutty.packages.domain.package import Author
 from cutty.projects.config import ProjectConfig
 from cutty.projects.generate import generate
 from cutty.projects.messages import importcommitmessage
@@ -41,12 +42,13 @@ def commitproject(
     with repository.build(parent=parent) as builder:
         storeproject(project, builder.path)
 
-        author = project.template.commit.author if project.template.commit else None
+        author: Optional[Author] = None
 
         if commitmessage is not None:
             message = commitmessage(project.template)
         else:
             message = importcommitmessage(project.template)
+            author = project.template.commit.author if project.template.commit else None
 
         return builder.commit(message, author=author)
 
