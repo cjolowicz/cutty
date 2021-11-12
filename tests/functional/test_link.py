@@ -225,3 +225,10 @@ def test_untracked_files(runcutty: RunCutty, project: Path, template: Path) -> N
 
     repository = Repository.open(project)
     assert existing.name not in repository.head.commit.tree
+
+
+def test_message(runcutty: RunCutty, project: Path, template: Path) -> None:
+    """It prints a message on success."""
+    output = runcutty("link", "--non-interactive", f"--cwd={project}", str(template))
+
+    assert output
