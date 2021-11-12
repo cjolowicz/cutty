@@ -433,3 +433,10 @@ def test_untracked_files(
     runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert untracked.name not in Repository.open(project).head.commit.tree
+
+
+def test_message(runcutty: RunCutty, project: Path) -> None:
+    """It prints a message on success."""
+    output = runcutty("update", "--non-interactive", f"--cwd={project}")
+
+    assert output

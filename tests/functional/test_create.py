@@ -249,3 +249,10 @@ def test_author(runcutty: RunCutty, template: Path) -> None:
 
     assert env["GIT_AUTHOR_NAME"] == author.name
     assert env["GIT_AUTHOR_EMAIL"] == author.email
+
+
+def test_message(runcutty: RunCutty, template: Path) -> None:
+    """It prints a message on success."""
+    output = runcutty("create", "--non-interactive", str(template))
+
+    assert output

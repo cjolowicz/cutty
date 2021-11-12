@@ -336,3 +336,10 @@ def test_untracked_files(
         runcutty("import")
 
     assert untracked.name not in tree(project)
+
+
+def test_console_message(runcutty: RunCutty, project: Path) -> None:
+    """It prints a message on success."""
+    output = runcutty("import", "--non-interactive", f"--cwd={project}")
+
+    assert output

@@ -88,3 +88,5 @@ def update(
         revision=revision,
         directory=template_directory,
     )
+
+    click.secho("The project has been updated.", fg="green")
