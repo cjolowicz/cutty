@@ -72,3 +72,5 @@ def create(
         directory=template_directory,
         in_place=in_place,
     )
+
+    click.echo("done")
