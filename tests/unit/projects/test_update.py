@@ -1,12 +1,10 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
-import datetime
 from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 
-from cutty.packages.domain.package import Author
 from cutty.packages.domain.package import Commit
 from cutty.projects.messages import createcommitmessage
 from cutty.projects.messages import updatecommitmessage
@@ -162,16 +160,9 @@ def test_updateproject_commit_message_template(
 
 
 def test_updateproject_commit_message_revision(
-    project: Repository, template: Template.Metadata
+    project: Repository, template: Template.Metadata, commit: Commit
 ) -> None:
     """It includes the template revision in the commit message."""
-    commit = Commit(
-        "f4c0629d635865697b3e99b5ca581e78b2c7d976",
-        "v1.0.0",
-        "Release 1.0.0",
-        Author("You", "you@example.com"),
-        datetime.datetime.now(datetime.timezone.utc),
-    )
     template = dataclasses.replace(template, commit=commit)
 
     updateproject(project.path, template)
