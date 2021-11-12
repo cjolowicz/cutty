@@ -1,5 +1,6 @@
 """Unit tests for cutty.projects.repository."""
 import dataclasses
+import datetime
 import pathlib
 
 import pytest
@@ -104,6 +105,7 @@ def test_commit_message_revision(
         "v1.0.0",
         "Release 1.0.0",
         Author("You", "you@example.com"),
+        datetime.datetime.now(datetime.timezone.utc),
     )
     template = dataclasses.replace(template, commit=commit)
 

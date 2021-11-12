@@ -26,7 +26,7 @@ class Commit:
     revision: str
     message: str
     author: Author
-    date: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
+    date: datetime.datetime
 
 
 @dataclass
