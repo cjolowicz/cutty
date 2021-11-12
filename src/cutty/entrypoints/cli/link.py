@@ -65,3 +65,5 @@ def link(
         revision=revision,
         directory=template_directory,
     )
+
+    click.secho("The project has been linked.", fg="green")
