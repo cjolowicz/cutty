@@ -73,4 +73,4 @@ def create(
         in_place=in_place,
     )
 
-    click.echo("done")
+    click.secho("The project has been created.", fg="green")
