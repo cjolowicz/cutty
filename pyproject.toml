@@ -60,10 +60,11 @@ cutty = "cutty.__main__:main"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
+tests = ["tests", "*/tests"]
 
 [tool.coverage.run]
 branch = true
-source = ["cutty"]
+source = ["cutty", "tests"]
 
 [tool.coverage.report]
 show_missing = true
