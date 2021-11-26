@@ -15,7 +15,7 @@ def _fromaccess(access: Access) -> int:
         Access.EXECUTE: os.X_OK,
     }
     return sum(
-        [mapping[flag] for flag in Access if flag and flag in access],
+        (mapping[flag] for flag in Access if flag and flag in access),
         start=os.F_OK,
     )
 

@@ -46,6 +46,7 @@ dependencies = {
         "pep8-naming",
         "pre-commit",
         "pre-commit-hooks",
+        "pyupgrade",
         "reorder-python-imports",
     ],
 }
