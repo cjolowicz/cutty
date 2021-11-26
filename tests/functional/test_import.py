@@ -151,7 +151,7 @@ def test_conflict_message(
 
 def test_no_vcs(runcutty: RunCutty, template: Path, templateproject: Path) -> None:
     """It returns with non-zero status if the template has no version history."""
-    location = "local+{}".format(template.as_uri())
+    location = f"local+{template.as_uri()}"
 
     runcutty("create", "--non-interactive", location)
 
