@@ -49,8 +49,7 @@ def updatefile(path: Path, text: str = "") -> None:
 
 def updatefiles(paths: dict[Path, str]) -> None:
     """Add or update repository files."""
-    if not paths:
-        return
+    assert paths
 
     verb = "Add"
 
