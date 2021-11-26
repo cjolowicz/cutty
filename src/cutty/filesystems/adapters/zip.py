@@ -54,7 +54,7 @@ class ZipFilesystemNode(FilesystemNode):
 
     def readlink(self) -> PurePath:
         """Return the link target."""
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def iterdir(self) -> Iterator[str]:
         """Iterate over the directory entries."""

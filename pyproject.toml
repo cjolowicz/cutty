@@ -73,6 +73,7 @@ exclude_lines = [
     "pragma: no cover",
     "@overload",
     "pytest.skip",
+    "raise NotImplementedError",
 ]
 
 [tool.pytest.ini_options]
