@@ -28,13 +28,13 @@ class IndigoError(BlueError):
 @exceptionhandler
 def suppress_red(error: RedError) -> bool:
     """Suppress RedError exceptions."""
-    return True
+    return True  # pragma: no cover
 
 
 @exceptionhandler()  # empty parentheses are equivalent to none
 def suppress_green(error: GreenError) -> bool:
     """Suppress GreenError exceptions."""
-    return True
+    return True  # pragma: no cover
 
 
 @exceptionhandler
@@ -58,7 +58,7 @@ def suppress_red_and_blue(error: Union[RedError, BlueError]) -> bool:
 @exceptionhandler(RedError, GreenError)
 def suppress_red_and_green(error: Union[RedError, GreenError]) -> bool:
     """Suppress RedError and GreenError exceptions."""
-    return True
+    return True  # pragma: no cover
 
 
 @exceptionhandler(RedError, GreenError, BlueError)
@@ -80,7 +80,7 @@ def test_decorator_missing_annotation() -> None:
 
         @exceptionhandler
         def _(exception):  # type: ignore[no-untyped-def]
-            pass
+            pass  # pragma: no cover
 
 
 def test_decorator_decorator() -> None:
