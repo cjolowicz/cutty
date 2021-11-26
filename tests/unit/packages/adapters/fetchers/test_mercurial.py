@@ -86,7 +86,7 @@ def test_update(repository: pathlib.Path, hg: Hg, store: Store) -> None:
 
 
 @pytest.fixture(scope="session")
-def skip_on_http_errors() -> None:
+def skip_on_http_errors() -> None:  # pragma: no cover
     """Skip a test if HTTP requests don't succeed within a configurable timeout."""
     if envvar := os.environ.get("CUTTY_TESTS_HTTP_TIMEOUT"):
         timeout = float(envvar)
