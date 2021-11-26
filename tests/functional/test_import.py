@@ -343,3 +343,9 @@ def test_console_message(runcutty: RunCutty, project: Path) -> None:
     output = runcutty("import", "--non-interactive", f"--cwd={project}")
 
     assert output
+
+
+def test_projectvariable(project: Path) -> None:
+    """It raises if the variable is not defined."""
+    with pytest.raises(StopIteration):
+        projectvariable(project, "undefined")

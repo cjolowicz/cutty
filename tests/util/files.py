@@ -28,11 +28,8 @@ def list_files_recursively(
     )
 
 
-def template_files(path: Union[Path, str]) -> frozenset[Path]:
+def template_files(path: Path) -> frozenset[Path]:
     """List the project files contained in the template repository."""
-    if isinstance(path, str):
-        path = Path(path)
-
     path = next(entry for entry in path.iterdir() if entry.name.startswith("{{"))
     return list_files_recursively(path)
 

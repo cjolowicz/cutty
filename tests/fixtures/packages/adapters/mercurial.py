@@ -11,5 +11,5 @@ def hg() -> Hg:
     """Fixture for a hg command."""
     try:
         return findhg(env={"HGUSER": "You <you@example.com>"})
-    except HgNotFoundError:
+    except HgNotFoundError:  # pragma: no cover
         pytest.skip("cannot locate hg")

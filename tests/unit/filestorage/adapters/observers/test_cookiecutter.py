@@ -46,8 +46,7 @@ def createstorage(tmp_path: pathlib.Path) -> CreateFileStorage:
         hooks: Sequence[str], *, fileexists: FileExistsPolicy = FileExistsPolicy.RAISE
     ) -> FileStorage:
         storage = DiskFileStorage(tmp_path, fileexists=fileexists)
-        if not hooks:
-            return storage
+        assert hooks
 
         hookfiles = [
             Executable(

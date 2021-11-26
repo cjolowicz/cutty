@@ -30,8 +30,8 @@ def updateproject(projectdir: Path, template: Template.Metadata) -> None:
         (builder.path / "cutty.json").touch()
         commit = builder.commit(updatecommitmessage(template))
 
-    if commit != parent:
-        project.import_(commit)
+    assert commit != parent
+    project.import_(commit)
 
 
 def continue_(projectdir: Path) -> None:
@@ -184,7 +184,5 @@ def test_updateproject_no_changes(
     with repository.build(parent=parent) as builder:
         commit = builder.commit(updatecommitmessage(template))
 
-    if commit != parent:
-        repository.import_(commit)
-
+    assert commit == parent
     assert tip == project.head.commit
