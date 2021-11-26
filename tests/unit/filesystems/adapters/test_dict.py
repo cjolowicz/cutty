@@ -211,7 +211,7 @@ def test_cmp_self(root: Path) -> None:
 
 def test_cmp_other(root: Path) -> None:
     """It compares the parts."""
-    a, b = [root / name for name in "ab"]
+    a, b = (root / name for name in "ab")
     assert a != b
     assert a < b
     assert a <= b

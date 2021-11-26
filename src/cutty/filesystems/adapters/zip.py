@@ -16,7 +16,7 @@ def _fromaccess(access: Access) -> int:
         Access.WRITE: stat.S_IWUSR,
         Access.EXECUTE: stat.S_IXUSR,
     }
-    return sum([mapping[flag] for flag in Access if flag and flag in access])
+    return sum(mapping[flag] for flag in Access if flag and flag in access)
 
 
 def _getfilemode(zippath: zipfile.Path) -> int:
