@@ -23,7 +23,7 @@ def loadvariable(name: str, value: Any) -> Variable:
     """Load a variable."""
     if isinstance(value, list):
         choices = tuple(loadvalue(choice) for choice in value)
-        [valuetype] = set(type(choice) for choice in choices)
+        [valuetype] = {type(choice) for choice in choices}
         return Variable(
             name=name,
             description=name,
