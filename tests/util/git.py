@@ -57,7 +57,7 @@ def updatefiles(paths: dict[Path, str]) -> None:
         repository = locaterepository(path)
 
         if path.exists():
-            verb = "Update"
+            verb = "Update"  # pragma: no cover
 
         path.write_text(dedent(text).lstrip())
 
