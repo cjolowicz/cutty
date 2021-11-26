@@ -172,9 +172,11 @@ def test_update(hgrepository: pathlib.Path, store: Store) -> None:
 def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
     """It raises an exception."""
     with pytest.raises(CuttyError):
-        if repository := hgprovider.provide(hgrepository):
-            with repository.get("invalid"):
-                pass
+        repository = hgprovider.provide(hgrepository)
+        assert repository
+
+        with repository.get("invalid"):
+            pass
 
 
 def test_parent_revision_tip(hgprovider: Provider, hgrepository: pathlib.Path) -> None:

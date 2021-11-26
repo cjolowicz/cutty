@@ -70,9 +70,11 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
     provider = LocalProvider(loader=loader)
 
     with pytest.raises(Exception):
-        if repository := provider.provide(tmp_path):
-            with repository.get("v1.0.0"):
-                pass
+        repository = provider.provide(tmp_path)
+        assert repository
+
+        with repository.get("v1.0.0"):
+            pass
 
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:
