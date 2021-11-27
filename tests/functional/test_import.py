@@ -345,6 +345,21 @@ def test_console_message(runcutty: RunCutty, project: Path) -> None:
     assert output
 
 
+def test_abort_console_message(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It prints a message on success."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("import", "--non-interactive", f"--cwd={project}")
+
+    output = runcutty("import", "--non-interactive", f"--cwd={project}", "--abort")
+
+    assert output
+
+
 def test_projectvariable(project: Path) -> None:
     """It raises if the variable is not defined."""
     with pytest.raises(StopIteration):
