@@ -116,7 +116,7 @@ jobs:
               curl --fail --silent --show-error --location $url |
                 tar --gunzip --extract --strip-components=1 --directory=$sourcedir
               cmake -S $sourcedir -B $builddir
-              cmake --build $builddir
+              cmake --build $builddir --parallel=2
           fi
 
           sudo cmake --install $builddir
