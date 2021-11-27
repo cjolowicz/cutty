@@ -110,9 +110,8 @@ jobs:
 
       - name: Run Nox
         run: |
-          nox --force-color --python=$NOXPYTHON
+          nox --force-color --python=${{ startsWith(matrix.python, '3.11.') && '3.11' || matrix.python }}
         env:
-          NOXPYTHON: ${{ startsWith(matrix.python, '3.11.') && '3.11' || matrix.python }}
           YARL_NO_EXTENSIONS: ${{ startsWith(matrix.python, '3.11.') && '1' || '' }}
 
       - name: Upload coverage data
