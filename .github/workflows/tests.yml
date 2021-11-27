@@ -89,6 +89,25 @@ jobs:
           restore-keys: |
             ${{ steps.pre-commit-cache.outputs.result }}-
 
+      - name: Install libgit2
+        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python, '3.11.')
+        run: |
+          package=libgit2
+          version=1.3.0
+          url=https://github.com/$package/$package/archive/refs/tags/v$version.tar.gz
+          directory=.thirdparty/$package-$version
+
+          sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+          cat /etc/apt/sources.list
+          sudo apt-get update && sudo apt-get build-dep -y $package
+          mkdir -p $directory && cd $directory
+          curl -fsSL $url | tar --gunzip --extract --strip-components=1
+          mkdir build && cd build
+          cmake ..
+          cmake --build .
+          sudo make install
+          sudo ldconfig -v
+
       - name: Run Nox
         run: |
           nox --force-color --python=$NOXPYTHON
