@@ -97,16 +97,16 @@ jobs:
           url=https://github.com/$package/$package/archive/refs/tags/v$version.tar.gz
           directory=.thirdparty/$package-$version
 
-          sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
-          cat /etc/apt/sources.list
-          sudo apt-get update && sudo apt-get build-dep -y $package
-          mkdir -p $directory && cd $directory
-          curl -fsSL $url | tar --gunzip --extract --strip-components=1
+          sudo sed --in-place 's/^# deb-src /deb-src /' /etc/apt/sources.list
+          sudo apt-get update && sudo apt-get build-dep --yes $package
+          mkdir --parents $directory && cd $directory
+          curl --fail --silent --show-error --location $url |
+            tar --gunzip --extract --strip-components=1
           mkdir build && cd build
           cmake ..
           cmake --build .
           sudo make install
-          sudo ldconfig -v
+          sudo ldconfig
 
       - name: Run Nox
         run: |
