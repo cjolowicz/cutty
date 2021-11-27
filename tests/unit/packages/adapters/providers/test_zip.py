@@ -43,7 +43,7 @@ def test_local_revision(url: URL) -> None:
         assert repository
 
         with repository.get("v1.0"):
-            pass
+            pass  # pragma: no cover
 
 
 def test_local_not_matching(tmp_path: Path) -> None:

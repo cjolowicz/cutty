@@ -36,4 +36,4 @@ def test_revision(repositorypath: Path) -> None:
         assert repository
 
         with repository.get("v1.0"):
-            pass
+            pass  # pragma: no cover

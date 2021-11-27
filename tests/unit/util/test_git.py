@@ -366,7 +366,7 @@ def test_worktree_tempfile_failure(
 
     with pytest.raises(Exception, match="boom"):
         with repository.worktree(branch, checkout=False):
-            pass
+            pass  # pragma: no cover
 
 
 def test_cherrypick_adds_file(repository: Repository, path: Path) -> None:

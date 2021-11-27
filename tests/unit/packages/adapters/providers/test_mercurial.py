@@ -176,7 +176,7 @@ def test_revision_not_found(hgprovider: Provider, hgrepository: pathlib.Path) ->
         assert repository
 
         with repository.get("invalid"):
-            pass
+            pass  # pragma: no cover
 
 
 def test_parent_revision_tip(hgprovider: Provider, hgrepository: pathlib.Path) -> None:
