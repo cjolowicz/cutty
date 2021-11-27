@@ -440,3 +440,35 @@ def test_message(runcutty: RunCutty, project: Path) -> None:
     output = runcutty("update", "--non-interactive", f"--cwd={project}")
 
     assert output
+
+
+def test_continue_message(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It prints a message on success."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("update", "--non-interactive", f"--cwd={project}")
+
+    resolveconflicts(project, project / "LICENSE", Side.THEIRS)
+
+    output = runcutty("update", "--non-interactive", f"--cwd={project}", "--continue")
+
+    assert output
+
+
+def test_abort_message(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It prints a message on success."""
+    updatefile(project / "LICENSE", "a")
+    updatefile(templateproject / "LICENSE", "b")
+
+    with pytest.raises(Exception, match="conflict"):
+        runcutty("update", "--non-interactive", f"--cwd={project}")
+
+    output = runcutty("update", "--non-interactive", f"--cwd={project}", "--abort")
+
+    assert output
