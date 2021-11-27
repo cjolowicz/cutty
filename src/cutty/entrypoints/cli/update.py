@@ -78,6 +78,7 @@ def update(
 
     if abort:
         project.abort()
+        click.secho("The update has been aborted.", fg="green")
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
