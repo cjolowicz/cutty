@@ -75,6 +75,7 @@ def import_(
 
     if abort:
         project.abort()
+        click.secho("The import has been aborted.", fg="green")
         return
 
     extrabindings = [Binding(key, value) for key, value in extra_context.items()]
