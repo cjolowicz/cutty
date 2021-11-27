@@ -113,6 +113,7 @@ jobs:
           nox --force-color --python=$NOXPYTHON
         env:
           NOXPYTHON: ${{ startsWith(matrix.python, '3.11.') && '3.11' || matrix.python }}
+          YARL_NO_EXTENSIONS: ${{ startsWith(matrix.python, '3.11.') && '1' || '' }}
 
       - name: Upload coverage data
         if: always() && matrix.session == 'tests'
