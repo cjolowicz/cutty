@@ -71,6 +71,7 @@ def import_(
 
     if continue_:
         project.continue_()
+        click.secho("The project has been updated.", fg="green")
         return
 
     if abort:
