@@ -19,4 +19,4 @@ def test_unversioned_mounter_fail(tmp_path: Path) -> None:
     mount = unversioned_mounter(DiskFilesystem)
     with pytest.raises(Exception):
         with mount(tmp_path, "v1.0.0"):
-            pass
+            pass  # pragma: no cover

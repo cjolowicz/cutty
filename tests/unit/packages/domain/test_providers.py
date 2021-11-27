@@ -74,7 +74,7 @@ def test_localprovider_revision(tmp_path: pathlib.Path) -> None:
         assert repository
 
         with repository.get("v1.0.0"):
-            pass
+            pass  # pragma: no cover
 
 
 def test_remoteproviderfactory_no_fetchers(store: Store) -> None:

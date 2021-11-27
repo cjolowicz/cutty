@@ -64,7 +64,7 @@ def test_local_invalid_revision(url: URL) -> None:
         assert repository
 
         with repository.get("invalid"):
-            pass
+            pass  # pragma: no cover
 
 
 def test_local_revision_tag(url: URL) -> None:
