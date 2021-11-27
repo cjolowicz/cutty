@@ -107,6 +107,8 @@ jobs:
           cmake --build .
           sudo make install
           sudo ldconfig
+        env:
+          CLICOLOR_FORCE: "1"
 
       - name: Run Nox
         run: |
