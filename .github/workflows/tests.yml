@@ -91,13 +91,13 @@ jobs:
 
       - name: Restore build directory for libgit2
         uses: actions/cache@v2.1.7
-        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python, '3.11.')
+        if: startsWith(matrix.python, '3.11.')
         with:
           path: .thirdparty/libgit2-1.3.0
           key: .thirdparty/libgit2-1.3.0
 
       - name: Build and install libgit2
-        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python, '3.11.')
+        if: startsWith(matrix.python, '3.11.')
         run: |
           set -x
 
