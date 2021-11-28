@@ -3,7 +3,6 @@ import json
 from collections.abc import Iterator
 from collections.abc import Mapping
 from pathlib import Path
-from textwrap import dedent
 from typing import Optional
 from typing import Protocol
 
@@ -76,14 +75,6 @@ def runcutty(runner: CliRunner, pipeinput: PipeInput) -> RunCutty:
 @pytest.fixture
 def template_directory(tmp_path: Path) -> Path:
     """Fixture for a template directory."""
-
-    def create(path: Path, text: str) -> None:
-        """Create a file with the given path and contents."""
-        text = dedent(text).removeprefix("\n")
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
-
-    template = tmp_path / "template-42"
     context = {
         "project": "example",
         "license": ["MIT", "GPL-3.0", "Apache-2.0"],
@@ -91,21 +82,17 @@ def template_directory(tmp_path: Path) -> Path:
         "_extensions": ["jinja2_time.TimeExtension"],
     }
 
-    create(template / "cookiecutter.json", json.dumps(context))
+    template = _ = tmp_path / "template-42"
 
-    create(
-        template / "{{ cookiecutter.project }}" / "README.md",
-        """
-        # {{ cookiecutter.project }}
-        """,
-    )
+    files = {
+        _ / "cookiecutter.json": json.dumps(context),
+        _ / "{{ cookiecutter.project }}" / "README.md": "# {{ cookiecutter.project }}",
+        _ / "hooks" / "post_gen_project.py": 'open("post_gen_project", mode="w")',
+    }
 
-    create(
-        template / "hooks" / "post_gen_project.py",
-        """
-        open("post_gen_project", mode="w")
-        """,
-    )
+    for path, text in files.items():
+        path.parent.mkdir()
+        path.write_text(text + "\n")
 
     return template
 
