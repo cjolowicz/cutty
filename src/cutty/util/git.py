@@ -273,6 +273,8 @@ class Repository:
         self._repository.cherrypick(commit.id)
 
         if self._repository.index.conflicts:
+            _patch_merge_msg(self.path)
+
             raise MergeConflictError.fromindex(self._repository.index)
 
         self.commit(
@@ -351,3 +353,29 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
             break
 
     return head.resolve()
+
+
+def _patch_merge_msg(repositorypath: Path) -> None:
+    """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
+    # https://github.com/libgit2/libgit2/issues/6131
+    path = repositorypath / ".git" / "MERGE_MSG"
+    if not path.is_file():
+        return
+
+    text = path.read_text()
+    lines = text.splitlines(keepends=True)
+
+    for _reverse_index, line in enumerate(reversed(lines)):
+        if line.rstrip() == "Conflicts:":
+            break
+    else:
+        return
+
+    index = -_reverse_index - 1
+
+    if not all(line.startswith("\t") for line in lines[index + 1 :]):
+        return
+
+    lines[index:] = [f"# {line}" for line in lines[index:]]
+
+    path.write_text("".join(lines))

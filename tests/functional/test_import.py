@@ -149,6 +149,25 @@ def test_conflict_message(
     assert "cutty.json" not in str(exceptioninfo.value)
 
 
+def test_conflict_commit_message_comment(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It uses comments for the "Conflicts:" hint in the commit message."""
+    updatefile(templateproject / "extra")
+    updatefile(templateproject / "marker", "a")
+    updatefile(project / "marker", "b")
+
+    with pytest.raises(Exception):
+        with chdir(project):
+            runcutty("import")
+
+    with (project / ".git" / "MERGE_MSG").open() as io:
+        lines = list(io)
+
+    assert "Conflicts:\n" not in lines
+    assert "# Conflicts:\n" in lines
+
+
 def test_no_vcs(runcutty: RunCutty, template: Path, templateproject: Path) -> None:
     """It returns with non-zero status if the template has no version history."""
     location = f"local+{template.as_uri()}"
