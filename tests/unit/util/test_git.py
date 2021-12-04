@@ -5,6 +5,7 @@ from pathlib import Path
 import pygit2
 import pytest
 
+from cutty.util.git import _patch_merge_msg
 from cutty.util.git import MergeConflictError
 from cutty.util.git import Repository
 from tests.util.git import createbranches
@@ -631,3 +632,32 @@ def test_resetcherrypick_idempotent(repository: Repository, path: Path) -> None:
 
     repository.resetcherrypick()
     repository.resetcherrypick()
+
+
+def test_patch_merge_msg_not_found(repository: Repository) -> None:
+    """It does nothing if the MERGE_MSG file does not exist."""
+    _patch_merge_msg(repository.path)
+
+    assert not (repository.path / ".git" / "MERGE_MSG").exists()
+
+
+def test_patch_merge_msg_no_hint(repository: Repository) -> None:
+    """It does nothing if MERGE_MSG does not contain "Conflicts:"."""
+    path = repository.path / ".git" / "MERGE_MSG"
+    path.touch()
+
+    _patch_merge_msg(repository.path)
+
+    assert not path.read_text()
+
+
+def test_patch_merge_msg_no_tab(repository: Repository) -> None:
+    """It does nothing if lines after "Conflicts:" are not indented."""
+    text = "Conflicts:\nbogus\n"
+
+    path = repository.path / ".git" / "MERGE_MSG"
+    path.write_text(text)
+
+    _patch_merge_msg(repository.path)
+
+    assert text == path.read_text()
