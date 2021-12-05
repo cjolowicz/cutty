@@ -149,6 +149,24 @@ def test_conflict_message(
     assert "cutty.json" not in str(exceptioninfo.value)
 
 
+def test_conflict_commit_message(
+    runcutty: RunCutty, templateproject: Path, project: Path
+) -> None:
+    """It does not include cutty.json in the merge message."""
+    updatefile(templateproject / "extra")
+    updatefile(templateproject / "marker", "a")
+    updatefile(project / "marker", "b")
+
+    with pytest.raises(Exception):
+        with chdir(project):
+            runcutty("import")
+
+    with (project / ".git" / "MERGE_MSG").open() as io:
+        lines = list(io)
+
+    assert "# \tcutty.json\n" not in lines
+
+
 def test_conflict_commit_message_comment(
     runcutty: RunCutty, templateproject: Path, project: Path
 ) -> None:
