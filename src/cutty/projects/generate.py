@@ -84,10 +84,10 @@ def generate(
 ) -> Project:
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
-    bindings = generator.bind(interactive=interactive, bindings=bindings)
-    project = generator.generate(bindings)
+    bindings2 = generator.bind(interactive=interactive, bindings=bindings)
+    project = generator.generate(bindings2)
 
     if createconfigfile:
-        project = generator.addconfig(project, bindings)
+        project = generator.addconfig(project, [*bindings, *bindings2])
 
     return project
