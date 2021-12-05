@@ -24,7 +24,7 @@ def update(
 
     config2 = ProjectConfig(
         config1.template,
-        [*config1.bindings, *extrabindings],
+        config1.bindings,
         revision,
         config1.directory if directory is None else directory,
     )
@@ -41,6 +41,7 @@ def update(
     commit = buildproject(
         repository,
         config2,
+        userbindings=extrabindings,
         interactive=interactive,
         commitmessage=updatecommitmessage,
         parent=parent,
