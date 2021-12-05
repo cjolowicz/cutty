@@ -361,6 +361,11 @@ class MergeMessage:
 
     lines: list[str]
 
+    @classmethod
+    def parse(cls, text: str) -> MergeMessage:
+        """Parse the merge message from the contents of a MERGE_MSG file."""
+        return cls(text.splitlines(keepends=True))
+
     def format(self) -> str:
         """Return the contents as a string."""
         return "".join(self.lines)
@@ -374,7 +379,7 @@ def _patch_merge_msg(repositorypath: Path) -> None:
         return
 
     text = path.read_text()
-    message = MergeMessage(text.splitlines(keepends=True))
+    message = MergeMessage.parse(text)
 
     for _reverse_index, line in enumerate(reversed(message.lines)):
         if line.rstrip() == "Conflicts:":
