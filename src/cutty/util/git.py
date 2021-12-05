@@ -390,12 +390,14 @@ class MergeMessage:
         path = self.path(repositorypath)
         path.write_text(self.format())
 
-    def findconflicts(self) -> int:
+    def findconflicts(self, *, prefix: str = "") -> int:
         """Find the position of the "Conflicts:" hint."""
         for index, line in enumerate(reversed(self.lines)):
-            if line.rstrip() == "Conflicts:":
+            if line.rstrip() == f"{prefix}Conflicts:":
                 index = -index - 1
-                if all(line.startswith("\t") for line in self.lines[index + 1 :]):
+                if all(
+                    line.startswith(f"{prefix}\t") for line in self.lines[index + 1 :]
+                ):
                     return index
 
         return -1
