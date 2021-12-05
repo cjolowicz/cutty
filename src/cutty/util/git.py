@@ -362,9 +362,14 @@ class MergeMessage:
     lines: list[str]
 
     @classmethod
+    def path(cls, repositorypath: Path) -> Path:
+        """Return the path to the MERGE_MSG file."""
+        return repositorypath / ".git" / "MERGE_MSG"
+
+    @classmethod
     def read(cls, repositorypath: Path) -> Optional[MergeMessage]:
         """Read the merge message from the git repository."""
-        path = repositorypath / ".git" / "MERGE_MSG"
+        path = cls.path(repositorypath)
         if not path.is_file():
             return None
 
@@ -382,7 +387,7 @@ class MergeMessage:
 
     def write(self, repositorypath: Path) -> None:
         """Write the merge message to the git repository."""
-        path = repositorypath / ".git" / "MERGE_MSG"
+        path = self.path(repositorypath)
         path.write_text(self.format())
 
     def findconflicts(self) -> int:
