@@ -361,6 +361,10 @@ class MergeMessage:
 
     lines: list[str]
 
+    def format(self) -> str:
+        """Return the contents as a string."""
+        return "".join(self.lines)
+
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
@@ -385,4 +389,4 @@ def _patch_merge_msg(repositorypath: Path) -> None:
 
     message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
 
-    path.write_text("".join(message.lines))
+    path.write_text(message.format())
