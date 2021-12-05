@@ -395,14 +395,10 @@ class MergeMessage:
         for index, line in enumerate(reversed(self.lines)):
             if line.rstrip() == "Conflicts:":
                 index = -index - 1
-                break
-        else:
-            return -1
+                if all(line.startswith("\t") for line in self.lines[index + 1 :]):
+                    return index
 
-        if not all(line.startswith("\t") for line in self.lines[index + 1 :]):
-            return -1
-
-        return index
+        return -1
 
 
 def _patch_merge_msg(repositorypath: Path) -> None:
