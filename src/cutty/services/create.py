@@ -22,9 +22,11 @@ def create(
     in_place: bool,
 ) -> None:
     """Generate projects from templates."""
-    config = ProjectConfig(location, extrabindings, revision, directory)
+    config = ProjectConfig(location, (), revision, directory)
 
-    with createproject(config, interactive=interactive) as project:
+    with createproject(
+        config, userbindings=extrabindings, interactive=interactive
+    ) as project:
         projectdir = outputdir if in_place else outputdir / project.name
         repository = ProjectRepository.create(projectdir, message="Initial commit")
         commit = commitproject(repository, project, commitmessage=createcommitmessage)
