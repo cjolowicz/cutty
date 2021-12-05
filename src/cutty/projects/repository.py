@@ -140,6 +140,8 @@ class ProjectRepository:
         )
 
         if index.conflicts:
+            _patch_merge_msg(self.project.path)
+
             raise MergeConflictError.fromindex(index)
 
         self.continue_()
@@ -175,3 +177,30 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
+
+
+def _patch_merge_msg(repositorypath: Path) -> None:
+    """Remove cutty.json from MERGE_MSG."""
+    path = repositorypath / ".git" / "MERGE_MSG"
+    if not path.is_file():
+        return
+
+    text = path.read_text()
+    lines = text.splitlines(keepends=True)
+
+    for _reverse_index, line in enumerate(reversed(lines)):
+        if line.rstrip() == "# Conflicts:":
+            break
+    else:
+        return
+
+    index = -_reverse_index - 1
+
+    if not all(line.startswith("# \t") for line in lines[index + 1 :]):
+        return
+
+    lines[index:] = [
+        line for line in lines[index:] if line.rstrip() != "# \tcutty.json"
+    ]
+
+    path.write_text("".join(lines))
