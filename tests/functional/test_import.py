@@ -418,3 +418,16 @@ def test_projectvariable(project: Path) -> None:
     """It raises if the variable is not defined."""
     with pytest.raises(StopIteration):
         projectvariable(project, "undefined")
+
+
+def test_reorder_commits(
+    runcutty: RunCutty, template: Path, templateproject: Path, project: Path
+) -> None:
+    """It does not remove bindings when changes are reordered."""
+    updatefile(templateproject / "marker")
+    updatetemplatevariable(template, "status", ["alpha", "beta", "stable"])
+
+    runcutty("import", "--non-interactive", f"--cwd={project}", "status=stable")
+    runcutty("import", "--non-interactive", f"--cwd={project}", "--revision=HEAD^")
+
+    assert "stable" == projectvariable(project, "status")

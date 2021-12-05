@@ -33,15 +33,15 @@ def loadprojectconfig(projectdir: pathlib.Path) -> Optional[ProjectConfig]:
 def createprojectconfig(
     projectdir: pathlib.Path,
     location: Optional[str],
-    bindings: Sequence[Binding],
     revision: Optional[str],
     directory: Optional[pathlib.Path],
 ) -> ProjectConfig:
     """Assemble project configuration from parameters and the existing project."""
+    bindings: Sequence[Binding] = ()
     config = loadprojectconfig(projectdir)
 
     if config is not None:
-        bindings = [*config.bindings, *bindings]
+        bindings = config.bindings
 
         if location is None:
             location = config.template
@@ -66,15 +66,14 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a template."""
-    config = createprojectconfig(
-        projectdir, location, extrabindings, revision, directory
-    )
+    config = createprojectconfig(projectdir, location, revision, directory)
 
     repository = ProjectRepository(projectdir)
 
     commit = buildproject(
         repository,
         config,
+        userbindings=extrabindings,
         interactive=interactive,
         commitmessage=linkcommitmessage,
     )

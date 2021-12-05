@@ -256,3 +256,11 @@ def test_message(runcutty: RunCutty, template: Path) -> None:
     output = runcutty("create", "--non-interactive", str(template))
 
     assert output
+
+
+def test_unknown_binding(runcutty: RunCutty, template: Path) -> None:
+    """It does not store unknown bindings in cutty.json."""
+    runcutty("create", "--non-interactive", str(template), "bogus=")
+
+    config = readprojectconfigfile(Path("example"))
+    assert "bogus" not in {binding.name for binding in config.bindings}

@@ -24,7 +24,7 @@ def import_(
 
     config2 = ProjectConfig(
         config1.template,
-        [*config1.bindings, *extrabindings],
+        config1.bindings,
         revision,
         config1.directory if directory is None else directory,
     )
@@ -35,7 +35,13 @@ def import_(
         repository, config1, revision=revision, interactive=interactive
     )
 
-    commit = buildproject(repository, config2, interactive=interactive, parent=parent)
+    commit = buildproject(
+        repository,
+        config2,
+        userbindings=extrabindings,
+        interactive=interactive,
+        parent=parent,
+    )
 
     # If `commit` and `parent` are identical then so is the template revision
     # stored in their cutty.json. But for the version control systems we

@@ -21,10 +21,13 @@ def create(
     fileexists: FileExistsPolicy,
 ) -> None:
     """Generate projects from Cookiecutter templates."""
-    config = ProjectConfig(location, extrabindings, checkout, directory)
+    config = ProjectConfig(location, (), checkout, directory)
 
     with createproject(
-        config, interactive=interactive, createconfigfile=False
+        config,
+        userbindings=extrabindings,
+        interactive=interactive,
+        createconfigfile=False,
     ) as project:
         storeproject(
             project,
