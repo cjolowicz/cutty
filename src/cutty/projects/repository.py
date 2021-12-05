@@ -182,16 +182,12 @@ class ProjectRepository:
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Remove cutty.json from MERGE_MSG."""
-    message = MergeMessage.read(repositorypath)
-    if message is None:
-        return
-
-    index = message.findconflicts(prefix="# ")
-    if index == -1:
-        return
-
-    message.lines[index:] = [
-        line for line in message.lines[index:] if line.rstrip() != "# \tcutty.json"
-    ]
-
-    message.write(repositorypath)
+    if message := MergeMessage.read(repositorypath):
+        index = message.findconflicts(prefix="# ")
+        if index != -1:
+            message.lines[index:] = [
+                line
+                for line in message.lines[index:]
+                if line.rstrip() != "# \tcutty.json"
+            ]
+            message.write(repositorypath)
