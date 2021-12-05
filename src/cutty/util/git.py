@@ -395,11 +395,10 @@ def _patch_merge_msg(repositorypath: Path) -> None:
 
     for _reverse_index, line in enumerate(reversed(message.lines)):
         if line.rstrip() == "Conflicts:":
+            index = -_reverse_index - 1
             break
     else:
         return
-
-    index = -_reverse_index - 1
 
     if not all(line.startswith("\t") for line in message.lines[index + 1 :]):
         return
