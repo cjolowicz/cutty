@@ -1,6 +1,7 @@
 """Building projects in a repository."""
 import datetime
 from collections.abc import Iterator
+from collections.abc import Sequence
 from typing import Optional
 
 from cutty.compat.contextlib import contextmanager
@@ -12,11 +13,16 @@ from cutty.projects.project import Project
 from cutty.projects.repository import ProjectRepository
 from cutty.projects.store import storeproject
 from cutty.projects.template import TemplateProvider
+from cutty.variables.domain.bindings import Binding
 
 
 @contextmanager
 def createproject(
-    config: ProjectConfig, *, interactive: bool, createconfigfile: bool = True
+    config: ProjectConfig,
+    *,
+    interactive: bool,
+    createconfigfile: bool = True,
+    userbindings: Sequence[Binding] = (),
 ) -> Iterator[Project]:
     """Create the project."""
     provider = TemplateProvider.create()
@@ -28,6 +34,7 @@ def createproject(
             config.bindings,
             interactive=interactive,
             createconfigfile=createconfigfile,
+            userbindings=userbindings,
         )
 
 
