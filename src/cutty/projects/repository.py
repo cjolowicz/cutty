@@ -186,19 +186,11 @@ def _patch_merge_msg(repositorypath: Path) -> None:
     if message is None:
         return
 
+    index = message.findconflicts(prefix="# ")
+    if index == -1:
+        return
+
     lines = message.lines
-
-    for _reverse_index, line in enumerate(reversed(lines)):
-        if line.rstrip() == "# Conflicts:":
-            break
-    else:
-        return
-
-    index = -_reverse_index - 1
-
-    if not all(line.startswith("# \t") for line in lines[index + 1 :]):
-        return
-
     lines[index:] = [
         line for line in lines[index:] if line.rstrip() != "# \tcutty.json"
     ]
