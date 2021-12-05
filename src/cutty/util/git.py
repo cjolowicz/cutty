@@ -385,6 +385,20 @@ class MergeMessage:
         path = repositorypath / ".git" / "MERGE_MSG"
         path.write_text(self.format())
 
+    def findconflicts(self) -> int:
+        """Find the position of the "Conflicts:" hint."""
+        for index, line in enumerate(reversed(self.lines)):
+            if line.rstrip() == "Conflicts:":
+                index = -index - 1
+                break
+        else:
+            return -1
+
+        if not all(line.startswith("\t") for line in self.lines[index + 1 :]):
+            return -1
+
+        return index
+
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
@@ -393,14 +407,8 @@ def _patch_merge_msg(repositorypath: Path) -> None:
     if message is None:
         return
 
-    for index, line in enumerate(reversed(message.lines)):
-        if line.rstrip() == "Conflicts:":
-            index = -index - 1
-            break
-    else:
-        return
-
-    if not all(line.startswith("\t") for line in message.lines[index + 1 :]):
+    index = message.findconflicts()
+    if index == -1:
         return
 
     message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
