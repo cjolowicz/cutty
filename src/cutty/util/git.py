@@ -355,27 +355,59 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     return head.resolve()
 
 
+@dataclass(frozen=True)
+class MergeMessage:
+    """Contents of a MERGE_MSG file under .git."""
+
+    lines: list[str]
+
+    @classmethod
+    def path(cls, repositorypath: Path) -> Path:
+        """Return the path to the MERGE_MSG file."""
+        return repositorypath / ".git" / "MERGE_MSG"
+
+    @classmethod
+    def read(cls, repositorypath: Path) -> Optional[MergeMessage]:
+        """Read the merge message from the git repository."""
+        path = cls.path(repositorypath)
+        if not path.is_file():
+            return None
+
+        text = path.read_text()
+        return cls.parse(text)
+
+    @classmethod
+    def parse(cls, text: str) -> MergeMessage:
+        """Parse the merge message from the contents of a MERGE_MSG file."""
+        return cls(text.splitlines(keepends=True))
+
+    def format(self) -> str:
+        """Return the contents as a string."""
+        return "".join(self.lines)
+
+    def write(self, repositorypath: Path) -> None:
+        """Write the merge message to the git repository."""
+        path = self.path(repositorypath)
+        path.write_text(self.format())
+
+    def findconflicts(self, *, prefix: str = "") -> int:
+        """Find the position of the "Conflicts:" hint."""
+        for index, line in enumerate(reversed(self.lines)):
+            if line.rstrip() == f"{prefix}Conflicts:":
+                index = -index - 1
+                if all(
+                    line.startswith(f"{prefix}\t") for line in self.lines[index + 1 :]
+                ):
+                    return index
+
+        return -1
+
+
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
     # https://github.com/libgit2/libgit2/issues/6131
-    path = repositorypath / ".git" / "MERGE_MSG"
-    if not path.is_file():
-        return
-
-    text = path.read_text()
-    lines = text.splitlines(keepends=True)
-
-    for _reverse_index, line in enumerate(reversed(lines)):
-        if line.rstrip() == "Conflicts:":
-            break
-    else:
-        return
-
-    index = -_reverse_index - 1
-
-    if not all(line.startswith("\t") for line in lines[index + 1 :]):
-        return
-
-    lines[index:] = [f"# {line}" for line in lines[index:]]
-
-    path.write_text("".join(lines))
+    if message := MergeMessage.read(repositorypath):
+        index = message.findconflicts()
+        if index != -1:
+            message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
+            message.write(repositorypath)

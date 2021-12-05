@@ -15,6 +15,7 @@ from cutty.errors import CuttyError
 from cutty.packages.domain.package import Author
 from cutty.projects.config import PROJECT_CONFIG_FILE
 from cutty.util.git import MergeConflictError
+from cutty.util.git import MergeMessage
 from cutty.util.git import Repository
 
 
@@ -140,6 +141,8 @@ class ProjectRepository:
         )
 
         if index.conflicts:
+            _patch_merge_msg(self.project.path)
+
             raise MergeConflictError.fromindex(index)
 
         self.continue_()
@@ -175,3 +178,16 @@ class ProjectRepository:
             raise NoUpdateInProgressError()
 
         self.project.resetcherrypick()
+
+
+def _patch_merge_msg(repositorypath: Path) -> None:
+    """Remove cutty.json from MERGE_MSG."""
+    if message := MergeMessage.read(repositorypath):  # pragma: no branch
+        index = message.findconflicts(prefix="# ")
+        if index != -1:  # pragma: no branch
+            message.lines[index:] = [
+                line
+                for line in message.lines[index:]
+                if line.rstrip() != "# \tcutty.json"
+            ]
+            message.write(repositorypath)
