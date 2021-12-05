@@ -88,6 +88,7 @@ def buildparentproject(
     repository: ProjectRepository,
     config: ProjectConfig,
     *,
+    userbindings: Sequence[Binding] = (),
     revision: Optional[str],
     interactive: bool,
 ) -> Optional[str]:
@@ -97,7 +98,12 @@ def buildparentproject(
 
     if parentrevision := templates.getparentrevision(revision):
         with templates.get(parentrevision) as template:
-            project = generate(template, config.bindings, interactive=interactive)
+            project = generate(
+                template,
+                config.bindings,
+                userbindings=userbindings,
+                interactive=interactive,
+            )
             return commitproject(repository, project)
 
     return None
