@@ -66,15 +66,14 @@ def link(
     directory: Optional[pathlib.Path],
 ) -> None:
     """Link project to a template."""
-    config = createprojectconfig(
-        projectdir, location, extrabindings, revision, directory
-    )
+    config = createprojectconfig(projectdir, location, (), revision, directory)
 
     repository = ProjectRepository(projectdir)
 
     commit = buildproject(
         repository,
         config,
+        userbindings=extrabindings,
         interactive=interactive,
         commitmessage=linkcommitmessage,
     )
