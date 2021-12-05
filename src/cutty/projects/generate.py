@@ -80,11 +80,14 @@ def generate(
     /,
     *,
     interactive: bool,
+    userbindings: Sequence[Binding] = (),
     createconfigfile: bool = True,
 ) -> Project:
     """Generate a project from a project template."""
     generator = ProjectGenerator.create(template)
-    bindings2 = generator.bind(interactive=interactive, bindings=bindings)
+    bindings2 = generator.bind(
+        interactive=interactive, bindings=[*bindings, *userbindings]
+    )
     project = generator.generate(bindings2)
 
     if createconfigfile:
