@@ -182,9 +182,9 @@ class ProjectRepository:
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Remove cutty.json from MERGE_MSG."""
-    if message := MergeMessage.read(repositorypath):
+    if message := MergeMessage.read(repositorypath):  # pragma: no branch
         index = message.findconflicts(prefix="# ")
-        if index != -1:
+        if index != -1:  # pragma: no branch
             message.lines[index:] = [
                 line
                 for line in message.lines[index:]
