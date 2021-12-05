@@ -70,12 +70,15 @@ def buildproject(
     repository: ProjectRepository,
     config: ProjectConfig,
     *,
+    userbindings: Sequence[Binding] = (),
     interactive: bool,
     parent: Optional[str] = None,
     commitmessage: Optional[MessageBuilder] = None,
 ) -> str:
     """Build the project, returning the commit ID."""
-    with createproject(config, interactive=interactive) as project:
+    with createproject(
+        config, userbindings=userbindings, interactive=interactive
+    ) as project:
         return commitproject(
             repository, project, parent=parent, commitmessage=commitmessage
         )
