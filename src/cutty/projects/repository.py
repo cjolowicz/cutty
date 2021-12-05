@@ -15,6 +15,7 @@ from cutty.errors import CuttyError
 from cutty.packages.domain.package import Author
 from cutty.projects.config import PROJECT_CONFIG_FILE
 from cutty.util.git import MergeConflictError
+from cutty.util.git import MergeMessage
 from cutty.util.git import Repository
 
 
@@ -181,12 +182,11 @@ class ProjectRepository:
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Remove cutty.json from MERGE_MSG."""
-    path = repositorypath / ".git" / "MERGE_MSG"
-    if not path.is_file():
+    message = MergeMessage.read(repositorypath)
+    if message is None:
         return
 
-    text = path.read_text()
-    lines = text.splitlines(keepends=True)
+    lines = message.lines
 
     for _reverse_index, line in enumerate(reversed(lines)):
         if line.rstrip() == "# Conflicts:":
@@ -203,4 +203,4 @@ def _patch_merge_msg(repositorypath: Path) -> None:
         line for line in lines[index:] if line.rstrip() != "# \tcutty.json"
     ]
 
-    path.write_text("".join(lines))
+    message.write(repositorypath)
