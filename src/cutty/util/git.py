@@ -355,6 +355,13 @@ def _fix_repository_head(repository: pygit2.Repository) -> pygit2.Reference:
     return head.resolve()
 
 
+@dataclass(frozen=True)
+class MergeMessage:
+    """Contents of a MERGE_MSG file under .git."""
+
+    lines: list[str]
+
+
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
     # https://github.com/libgit2/libgit2/issues/6131
@@ -363,9 +370,9 @@ def _patch_merge_msg(repositorypath: Path) -> None:
         return
 
     text = path.read_text()
-    lines = text.splitlines(keepends=True)
+    message = MergeMessage(text.splitlines(keepends=True))
 
-    for _reverse_index, line in enumerate(reversed(lines)):
+    for _reverse_index, line in enumerate(reversed(message.lines)):
         if line.rstrip() == "Conflicts:":
             break
     else:
@@ -373,9 +380,9 @@ def _patch_merge_msg(repositorypath: Path) -> None:
 
     index = -_reverse_index - 1
 
-    if not all(line.startswith("\t") for line in lines[index + 1 :]):
+    if not all(line.startswith("\t") for line in message.lines[index + 1 :]):
         return
 
-    lines[index:] = [f"# {line}" for line in lines[index:]]
+    message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
 
-    path.write_text("".join(lines))
+    path.write_text("".join(message.lines))
