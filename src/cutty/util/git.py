@@ -403,13 +403,8 @@ class MergeMessage:
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
     # https://github.com/libgit2/libgit2/issues/6131
-    message = MergeMessage.read(repositorypath)
-    if message is None:
-        return
-
-    index = message.findconflicts()
-    if index == -1:
-        return
-
-    message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
-    message.write(repositorypath)
+    if message := MergeMessage.read(repositorypath):
+        index = message.findconflicts()
+        if index != -1:
+            message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
+            message.write(repositorypath)
