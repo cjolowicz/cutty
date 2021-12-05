@@ -190,9 +190,8 @@ def _patch_merge_msg(repositorypath: Path) -> None:
     if index == -1:
         return
 
-    lines = message.lines
-    lines[index:] = [
-        line for line in lines[index:] if line.rstrip() != "# \tcutty.json"
+    message.lines[index:] = [
+        line for line in message.lines[index:] if line.rstrip() != "# \tcutty.json"
     ]
 
     message.write(repositorypath)
