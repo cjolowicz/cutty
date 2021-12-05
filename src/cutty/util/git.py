@@ -362,6 +362,16 @@ class MergeMessage:
     lines: list[str]
 
     @classmethod
+    def read(cls, repositorypath: Path) -> Optional[MergeMessage]:
+        """Read the merge message from the git repository."""
+        path = repositorypath / ".git" / "MERGE_MSG"
+        if not path.is_file():
+            return None
+
+        text = path.read_text()
+        return cls.parse(text)
+
+    @classmethod
     def parse(cls, text: str) -> MergeMessage:
         """Parse the merge message from the contents of a MERGE_MSG file."""
         return cls(text.splitlines(keepends=True))
@@ -374,12 +384,9 @@ class MergeMessage:
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
     # https://github.com/libgit2/libgit2/issues/6131
-    path = repositorypath / ".git" / "MERGE_MSG"
-    if not path.is_file():
+    message = MergeMessage.read(repositorypath)
+    if message is None:
         return
-
-    text = path.read_text()
-    message = MergeMessage.parse(text)
 
     for _reverse_index, line in enumerate(reversed(message.lines)):
         if line.rstrip() == "Conflicts:":
@@ -394,4 +401,5 @@ def _patch_merge_msg(repositorypath: Path) -> None:
 
     message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
 
+    path = repositorypath / ".git" / "MERGE_MSG"
     path.write_text(message.format())
