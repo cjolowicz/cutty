@@ -393,9 +393,9 @@ def _patch_merge_msg(repositorypath: Path) -> None:
     if message is None:
         return
 
-    for _reverse_index, line in enumerate(reversed(message.lines)):
+    for index, line in enumerate(reversed(message.lines)):
         if line.rstrip() == "Conflicts:":
-            index = -_reverse_index - 1
+            index = -index - 1
             break
     else:
         return
