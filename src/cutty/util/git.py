@@ -380,6 +380,11 @@ class MergeMessage:
         """Return the contents as a string."""
         return "".join(self.lines)
 
+    def write(self, repositorypath: Path) -> None:
+        """Write the merge message to the git repository."""
+        path = repositorypath / ".git" / "MERGE_MSG"
+        path.write_text(self.format())
+
 
 def _patch_merge_msg(repositorypath: Path) -> None:
     """Insert comment markers for "Conflicts:" hint in MERGE_MSG."""
@@ -400,6 +405,4 @@ def _patch_merge_msg(repositorypath: Path) -> None:
         return
 
     message.lines[index:] = [f"# {line}" for line in message.lines[index:]]
-
-    path = repositorypath / ".git" / "MERGE_MSG"
-    path.write_text(message.format())
+    message.write(repositorypath)
