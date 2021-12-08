@@ -9,7 +9,6 @@ if TYPE_CHECKING:  # pragma: no cover
         """This decorator is a noop during static type-checking."""
         return f
 
-
 else:
     from typing import no_type_check as typeguard_ignore
 
