@@ -14,6 +14,7 @@ from cutty.packages.adapters.providers.mercurial import MercurialPackageReposito
 from cutty.packages.domain.providers import Provider
 from cutty.packages.domain.stores import Store
 
+
 pytest_plugins = ["tests.fixtures.packages.adapters.mercurial"]
 
 
