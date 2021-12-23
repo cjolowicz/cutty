@@ -51,7 +51,6 @@ dependencies = {
         "pre-commit",
         "pre-commit-hooks",
         "pyupgrade",
-        "reorder-python-imports",
     ],
 }
 
