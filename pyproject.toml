@@ -83,6 +83,10 @@ filterwarnings = [
     "ignore:no code associated -- not typechecking .*",
 ]
 
+[tool.isort]
+profile = "black"
+force_single_line = true
+
 [tool.mypy]
 strict = true
 warn_unreachable = true
