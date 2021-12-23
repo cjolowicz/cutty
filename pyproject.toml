@@ -54,6 +54,7 @@ pyftpdlib = ">=1.5.6"
 pytest-sugar = ">=0.9.4"
 pyupgrade = ">=2.29.0"
 furo = ">=2021.11.12"
+isort = "^5.10.1"
 
 [tool.poetry.scripts]
 cutty = "cutty.__main__:main"
