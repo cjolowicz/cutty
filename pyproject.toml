@@ -86,6 +86,7 @@ filterwarnings = [
 [tool.isort]
 profile = "black"
 force_single_line = true
+order_by_type = false
 
 [tool.mypy]
 strict = true
