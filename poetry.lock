@@ -657,11 +657,11 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pre-commit"
-version = "2.17.0"
+version = "2.18.1"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
-python-versions = ">=3.6.1"
+python-versions = ">=3.7"
 
 [package.dependencies]
 cfgv = ">=2.0.0"
@@ -1428,9 +1428,6 @@ coverage = [
     {file = "coverage-6.3-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:2bc85664b06ba42d14bb74d6ddf19d8bfc520cb660561d2d9ce5786ae72f71b5"},
     {file = "coverage-6.3-cp310-cp310-win32.whl", hash = "sha256:27a94db5dc098c25048b0aca155f5fac674f2cf1b1736c5272ba28ead2fc267e"},
     {file = "coverage-6.3-cp310-cp310-win_amd64.whl", hash = "sha256:bde4aeabc0d1b2e52c4036c54440b1ad05beeca8113f47aceb4998bb7471e2c2"},
-    {file = "coverage-6.3-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:509c68c3e2015022aeda03b003dd68fa19987cdcf64e9d4edc98db41cfc45d30"},
-    {file = "coverage-6.3-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:e4ff163602c5c77e7bb4ea81ba5d3b793b4419f8acd296aae149370902cf4e92"},
-    {file = "coverage-6.3-cp311-cp311-win_amd64.whl", hash = "sha256:d1675db48490e5fa0b300f6329ecb8a9a37c29b9ab64fa9c964d34111788ca2d"},
     {file = "coverage-6.3-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:7eed8459a2b81848cafb3280b39d7d49950d5f98e403677941c752e7e7ee47cb"},
     {file = "coverage-6.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1b4285fde5286b946835a1a53bba3ad41ef74285ba9e8013e14b5ea93deaeafc"},
     {file = "coverage-6.3-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:a4748349734110fd32d46ff8897b561e6300d8989a494ad5a0a2e4f0ca974fc7"},
@@ -1756,8 +1753,8 @@ pluggy = [
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
 pre-commit = [
-    {file = "pre_commit-2.17.0-py2.py3-none-any.whl", hash = "sha256:725fa7459782d7bec5ead072810e47351de01709be838c2ce1726b9591dad616"},
-    {file = "pre_commit-2.17.0.tar.gz", hash = "sha256:c1a8040ff15ad3d648c70cc3e55b93e4d2d5b687320955505587fd79bbaed06a"},
+    {file = "pre_commit-2.18.1-py2.py3-none-any.whl", hash = "sha256:02226e69564ebca1a070bd1f046af866aa1c318dbc430027c50ab832ed2b73f2"},
+    {file = "pre_commit-2.18.1.tar.gz", hash = "sha256:5d445ee1fa8738d506881c5d84f83c62bb5be6b2838e32207433647e8e5ebe10"},
 ]
 pre-commit-hooks = [
     {file = "pre_commit_hooks-4.1.0-py2.py3-none-any.whl", hash = "sha256:ba95316b79038e56ce998cdacb1ce922831ac0e41744c77bcc2b9677bf183206"},
